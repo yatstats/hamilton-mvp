@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Hamilton YATSTATS — Alumni Roster</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+        /* This is a web-safe alternative that closely matches Bahnschrift */
+        @import url('https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@400;700&family=Oswald:wght@500&display=swap');
+        
+        :root { 
+            --bg: #fff; 
+            --ink: #111; 
+            --panel: #f4f4f4; 
+            --line: #ddd; 
+            --accent: #333;
+            --accent-dark: #111;
+        }
+        
+        /* Font stack to mimic the Fox Sports aesthetic */
+        body { font-family: 'Roboto Condensed', sans-serif; }
+        .header, .nav-links a, .filter-buttons button, .school-header h1, .school-header h2, .player-label {
+            font-family: 'Oswald', sans-serif;
+        }
+        .nav-links a {
+            font-size: 12px;
+            font-weight: 500; /* Un-bolded navigation links */
+        }
+        .nav-links a.active {
+            font-weight: 700; /* Only bold the active link */
+        }
+
+        * {box-sizing: border-box}
+        body { 
+            margin: 0; 
+            background: var(--bg); 
+            color: var(--ink); 
+            padding-bottom: 50px;
+            overflow-x: hidden;
+        }
+        body.no-scroll { overflow: hidden; }
+
+        /* New Sticky Top Section Container */
+        .sticky-top-section {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: #fff;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        /* Minimalist Header & Navigation */
+        .header-container {
+            max-width: 1100px; /* Reduced width by ~20% */
+            margin: 0 auto;
+            padding: 10px 20px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+        }
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        .yatstats-logo { 
+            max-height: 50px;
+            margin-right: auto;
+            /* Removed animation to keep it still */
+        }
+        .nav-links {
+            display: flex;
+            justify-content: center;
+            flex-grow: 1;
+            gap: 30px;
+            text-align: center;
+        }
+        .nav-links a {
+            text-decoration: none;
+            color: #555;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding-bottom: 10px;
+            position: relative;
+        }
+        .nav-links a.active {
+            color: var(--accent);
+            border-bottom: 2px solid var(--accent);
+        }
+        .user-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            position: relative;
+        }
+        .user-controls a, .user-controls span {
+            text-decoration: none;
+            color: #333;
+            font-weight: 500;
+            font-size: 14px;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+        }
+        .user-controls span {
+            font-size: 20px;
+        }
+        .header-button {
+            background: #fff;
+            color: #555;
+            border: 1px solid #ddd;
+            padding: 8px 15px;
+            cursor: pointer;
+            font-size: 12px;
+            border-radius: 20px;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+            text-transform: uppercase;
+            font-family: 'Oswald', sans-serif;
+            text-decoration: none;
+        }
+        .header-button:hover {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: #fff;
+        }
+        
+        /* New School Header Section */
+        .school-header {
+            max-width: 1000px; /* Reduced width by ~20% */
+            margin: 0 auto;
+            padding: 20px 18px 0;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 15px;
+        }
+        .school-header .logo {
+            max-width: 90px;
+            height: auto;
+        }
+        .school-header .text {
+            display: flex;
+            flex-direction: column;
+            line-height: 1.0;
+        }
+        .school-header .location {
+            font-size: 12px;
+            font-weight: 500;
+            color: #555;
+            text-transform: uppercase;
+        }
+        .school-header h1 {
+            font-size: 20px;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin: 2px 0;
+        }
+        .school-header h2 {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--accent);
+            text-transform: uppercase;
+            margin: 0;
+        }
+        /* Style for the sponsor logo which is now separate */
+        .school-header .sponsor-logo {
+            margin-left: auto;
+        }
+        
+        /* Filter Buttons Section */
+        .filter-section {
+            background: var(--bg);
+            padding: 15px 0;
+            position: relative;
+        }
+        .filter-buttons-container {
+            max-width: 1000px; /* Reduced width by ~20% */
+            margin: 0 auto;
+            padding: 0 18px;
+            display: flex;
+            align-items: center;
+            position: relative;
+        }
+        .filter-buttons {
+            display: flex;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            white-space: nowrap;
+            padding: 0 10px;
+            gap: 10px;
+            flex-grow: 1;
+        }
+        .filter-buttons::-webkit-scrollbar { display: none; }
+        .filter-buttons-scroll {
+            background: #fff;
+            border: none;
+            cursor: pointer;
+            font-size: 24px;
+            color: #555;
+            padding: 0 5px;
+            user-select: none;
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 10;
+        }
+        .filter-buttons-scroll.left { left: 0; }
+        .filter-buttons-scroll.right { right: 0; }
+        .filter-buttons button {
+            background: #fff;
+            color: #555;
+            border: 1px solid #ddd;
+            padding: 8px 15px;
+            cursor: pointer;
+            font-size: 14px;
+            border-radius: 20px;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+        .filter-buttons button.active, .filter-buttons button:hover {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: #fff;
+        }
+
+        /* Main content and grid */
+        .wrap {
+            max-width: 1000px; /* Reduced width by ~20% */
+            margin: 0 auto;
+            padding: 18px;
+        }
+        .grid {
+            display: grid;
+            column-gap: 12px;
+            row-gap: 0;
+            grid-template-columns: repeat(3, minmax(240px, 1fr));
+        }
+        /* This media query ensures the grid is responsive on smaller screens */
+        @media (max-width: 980px) {
+            .grid { grid-template-columns: repeat(2, 1fr); }
+            .nav-links { display: none; }
+            .header-container { justify-content: space-around; }
+        }
+        @media (max-width: 640px) {
+            .grid { 
+                grid-template-columns: 1fr;
+                padding: 0 15px;
+            }
+            .card-ticker-item {
+                font-size: 18px; /* Smaller font for mobile */
+            }
+        }
+        /* New class to contain the card and ticker */
+        .card-wrapper {
+            margin-bottom: 0;
+        }
+        .card {
+            perspective: 1000px;
+            display: block;
+            border-radius: 4px;
+            height: 380px; /* Added fixed height */
+        }
+        .card.hidden { display: none; }
+        .inner {
+            position: relative;
+            width: 100%;
+            height: 100%; /* Changed padding-top to height */
+            transform-style: preserve-3d;
+            transition: transform .6s;
+        }
+        .card:hover .inner, .card.flipped .inner { transform: rotateY(180deg); }
+        .face {
+            position: absolute;
+            inset: 0;
+            backface-visibility: hidden;
+            border-radius: 4px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,.1);
+        }
+        .face img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            padding: 0;
+            background: none;
+        }
+        .back { transform: rotateY(180deg); }
+        .ph {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #0f0f0f;
+            color: #aaa;
+            font-size: 12px;
+            padding: 12px;
+        }
+
+        /* Card-level Ticker styles */
+        .card-ticker {
+            height: 50px;
+            overflow: hidden;
+            background: #000;
+            border: 1px solid #ddd;
+            border-top: none; /* Removes the top border to make it flush */
+            /* Added beveled edge effect */
+            box-shadow: 
+                inset 0 1px 0 rgba(255,255,255,0.1), /* Top inner shadow for bevel */
+                inset 0 -1px 0 rgba(0,0,0,0.5), /* Bottom inner shadow for bevel */
+                0 2px 8px rgba(0,0,0,0.2);
+            position: relative; /* Needed for the inside border effect */
+            margin-bottom: 12px; /* Added margin back for spacing below the ticker */
+        }
+        .card-ticker-content {
+            display: inline-block;
+            width: max-content; /* Ensure the content takes up its full width */
+            padding-left: 100%;
+            white-space: nowrap;
+            will-change: transform;
+            animation-timing-function: linear;
+            animation-iteration-count: infinite;
+            position: relative;
+            z-index: 2; /* To ensure it's above the inner border */
+        }
+        /* New inner border effect */
+        .card-ticker::before {
+            content: '';
+            position: absolute;
+            top: 5px; /* Adjust top/bottom to create the inner border space */
+            left: 5px;
+            right: 5px;
+            bottom: 5px;
+            background: #000;
+            z-index: 1;
+            pointer-events: none;
+        }
+        .card-ticker-item {
+            font-family: 'Oswald', sans-serif;
+            font-size: 24px;
+            color: #ff9900;
+            margin-right: 20px;
+            line-height: 50px;
+            text-transform: uppercase;
+        }
+        @keyframes ticker-scroll {
+            from { transform: translateX(0%); }
+            to { transform: translateX(-100%); }
+        }
+        
+        /* Floating search bar styles */
+        .search-container {
+            position: absolute;
+            top: 50px;
+            right: 20px;
+            z-index: 1001;
+            width: 300px;
+            display: none;
+        }
+        .search-container.active {
+            display: block;
+        }
+        .search-container input {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-shadow: 4px 8px rgba(0,0,0,0.1);
+        }
+
+        /* Mobile Hamburger Menu */
+        .hamburger-menu {
+            display: none;
+            flex-direction: column;
+            justify-content: space-around;
+            width: 25px;
+            height: 20px;
+            cursor: pointer;
+        }
+        .hamburger-menu span {
+            display: block;
+            width: 100%;
+            height: 2px;
+            background: #333;
+            transition: all 0.3s ease-in-out;
+        }
+
+        /* Sidebar Navigation */
+        #sidebar-nav {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 250px;
+            height: 100%;
+            background-color: white;
+            z-index: 2000;
+            box-shadow: -2px 0 5px rgba(0,0,0,0.1);
+            transform: translateX(100%);
+            transition: transform 0.3s ease-in-out;
+            padding-top: 80px;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            padding-top: 80px;
+        }
+        #sidebar-nav.active {
+            transform: translateX(0);
+        }
+        #sidebar-nav .nav-link-item {
+            display: block;
+            padding: 15px;
+            text-decoration: none;
+            color: #555;
+            text-transform: uppercase;
+            font-family: 'Oswald', sans-serif;
+            font-size: 16px;
+            font-weight: 500;
+            border-bottom: 1px solid #eee;
+        }
+        #sidebar-nav .nav-link-item:first-child { border-top: 1px solid #eee; }
+        .sidebar-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 30px;
+            cursor: pointer;
+            color: #333;
+            font-family: sans-serif;
+        }
+        .backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1999;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease-in-out;
+        }
+        .backdrop.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Sticky Footer */
+        .sticky-footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 50px;
+            background-color: black;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            text-align: center;
+            font-size: 1rem;
+            text-transform: uppercase;
+        }
+
+        /* Media Queries for Mobile */
+        @media (max-width: 980px) {
+            .nav-links { display: none; }
+            .hamburger-menu { display: flex; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="sticky-top-section">
+        <header class="header">
+            <div class="header-container">
+                <a href="https://www.yatstats.com" target="_blank">
+                    <img src="yatstats-logo-stacked.png" class="yatstats-logo" alt="YATSTATS Logo" onerror="this.remove()">
+                </a>
+                <div class="nav-links">
+                    <a href="#" class="active">WHERE THEY YAT?</a>
+                    <a href="#">PLAYER NEWS</a>
+                    <a href="#">ALL-TIME ROSTER</a>
+                    <a href="#">YAT-A-BOY MARKETPLACE</a>
+                    <a href="#">OTHER SCHOOLS</a>
+                    <a href="#">OUR PARTNERS</a>
+                </div>
+                <div class="user-controls">
+                    <span id="search-icon">🔍</span>
+                    <button class="header-button">LOGIN</button>
+                    <button class="header-button">REGISTER</button>
+                    <div class="hamburger-menu" id="hamburger-menu">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                    <div id="search-container" class="search-container">
+                        <input type="text" id="player-search" placeholder="Search for a player...">
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="school-header">
+            <img src="hamilton-logo.png" class="logo" alt="Hamilton Huskies Logo" onerror="this.remove()">
+            <div class="text">
+                <div class="location">CHANDLER, AZ</div>
+                <h1>HAMILTON HIGH SCHOOL</h1>
+                <h2>ACTIVE ALUMNI</h2>
+            </div>
+            <img src="sponsor-logo.png" class="logo sponsor-logo" alt="Sponsor Logo" onerror="this.remove()">
+        </div>
+        
+        <div class="filter-section">
+            <div class="filter-buttons-container">
+                <button class="filter-buttons-scroll left" id="scroll-left">&lt;</button>
+                <div class="filter-buttons">
+                    </div>
+                <button class="filter-buttons-scroll right" id="scroll-right">&gt;</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="wrap">
+        <div id="grid" class="grid"></div>
+    </div>
+
+    <div id="sidebar-nav">
+        <span class="sidebar-close" id="sidebar-close">&times;</span>
+        <a href="#" class="nav-link-item active">WHERE THEY YAT?</a>
+        <a href="#" class="nav-link-item">PLAYER NEWS</a>
+        <a href="#" class="nav-link-item">ALL-TIME ROSTER</a>
+        <a href="#" class="nav-link-item">YAT-A-BOY MARKETPLACE</a>
+        <a href="#" class="nav-link-item">OTHER SCHOOLS</a>
+        <a href="#" class="nav-link-item">OUR PARTNERS</a>
+    </div>
+    <div class="backdrop" id="backdrop"></div>
+
+    <footer class="sticky-footer">
+        SPONSOR AD BANNER
+    </footer>
+    <script>
+        const cards = [
+            { label:'Cody Bellinger', year: 2013, team: 'New York Yankees', level: 'MLB', front:'01_Bellinger-Front-page-00001.jpg', back:'01_Bellinger-Back-page-00001.jpg', schedule: 'WHERE IS CODY YAT? .....TODAY THE NEW YORK YANKEES ARE PLAYING IN BOSTON, MA AGAINST THE BOSTON RED SOX.....GAME TIME: 7:05 PM (AZ TIME)..... DON\'T FORGET TO SIGN UP FOR YATSTATS DAILY RECAP TEXTS OR EMAILS! .... GAME RESULTS FOR ALL YOUR HAMILTOON HUSKIES ACTIVE ALUMNI, COMPLEMENTS OF OUR PARTNER, USA/BMX - AMERICAN BICYCLE ASSOSIATION - TO FIND OUT WHERE A RACETRACK NEAR YOU IS YAT.... GO T: https://www.usabmx.com/tracks/find-tracks... TELL THEM THAT YATSTATS SENT YOU!'},
+            { label:'Patrick Murphy', year: 2013, team: 'San Francisco Giants', level: 'MLB', front:'02_Murphy-Front-page-00001.jpg', back:'02_Murphy-Back-page-00001.jpg', schedule: 'WHERE IS PATRICK YAT? .....TODAY THE SAN FRANCISCO GIANTS ARE PLAYING IN SAN FRANCISCO, CA AGAINST THE LOS ANGELES DODGERS.....GAME TIME: 7:15 PM (AZ TIME)..... DON\'T FORGET TO SIGN UP FOR YATSTATS DAILY RECAP TEXTS OR EMAILS! .... GAME RESULTS FOR ALL YOUR HAMILTOON HUSKIES ACTIVE ALUMNI, COMPLEMENTS OF OUR PARTNER, USA/BMX - AMERICAN BICYCLE ASSOSIATION - TO FIND OUT WHERE A RACETRACK NEAR YOU IS YAT.... GO T: https://www.usabmx.com/tracks/find-tracks... TELL THEM THAT YATSTATS SENT YOU!'},
+            { label:'Drew Swift', year: 2017, team: 'Oakland Athletics', level: 'AAA', front:'04_Swift-Front-page-00001.jpg', back:'04_Swift-Back-page-00001.jpg', schedule: 'WHERE IS DREW YAT? .....TODAY THE OAKLAND ATHLETICS ARE PLAYING IN LAS VEGAS, NV AGAINST THE LAS VEGAS AVIATORS.....GAME TIME: 6:30 PM (AZ TIME)..... DON\'T FORGET TO SIGN UP FOR YATSTATS DAILY RECAP TEXTS OR EMAILS! .... GAME RESULTS FOR ALL YOUR HAMILTOON HUSKIES ACTIVE ALUMNI, COMPLEMENTS OF OUR PARTNER, USA/BMX - AMERICAN BICYCLE ASSOSIATION - TO FIND OUT WHERE A RACETRACK NEAR YOU IS YAT.... GO T: https://www.usabmx.com/tracks/find-tracks... TELL THEM THAT YATSTATS SENT YOU!'},
+            { label:'Logan Boyer', year: 2016, team: 'Tampa Bay Rays', level: 'HIGH-A', front:'11_Boyer-Front-page-00001.jpg', back:'11_Boyer-Back-page-00001.jpg', schedule: 'WHERE IS LOGAN YAT? .....TODAY THE TAMPA BAY RAYS ARE PLAYING IN CHARLESTON, SC AGAINST THE CHARLESTON RIVERDOGS.....GAME TIME: 7:00 PM (AZ TIME)..... DON\'T FORGET TO SIGN UP FOR YATSTATS DAILY RECAP TEXTS OR EMAILS! .... GAME RESULTS FOR ALL YOUR HAMILTOON HUSKIES ACTIVE ALUMNI, COMPLEMENTS OF OUR PARTNER, USA/BMX - AMERICAN BICYCLE ASSOSIATION - TO FIND OUT WHERE A RACETRACK NEAR YOU IS YAT.... GO T: https://www.usabmx.com/tracks/find-tracks... TELL THEM THAT YATSTATS SENT YOU!'},
+            { label:'Brock Selvidge', year: 2021, team: 'Arizona Diamondbacks', level: 'LOW-A', front:'22_Selvidge-Front-page-00001.jpg', back:'22_Selvidge-Back-page-00001.jpg', schedule: 'WHERE IS BROCK YAT? .....TODAY THE ARIZONA DIAMONDBACKS ARE PLAYING IN FRESNO, CA AGAINST THE FRESNO GRIZZLIES.....GAME TIME: 6:45 PM (AZ TIME)..... DON\'T FORGET TO SIGN UP FOR YATSTATS DAILY RECAP TEXTS OR EMAILS! .... GAME RESULTS FOR ALL YOUR HAMILTOON HUSKIES ACTIVE ALUMNI, COMPLEMENTS OF OUR PARTNER, USA/BMX - AMERICAN BICYCLE ASSOSIATION - TO FIND OUT WHERE A RACETRACK NEAR YOU IS YAT.... GO T: https://www.usabmx.com/tracks/find-tracks... TELL THEM THAT YATSTATS SENT YOU!'},
+            { label:'Dominic Hamel', year: 2017, team: 'Los Angeles Dodgers', level: 'AA', front:'23_Hamel-Front-page-00001.jpg', back:'23_Hamel-Back-page-00001.jpg', schedule: 'WHERE IS DOMINIC YAT? .....TODAY THE LOS ANGELES DODGERS ARE PLAYING IN CORPUS CHRISTI, TX AGAINST THE CORPUS CHRISTI HOOKS.....GAME TIME: 7:00 PM (AZ TIME)..... DON\'T FORGET TO SIGN UP FOR YATSTATS DAILY RECAP TEXTS OR EMAILS! .... GAME RESULTS FOR ALL YOUR HAMILTOON HUSKIES ACTIVE ALUMNI, COMPLEMENTS OF OUR PARTNER, USA/BMX - AMERICAN BICYCLE ASSOSIATION - TO FIND OUT WHERE A RACETRACK NEAR YOU IS YAT.... GO T: https://www.usabmx.com/tracks/find-tracks... TELL THEM THAT YATSTATS SENT YOU!'},
+            { label:'Shane Murphy', year: 2019, team: 'NJCAA', level: 'NJCAA', front:'26_Murphy-Front-page-00001.jpg', back:'26_Murphy-Back-page-00001.jpg', schedule: 'NEXT GAME: FALL SEMESTER BEGINS IN SEPTEMBER. EXHIBITION GAMES TO BE ANNOUNCED..... DON\'T FORGET TO SIGN UP FOR YATSTATS DAILY RECAP TEXTS OR EMAILS! .... GAME RESULTS FOR ALL YOUR HAMILTOON HUSKIES ACTIVE ALUMNI, COMPLEMENTS OF OUR PARTNER, USA/BMX - AMERICAN BICYCLE ASSOSIATION - TO FIND OUT WHERE A RACETRACK NEAR YOU IS YAT.... GO T: https://www.usabmx.com/tracks/find-tracks... TELL THEM THAT YATSTATS SENT YOU!'},
+            { label:'Tyler Wilson', year: 2020, team: 'NCAA-D1', level: 'NCAA-D1', front:'34_Wilson-Front-page-00001.jpg', back:'34_Wilson-Back-page-00001.jpg', schedule: 'NEXT GAME: FALL SEMESTER BEGINS IN SEPTEMBER. SCHEDULE TO BE ANNOUNCED..... DON\'T FORGET TO SIGN UP FOR YATSTATS DAILY RECAP TEXTS OR EMAILS! .... GAME RESULTS FOR ALL YOUR HAMILTOON HUSKIES ACTIVE ALUMNI, COMPLEMENTS OF OUR PARTNER, USA/BMX - AMERICAN BICYCLE ASSOSIATION - TO FIND OUT WHERE A RACETRACK NEAR YOU IS YAT.... GO T: https://www.usabmx.com/tracks/find-tracks... TELL THEM THAT YATSTATS SENT YOU!'},
+            { label:'Chaz DeLuca', year: 2017, team: 'NCAA-D1', level: 'NCAA-D1', front:'38_DeLuca-Front-page-00001.jpg', back:'38_DeLuca-Back-page-00001.jpg', schedule: 'NEXT GAME: FALL SEMESTER BEGINS IN SEPTEMBER. SCHEDULE TO BE ANNOUNCED..... DON\'T FORGET TO SIGN UP FOR YATSTATS DAILY RECAP TEXTS OR EMAILS! .... GAME RESULTS FOR ALL YOUR HAMILTOON HUSKIES ACTIVE ALUMNI, COMPLEMENTS OF OUR PARTNER, USA/BMX - AMERICAN BICYCLE ASSOSIATION - TO FIND OUT WHERE A RACETRACK NEAR YOU IS YAT.... GO T: https://www.usabmx.com/tracks/find-tracks... TELL THEM THAT YATSTATS SENT YOU!'},
+            
+            // Example Team cards
+            { label:'Team Card', year: 2003, team: '', level: 'Team', front:'51_TEAM CARD 2003-Front-page-00001.jpg', back:'51_TEAM CARD 2003-Back-page-00001.jpg', schedule: 'UPCOMING GAMES: Check back soon for the latest schedule information!..... DON\'T FORGET TO SIGN UP FOR YATSTATS DAILY RECAP TEXTS OR EMAILS! .... GAME RESULTS FOR ALL YOUR HAMILTOON HUSKIES ACTIVE ALUMNI, COMPLEMENTS OF OUR PARTNER, USA/BMX - AMERICAN BICYCLE ASSOSIATION - TO FIND OUT WHERE A RACETRACK NEAR YOU IS YAT.... GO T: https://www.usabmx.com/tracks/find-tracks... TELL THEM THAT YATSTATS SENT YOU!'},
+            { label:'Team Card', year: 2004, team: '', level: 'Team', front:'52_TEAM CARD 2004-Front-page-00001.jpg', back:'52_TEAM CARD 2004-Back-page-00001.jpg', schedule: 'UPCOMING GAMES: Check back soon for the latest schedule information!..... DON\'T FORGET TO SIGN UP FOR YATSTATS DAILY RECAP TEXTS OR EMAILS! .... GAME RESULTS FOR ALL YOUR HAMILTOON HUSKIES ACTIVE ALUMNI, COMPLEMENTS OF OUR PARTNER, USA/BMX - AMERICAN BICYCLE ASSOSIATION - TO FIND OUT WHERE A RACETRACK NEAR YOU IS YAT.... GO T: https://www.usabmx.com/tracks/find-tracks... TELL THEM THAT YATSTATS SENT YOU!'},
+            { label:'Team Card', year: 2008, team: '', level: 'Team', front:'53_TEAM CARD 2008-Front-page-00001.jpg', back:'53_TEAM CARD_2008-Back-page-00001.jpg', schedule: 'UPCOMING GAMES: Check back soon for the latest schedule information!..... DON\'T FORGET TO SIGN UP FOR YATSTATS DAILY RECAP TEXTS OR EMAILS! .... GAME RESULTS FOR ALL YOUR HAMILTOON HUSKIES ACTIVE ALUMNI, COMPLEMENTS OF OUR PARTNER, USA/BMX - AMERICAN BICYCLE ASSOSIATION - TO FIND OUT WHERE A RACETRACK NEAR YOU IS YAT.... GO T: https://www.usabmx.com/tracks/find-tracks... TELL THEM THAT YATSTATS SENT YOU!'},
+        ];
+
+        function imgOrPlaceholder(src, alt){
+            if(!src) return `<div class="ph">Missing image</div>`;
+            return `<img src="${src}" alt="${alt}" onerror="this.outerHTML='<div class=&quot;ph&quot;>Missing: ${src}</div>'">`;
+        }
+
+        // Function to get a consistent ticker speed based on text length
+        function getTickerSpeed(text) {
+            const minDuration = 20; // Minimum duration in seconds
+            const charsPerSecond = 5; // The target speed in characters per second
+            const duration = text.length / charsPerSecond;
+            return Math.max(duration, minDuration);
+        }
+
+        function renderCards(filter = 'All', filterBy = 'level', searchTerm = '') {
+            const grid = document.getElementById('grid');
+            const filteredCards = cards.filter(c => {
+                const matchesFilter = filter === 'All' || c[filterBy] == filter;
+                const matchesSearch = c.label.toLowerCase().includes(searchTerm.toLowerCase());
+                return matchesFilter && matchesSearch;
+            });
+            
+            grid.innerHTML = filteredCards.map((c) => {
+                const front = c.front;
+                const back = c.back || c.front;
+                
+                // Calculate the animation duration based on text length
+                const animationDuration = getTickerSpeed(c.schedule);
+                
+                return `
+                    <div class="card-wrapper">
+                        <div class="card" onclick="this.classList.toggle('flipped')">
+                            <div class="inner">
+                                <div class="face front">${imgOrPlaceholder(front, c.label + ' — front')}</div>
+                                <div class="face back">${imgOrPlaceholder(back, c.label + ' — back')}</div>
+                            </div>
+                        </div>
+                        <div class="card-ticker">
+                            <div class="card-ticker-content" style="animation: ticker-scroll ${animationDuration}s linear infinite;">
+                                <span class="card-ticker-item">${c.schedule}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderFilterButtons() {
+            const buttonContainer = document.querySelector('.filter-buttons');
+            
+            // Corrected order as per user request
+            const levelOrder = ['MLB', 'AAA', 'AA', 'HIGH-A', 'LOW-A', 'NCAA-D1', 'NJCAA', 'Team'];
+            const levels = levelOrder.filter(level => cards.some(c => c.level === level));
+
+            const years = [...new Set(cards.map(c => c.year))].filter(y => y < 2025).sort((a, b) => b - a);
+            
+            const allButton = document.createElement('button');
+            allButton.textContent = 'ALL ACTIVE ALUMNI';
+            allButton.classList.add('active');
+            allButton.dataset.filter = 'All';
+            allButton.dataset.filterBy = 'level';
+            buttonContainer.appendChild(allButton);
+
+            levels.forEach(level => {
+                const button = document.createElement('button');
+                button.textContent = level;
+                button.dataset.filter = level;
+                button.dataset.filterBy = 'level';
+                buttonContainer.appendChild(button);
+            });
+
+            years.forEach(year => {
+                const button = document.createElement('button');
+                button.textContent = year;
+                button.dataset.filter = year;
+                button.dataset.filterBy = 'year';
+                buttonContainer.appendChild(button);
+            });
+
+            const filterButtons = document.querySelector('.filter-buttons');
+            const scrollLeftBtn = document.getElementById('scroll-left');
+            const scrollRightBtn = document.getElementById('scroll-right');
+            
+            if (filterButtons.scrollWidth > filterButtons.clientWidth) {
+                scrollLeftBtn.style.display = 'block';
+                scrollRightBtn.style.display = 'block';
+            } else {
+                scrollLeftBtn.style.display = 'none';
+                scrollRightBtn.style.display = 'none';
+            }
+        }
+
+        // Initial render
+        document.addEventListener('DOMContentLoaded', () => {
+            renderFilterButtons();
+            renderCards();
+        });
+
+        // Event listeners
+        document.querySelector('.filter-buttons-container').addEventListener('click', e => {
+            if (e.target.tagName === 'BUTTON') {
+                // Remove active class from all buttons
+                document.querySelectorAll('.filter-buttons button').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                // Add active class to the clicked button
+                e.target.classList.add('active');
+                
+                const filter = e.target.dataset.filter;
+                const filterBy = e.target.dataset.filterBy;
+                renderCards(filter, filterBy);
+            }
+        });
+        
+        const searchIcon = document.getElementById('search-icon');
+        const searchContainer = document.getElementById('search-container');
+        const searchInput = document.getElementById('player-search');
+        
+        searchIcon.addEventListener('click', () => {
+            searchContainer.classList.toggle('active');
+            if (searchContainer.classList.contains('active')) {
+                searchInput.focus();
+            }
+        });
+        
+        searchInput.addEventListener('input', e => {
+            const searchTerm = e.target.value;
+            // Find the currently active filter button
+            const activeBtn = document.querySelector('.filter-buttons button.active');
+            const filter = activeBtn ? activeBtn.dataset.filter : 'All';
+            const filterBy = activeBtn ? activeBtn.dataset.filterBy : 'level';
+            renderCards(filter, filterBy, searchTerm);
+        });
+        
+        // Sidebar and Backdrop functionality
+        const hamburgerMenu = document.getElementById('hamburger-menu');
+        const sidebarNav = document.getElementById('sidebar-nav');
+        const sidebarClose = document.getElementById('sidebar-close');
+        const backdrop = document.getElementById('backdrop');
+
+        hamburgerMenu.addEventListener('click', () => {
+            sidebarNav.classList.add('active');
+            backdrop.classList.add('active');
+            document.body.classList.add('no-scroll');
+        });
+
+        sidebarClose.addEventListener('click', () => {
+            sidebarNav.classList.remove('active');
+            backdrop.classList.remove('active');
+            document.body.classList.remove('no-scroll');
+        });
+
+        backdrop.addEventListener('click', () => {
+            sidebarNav.classList.remove('active');
+            backdrop.classList.remove('active');
+            document.body.classList.remove('no-scroll');
+        });
+        
+        // Horizontal scroll buttons for filters
+        const filterButtons = document.querySelector('.filter-buttons');
+        const scrollLeftBtn = document.getElementById('scroll-left');
+        const scrollRightBtn = document.getElementById('scroll-right');
+        
+        scrollLeftBtn.addEventListener('click', () => {
+            filterButtons.scrollBy({ left: -200, behavior: 'smooth' });
+        });
+        
+        scrollRightBtn.addEventListener('click', () => {
+            filterButtons.scrollBy({ left: 200, behavior: 'smooth' });
+        });
+    </script>
+</body>
+</html>
