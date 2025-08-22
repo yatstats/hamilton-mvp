@@ -1,285 +1,518 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <title>Hamilton YATSTATS — Alumni Roster</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@400;700&family=Oswald:wght@500&display=swap');
-
-    :root{
-      --bg:#fff;--ink:#111;--panel:#f4f4f4;--line:#ddd;--accent:#333;--accent-dark:#111;
+<html><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script> window.FontAwesomeConfig = { autoReplaceSvg: 'nest'};</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    
+    <style>::-webkit-scrollbar { display: none;}</style>
+    <script>tailwind.config = {
+  "theme": {
+    "extend": {
+      "colors": {
+        "primary": "#7A0019",
+        "neutral": {
+          "100": "#F8F9FA",
+          "200": "#E3E6EA",
+          "800": "#111111"
+        }
+      },
+      "fontFamily": {
+        "inter": [
+          "Inter",
+          "sans-serif"
+        ],
+        "sans": [
+          "Inter",
+          "sans-serif"
+        ]
+      }
     }
-    *{box-sizing:border-box}
-    body{margin:0;background:var(--bg);color:var(--ink);padding-bottom:50px;overflow-x:hidden;font-family:'Roboto Condensed',sans-serif}
-    body.no-scroll{overflow:hidden}
+  }
+};</script>
+    <style>
+        .flip-card {
+            perspective: 1000px;
+        }
+        .flip-card-inner {
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+        }
+        .flip-card.flipped .flip-card-inner {
+            transform: rotateY(180deg);
+        }
+        .flip-card-front, .flip-card-back {
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+        }
+        .flip-card-back {
+            transform: rotateY(180deg);
+        }
+        #mobile-sidebar {
+            transition: transform 0.3s ease-in-out;
+        }
+    </style>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin=""><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&amp;display=swap"><style>
+      body {
+        font-family: 'Inter', sans-serif !important;
+      }
+      
+      /* Preserve Font Awesome icons */
+      .fa, .fas, .far, .fal, .fab {
+        font-family: "Font Awesome 6 Free", "Font Awesome 6 Brands" !important;
+      }
+    </style><style>
+  .highlighted-section {
+    outline: 2px solid #3F20FB;
+    background-color: rgba(63, 32, 251, 0.1);
+  }
 
-    /* Sticky top shell */
-    .sticky-top-section{position:sticky;top:0;z-index:1000;background:#fff;border-bottom:1px solid #e0e0e0}
+  .edit-button {
+    position: absolute;
+    z-index: 1000;
+  }
 
-    /* Header / nav */
-    .header-container{max-width:1100px;margin:0 auto;padding:10px 20px;display:flex;align-items:flex-end;justify-content:space-between}
-    .nav-links{display:flex;justify-content:center;flex-grow:1;gap:30px;text-align:center}
-    .nav-links a{font-family:'Oswald',sans-serif;font-size:12px;font-weight:500;text-decoration:none;color:#555;text-transform:uppercase;letter-spacing:.5px;padding-bottom:10px;position:relative}
-    .nav-links a.active{font-weight:700;color:var(--accent);border-bottom:2px solid var(--accent)}
-    .yatstats-logo{max-height:50px;margin-right:auto}
-    .user-controls{display:flex;align-items:center;gap:15px;position:relative}
-    .user-controls span{font-size:20px;cursor:pointer}
-    .header-button{background:#fff;color:#555;border:1px solid #ddd;padding:8px 15px;cursor:pointer;font-size:12px;border-radius:20px;transition:.2s;white-space:nowrap;text-transform:uppercase;font-family:'Oswald',sans-serif}
-    .header-button:hover{background:var(--accent);border-color:var(--accent);color:#fff}
+  ::-webkit-scrollbar {
+    display: none;
+  }
 
-    /* School header */
-    .school-header{max-width:1000px;margin:0 auto;padding:20px 18px 0;display:flex;align-items:center;gap:15px}
-    .school-header .logo{max-width:90px;height:auto}
-    .school-header .text{display:flex;flex-direction:column;line-height:1}
-    .school-header .location{font-family:'Oswald',sans-serif;font-size:12px;font-weight:500;color:#555;text-transform:uppercase}
-    .school-header h1{font-family:'Oswald',sans-serif;font-size:20px;font-weight:700;text-transform:uppercase;margin:2px 0}
-    .school-header h2{font-family:'Oswald',sans-serif;font-size:28px;font-weight:700;color:var(--accent);text-transform:uppercase;margin:0}
-    .school-header .sponsor-logo{margin-left:auto}
-
-    /* Filters */
-    .filter-section{background:var(--bg);padding:15px 0;position:relative}
-    .filter-buttons-container{max-width:1000px;margin:0 auto;padding:0 18px;display:flex;align-items:center;position:relative}
-    .filter-buttons{display:flex;overflow-x:auto;-webkit-overflow-scrolling:touch;white-space:nowrap;padding:0 10px;gap:10px;flex-grow:1;scrollbar-width:none}
-    .filter-buttons::-webkit-scrollbar{display:none}
-    .filter-buttons-scroll{background:#fff;border:none;cursor:pointer;font-size:24px;color:#555;padding:0 5px;user-select:none;position:absolute;top:50%;transform:translateY(-50%);z-index:10;display:none}
-    .filter-buttons-scroll.left{left:0}
-    .filter-buttons-scroll.right{right:0}
-    .filter-buttons button{background:#fff;color:#555;border:1px solid #ddd;padding:8px 15px;cursor:pointer;font-size:14px;border-radius:20px;transition:.2s;white-space:nowrap;font-family:'Oswald',sans-serif}
-    .filter-buttons button.active,.filter-buttons button:hover{background:var(--accent);border-color:var(--accent);color:#fff}
-
-    /* Grid */
-    .wrap{max-width:1000px;margin:0 auto;padding:18px}
-    .grid{display:grid;column-gap:12px;row-gap:0;grid-template-columns:repeat(3,minmax(240px,1fr))}
-    @media (max-width:980px){.grid{grid-template-columns:repeat(2,1fr)}.nav-links{display:none}.header-container{justify-content:space-around}}
-    @media (max-width:640px){.grid{grid-template-columns:1fr;padding:0 15px}.card-ticker-item{font-size:18px}}
-
-    /* Card + ticker wrapper */
-    .card-wrapper{margin:0}
-    .card{perspective:1000px;display:block;border-radius:4px;height:380px}
-    .card.hidden{display:none}
-    .inner{position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform .6s}
-    /* click-to-flip only (no hover) */
-    .card:hover .inner{transform:none}
-    .card.flipped .inner{transform:rotateY(180deg)}
-    .face{position:absolute;inset:0;backface-visibility:hidden;border-radius:4px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.1)}
-    .face img{width:100%;height:100%;object-fit:contain;background:none}
-    .back{transform:rotateY(180deg)}
-    .ph{display:flex;align-items:center;justify-content:center;background:#0f0f0f;color:#aaa;font-size:12px;padding:12px}
-
-    /* Ticker (flush with card bottom) */
-    .card-ticker{height:50px;overflow:hidden;background:#000;border:1px solid #222;border-top:none;box-shadow:inset 0 1px 0 rgba(255,255,255,.08),inset 0 -1px 0 rgba(0,0,0,.6),0 2px 8px rgba(0,0,0,.2);position:relative;margin-top:0;margin-bottom:12px}
-    .card-ticker::before{content:'';position:absolute;top:5px;left:5px;right:5px;bottom:5px;background:#000;z-index:1;pointer-events:none}
-    .card-ticker-content{display:inline-block;width:max-content;padding-left:100%;white-space:nowrap;will-change:transform;animation-timing-function:linear;animation-iteration-count:infinite;position:relative;z-index:2}
-    .card-ticker-item{font-family:'Oswald',sans-serif;font-size:24px;color:#ff9900;margin-right:20px;line-height:50px;text-transform:uppercase;letter-spacing:.5px}
-    @keyframes ticker-scroll{from{transform:translateX(0%)}to{transform:translateX(-100%)}}
-
-    /* Floating search */
-    .search-container{position:absolute;top:50px;right:20px;z-index:1001;width:300px;display:none}
-    .search-container.active{display:block}
-    .search-container input{width:100%;padding:10px;font-size:16px;border:1px solid #ddd;border-radius:5px;box-shadow:0 4px 8px rgba(0,0,0,.1)}
-
-    /* Sidebar */
-    .hamburger-menu{display:none;flex-direction:column;justify-content:space-around;width:25px;height:20px;cursor:pointer}
-    .hamburger-menu span{display:block;width:100%;height:2px;background:#333;transition:.3s}
-    #sidebar-nav{position:fixed;top:0;right:0;width:250px;height:100%;background:#fff;z-index:2000;box-shadow:-2px 0 5px rgba(0,0,0,.1);transform:translateX(100%);transition:transform .3s;padding-top:80px;display:flex;flex-direction:column;padding:20px}
-    #sidebar-nav.active{transform:translateX(0)}
-    #sidebar-nav .nav-link-item{display:block;padding:15px;text-decoration:none;color:#555;text-transform:uppercase;font-family:'Oswald',sans-serif;font-size:16px;font-weight:500;border-bottom:1px solid #eee}
-    #sidebar-nav .nav-link-item:first-child{border-top:1px solid #eee}
-    .sidebar-close{position:absolute;top:20px;right:20px;font-size:30px;cursor:pointer;color:#333;font-family:sans-serif}
-    .backdrop{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.5);z-index:1999;opacity:0;visibility:hidden;transition:opacity .3s}
-    .backdrop.active{opacity:1;visibility:visible}
-
-    /* Sticky footer */
-    .sticky-footer{position:fixed;bottom:0;left:0;width:100%;height:50px;background:#000;color:#fff;display:flex;justify-content:center;align-items:center;z-index:1000;text-align:center;font-size:1rem;text-transform:uppercase}
-
-    /* Mobile */
-    @media (max-width:980px){.nav-links{display:none}.hamburger-menu{display:flex}}
-  </style>
-</head>
-<body>
-
-  <div class="sticky-top-section">
-    <header class="header">
-      <div class="header-container">
-        <a href="https://www.yatstats.com" target="_blank" rel="nofollow noopener">
-          <img src="yatstats-logo-stacked.png" class="yatstats-logo" alt="YATSTATS Logo" onerror="this.remove()">
-        </a>
-        <div class="nav-links">
-          <a href="#" class="active">WHERE THEY YAT?</a>
-          <a href="#">PLAYER NEWS</a>
-          <a href="#">ALL-TIME ROSTER</a>
-          <a href="#">YAT-A-BOY MARKETPLACE</a>
-          <a href="#">OTHER SCHOOLS</a>
-          <a href="#">OUR PARTNERS</a>
+  html, body {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  </style></head>
+<body class="bg-neutral-100 text-neutral-800 font-sans">
+    <!-- Sticky Header -->
+    <header id="header" class="fixed top-0 left-0 right-0 z-50 bg-white shadow-md">
+        <!-- Global Nav -->
+        <div class="px-4 h-20 flex items-center justify-between border-b border-neutral-200">
+            <div class="flex items-center space-x-2">
+                <img src="https://i.postimg.cc/KYrbztp1/hamilton-logo-block-with-3-lines-of-type.png" alt="Hamilton Logo" class="h-14 w-auto">
+                <img src="https://i.postimg.cc/76srDfFT/yatstats-logo-stacked.png" alt="YAT?STATS Logo" class="h-10 w-auto md:hidden">
+            </div>
+            <button id="hamburger-menu" class="md:hidden text-neutral-800 z-50">
+                <i class="fa-solid fa-bars text-2xl"></i>
+            </button>
+            <nav class="hidden md:flex items-center space-x-5 text-xs font-bold uppercase tracking-wider">
+                <span class="text-primary border-b-2 border-primary pb-1 cursor-pointer">Where They Yat?</span>
+                <span class="text-neutral-600 hover:text-primary cursor-pointer">Active Alumni News</span>
+                <span class="text-neutral-600 hover:text-primary cursor-pointer">All-Time Huskies Roster</span>
+                <span class="text-neutral-600 hover:text-primary cursor-pointer">Yat-A-Boy Marketplace</span>
+                <span class="text-neutral-600 hover:text-primary cursor-pointer">PCDAction Partners Program</span>
+                <span class="text-neutral-600 hover:text-primary cursor-pointer">Current High School Team</span>
+                <span class="text-neutral-600 hover:text-primary cursor-pointer">Global School Search</span>
+                <span class="text-neutral-600 hover:text-primary cursor-pointer">Register | Login</span>
+            </nav>
+            <div class="hidden md:flex items-center">
+                 <img src="https://i.postimg.cc/76srDfFT/yatstats-logo-stacked.png" alt="YAT?STATS Logo" class="h-12 w-auto">
+            </div>
         </div>
-        <div class="user-controls">
-          <span id="search-icon" aria-label="Search">🔍</span>
-          <button class="header-button">LOGIN</button>
-          <button class="header-button">REGISTER</button>
-          <div class="hamburger-menu" id="hamburger-menu"><span></span><span></span><span></span></div>
-          <div id="search-container" class="search-container">
-            <input type="text" id="player-search" placeholder="Search for a player..." />
-          </div>
-        </div>
-      </div>
     </header>
 
-    <div class="school-header">
-      <img src="hamilton-logo.png" class="logo" alt="Hamilton Huskies Logo"
-           onerror="this.src='yatstats-logo-stacked.png'">
-      <div class="text">
-        <div class="location">CHANDLER, AZ</div>
-        <h1>HAMILTON HIGH SCHOOL</h1>
-        <h2>ACTIVE ALUMNI</h2>
-      </div>
-      <img src="sponsor-logo.png" class="logo sponsor-logo" alt="Sponsor Logo" onerror="this.remove()">
+    <!-- Mobile Sidebar Navigation -->
+    <div id="mobile-sidebar" class="fixed top-0 right-0 h-full w-4/5 max-w-sm bg-white/90 backdrop-blur-sm shadow-lg z-40 transform translate-x-full md:hidden">
+        <div id="sidebar-content" class="pt-4 p-6 overflow-y-auto h-full">
+            <nav class="flex flex-col space-y-6 text-right">
+                <span class="text-lg font-semibold text-primary cursor-pointer">Where They Yat?</span>
+                <span class="text-lg font-semibold text-neutral-700 cursor-pointer">Active Alumni News</span>
+                <span class="text-lg font-semibold text-neutral-700 cursor-pointer">Yat-A-Boy Marketplace</span>
+                <span class="text-lg font-semibold text-neutral-700 cursor-pointer">PCDAction Partner Program</span>
+                <span class="text-lg font-semibold text-neutral-700 cursor-pointer">Current High School Team</span>
+                <span class="text-lg font-semibold text-neutral-700 cursor-pointer">YatStats Global School Search</span>
+                <div class="pt-4 border-t border-neutral-200">
+                    <span class="text-lg font-semibold text-neutral-700 cursor-pointer">Register | Login</span>
+                </div>
+            </nav>
+        </div>
     </div>
+    <div id="sidebar-overlay" class="fixed inset-0 bg-black/20 z-30 hidden md:hidden"></div>
 
-    <div class="filter-section">
-      <div class="filter-buttons-container">
-        <button class="filter-buttons-scroll left" id="scroll-left">&lt;</button>
-        <div class="filter-buttons"></div>
-        <button class="filter-buttons-scroll right" id="scroll-right">&gt;</button>
-      </div>
-    </div>
-  </div>
-
-  <div class="wrap"><div id="grid" class="grid"></div></div>
-
-  <div id="sidebar-nav">
-    <span class="sidebar-close" id="sidebar-close">&times;</span>
-    <a href="#" class="nav-link-item active">WHERE THEY YAT?</a>
-    <a href="#" class="nav-link-item">PLAYER NEWS</a>
-    <a href="#" class="nav-link-item">ALL-TIME ROSTER</a>
-    <a href="#" class="nav-link-item">YAT-A-BOY MARKETPLACE</a>
-    <a href="#" class="nav-link-item">OTHER SCHOOLS</a>
-    <a href="#" class="nav-link-item">OUR PARTNERS</a>
-  </div>
-  <div class="backdrop" id="backdrop"></div>
-
-  <footer class="sticky-footer">SPONSOR AD BANNER</footer>
-
-  <script>
-    const cards = [
-      {label:'Cody Bellinger',year:2013,team:'New York Yankees',level:'MLB',front:'01_Bellinger-Front-page-00001.jpg',back:'01_Bellinger-Back-page-00001.jpg',schedule:'RED SOX @ YANKEES — 7:05 PM (AZ)'},
-      {label:'Patrick Murphy',year:2013,team:'San Francisco Giants',level:'MLB',front:'02_Murphy-Front-page-00001.jpg',back:'02_Murphy-Back-page-00001.jpg',schedule:'DODGERS @ GIANTS — 7:15 PM (AZ)'},
-      {label:'Drew Swift',year:2017,team:'Oakland Athletics',level:'AAA',front:'04_Swift-Front-page-00001.jpg',back:'04_Swift-Back-page-00001.jpg',schedule:'AVIATORS HOME — 6:30 PM (AZ)'},
-      {label:'Logan Boyer',year:2016,team:'Tampa Bay Rays',level:'HIGH-A',front:'11_Boyer-Front-page-00001.jpg',back:'11_Boyer-Back-page-00001.jpg',schedule:'RIVERDOGS — 7:00 PM (AZ)'},
-      {label:'Brock Selvidge',year:2021,team:'Arizona Diamondbacks',level:'LOW-A',front:'22_Selvidge-Front-page-00001.jpg',back:'22_Selvidge-Back-page-00001.jpg',schedule:'GRIZZLIES — 6:45 PM (AZ)'},
-      {label:'Dominic Hamel',year:2017,team:'Los Angeles Dodgers',level:'AA',front:'23_Hamel-Front-page-00001.jpg',back:'23_Hamel-Back-page-00001.jpg',schedule:'HOOKS — 7:00 PM (AZ)'},
-      {label:'Shane Murphy',year:2019,team:'NJCAA',level:'NJCAA',front:'26_Murphy-Front-page-00001.jpg',back:'26_Murphy-Back-page-00001.jpg',schedule:'NJC AA — FALL EXHIBITIONS'},
-      {label:'Tyler Wilson',year:2020,team:'NCAA-D1',level:'NCAA-D1',front:'34_Wilson-Front-page-00001.jpg',back:'34_Wilson-Back-page-00001.jpg',schedule:'NCAA D1 — FALL SCHEDULE TBA'},
-      {label:'Chaz DeLuca',year:2017,team:'NCAA-D1',level:'NCAA-D1',front:'38_DeLuca-Front-page-00001.jpg',back:'38_DeLuca-Back-page-00001.jpg',schedule:'NCAA D1 — FALL SCHEDULE TBA'},
-      {label:'Team Card',year:2003,team:'',level:'Team',front:'51_TEAM CARD 2003-Front-page-00001.jpg',back:'51_TEAM CARD 2003-Back-page-00001.jpg',schedule:'PROGRAM MOMENTS — CHECK BACK'},
-      {label:'Team Card',year:2004,team:'',level:'Team',front:'52_TEAM CARD 2004-Front-page-00001.jpg',back:'52_TEAM CARD 2004-Back-page-00001.jpg',schedule:'PROGRAM MOMENTS — CHECK BACK'},
-      {label:'Team Card',year:2008,team:'',level:'Team',front:'53_TEAM CARD 2008-Front-page-00001.jpg',back:'53_TEAM CARD_2008-Back-page-00001.jpg',schedule:'PROGRAM MOMENTS — CHECK BACK'},
-    ];
-
-    const $ = (s,sc=document)=>sc.querySelector(s);
-    const $$ = (s,sc=document)=>Array.from(sc.querySelectorAll(s));
-
-    function imgOrPlaceholder(src, alt){
-      if(!src) return `<div class="ph">Missing image</div>`;
-      return `<img src="${src}" alt="${alt}" onerror="this.outerHTML='<div class=&quot;ph&quot;>Missing: ${src}</div>'">`;
-    }
-
-    // Base ticker speed from length; then add jitter so neighbors differ
-    function baseTickerSpeed(text){
-      const minDur = 20; const cps = 5; // chars/sec
-      return Math.max(text.length / cps, minDur);
-    }
-
-    function renderCards(filter='All', filterBy='level', searchTerm=''){
-      const grid = $('#grid');
-      const filtered = cards.filter(c=>{
-        const matchesFilter = filter==='All' || c[filterBy]==filter;
-        const matchesSearch = c.label.toLowerCase().includes(searchTerm.toLowerCase());
-        return matchesFilter && matchesSearch;
-      });
-
-      grid.innerHTML = filtered.map((c)=>{
-        const front = c.front, back = c.back || c.front;
-        const jitter = (Math.random()*4-2); // -2..+2s
-        const dur = Math.max(baseTickerSpeed(c.schedule)+jitter,18).toFixed(1);
-        return `
-          <div class="card-wrapper">
-            <div class="card" tabindex="0" aria-label="${c.label} card" onclick="this.classList.toggle('flipped')">
-              <div class="inner">
-                <div class="face front">${imgOrPlaceholder(front, c.label+' — front')}</div>
-                <div class="face back">${imgOrPlaceholder(back, c.label+' — back')}</div>
-              </div>
+    <!-- Main Content -->
+    <main id="main-content" class="pt-20 pb-20">
+        <!-- Search & Filter Row - Now Sticky -->
+        <div id="search-filter" class="sticky top-20 z-40 bg-neutral-100 py-4 px-4 mb-5 shadow-sm">
+            <div class="flex flex-col space-y-3">
+                <div class="relative">
+                    <input type="text" placeholder="Search by Player Name" class="w-full pl-10 pr-4 py-2 border border-neutral-200 rounded-lg text-sm">
+                    <i class="fa-solid fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-neutral-400"></i>
+                </div>
+                <div class="flex space-x-3">
+                    <div class="w-1/2">
+                        <select class="w-full px-3 py-2 border border-neutral-200 rounded-lg text-sm appearance-none bg-white">
+                            <option value="">Filter by Graduating Class</option>
+                            <option value="2023">2023</option>
+                            <option value="2022">2022</option>
+                            <option value="2021">2021</option>
+                            <option value="2020">2020</option>
+                        </select>
+                    </div>
+                    <div class="w-1/2">
+                        <select class="w-full px-3 py-2 border border-neutral-200 rounded-lg text-sm appearance-none bg-white">
+                            <option value="">Filter by Current Level</option>
+                            <option value="mlb">MLB</option>
+                            <option value="aaa">AAA</option>
+                            <option value="aa">AA</option>
+                            <option value="a+">A+</option>
+                            <option value="a">A</option>
+                            <option value="high-a">HIGH-A</option>
+                            <option value="low-a">LOW-A</option>
+                            <option value="rookie">ROOKIE</option>
+                            <option value="ncaa">NCAA</option>
+                            <option value="ncaa-d1">NCAA-D1</option>
+                            <option value="ncaa-d2">NCAA-D2</option>
+                            <option value="ncaa-d3">NCAA-D3</option>
+                            <option value="naia">NAIA</option>
+                            <option value="jrcollege">JrCollege</option>
+                            <option value="njcaa">NJCAA</option>
+                            <option value="indy">INDY</option>
+                            <option value="kbo">KBO</option>
+                        </select>
+                    </div>
+                </div>
             </div>
-            <div class="card-ticker">
-              <div class="card-ticker-content" style="animation:ticker-scroll ${dur}s linear infinite">
-                <span class="card-ticker-item">${c.schedule}</span>
-              </div>
+        </div>
+
+        <!-- Roster Grid -->
+        <div id="roster-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8 px-4">
+            <!-- Player Card - Cody Bellinger -->
+            <div id="player-card-bellinger" class="flip-card w-full bg-white rounded-lg shadow-md">
+                <div class="flip-card-inner w-full h-full relative">
+                    <!-- Front of Card -->
+                    <div class="flip-card-front w-full h-full">
+                        <div class="relative">
+                            <img class="w-full h-[200px] object-cover rounded-t-lg" src="https://i.postimg.cc/Jh7Vq8wp/Cody-Montage.png" alt="Cody Bellinger">
+                            <div class="absolute top-2 right-2 bg-primary text-white text-xs font-bold px-2 py-1 rounded">MLB</div>
+                        </div>
+                        <div class="p-3">
+                            <div class="flex justify-between items-start mb-1">
+                                <h3 class="text-lg font-bold">Cody Bellinger</h3>
+                                <span class="text-xs bg-neutral-200 px-2 py-1 rounded">2013</span>
+                            </div>
+                            <div class="flex justify-between text-sm mb-2">
+                                <span>CF-1B | New York Yankees</span>
+                            </div>
+                            <button class="flip-button w-full mt-2 text-sm font-medium text-primary border border-primary rounded-lg py-2">
+                                SHOW ME HIS STATS!
+                            </button>
+                        </div>
+                    </div>
+                    <!-- Back of Card -->
+                    <div class="flip-card-back w-full h-full bg-white rounded-lg absolute top-0">
+                        <div class="p-4">
+                            <div class="flex justify-between items-center mb-3">
+                                <h3 class="text-lg font-bold">Cody Bellinger</h3>
+                                <span class="text-xs bg-neutral-200 px-2 py-1 rounded">2013</span>
+                            </div>
+                            <div class="space-y-3">
+                                <div class="grid grid-cols-2 gap-2 text-sm">
+                                    <div class="bg-neutral-100 p-2 rounded"><p class="text-xs text-neutral-500">AVG</p><p class="font-bold">.275</p></div>
+                                    <div class="bg-neutral-100 p-2 rounded"><p class="text-xs text-neutral-500">HR</p><p class="font-bold">28</p></div>
+                                    <div class="bg-neutral-100 p-2 rounded"><p class="text-xs text-neutral-500">RBI</p><p class="font-bold">95</p></div>
+                                    <div class="bg-neutral-100 p-2 rounded"><p class="text-xs text-neutral-500">OPS</p><p class="font-bold">.840</p></div>
+                                </div>
+                                <div class="text-sm"><p class="font-medium mb-1">Career Highlights:</p><ul class="list-disc list-inside text-xs space-y-1"><li>NL MVP (2019)</li><li>World Series Champion (2020)</li><li>2x All-Star</li></ul></div>
+                            </div>
+                            <button class="w-full mt-4 text-sm font-medium text-primary border border-primary rounded-lg py-2">View full profile</button>
+                        </div>
+                    </div>
+                </div>
             </div>
-          </div>`;
-      }).join('');
-    }
 
-    function renderFilterButtons(){
-      const container = document.querySelector('.filter-buttons');
-      container.innerHTML = '';
-      const levelOrder = ['MLB','AAA','AA','HIGH-A','LOW-A','NCAA-D1','NJCAA','Team'];
-      const levels = levelOrder.filter(l=>cards.some(c=>c.level===l));
-      const years = [...new Set(cards.map(c=>c.year))].filter(y=>y<2026).sort((a,b)=>b-a);
+            <!-- Player Card - Patrick Murphy -->
+            <div id="player-card-murphy-p" class="flip-card w-full bg-white rounded-lg shadow-md">
+                <div class="flip-card-inner w-full h-full relative">
+                    <!-- Front of Card -->
+                    <div class="flip-card-front w-full h-full">
+                        <div class="relative">
+                            <img class="w-full h-[200px] object-cover rounded-t-lg" src="https://i.postimg.cc/pLJMzTS9/PAtrick-montage.png" alt="Patrick Murphy">
+                            <div class="absolute top-2 right-2 bg-blue-800 text-white text-xs font-bold px-2 py-1 rounded">KBO</div>
+                        </div>
+                        <div class="p-3">
+                            <div class="flex justify-between items-start mb-1">
+                                <h3 class="text-lg font-bold">Patrick Murphy</h3>
+                                <span class="text-xs bg-neutral-200 px-2 py-1 rounded">2013</span>
+                            </div>
+                            <div class="flex justify-between text-sm mb-2">
+                                <span>Pitcher | KT Wiz Suwon</span>
+                            </div>
+                            <button class="flip-button w-full mt-2 text-sm font-medium text-primary border border-primary rounded-lg py-2">
+                                SHOW ME HIS STATS!
+                            </button>
+                        </div>
+                    </div>
+                    <!-- Back of Card -->
+                    <div class="flip-card-back w-full h-full bg-white rounded-lg absolute top-0">
+                        <div class="p-4">
+                            <div class="flex justify-between items-center mb-3">
+                                <h3 class="text-lg font-bold">Patrick Murphy</h3>
+                                <span class="text-xs bg-neutral-200 px-2 py-1 rounded">2013</span>
+                            </div>
+                            <div class="space-y-3">
+                                <div class="grid grid-cols-2 gap-2 text-sm">
+                                    <div class="bg-neutral-100 p-2 rounded"><p class="text-xs text-neutral-500">ERA</p><p class="font-bold">3.15</p></div>
+                                    <div class="bg-neutral-100 p-2 rounded"><p class="text-xs text-neutral-500">WHIP</p><p class="font-bold">1.18</p></div>
+                                    <div class="bg-neutral-100 p-2 rounded"><p class="text-xs text-neutral-500">SO</p><p class="font-bold">58</p></div>
+                                    <div class="bg-neutral-100 p-2 rounded"><p class="text-xs text-neutral-500">IP</p><p class="font-bold">62.1</p></div>
+                                </div>
+                                <div class="text-sm"><p class="font-medium mb-1">Career Notes:</p><ul class="list-disc list-inside text-xs space-y-1"><li>Debuted with Toronto Blue Jays</li><li>Pitched for Washington Nationals</li><li>Signed with Twins in 2023</li></ul></div>
+                            </div>
+                            <button class="w-full mt-4 text-sm font-medium text-primary border border-primary rounded-lg py-2">View full profile</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-      const mk = (txt,filter,by)=>{const b=document.createElement('button');b.textContent=txt;b.dataset.filter=filter;b.dataset.filterBy=by;return b;};
-      const allBtn = mk('ALL ACTIVE ALUMNI','All','level'); allBtn.classList.add('active'); container.appendChild(allBtn);
-      levels.forEach(l=>container.appendChild(mk(l,l,'level')));
-      years.forEach(y=>container.appendChild(mk(String(y),y,'year')));
+            <!-- Player Card - Dom Hamel -->
+            <div id="player-card-hamel" class="flip-card w-full bg-white rounded-lg shadow-md">
+                <div class="flip-card-inner w-full h-full relative">
+                    <!-- Front of Card -->
+                    <div class="flip-card-front w-full h-full">
+                        <div class="relative">
+                            <img class="w-full h-[200px] object-cover rounded-t-lg" src="https://i.postimg.cc/5012jYK7/23-Hamel-Front-page-00001.jpg" alt="Dom Hamel">
+                            <div class="absolute top-2 right-2 bg-blue-600 text-white text-xs font-bold px-2 py-1 rounded">AAA</div>
+                        </div>
+                        <div class="p-3">
+                            <div class="flex justify-between items-start mb-1">
+                                <h3 class="text-lg font-bold">Dom Hamel</h3>
+                                <span class="text-xs bg-neutral-200 px-2 py-1 rounded">2017</span>
+                            </div>
+                            <div class="flex justify-between text-sm mb-2">
+                                <span>Pitcher | Syracuse Mets</span>
+                            </div>
+                            <button class="flip-button w-full mt-2 text-sm font-medium text-primary border border-primary rounded-lg py-2">
+                                SHOW ME HIS STATS!
+                            </button>
+                        </div>
+                    </div>
+                    <!-- Back of Card -->
+                    <div class="flip-card-back w-full h-full bg-white rounded-lg absolute top-0">
+                        <div class="p-4">
+                            <div class="flex justify-between items-center mb-3">
+                                <h3 class="text-lg font-bold">Dom Hamel</h3>
+                                <span class="text-xs bg-neutral-200 px-2 py-1 rounded">2017</span>
+                            </div>
+                            <div class="space-y-3">
+                                <div class="grid grid-cols-2 gap-2 text-sm">
+                                    <div class="bg-neutral-100 p-2 rounded"><p class="text-xs text-neutral-500">ERA</p><p class="font-bold">3.85</p></div>
+                                    <div class="bg-neutral-100 p-2 rounded"><p class="text-xs text-neutral-500">K/9</p><p class="font-bold">10.5</p></div>
+                                    <div class="bg-neutral-100 p-2 rounded"><p class="text-xs text-neutral-500">W-L</p><p class="font-bold">9-6</p></div>
+                                    <div class="bg-neutral-100 p-2 rounded"><p class="text-xs text-neutral-500">IP</p><p class="font-bold">124.0</p></div>
+                                </div>
+                                <div class="text-sm"><p class="font-medium mb-1">Career Notes:</p><ul class="list-disc list-inside text-xs space-y-1"><li>Mets minor league pitcher of the year</li><li>Top pitching prospect</li><li>Invited to MLB Spring Training</li></ul></div>
+                            </div>
+                            <button class="w-full mt-4 text-sm font-medium text-primary border border-primary rounded-lg py-2">View full profile</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-      // show arrows only if overflow
-      const fb = document.querySelector('.filter-buttons');
-      const left = document.getElementById('scroll-left');
-      const right = document.getElementById('scroll-right');
-      const updateArrows = ()=>{ const overflow = fb.scrollWidth > fb.clientWidth; left.style.display = right.style.display = overflow?'block':'none'; };
-      updateArrows(); new ResizeObserver(updateArrows).observe(fb);
-    }
+            <!-- Player Card - Brock Selvidge -->
+            <div id="player-card-selvidge" class="flip-card w-full bg-white rounded-lg shadow-md">
+                <div class="flip-card-inner w-full h-full relative">
+                    <div class="flip-card-front w-full h-full">
+                        <div class="relative">
+                            <img class="w-full h-[200px] object-cover rounded-t-lg" src="https://i.postimg.cc/xdLd0y5N/22-Selvidge-Front-page-00001.jpg" alt="Brock Selvidge">
+                            <div class="absolute top-2 right-2 bg-blue-500 text-white text-xs font-bold px-2 py-1 rounded">AA</div>
+                        </div>
+                        <div class="p-3">
+                            <div class="flex justify-between items-start mb-1">
+                                <h3 class="text-lg font-bold">Brock Selvidge</h3>
+                                <span class="text-xs bg-neutral-200 px-2 py-1 rounded">2021</span>
+                            </div>
+                            <div class="flex justify-between text-sm mb-2">
+                                <span>Pitcher | Somerset Patriots</span>
+                            </div>
+                            <button class="flip-button w-full mt-2 text-sm font-medium text-primary border border-primary rounded-lg py-2">
+                                SHOW ME HIS STATS!
+                            </button>
+                        </div>
+                    </div>
+                    <div class="flip-card-back w-full h-full bg-white rounded-lg absolute top-0">
+                        <div class="p-4">
+                            <div class="flex justify-between items-center mb-3">
+                                <h3 class="text-lg font-bold">Brock Selvidge</h3>
+                                <span class="text-xs bg-neutral-200 px-2 py-1 rounded">2021</span>
+                            </div>
+                            <div class="space-y-3">
+                                <div class="grid grid-cols-2 gap-2 text-sm">
+                                    <div class="bg-neutral-100 p-2 rounded"><p class="text-xs text-neutral-500">ERA</p><p class="font-bold">2.98</p></div>
+                                    <div class="bg-neutral-100 p-2 rounded"><p class="text-xs text-neutral-500">WHIP</p><p class="font-bold">1.21</p></div>
+                                    <div class="bg-neutral-100 p-2 rounded"><p class="text-xs text-neutral-500">SO</p><p class="font-bold">125</p></div>
+                                    <div class="bg-neutral-100 p-2 rounded"><p class="text-xs text-neutral-500">IP</p><p class="font-bold">115.0</p></div>
+                                </div>
+                            </div>
+                            <button class="w-full mt-4 text-sm font-medium text-primary border border-primary rounded-lg py-2">View full profile</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-    document.addEventListener('DOMContentLoaded', ()=>{
-      renderFilterButtons();
-      renderCards();
-    });
+            <!-- Player Card - Shane Anderson -->
+            <div id="player-card-anderson" class="flip-card w-full bg-white rounded-lg shadow-md">
+                <div class="flip-card-inner w-full h-full relative">
+                    <div class="flip-card-front w-full h-full">
+                        <div class="relative">
+                            <img class="w-full h-[200px] object-cover rounded-t-lg" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/778fd73592-ae8f93edadacfb4a0793.png" alt="Shane Anderson">
+                            <div class="absolute top-2 right-2 bg-green-600 text-white text-xs font-bold px-2 py-1 rounded">NCAA</div>
+                        </div>
+                        <div class="p-3">
+                            <div class="flex justify-between items-start mb-1">
+                                <h3 class="text-lg font-bold">Shane Anderson</h3>
+                                <span class="text-xs bg-neutral-200 px-2 py-1 rounded">2020</span>
+                            </div>
+                            <div class="flex justify-between text-sm mb-2">
+                                <span>Utility | Georgia Gwinnett</span>
+                            </div>
+                            <button class="flip-button w-full mt-2 text-sm font-medium text-primary border border-primary rounded-lg py-2">
+                                SHOW ME HIS STATS!
+                            </button>
+                        </div>
+                    </div>
+                    <div class="flip-card-back w-full h-full bg-white rounded-lg absolute top-0">
+                        <div class="p-4">
+                            <div class="flex justify-between items-center mb-3">
+                                <h3 class="text-lg font-bold">Shane Anderson</h3>
+                                <span class="text-xs bg-neutral-200 px-2 py-1 rounded">2020</span>
+                            </div>
+                            <div class="space-y-3">
+                                <div class="grid grid-cols-2 gap-2 text-sm">
+                                    <div class="bg-neutral-100 p-2 rounded"><p class="text-xs text-neutral-500">AVG</p><p class="font-bold">.310</p></div>
+                                    <div class="bg-neutral-100 p-2 rounded"><p class="text-xs text-neutral-500">HR</p><p class="font-bold">8</p></div>
+                                    <div class="bg-neutral-100 p-2 rounded"><p class="text-xs text-neutral-500">RBI</p><p class="font-bold">45</p></div>
+                                    <div class="bg-neutral-100 p-2 rounded"><p class="text-xs text-neutral-500">OPS</p><p class="font-bold">.915</p></div>
+                                </div>
+                            </div>
+                             <button class="w-full mt-4 text-sm font-medium text-primary border border-primary rounded-lg py-2">View full profile</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-    // Filter clicks
-    document.querySelector('.filter-buttons-container').addEventListener('click', e=>{
-      if(e.target.tagName==='BUTTON' && e.target.closest('.filter-buttons')){
-        $$('.filter-buttons button').forEach(b=>b.classList.remove('active'));
-        e.target.classList.add('active');
-        renderCards(e.target.dataset.filter, e.target.dataset.filterBy, $('#player-search').value || '');
-      }
-    });
+            <!-- Player Card - Jake Wong -->
+            <div id="player-card-wong" class="flip-card w-full bg-white rounded-lg shadow-md">
+                <div class="flip-card-inner w-full h-full relative">
+                    <div class="flip-card-front w-full h-full">
+                        <div class="relative">
+                            <img class="w-full h-[200px] object-cover rounded-t-lg" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/778fd73592-ae8f93edadacfb4a0793.png" alt="Jake Wong">
+                            <div class="absolute top-2 right-2 bg-primary text-white text-xs font-bold px-2 py-1 rounded">MLB</div>
+                        </div>
+                        <div class="p-3">
+                            <div class="flex justify-between items-start mb-1">
+                                <h3 class="text-lg font-bold">Jake Wong</h3>
+                                <span class="text-xs bg-neutral-200 px-2 py-1 rounded">2015</span>
+                            </div>
+                            <div class="flex justify-between text-sm mb-2">
+                                <span>Pitcher | Free Agent</span>
+                            </div>
+                            <button class="flip-button w-full mt-2 text-sm font-medium text-primary border border-primary rounded-lg py-2">
+                                SHOW ME HIS STATS!
+                            </button>
+                        </div>
+                    </div>
+                    <div class="flip-card-back w-full h-full bg-white rounded-lg absolute top-0">
+                        <div class="p-4">
+                            <div class="flex justify-between items-center mb-3">
+                                <h3 class="text-lg font-bold">Jake Wong</h3>
+                                <span class="text-xs bg-neutral-200 px-2 py-1 rounded">2015</span>
+                            </div>
+                            <div class="space-y-3">
+                                <div class="grid grid-cols-2 gap-2 text-sm">
+                                    <div class="bg-neutral-100 p-2 rounded"><p class="text-xs text-neutral-500">ERA</p><p class="font-bold">7.36</p></div>
+                                    <div class="bg-neutral-100 p-2 rounded"><p class="text-xs text-neutral-500">WHIP</p><p class="font-bold">1.82</p></div>
+                                    <div class="bg-neutral-100 p-2 rounded"><p class="text-xs text-neutral-500">SO</p><p class="font-bold">4</p></div>
+                                    <div class="bg-neutral-100 p-2 rounded"><p class="text-xs text-neutral-500">IP</p><p class="font-bold">3.2</p></div>
+                                </div>
+                            </div>
+                            <button class="w-full mt-4 text-sm font-medium text-primary border border-primary rounded-lg py-2">View full profile</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-    // Search open/close with clear
-    const searchIcon = $('#search-icon'), searchContainer = $('#search-container'), searchInput = $('#player-search');
-    searchIcon.addEventListener('click', ()=>{
-      const wasActive = searchContainer.classList.contains('active');
-      searchContainer.classList.toggle('active');
-      if(!searchContainer.classList.contains('active') && wasActive){
-        searchInput.value=''; renderCards('All','level','');
-        $$('.filter-buttons button').forEach((b,i)=>b.classList.toggle('active',i===0));
-      }else{ searchInput.focus(); }
-    });
-    searchInput.addEventListener('input', e=>{
-      const active = $('.filter-buttons button.active');
-      const f = active?active.dataset.filter:'All';
-      const by = active?active.dataset.filterBy:'level';
-      renderCards(f,by,e.target.value);
-    });
+            <!-- More cards would be generated here dynamically -->
 
-    // Sidebar / backdrop
-    const hamburgerMenu=$('#hamburger-menu'), sidebarNav=$('#sidebar-nav'), sidebarClose=$('#sidebar-close'), backdrop=$('#backdrop');
-    function closeSide(){sidebarNav.classList.remove('active');backdrop.classList.remove('active');document.body.classList.remove('no-scroll');}
-    hamburgerMenu.addEventListener('click',()=>{sidebarNav.classList.add('active');backdrop.classList.add('active');document.body.classList.add('no-scroll');});
-    sidebarClose.addEventListener('click',closeSide); backdrop.addEventListener('click',closeSide);
+        </div>
 
-    // Filter scroll buttons
-    const fb = document.querySelector('.filter-buttons');
-    document.getElementById('scroll-left').addEventListener('click',()=>fb.scrollBy({left:-200,behavior:'smooth'}));
-    document.getElementById('scroll-right').addEventListener('click',()=>fb.scrollBy({left:200,behavior:'smooth'}));
-  </script>
-</body>
-</html>
+        <!-- News Section -->
+        <div id="news-section" class="mb-8 px-4">
+            <h2 class="text-xl font-bold mb-4">Latest News</h2>
+            <div class="space-y-4">
+                <div id="news-item-1" class="bg-white rounded-lg shadow-sm overflow-hidden">
+                     <div class="flex">
+                        <div class="w-24 h-24 flex-shrink-0">
+                            <img class="w-full h-full object-cover" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/778fd73592-ae8f93edadacfb4a0793.png" alt="Baseball player sliding into base, dramatic action shot, sports photography">
+                        </div>
+                        <div class="p-3 flex-1">
+                            <h3 class="font-bold text-sm mb-1">Rodriguez Strikes Out 12 in Complete Game Shutout</h3>
+                            <p class="text-xs text-neutral-500 mb-2">ESPN • June 12, 2023</p>
+                            <span class="text-primary text-xs font-medium cursor-pointer">Read More</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Sticky Footer Banner -->
+    <footer id="footer" class="fixed bottom-0 left-0 right-0 z-40 bg-white shadow-lg">
+        <span class="block cursor-pointer">
+            <img src="https://i.postimg.cc/05DWb4Fj/bmx-banner.png" alt="Partner Banner" class="w-full h-auto">
+        </span>
+    </footer>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Flip card functionality
+            const flipButtons = document.querySelectorAll('.flip-button');
+            flipButtons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const card = this.closest('.flip-card');
+                    card.classList.toggle('flipped');
+                });
+            });
+
+            // Mobile sidebar functionality
+            const hamburgerMenu = document.getElementById('hamburger-menu');
+            const mobileSidebar = document.getElementById('mobile-sidebar');
+            const sidebarOverlay = document.getElementById('sidebar-overlay');
+            const mainContent = document.getElementById('main-content');
+            const searchFilter = document.getElementById('search-filter');
+            const sidebarContent = document.getElementById('sidebar-content');
+
+            function openSidebar() {
+                mobileSidebar.classList.remove('translate-x-full');
+                sidebarOverlay.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+                updateSidebarPadding();
+            }
+
+            function closeSidebar() {
+                mobileSidebar.classList.add('translate-x-full');
+                sidebarOverlay.classList.add('hidden');
+                document.body.style.overflow = '';
+            }
+            
+            function updateSidebarPadding() {
+                 if (!mobileSidebar.classList.contains('translate-x-full')) {
+                    const searchFilterHeight = searchFilter.offsetHeight;
+                    const headerHeight = document.getElementById('header').offsetHeight;
+                    sidebarContent.style.paddingTop = `${headerHeight + searchFilterHeight + 16}px`; // 16px for extra space
+                }
+            }
+
+            hamburgerMenu.addEventListener('click', function() {
+                if (mobileSidebar.classList.contains('translate-x-full')) {
+                    openSidebar();
+                } else {
+                    closeSidebar();
+                }
+            });
+            
+            sidebarOverlay.addEventListener('click', closeSidebar);
+            window.addEventListener('resize', updateSidebarPadding);
+        });
+    </script>
+
+</body></html>
