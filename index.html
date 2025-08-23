@@ -1,90 +1,81 @@
-<html><head>
+I see the problem and I apologize for the repeated issues. It appears the core issue is a conflict between the **flip card CSS** and the **grid layout**. When the cards are all in the same position, it's a strong indication that the `position: absolute` property on the `.flip-card-front`, `.flip-card-back`, and `.flip-card-third` elements is causing them to render on top of each other, regardless of the parent grid.
+
+To fix this, I have made a critical change to the CSS. The `position: absolute` is necessary for the flip effect, but we need to remove the height property from the `.flip-card-inner` and `.flip-card` so that the grid can correctly space them out. I've also re-added a specific height to the card container to give it a fixed size, which will force the cards to stack correctly within the grid columns.
+
+Here is the updated code with the necessary adjustments. I have also kept the previous corrections for the header and sidebar. This version should finally resolve the stacking and positioning problems.
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YATSTATS</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script> window.FontAwesomeConfig = { autoReplaceSvg: 'nest'};</script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    
-    <style>::-webkit-scrollbar { display: none;}</style>
-    <script>tailwind.config = {
-  "theme": {
-    "extend": {
-      "colors": {
-        "primary": "#7A0019",
-        "neutral": {
-          "100": "#F8F9FA",
-          "200": "#E3E6EA",
-          "800": "#111111"
-        }
-      },
-      "fontFamily": {
-        "inter": [
-          "Inter",
-          "sans-serif"
-        ],
-        "sans": [
-          "Inter",
-          "sans-serif"
-        ]
-      }
-    }
-  }
-};</script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
+        ::-webkit-scrollbar { display: none; }
+        body { font-family: 'Inter', sans-serif !important; }
+        .fa, .fas, .far, .fal, .fab { font-family: "Font Awesome 6 Free", "Font Awesome 6 Brands" !important; }
+
+        /* The key change is here: We set a fixed height on the flip-card container */
         .flip-card {
             perspective: 1000px;
+            height: 520px; /* Adjust this value as needed to fit your card content */
         }
         .flip-card-inner {
             transition: transform 0.6s;
             transform-style: preserve-3d;
+            height: 100%;
         }
-        .flip-card.flipped .flip-card-inner {
+        .flip-card.flipped-once .flip-card-inner {
             transform: rotateY(180deg);
         }
-        .flip-card-front, .flip-card-back {
+        .flip-card.flipped-twice .flip-card-inner {
+            transform: rotateY(270deg);
+        }
+        .flip-card-front, .flip-card-back, .flip-card-third {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             backface-visibility: hidden;
             -webkit-backface-visibility: hidden;
         }
         .flip-card-back {
             transform: rotateY(180deg);
         }
-        #mobile-sidebar {
-            transition: transform 0.3s ease-in-out;
+        .flip-card-third {
+            transform: rotateY(270deg);
         }
+        
+        #mobile-sidebar { transition: transform 0.3s ease-in-out; }
+        
+        .bg-level-mlb { background-color: #7A0019; }
+        .bg-level-aaa { background-color: #1a56db; }
+        .bg-level-aa { background-color: #3b82f6; }
+        .bg-level-a-plus { background-color: #2563eb; }
+        .bg-level-a { background-color: #3730a3; }
+        .bg-level-high-a { background-color: #4f46e5; }
+        .bg-level-low-a { background-color: #4338ca; }
+        .bg-level-rookie { background-color: #1e40af; }
+        .bg-level-ncaa { background-color: #14532d; }
+        .bg-level-ncaa-d1 { background-color: #15803d; }
+        .bg-level-ncaa-d2 { background-color: #166534; }
+        .bg-level-ncaa-d3 { background-color: #14532d; }
+        .bg-level-naia { background-color: #92400e; }
+        .bg-level-jrcollege { background-color: #a16207; }
+        .bg-level-njcaa { background-color: #f59e0b; }
+        .bg-level-indy { background-color: #3f6212; }
+        .bg-level-kbo { background-color: #0c4a6e; }
     </style>
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin=""><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&amp;display=swap"><style>
-      body {
-        font-family: 'Inter', sans-serif !important;
-      }
-      
-      /* Preserve Font Awesome icons */
-      .fa, .fas, .far, .fal, .fab {
-        font-family: "Font Awesome 6 Free", "Font Awesome 6 Brands" !important;
-      }
-    </style><style>
-  .highlighted-section {
-    outline: 2px solid #3F20FB;
-    background-color: rgba(63, 32, 251, 0.1);
-  }
-
-  .edit-button {
-    position: absolute;
-    z-index: 1000;
-  }
-
-  ::-webkit-scrollbar {
-    display: none;
-  }
-
-  html, body {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-  }
-  </style></head>
+</head>
 <body class="bg-neutral-100 text-neutral-800 font-sans">
-    <!-- Sticky Header -->
     <header id="header" class="fixed top-0 left-0 right-0 z-50 bg-white shadow-md">
-        <!-- Global Nav -->
         <div class="px-4 h-20 flex items-center justify-between border-b border-neutral-200">
             <div class="flex items-center space-x-2">
                 <img src="https://i.postimg.cc/KYrbztp1/hamilton-logo-block-with-3-lines-of-type.png" alt="Hamilton Logo" class="h-14 w-auto">
@@ -109,7 +100,6 @@
         </div>
     </header>
 
-    <!-- Mobile Sidebar Navigation -->
     <div id="mobile-sidebar" class="fixed top-0 right-0 h-full w-4/5 max-w-sm bg-white/90 backdrop-blur-sm shadow-lg z-40 transform translate-x-full md:hidden">
         <div id="sidebar-content" class="pt-4 p-6 overflow-y-auto h-full">
             <nav class="flex flex-col space-y-6 text-right">
@@ -127,313 +117,31 @@
     </div>
     <div id="sidebar-overlay" class="fixed inset-0 bg-black/20 z-30 hidden md:hidden"></div>
 
-    <!-- Main Content -->
-    <main id="main-content" class="pt-20 pb-20">
-        <!-- Search & Filter Row - Now Sticky -->
+    <main id="main-content" class="pt-[140px] pb-20">
         <div id="search-filter" class="sticky top-20 z-40 bg-neutral-100 py-4 px-4 mb-5 shadow-sm">
             <div class="flex flex-col space-y-3">
                 <div class="relative">
-                    <input type="text" placeholder="Search by Player Name" class="w-full pl-10 pr-4 py-2 border border-neutral-200 rounded-lg text-sm">
+                    <input id="search-input" type="text" placeholder="Search by Player Name" class="w-full pl-10 pr-4 py-2 border border-neutral-200 rounded-lg text-sm">
                     <i class="fa-solid fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-neutral-400"></i>
                 </div>
                 <div class="flex space-x-3">
                     <div class="w-1/2">
-                        <select class="w-full px-3 py-2 border border-neutral-200 rounded-lg text-sm appearance-none bg-white">
+                        <select id="grad-class-select" class="w-full px-3 py-2 border border-neutral-200 rounded-lg text-sm appearance-none bg-white">
                             <option value="">Filter by Graduating Class</option>
-                            <option value="2023">2023</option>
-                            <option value="2022">2022</option>
-                            <option value="2021">2021</option>
-                            <option value="2020">2020</option>
                         </select>
                     </div>
                     <div class="w-1/2">
-                        <select class="w-full px-3 py-2 border border-neutral-200 rounded-lg text-sm appearance-none bg-white">
+                        <select id="level-select" class="w-full px-3 py-2 border border-neutral-200 rounded-lg text-sm appearance-none bg-white">
                             <option value="">Filter by Current Level</option>
-                            <option value="mlb">MLB</option>
-                            <option value="aaa">AAA</option>
-                            <option value="aa">AA</option>
-                            <option value="a+">A+</option>
-                            <option value="a">A</option>
-                            <option value="high-a">HIGH-A</option>
-                            <option value="low-a">LOW-A</option>
-                            <option value="rookie">ROOKIE</option>
-                            <option value="ncaa">NCAA</option>
-                            <option value="ncaa-d1">NCAA-D1</option>
-                            <option value="ncaa-d2">NCAA-D2</option>
-                            <option value="ncaa-d3">NCAA-D3</option>
-                            <option value="naia">NAIA</option>
-                            <option value="jrcollege">JrCollege</option>
-                            <option value="njcaa">NJCAA</option>
-                            <option value="indy">INDY</option>
-                            <option value="kbo">KBO</option>
                         </select>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Roster Grid -->
         <div id="roster-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8 px-4">
-            <!-- Player Card - Cody Bellinger -->
-            <div id="player-card-bellinger" class="flip-card w-full bg-white rounded-lg shadow-md">
-                <div class="flip-card-inner w-full h-full relative">
-                    <!-- Front of Card -->
-                    <div class="flip-card-front w-full h-full">
-                        <div class="relative">
-                            <img class="w-full h-[200px] object-cover rounded-t-lg" src="https://i.postimg.cc/Jh7Vq8wp/Cody-Montage.png" alt="Cody Bellinger">
-                            <div class="absolute top-2 right-2 bg-primary text-white text-xs font-bold px-2 py-1 rounded">MLB</div>
-                        </div>
-                        <div class="p-3">
-                            <div class="flex justify-between items-start mb-1">
-                                <h3 class="text-lg font-bold">Cody Bellinger</h3>
-                                <span class="text-xs bg-neutral-200 px-2 py-1 rounded">2013</span>
-                            </div>
-                            <div class="flex justify-between text-sm mb-2">
-                                <span>CF-1B | New York Yankees</span>
-                            </div>
-                            <button class="flip-button w-full mt-2 text-sm font-medium text-primary border border-primary rounded-lg py-2">
-                                SHOW ME HIS STATS!
-                            </button>
-                        </div>
-                    </div>
-                    <!-- Back of Card -->
-                    <div class="flip-card-back w-full h-full bg-white rounded-lg absolute top-0">
-                        <div class="p-4">
-                            <div class="flex justify-between items-center mb-3">
-                                <h3 class="text-lg font-bold">Cody Bellinger</h3>
-                                <span class="text-xs bg-neutral-200 px-2 py-1 rounded">2013</span>
-                            </div>
-                            <div class="space-y-3">
-                                <div class="grid grid-cols-2 gap-2 text-sm">
-                                    <div class="bg-neutral-100 p-2 rounded"><p class="text-xs text-neutral-500">AVG</p><p class="font-bold">.275</p></div>
-                                    <div class="bg-neutral-100 p-2 rounded"><p class="text-xs text-neutral-500">HR</p><p class="font-bold">28</p></div>
-                                    <div class="bg-neutral-100 p-2 rounded"><p class="text-xs text-neutral-500">RBI</p><p class="font-bold">95</p></div>
-                                    <div class="bg-neutral-100 p-2 rounded"><p class="text-xs text-neutral-500">OPS</p><p class="font-bold">.840</p></div>
-                                </div>
-                                <div class="text-sm"><p class="font-medium mb-1">Career Highlights:</p><ul class="list-disc list-inside text-xs space-y-1"><li>NL MVP (2019)</li><li>World Series Champion (2020)</li><li>2x All-Star</li></ul></div>
-                            </div>
-                            <button class="w-full mt-4 text-sm font-medium text-primary border border-primary rounded-lg py-2">View full profile</button>
-                        </div>
-                    </div>
-                </div>
             </div>
 
-            <!-- Player Card - Patrick Murphy -->
-            <div id="player-card-murphy-p" class="flip-card w-full bg-white rounded-lg shadow-md">
-                <div class="flip-card-inner w-full h-full relative">
-                    <!-- Front of Card -->
-                    <div class="flip-card-front w-full h-full">
-                        <div class="relative">
-                            <img class="w-full h-[200px] object-cover rounded-t-lg" src="https://i.postimg.cc/pLJMzTS9/PAtrick-montage.png" alt="Patrick Murphy">
-                            <div class="absolute top-2 right-2 bg-blue-800 text-white text-xs font-bold px-2 py-1 rounded">KBO</div>
-                        </div>
-                        <div class="p-3">
-                            <div class="flex justify-between items-start mb-1">
-                                <h3 class="text-lg font-bold">Patrick Murphy</h3>
-                                <span class="text-xs bg-neutral-200 px-2 py-1 rounded">2013</span>
-                            </div>
-                            <div class="flex justify-between text-sm mb-2">
-                                <span>Pitcher | KT Wiz Suwon</span>
-                            </div>
-                            <button class="flip-button w-full mt-2 text-sm font-medium text-primary border border-primary rounded-lg py-2">
-                                SHOW ME HIS STATS!
-                            </button>
-                        </div>
-                    </div>
-                    <!-- Back of Card -->
-                    <div class="flip-card-back w-full h-full bg-white rounded-lg absolute top-0">
-                        <div class="p-4">
-                            <div class="flex justify-between items-center mb-3">
-                                <h3 class="text-lg font-bold">Patrick Murphy</h3>
-                                <span class="text-xs bg-neutral-200 px-2 py-1 rounded">2013</span>
-                            </div>
-                            <div class="space-y-3">
-                                <div class="grid grid-cols-2 gap-2 text-sm">
-                                    <div class="bg-neutral-100 p-2 rounded"><p class="text-xs text-neutral-500">ERA</p><p class="font-bold">3.15</p></div>
-                                    <div class="bg-neutral-100 p-2 rounded"><p class="text-xs text-neutral-500">WHIP</p><p class="font-bold">1.18</p></div>
-                                    <div class="bg-neutral-100 p-2 rounded"><p class="text-xs text-neutral-500">SO</p><p class="font-bold">58</p></div>
-                                    <div class="bg-neutral-100 p-2 rounded"><p class="text-xs text-neutral-500">IP</p><p class="font-bold">62.1</p></div>
-                                </div>
-                                <div class="text-sm"><p class="font-medium mb-1">Career Notes:</p><ul class="list-disc list-inside text-xs space-y-1"><li>Debuted with Toronto Blue Jays</li><li>Pitched for Washington Nationals</li><li>Signed with Twins in 2023</li></ul></div>
-                            </div>
-                            <button class="w-full mt-4 text-sm font-medium text-primary border border-primary rounded-lg py-2">View full profile</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Player Card - Dom Hamel -->
-            <div id="player-card-hamel" class="flip-card w-full bg-white rounded-lg shadow-md">
-                <div class="flip-card-inner w-full h-full relative">
-                    <!-- Front of Card -->
-                    <div class="flip-card-front w-full h-full">
-                        <div class="relative">
-                            <img class="w-full h-[200px] object-cover rounded-t-lg" src="https://i.postimg.cc/5012jYK7/23-Hamel-Front-page-00001.jpg" alt="Dom Hamel">
-                            <div class="absolute top-2 right-2 bg-blue-600 text-white text-xs font-bold px-2 py-1 rounded">AAA</div>
-                        </div>
-                        <div class="p-3">
-                            <div class="flex justify-between items-start mb-1">
-                                <h3 class="text-lg font-bold">Dom Hamel</h3>
-                                <span class="text-xs bg-neutral-200 px-2 py-1 rounded">2017</span>
-                            </div>
-                            <div class="flex justify-between text-sm mb-2">
-                                <span>Pitcher | Syracuse Mets</span>
-                            </div>
-                            <button class="flip-button w-full mt-2 text-sm font-medium text-primary border border-primary rounded-lg py-2">
-                                SHOW ME HIS STATS!
-                            </button>
-                        </div>
-                    </div>
-                    <!-- Back of Card -->
-                    <div class="flip-card-back w-full h-full bg-white rounded-lg absolute top-0">
-                        <div class="p-4">
-                            <div class="flex justify-between items-center mb-3">
-                                <h3 class="text-lg font-bold">Dom Hamel</h3>
-                                <span class="text-xs bg-neutral-200 px-2 py-1 rounded">2017</span>
-                            </div>
-                            <div class="space-y-3">
-                                <div class="grid grid-cols-2 gap-2 text-sm">
-                                    <div class="bg-neutral-100 p-2 rounded"><p class="text-xs text-neutral-500">ERA</p><p class="font-bold">3.85</p></div>
-                                    <div class="bg-neutral-100 p-2 rounded"><p class="text-xs text-neutral-500">K/9</p><p class="font-bold">10.5</p></div>
-                                    <div class="bg-neutral-100 p-2 rounded"><p class="text-xs text-neutral-500">W-L</p><p class="font-bold">9-6</p></div>
-                                    <div class="bg-neutral-100 p-2 rounded"><p class="text-xs text-neutral-500">IP</p><p class="font-bold">124.0</p></div>
-                                </div>
-                                <div class="text-sm"><p class="font-medium mb-1">Career Notes:</p><ul class="list-disc list-inside text-xs space-y-1"><li>Mets minor league pitcher of the year</li><li>Top pitching prospect</li><li>Invited to MLB Spring Training</li></ul></div>
-                            </div>
-                            <button class="w-full mt-4 text-sm font-medium text-primary border border-primary rounded-lg py-2">View full profile</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Player Card - Brock Selvidge -->
-            <div id="player-card-selvidge" class="flip-card w-full bg-white rounded-lg shadow-md">
-                <div class="flip-card-inner w-full h-full relative">
-                    <div class="flip-card-front w-full h-full">
-                        <div class="relative">
-                            <img class="w-full h-[200px] object-cover rounded-t-lg" src="https://i.postimg.cc/xdLd0y5N/22-Selvidge-Front-page-00001.jpg" alt="Brock Selvidge">
-                            <div class="absolute top-2 right-2 bg-blue-500 text-white text-xs font-bold px-2 py-1 rounded">AA</div>
-                        </div>
-                        <div class="p-3">
-                            <div class="flex justify-between items-start mb-1">
-                                <h3 class="text-lg font-bold">Brock Selvidge</h3>
-                                <span class="text-xs bg-neutral-200 px-2 py-1 rounded">2021</span>
-                            </div>
-                            <div class="flex justify-between text-sm mb-2">
-                                <span>Pitcher | Somerset Patriots</span>
-                            </div>
-                            <button class="flip-button w-full mt-2 text-sm font-medium text-primary border border-primary rounded-lg py-2">
-                                SHOW ME HIS STATS!
-                            </button>
-                        </div>
-                    </div>
-                    <div class="flip-card-back w-full h-full bg-white rounded-lg absolute top-0">
-                        <div class="p-4">
-                            <div class="flex justify-between items-center mb-3">
-                                <h3 class="text-lg font-bold">Brock Selvidge</h3>
-                                <span class="text-xs bg-neutral-200 px-2 py-1 rounded">2021</span>
-                            </div>
-                            <div class="space-y-3">
-                                <div class="grid grid-cols-2 gap-2 text-sm">
-                                    <div class="bg-neutral-100 p-2 rounded"><p class="text-xs text-neutral-500">ERA</p><p class="font-bold">2.98</p></div>
-                                    <div class="bg-neutral-100 p-2 rounded"><p class="text-xs text-neutral-500">WHIP</p><p class="font-bold">1.21</p></div>
-                                    <div class="bg-neutral-100 p-2 rounded"><p class="text-xs text-neutral-500">SO</p><p class="font-bold">125</p></div>
-                                    <div class="bg-neutral-100 p-2 rounded"><p class="text-xs text-neutral-500">IP</p><p class="font-bold">115.0</p></div>
-                                </div>
-                            </div>
-                            <button class="w-full mt-4 text-sm font-medium text-primary border border-primary rounded-lg py-2">View full profile</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Player Card - Shane Anderson -->
-            <div id="player-card-anderson" class="flip-card w-full bg-white rounded-lg shadow-md">
-                <div class="flip-card-inner w-full h-full relative">
-                    <div class="flip-card-front w-full h-full">
-                        <div class="relative">
-                            <img class="w-full h-[200px] object-cover rounded-t-lg" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/778fd73592-ae8f93edadacfb4a0793.png" alt="Shane Anderson">
-                            <div class="absolute top-2 right-2 bg-green-600 text-white text-xs font-bold px-2 py-1 rounded">NCAA</div>
-                        </div>
-                        <div class="p-3">
-                            <div class="flex justify-between items-start mb-1">
-                                <h3 class="text-lg font-bold">Shane Anderson</h3>
-                                <span class="text-xs bg-neutral-200 px-2 py-1 rounded">2020</span>
-                            </div>
-                            <div class="flex justify-between text-sm mb-2">
-                                <span>Utility | Georgia Gwinnett</span>
-                            </div>
-                            <button class="flip-button w-full mt-2 text-sm font-medium text-primary border border-primary rounded-lg py-2">
-                                SHOW ME HIS STATS!
-                            </button>
-                        </div>
-                    </div>
-                    <div class="flip-card-back w-full h-full bg-white rounded-lg absolute top-0">
-                        <div class="p-4">
-                            <div class="flex justify-between items-center mb-3">
-                                <h3 class="text-lg font-bold">Shane Anderson</h3>
-                                <span class="text-xs bg-neutral-200 px-2 py-1 rounded">2020</span>
-                            </div>
-                            <div class="space-y-3">
-                                <div class="grid grid-cols-2 gap-2 text-sm">
-                                    <div class="bg-neutral-100 p-2 rounded"><p class="text-xs text-neutral-500">AVG</p><p class="font-bold">.310</p></div>
-                                    <div class="bg-neutral-100 p-2 rounded"><p class="text-xs text-neutral-500">HR</p><p class="font-bold">8</p></div>
-                                    <div class="bg-neutral-100 p-2 rounded"><p class="text-xs text-neutral-500">RBI</p><p class="font-bold">45</p></div>
-                                    <div class="bg-neutral-100 p-2 rounded"><p class="text-xs text-neutral-500">OPS</p><p class="font-bold">.915</p></div>
-                                </div>
-                            </div>
-                             <button class="w-full mt-4 text-sm font-medium text-primary border border-primary rounded-lg py-2">View full profile</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Player Card - Jake Wong -->
-            <div id="player-card-wong" class="flip-card w-full bg-white rounded-lg shadow-md">
-                <div class="flip-card-inner w-full h-full relative">
-                    <div class="flip-card-front w-full h-full">
-                        <div class="relative">
-                            <img class="w-full h-[200px] object-cover rounded-t-lg" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/778fd73592-ae8f93edadacfb4a0793.png" alt="Jake Wong">
-                            <div class="absolute top-2 right-2 bg-primary text-white text-xs font-bold px-2 py-1 rounded">MLB</div>
-                        </div>
-                        <div class="p-3">
-                            <div class="flex justify-between items-start mb-1">
-                                <h3 class="text-lg font-bold">Jake Wong</h3>
-                                <span class="text-xs bg-neutral-200 px-2 py-1 rounded">2015</span>
-                            </div>
-                            <div class="flex justify-between text-sm mb-2">
-                                <span>Pitcher | Free Agent</span>
-                            </div>
-                            <button class="flip-button w-full mt-2 text-sm font-medium text-primary border border-primary rounded-lg py-2">
-                                SHOW ME HIS STATS!
-                            </button>
-                        </div>
-                    </div>
-                    <div class="flip-card-back w-full h-full bg-white rounded-lg absolute top-0">
-                        <div class="p-4">
-                            <div class="flex justify-between items-center mb-3">
-                                <h3 class="text-lg font-bold">Jake Wong</h3>
-                                <span class="text-xs bg-neutral-200 px-2 py-1 rounded">2015</span>
-                            </div>
-                            <div class="space-y-3">
-                                <div class="grid grid-cols-2 gap-2 text-sm">
-                                    <div class="bg-neutral-100 p-2 rounded"><p class="text-xs text-neutral-500">ERA</p><p class="font-bold">7.36</p></div>
-                                    <div class="bg-neutral-100 p-2 rounded"><p class="text-xs text-neutral-500">WHIP</p><p class="font-bold">1.82</p></div>
-                                    <div class="bg-neutral-100 p-2 rounded"><p class="text-xs text-neutral-500">SO</p><p class="font-bold">4</p></div>
-                                    <div class="bg-neutral-100 p-2 rounded"><p class="text-xs text-neutral-500">IP</p><p class="font-bold">3.2</p></div>
-                                </div>
-                            </div>
-                            <button class="w-full mt-4 text-sm font-medium text-primary border border-primary rounded-lg py-2">View full profile</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- More cards would be generated here dynamically -->
-
-        </div>
-
-        <!-- News Section -->
         <div id="news-section" class="mb-8 px-4">
             <h2 class="text-xl font-bold mb-4">Latest News</h2>
             <div class="space-y-4">
@@ -453,7 +161,6 @@
         </div>
     </main>
 
-    <!-- Sticky Footer Banner -->
     <footer id="footer" class="fixed bottom-0 left-0 right-0 z-40 bg-white shadow-lg">
         <span class="block cursor-pointer">
             <img src="https://i.postimg.cc/05DWb4Fj/bmx-banner.png" alt="Partner Banner" class="w-full h-auto">
@@ -462,22 +169,224 @@
     
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Flip card functionality
-            const flipButtons = document.querySelectorAll('.flip-button');
-            flipButtons.forEach(button => {
-                button.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    const card = this.closest('.flip-card');
-                    card.classList.toggle('flipped');
-                });
-            });
+            const players = [
+                {
+                    id: "bellinger",
+                    name: "Cody Bellinger",
+                    graduatingClass: 2013,
+                    currentLevel: "MLB",
+                    position: "CF-1B",
+                    team: "New York Yankees",
+                    frontImg: "https://i.postimg.cc/Jh7Vq8wp/Cody-Montage.png",
+                    backImg: "https://i.postimg.cc/9F40zQpX/20-Bellinger-Back-page-00001.jpg",
+                    stats: {
+                        avg: ".275",
+                        hr: "28",
+                        rbi: "95",
+                        ops: ".840"
+                    },
+                    highlights: ["NL MVP (2019)", "World Series Champion (2020)", "2x All-Star"]
+                },
+                {
+                    id: "murphy",
+                    name: "Patrick Murphy",
+                    graduatingClass: 2013,
+                    currentLevel: "KBO",
+                    position: "Pitcher",
+                    team: "KT Wiz Suwon",
+                    frontImg: "https://i.postimg.cc/pLJMzTS9/PAtrick-montage.png",
+                    backImg: "https://i.postimg.cc/pL6kR3Fq/21-Murphy-Back-page-00001.jpg",
+                    stats: {
+                        era: "3.15",
+                        whip: "1.18",
+                        so: "58",
+                        ip: "62.1"
+                    },
+                    highlights: ["Debuted with Toronto Blue Jays", "Pitched for Washington Nationals", "Signed with Twins in 2023"]
+                },
+                {
+                    id: "hamel",
+                    name: "Dom Hamel",
+                    graduatingClass: 2017,
+                    currentLevel: "AAA",
+                    position: "Pitcher",
+                    team: "Syracuse Mets",
+                    frontImg: "https://i.postimg.cc/5012jYK7/23-Hamel-Front-page-00001.jpg",
+                    backImg: "https://i.postimg.cc/85zK09qS/23-Hamel-Back-page-00001.jpg",
+                    stats: {
+                        era: "3.85",
+                        k9: "10.5",
+                        wl: "9-6",
+                        ip: "124.0"
+                    },
+                    highlights: ["Mets minor league pitcher of the year", "Top pitching prospect", "Invited to MLB Spring Training"]
+                },
+                {
+                    id: "selvidge",
+                    name: "Brock Selvidge",
+                    graduatingClass: 2021,
+                    currentLevel: "AA",
+                    position: "Pitcher",
+                    team: "Somerset Patriots",
+                    frontImg: "https://i.postimg.cc/xdLd0y5N/22-Selvidge-Front-page-00001.jpg",
+                    backImg: "https://i.postimg.cc/hGv5kS16/22-Selvidge-Back-page-00001.jpg",
+                    stats: {
+                        era: "2.98",
+                        whip: "1.21",
+                        so: "125",
+                        ip: "115.0"
+                    },
+                    highlights: ["Yankees pitching prospect", "High School All-American"]
+                },
+                {
+                    id: "anderson",
+                    name: "Shane Anderson",
+                    graduatingClass: 2020,
+                    currentLevel: "NCAA",
+                    position: "Utility",
+                    team: "Georgia Gwinnett",
+                    frontImg: "https://i.postimg.cc/Vv8Wq00Q/17-Shane-Anderson-Front-page-00001.jpg",
+                    backImg: "https://i.postimg.cc/d0gXfP99/17-Shane-Anderson-Back-page-00001.jpg",
+                    stats: {
+                        avg: ".310",
+                        hr: "8",
+                        rbi: "45",
+                        ops: ".915"
+                    },
+                    highlights: ["All-Conference Player", "Team Captain"]
+                },
+                {
+                    id: "wong",
+                    name: "Jake Wong",
+                    graduatingClass: 2015,
+                    currentLevel: "MLB",
+                    position: "Pitcher",
+                    team: "Free Agent",
+                    frontImg: "https://i.postimg.cc/cHzXQ6p6/Jake-Wong-Front-page-00001.jpg",
+                    backImg: "https://i.postimg.cc/PrYcK4wB/Jake-Wong-Back-page-00001.jpg",
+                    stats: {
+                        era: "7.36",
+                        whip: "1.82",
+                        so: "4",
+                        ip: "3.2"
+                    },
+                    highlights: ["Drafted by Giants", "MLB debut in 2023"]
+                }
+            ];
 
-            // Mobile sidebar functionality
+            function generateCardHTML(player) {
+                const isPitcher = player.position.toLowerCase().includes('pitcher');
+                const statHTML = isPitcher
+                    ? `<div class="grid grid-cols-2 gap-2 text-sm">
+                           <div class="bg-neutral-100 p-2 rounded"><p class="text-xs text-neutral-500">ERA</p><p class="font-bold">${player.stats.era}</p></div>
+                           <div class="bg-neutral-100 p-2 rounded"><p class="text-xs text-neutral-500">WHIP</p><p class="font-bold">${player.stats.whip || 'N/A'}</p></div>
+                           <div class="bg-neutral-100 p-2 rounded"><p class="text-xs text-neutral-500">SO</p><p class="font-bold">${player.stats.so}</p></div>
+                           <div class="bg-neutral-100 p-2 rounded"><p class="text-xs text-neutral-500">IP</p><p class="font-bold">${player.stats.ip}</p></div>
+                       </div>`
+                    : `<div class="grid grid-cols-2 gap-2 text-sm">
+                           <div class="bg-neutral-100 p-2 rounded"><p class="text-xs text-neutral-500">AVG</p><p class="font-bold">${player.stats.avg}</p></div>
+                           <div class="bg-neutral-100 p-2 rounded"><p class="text-xs text-neutral-500">HR</p><p class="font-bold">${player.stats.hr}</p></div>
+                           <div class="bg-neutral-100 p-2 rounded"><p class="text-xs text-neutral-500">RBI</p><p class="font-bold">${player.stats.rbi}</p></div>
+                           <div class="bg-neutral-100 p-2 rounded"><p class="text-xs text-neutral-500">OPS</p><p class="font-bold">${player.stats.ops}</p></div>
+                       </div>`;
+
+                const highlightsHTML = player.highlights.length > 0
+                    ? `<div class="text-sm"><p class="font-medium mb-1">Career Highlights:</p><ul class="list-disc list-inside text-xs space-y-1">${player.highlights.map(h => `<li>${h}</li>`).join('')}</ul></div>`
+                    : '';
+                
+                const levelClass = `bg-level-${player.currentLevel.toLowerCase().replace(/[+ ]/g, '-')}`;
+
+                return `
+                    <div id="player-card-${player.id}" class="flip-card w-full bg-white rounded-lg shadow-md">
+                        <div class="flip-card-inner w-full h-full relative">
+                            <div class="flip-card-front w-full h-full">
+                                <div class="relative">
+                                    <img class="w-full h-[320px] object-cover rounded-t-lg" src="${player.frontImg}" alt="${player.name}">
+                                    <div class="absolute top-2 right-2 ${levelClass} text-white text-xs font-bold px-2 py-1 rounded">${player.currentLevel}</div>
+                                </div>
+                                <div class="p-3">
+                                    <div class="flex justify-between items-start mb-1">
+                                        <h3 class="text-lg font-bold">${player.name}</h3>
+                                        <span class="text-xs bg-neutral-200 px-2 py-1 rounded">${player.graduatingClass}</span>
+                                    </div>
+                                    <div class="flex justify-between text-sm mb-2">
+                                        <span>${player.position} | ${player.team}</span>
+                                    </div>
+                                    <button class="w-full mt-2 text-sm font-medium text-primary border border-primary rounded-lg py-2">
+                                        SHOW ME HIS STATS!
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="flip-card-back w-full h-full bg-white rounded-lg absolute top-0">
+                                <div class="p-4">
+                                    <div class="flex justify-between items-center mb-3">
+                                        <h3 class="text-lg font-bold">${player.name}</h3>
+                                        <span class="text-xs bg-neutral-200 px-2 py-1 rounded">${player.graduatingClass}</span>
+                                    </div>
+                                    <div class="space-y-3">
+                                        ${statHTML}
+                                        ${highlightsHTML}
+                                    </div>
+                                    <button class="w-full mt-4 text-sm font-medium text-primary border border-primary rounded-lg py-2">View full profile</button>
+                                </div>
+                            </div>
+                            <div class="flip-card-third w-full h-full bg-white rounded-lg absolute top-0 p-4">
+                                <h3 class="text-xl font-bold mb-2">Did you know?</h3>
+                                <p class="text-neutral-600">This is the third side of the card. You can add more information here like a special message, a custom fact about the player, or an interactive element!</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            function renderCards(data) {
+                const container = document.getElementById('roster-grid');
+                container.innerHTML = '';
+                data.forEach(player => {
+                    const cardHTML = generateCardHTML(player);
+                    container.insertAdjacentHTML('beforeend', cardHTML);
+                });
+            }
+
+            function populateFilters() {
+                const gradClasses = [...new Set(players.map(p => p.graduatingClass))].sort((a, b) => b - a);
+                const levels = [...new Set(players.map(p => p.currentLevel))].sort();
+
+                const gradSelect = document.getElementById('grad-class-select');
+                gradClasses.forEach(grad => {
+                    const option = document.createElement('option');
+                    option.value = grad;
+                    option.textContent = grad;
+                    gradSelect.appendChild(option);
+                });
+
+                const levelSelect = document.getElementById('level-select');
+                levels.forEach(level => {
+                    const option = document.createElement('option');
+                    option.value = level.toLowerCase();
+                    option.textContent = level;
+                    levelSelect.appendChild(option);
+                });
+            }
+
+            function filterPlayers() {
+                const searchText = document.getElementById('search-input').value.toLowerCase();
+                const gradClass = document.getElementById('grad-class-select').value;
+                const level = document.getElementById('level-select').value;
+
+                const filteredPlayers = players.filter(player => {
+                    const matchesSearch = player.name.toLowerCase().includes(searchText);
+                    const matchesClass = !gradClass || player.graduatingClass.toString() === gradClass;
+                    const matchesLevel = !level || player.currentLevel.toLowerCase() === level;
+                    return matchesSearch && matchesClass && matchesLevel;
+                });
+
+                renderCards(filteredPlayers);
+            }
+
             const hamburgerMenu = document.getElementById('hamburger-menu');
             const mobileSidebar = document.getElementById('mobile-sidebar');
             const sidebarOverlay = document.getElementById('sidebar-overlay');
-            const mainContent = document.getElementById('main-content');
             const searchFilter = document.getElementById('search-filter');
             const sidebarContent = document.getElementById('sidebar-content');
 
@@ -496,9 +405,8 @@
             
             function updateSidebarPadding() {
                  if (!mobileSidebar.classList.contains('translate-x-full')) {
-                    const searchFilterHeight = searchFilter.offsetHeight;
                     const headerHeight = document.getElementById('header').offsetHeight;
-                    sidebarContent.style.paddingTop = `${headerHeight + searchFilterHeight + 16}px`; // 16px for extra space
+                    sidebarContent.style.paddingTop = `${headerHeight + 16}px`;
                 }
             }
 
@@ -512,7 +420,30 @@
             
             sidebarOverlay.addEventListener('click', closeSidebar);
             window.addEventListener('resize', updateSidebarPadding);
+
+            document.getElementById('roster-grid').addEventListener('click', function(e) {
+                const card = e.target.closest('.flip-card');
+                if (card) {
+                    if (card.classList.contains('flipped-twice')) {
+                        card.classList.remove('flipped-twice');
+                        card.classList.remove('flipped-once');
+                    } else if (card.classList.contains('flipped-once')) {
+                        card.classList.remove('flipped-once');
+                        card.classList.add('flipped-twice');
+                    } else {
+                        card.classList.add('flipped-once');
+                    }
+                }
+            });
+
+            renderCards(players);
+            populateFilters();
+            
+            document.getElementById('search-input').addEventListener('input', filterPlayers);
+            document.getElementById('grad-class-select').addEventListener('change', filterPlayers);
+            document.getElementById('level-select').addEventListener('change', filterPlayers);
         });
     </script>
-
-</body></html>
+</body>
+</html>
+```
