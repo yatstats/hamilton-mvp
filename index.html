@@ -14,22 +14,37 @@
         body { font-family: 'Inter', sans-serif !important; }
         .fa, .fas, .far, .fal, .fab { font-family: "Font Awesome 6 Free", "Font Awesome 6 Brands" !important; }
 
-        /* The key change is here: We set a fixed height on the flip-card container */
         .flip-card {
             perspective: 1000px;
-            height: 520px; /* Adjust this value as needed to fit your card content */
+            /* Adjust height to fit new design */
+            min-height: 520px; 
+            width: 100%;
         }
+        
+        @media (min-width: 768px) {
+            .flip-card {
+                height: 520px; /* Fixed height on larger screens */
+            }
+        }
+        
         .flip-card-inner {
             transition: transform 0.6s;
             transform-style: preserve-3d;
             height: 100%;
         }
-        .flip-card.flipped-once .flip-card-inner {
+        .flip-card.flipped-right-1 .flip-card-inner {
+            transform: rotateY(-90deg);
+        }
+        .flip-card.flipped-right-2 .flip-card-inner {
+            transform: rotateY(-180deg);
+        }
+        .flip-card.flipped-left-1 .flip-card-inner {
+            transform: rotateY(90deg);
+        }
+        .flip-card.flipped-left-2 .flip-card-inner {
             transform: rotateY(180deg);
         }
-        .flip-card.flipped-twice .flip-card-inner {
-            transform: rotateY(270deg);
-        }
+
         .flip-card-front, .flip-card-back, .flip-card-third {
             position: absolute;
             top: 0;
@@ -39,13 +54,15 @@
             backface-visibility: hidden;
             -webkit-backface-visibility: hidden;
         }
+
         .flip-card-back {
             transform: rotateY(180deg);
         }
+
         .flip-card-third {
-            transform: rotateY(270deg);
+            transform: rotateY(-90deg);
         }
-        
+
         #mobile-sidebar { transition: transform 0.3s ease-in-out; }
         
         .bg-level-mlb { background-color: #7A0019; }
@@ -74,9 +91,12 @@
                 <img src="https://i.postimg.cc/KYrbztp1/hamilton-logo-block-with-3-lines-of-type.png" alt="Hamilton Logo" class="h-14 w-auto">
                 <img src="https://i.postimg.cc/76srDfFT/yatstats-logo-stacked.png" alt="YAT?STATS Logo" class="h-10 w-auto md:hidden">
             </div>
-            <button id="hamburger-menu" class="md:hidden text-neutral-800 z-50">
-                <i class="fa-solid fa-bars text-2xl"></i>
-            </button>
+            <div class="flex items-center space-x-4 md:hidden">
+                <i class="fa-solid fa-search text-xl text-neutral-800"></i>
+                <button id="hamburger-menu" class="text-neutral-800 z-50">
+                    <i class="fa-solid fa-bars text-xl"></i>
+                </button>
+            </div>
             <nav class="hidden md:flex items-center space-x-5 text-xs font-bold uppercase tracking-wider">
                 <span class="text-primary border-b-2 border-primary pb-1 cursor-pointer">Where They Yat?</span>
                 <span class="text-neutral-600 hover:text-primary cursor-pointer">Active Alumni News</span>
@@ -95,25 +115,8 @@
 
     <div id="mobile-sidebar" class="fixed top-0 right-0 h-full w-4/5 max-w-sm bg-white/90 backdrop-blur-sm shadow-lg z-40 transform translate-x-full md:hidden">
         <div id="sidebar-content" class="pt-4 p-6 overflow-y-auto h-full">
-            <nav class="flex flex-col space-y-6 text-right">
-                <span class="text-lg font-semibold text-primary cursor-pointer">Where They Yat?</span>
-                <span class="text-lg font-semibold text-neutral-700 cursor-pointer">Active Alumni News</span>
-                <span class="text-lg font-semibold text-neutral-700 cursor-pointer">Yat-A-Boy Marketplace</span>
-                <span class="text-lg font-semibold text-neutral-700 cursor-pointer">PCDAction Partner Program</span>
-                <span class="text-lg font-semibold text-neutral-700 cursor-pointer">Current High School Team</span>
-                <span class="text-lg font-semibold text-neutral-700 cursor-pointer">YatStats Global School Search</span>
-                <div class="pt-4 border-t border-neutral-200">
-                    <span class="text-lg font-semibold text-neutral-700 cursor-pointer">Register | Login</span>
-                </div>
-            </nav>
-        </div>
-    </div>
-    <div id="sidebar-overlay" class="fixed inset-0 bg-black/20 z-30 hidden md:hidden"></div>
-
-    <main id="main-content" class="pt-[140px] pb-20">
-        <div id="search-filter" class="sticky top-20 z-40 bg-neutral-100 py-4 px-4 mb-5 shadow-sm">
-            <div class="flex flex-col space-y-3">
-                <div class="relative">
+            <div class="pb-6 border-b border-neutral-200 mb-6">
+                 <div class="relative mb-4">
                     <input id="search-input" type="text" placeholder="Search by Player Name" class="w-full pl-10 pr-4 py-2 border border-neutral-200 rounded-lg text-sm">
                     <i class="fa-solid fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-neutral-400"></i>
                 </div>
@@ -130,8 +133,22 @@
                     </div>
                 </div>
             </div>
+            <nav class="flex flex-col space-y-6 text-right">
+                <span class="text-lg font-semibold text-primary cursor-pointer">Where They Yat?</span>
+                <span class="text-lg font-semibold text-neutral-700 cursor-pointer">Active Alumni News</span>
+                <span class="text-lg font-semibold text-neutral-700 cursor-pointer">Yat-A-Boy Marketplace</span>
+                <span class="text-lg font-semibold text-neutral-700 cursor-pointer">PCDAction Partner Program</span>
+                <span class="text-lg font-semibold text-neutral-700 cursor-pointer">Current High School Team</span>
+                <span class="text-lg font-semibold text-neutral-700 cursor-pointer">YatStats Global School Search</span>
+                <div class="pt-4 border-t border-neutral-200">
+                    <span class="text-lg font-semibold text-neutral-700 cursor-pointer">Register | Login</span>
+                </div>
+            </nav>
         </div>
+    </div>
+    <div id="sidebar-overlay" class="fixed inset-0 bg-black/20 z-30 hidden md:hidden"></div>
 
+    <main id="main-content" class="pt-[96px] pb-20">
         <div id="roster-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8 px-4">
             </div>
 
@@ -293,8 +310,8 @@
                     <div id="player-card-${player.id}" class="flip-card w-full bg-white rounded-lg shadow-md">
                         <div class="flip-card-inner w-full h-full relative">
                             <div class="flip-card-front w-full h-full">
-                                <div class="relative">
-                                    <img class="w-full h-[320px] object-cover rounded-t-lg" src="${player.frontImg}" alt="${player.name}">
+                                <div class="relative h-2/3">
+                                    <img class="w-full h-full object-cover rounded-t-lg" src="${player.frontImg}" alt="${player.name}">
                                     <div class="absolute top-2 right-2 ${levelClass} text-white text-xs font-bold px-2 py-1 rounded">${player.currentLevel}</div>
                                 </div>
                                 <div class="p-3">
@@ -380,7 +397,6 @@
             const hamburgerMenu = document.getElementById('hamburger-menu');
             const mobileSidebar = document.getElementById('mobile-sidebar');
             const sidebarOverlay = document.getElementById('sidebar-overlay');
-            const searchFilter = document.getElementById('search-filter');
             const sidebarContent = document.getElementById('sidebar-content');
 
             function openSidebar() {
@@ -402,7 +418,7 @@
                     sidebarContent.style.paddingTop = `${headerHeight + 16}px`;
                 }
             }
-
+            
             hamburgerMenu.addEventListener('click', function() {
                 if (mobileSidebar.classList.contains('translate-x-full')) {
                     openSidebar();
@@ -417,17 +433,48 @@
             document.getElementById('roster-grid').addEventListener('click', function(e) {
                 const card = e.target.closest('.flip-card');
                 if (card) {
-                    if (card.classList.contains('flipped-twice')) {
-                        card.classList.remove('flipped-twice');
-                        card.classList.remove('flipped-once');
-                    } else if (card.classList.contains('flipped-once')) {
-                        card.classList.remove('flipped-once');
-                        card.classList.add('flipped-twice');
-                    } else {
-                        card.classList.add('flipped-once');
+                    const cardRect = card.getBoundingClientRect();
+                    const clickX = e.clientX - cardRect.left;
+                    const cardWidth = cardRect.width;
+                    const isRightSide = clickX > cardWidth / 2;
+                    let currentFlip = 0;
+
+                    if (card.classList.contains('flipped-right-1')) currentFlip = 1;
+                    if (card.classList.contains('flipped-right-2')) currentFlip = 2;
+                    if (card.classList.contains('flipped-left-1')) currentFlip = -1;
+                    if (card.classList.contains('flipped-left-2')) currentFlip = -2;
+
+                    // Reset all classes
+                    card.classList.remove('flipped-right-1', 'flipped-right-2', 'flipped-left-1', 'flipped-left-2');
+
+                    if (isRightSide) {
+                        if (currentFlip === 0) {
+                            card.classList.add('flipped-right-1');
+                        } else if (currentFlip === 1) {
+                            card.classList.add('flipped-right-2');
+                        } else if (currentFlip === 2) {
+                            // No change, back to front
+                        } else if (currentFlip === -1) {
+                            card.classList.add('flipped-right-1');
+                        } else if (currentFlip === -2) {
+                            card.classList.add('flipped-left-1');
+                        }
+                    } else { // Left side click
+                        if (currentFlip === 0) {
+                            card.classList.add('flipped-left-1');
+                        } else if (currentFlip === -1) {
+                            card.classList.add('flipped-left-2');
+                        } else if (currentFlip === -2) {
+                            // No change, back to front
+                        } else if (currentFlip === 1) {
+                            card.classList.add('flipped-left-1');
+                        } else if (currentFlip === 2) {
+                            card.classList.add('flipped-right-1');
+                        }
                     }
                 }
             });
+
 
             renderCards(players);
             populateFilters();
@@ -439,4 +486,3 @@
     </script>
 </body>
 </html>
-```
