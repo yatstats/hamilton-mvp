@@ -1,99 +1,384 @@
-<!DOCTYPE html>
+<<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>YATSTATS • Where They YAT?</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>YAT?STATS • Hamilton Active Alumni</title>
 
-  <!-- Tailwind (CDN) -->
+  <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
 
-  <!-- Fonts: FOX-like condensed (mobile drawer) + CBS-like grotesk (desktop nav) -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;600;700&family=Barlow+Condensed:wght@600;700;800&display=swap" rel="stylesheet">
+  <!-- Fonts: Oswald for nav (Fox/CBS vibe), Inter for body -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <!-- Icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/js/all.min.js" crossorigin="anonymous"></script>
 
   <style>
-    :root { --maroon:#7A0019; }
-    body{font-family:Inter,system-ui,Segoe UI,Roboto,Arial,sans-serif}
+    :root{
+      --maroon:#7A0019;
+      --text:#111;
+      --muted:#6b7280;
+      --border:#E3E6EA;
 
-    /* Typography systems */
-    .font-fox-condensed { font-family: "Barlow Condensed", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
-    .font-cbs { font-family: "Barlow", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
-    .nav-uppercase { text-transform: uppercase; letter-spacing: .06em; }
+      /* Header/Footer lock */
+      --header-h-desktop:115px;
+      --header-h-mobile:75px;
 
-    /* Desktop nav */
-    .nav-desktop-item { color: #6B7280; }        /* neutral-500 */
-    .nav-desktop-item:hover { color: var(--maroon); }
-    .nav-desktop-active { color: var(--maroon); border-bottom: 2px solid var(--maroon); }
-
-    /* Mobile drawer nav */
-    .side-nav-item { color:#1f2937; }            /* neutral-800 */
-    .side-nav-item--active { color: var(--maroon); }
-
-    /* Card sizing to match Fox feel:
-       ~150x300 on phones, ~200x320 on md, ~250x400 on lg */
-    .card-box{ width:150px; height:300px; }
-    @media (min-width: 768px){ .card-box{ width:200px; height:320px; } }
-    @media (min-width: 1024px){ .card-box{ width:250px; height:400px; } }
-
-    /* Flip system (3 sides: 0=front, 1=stats, 2=HS) */
-    .flip-card{perspective:1200px}
-    .flip-inner{transform-style:preserve-3d; transition:transform .6s}
-    .flip-face{backface-visibility:hidden; -webkit-backface-visibility:hidden}
-    .flip-back{transform:rotateY(180deg)}
-    .flip-third{transform:rotateY(-180deg)} /* use 360 to show third */
-    .state-0 .flip-inner{transform:rotateY(0deg)}
-    .state-1 .flip-inner{transform:rotateY(180deg)}
-    .state-2 .flip-inner{transform:rotateY(360deg)}
-
-    /* Level badges */
-    .bg-level-mlb{background:#7A0019}
-    .bg-level-aaa{background:#1a56db}
-    .bg-level-aa{background:#3b82f6}
-    .bg-level-high-a{background:#4f46e5}
-    .bg-level-low-a{background:#4338ca}
-    .bg-level-a-plus{background:#2563eb}
-    .bg-level-a{background:#3730a3}
-    .bg-level-rookie{background:#1e40af}
-    .bg-level-ncaa{background:#14532d}
-    .bg-level-ncaa-d1{background:#15803d}
-    .bg-level-ncaa-d2{background:#166534}
-    .bg-level-ncaa-d3{background:#14532d}
-    .bg-level-naia{background:#92400e}
-    .bg-level-jrcollege,.bg-level-njcaa{background:#a16207}
-    .bg-level-indy{background:#3f6212}
-    .bg-level-kbo{background:#0c4a6e}
-
-    .black-gradient{background-image:linear-gradient(to bottom,rgba(0,0,0,0) 0%,rgba(0,0,0,.55) 100%)}
-
-    /* Mobile sidebar animation */
-    #mobile-sidebar{transition:transform .3s ease-in-out}
-
-    /* Footer banner responsiveness */
-    .footer-banner {
-      width: 100%;
-      height: auto;              /* desktop/tablet natural aspect */
-      display:block;
+      /* Card sizes (Bananas vibe but tighter like Fox cards) */
+      --card-w-desktop:250px;
+      --card-h-desktop:400px;
+      --card-w-mobile:150px;
+      --card-h-mobile:300px;
     }
-    @media (max-width: 640px) {
-      .footer-banner {
-        height: 56px;            /* readable height on phones */
-        width: 100%;
-        object-fit: contain;     /* no distortion; letterbox if needed */
-        background:#000;         /* optional letterbox fill */
+
+    *{ box-sizing:border-box; }
+    body{ font-family:'Inter', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; color:var(--text); }
+
+    /* NAV typography (Fox/CBS feel) */
+    .nav-font{ font-family:'Oswald', Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif; letter-spacing:.03em; }
+
+    /* Header */
+    header#site-header{
+      position:fixed; inset:0 auto auto 0; right:0; z-index:50; background:#fff; border-bottom:1px solid var(--border);
+      height:var(--header-h-mobile);
+    }
+    @media (min-width: 768px){
+      header#site-header{ height:var(--header-h-desktop); }
+    }
+
+    /* Footer same height as header */
+    footer#site-footer{
+      position:fixed; left:0; right:0; bottom:0; z-index:40; background:#fff; border-top:1px solid var(--border);
+      height:var(--header-h-mobile);
+    }
+    @media (min-width: 768px){
+      footer#site-footer{ height:var(--header-h-desktop); }
+    }
+
+    /* Footer banner: letterboxed (never cropped) */
+    .footer-img{
+      width:100%; height:100%;
+      object-fit:contain;          /* <— keeps whole banner visible */
+      background:#000;             /* letterbox color (change if you want) */
+    }
+
+    /* Push main content away from fixed header/footer */
+    main#content{
+      padding-top:calc(var(--header-h-mobile) + 12px);
+      padding-bottom:calc(var(--header-h-mobile) + 16px);
+    }
+    @media (min-width: 768px){
+      main#content{
+        padding-top:calc(var(--header-h-desktop) + 16px);
+        padding-bottom:calc(var(--header-h-desktop) + 24px);
       }
     }
+
+    /* Card sizing */
+    .card-frame{
+      width:var(--card-w-mobile);
+      height:var(--card-h-mobile);
+    }
+    @media (min-width:1024px){
+      .card-frame{
+        width:var(--card-w-desktop);
+        height:var(--card-h-desktop);
+      }
+    }
+
+    /* Flip 3-sides (front/stats/HS) */
+    .flip-card{ perspective:1000px; }
+    .flip-inner{
+      position:relative; width:100%; height:100%;
+      transform-style:preserve-3d; transition:transform .6s ease;
+    }
+    .flip-panel{
+      position:absolute; inset:0; backface-visibility:hidden; -webkit-backface-visibility:hidden;
+      border-radius:.5rem; overflow:hidden; background:#fff;
+    }
+    .flip-back{ transform:rotateY(180deg); }
+    .flip-third{ transform:rotateY(-90deg); }
+
+    /* Click states controlling rotation */
+    .flipped-right-1 .flip-inner{ transform:rotateY(-90deg); }   /* front -> stats */
+    .flipped-right-2 .flip-inner{ transform:rotateY(-180deg); }  /* stats -> HS (keep rotating right) */
+    .flipped-left-1  .flip-inner{ transform:rotateY(90deg); }    /* front -> HS (left click) */
+    .flipped-left-2  .flip-inner{ transform:rotateY(180deg); }   /* HS -> stats (keep rotating left) */
+
+    /* Level chips */
+    .chip{ font-size:.7rem; font-weight:700; color:#fff; padding:.25rem .5rem; border-radius:.375rem; }
+    .lvl-mlb{ background:var(--maroon); }
+    .lvl-aaa{ background:#1a56db; } .lvl-aa{ background:#3b82f6; } .lvl-a-plus{ background:#2563eb; }
+    .lvl-a{ background:#3730a3; } .lvl-high-a{ background:#4f46e5; } .lvl-low-a{ background:#4338ca; }
+    .lvl-rookie{ background:#1e40af; } .lvl-ncaa{ background:#14532d; } .lvl-ncaa-d1{ background:#15803d; }
+    .lvl-ncaa-d2{ background:#166534; } .lvl-ncaa-d3{ background:#14532d; } .lvl-naia{ background:#92400e; }
+    .lvl-jrcollege{ background:#a16207; } .lvl-njcaa{ background:#f59e0b; color:#111; } .lvl-indy{ background:#3f6212; }
+    .lvl-n-a{ background:#6b7280; }
+
+    /* Image gradients for legibility */
+    .black-grad{ background-image:linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,.55) 100%); }
   </style>
 </head>
-
-<body class="bg-neutral-100 text-neutral-900">
+<body class="bg-neutral-100">
 
   <!-- Header -->
-  <header id="header" class="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur border-b border-neutral-200">
-    <div class="px-4 h-20 flex items-center justify-between">
+  <header id="site-header" class="w-full">
+    <div class="h-full max-w-7xl mx-auto px-4 flex items-center justify-between">
       <div class="flex items-center gap-3">
-        <img src
+        <!-- Hamilton lockup (swap src when ready) -->
+        <img src="https://i.postimg.cc/KYrbztp1/hamilton-logo-block-with-3-lines-of-type.png" class="h-10 md:h-14 w-auto" alt="Hamilton High • Active Alumni">
+      </div>
+
+      <nav class="hidden md:flex items-center gap-6 nav-font text-sm uppercase tracking-wide">
+        <a class="text-[var(--maroon)] border-b-2 border-[var(--maroon)] pb-1">Where They Yat?</a>
+        <a class="text-neutral-600 hover:text-[var(--maroon)]">Active Alumni News</a>
+        <a class="text-neutral-600 hover:text-[var(--maroon)]">All-Time Huskies Roster</a>
+        <a class="text-neutral-600 hover:text-[var(--maroon)]">Yat-A-Boy Marketplace</a>
+        <a class="text-neutral-600 hover:text-[var(--maroon)]">PCDAction Partners</a>
+        <a class="text-neutral-600 hover:text-[var(--maroon)]">Current HS Team</a>
+        <a class="text-neutral-600 hover:text-[var(--maroon)]">Global School Search</a>
+        <a class="text-neutral-600 hover:text-[var(--maroon)]">Register | Login</a>
+      </nav>
+
+      <div class="flex items-center gap-4">
+        <i class="fa-solid fa-search text-neutral-800 text-lg md:hidden"></i>
+        <!-- YAT?STATS mark -->
+        <img src="https://i.postimg.cc/76srDfFT/yatstats-logo-stacked.png" class="h-8 md:h-10 w-auto" alt="YAT?STATS">
+      </div>
+    </div>
+  </header>
+
+  <!-- Main -->
+  <main id="content" class="max-w-7xl mx-auto px-4">
+    <!-- Filters row -->
+    <div class="flex flex-col md:flex-row md:items-center gap-3 mb-4">
+      <div class="relative w-full md:w-1/2">
+        <input id="search-input" type="text" placeholder="Search by player name"
+               class="w-full pl-10 pr-3 py-2 rounded-lg border border-[var(--border)] text-sm">
+        <i class="fa-solid fa-search absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400"></i>
+      </div>
+      <select id="level-select" class="w-full md:w-44 px-3 py-2 rounded-lg border border-[var(--border)] text-sm">
+        <option value="">All Levels</option>
+      </select>
+      <select id="grad-class-select" class="w-full md:w-48 px-3 py-2 rounded-lg border border-[var(--border)] text-sm">
+        <option value="">All Grad Years</option>
+      </select>
+    </div>
+
+    <!-- Roster grid -->
+    <div id="roster-grid"
+         class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 gap-4 justify-items-center">
+      <!-- cards injected here -->
+    </div>
+
+    <!-- News (placeholder) -->
+    <section class="mt-8">
+      <h2 class="nav-font uppercase tracking-wide text-lg mb-3">Latest News</h2>
+      <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <article class="bg-white rounded-lg border border-[var(--border)] p-4">
+          <h3 class="font-semibold mb-1">Hamilton alum earns weekly honors</h3>
+          <p class="text-sm text-neutral-600">Quick summary…</p>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer (letterboxed banner) -->
+  <footer id="site-footer">
+    <!-- Replace src with your real 1900x64 (or similar) banner when ready -->
+    <img class="footer-img"
+         src="https://i.postimg.cc/05DWb4Fj/bmx-banner.png"
+         alt="Partner Banner">
+  </footer>
+
+  <script>
+    // --------- DATA: 30 players, ready for real values/images ----------
+    const players = [
+      // names list -> player objects with placeholders
+      "Cooper Brass","Caden Burghardt","Carson Johnson","Drew Rogers","Liam Wilson",
+      "DJ Barrett","Roch Cholowsky","Zachary Johnston","Ryan Kucherak","Rohan Lettow",
+      "Jeter Mauzey","Will Shelor","Zach Wadas","Jeremy Jones","Kole Klecker",
+      "Logan Saloman","Luke Thiele","Josh Tiedemann","Gavin Turley","Braden Watkins",
+      "Alex Hernandez","Shane Anderson","Brock Selvidge","Tyler Wilson","Shane Murphy",
+      "Dom Hamel","Drew Swift","Logan Boyer","Patrick Murphy","Cody Bellinger"
+    ].map(fullName => {
+      const slug = fullName.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'');
+      const initials = fullName.split(' ').map(p=>p[0]).slice(0,2).join('').toUpperCase();
+      const placeholder = `https://via.placeholder.com/500x700.png?text=${encodeURIComponent(initials)}&bg=111111&fg=FFFFFF`;
+      return {
+        id: slug,
+        name: fullName,
+        graduatingClass: "",              // e.g. 2019
+        currentLevel: "N/A",              // e.g. MLB, AAA, NCAA-D1, etc.
+        position: "",                     // e.g. P, CF-1B
+        team: "",                         // e.g. New York Yankees
+        frontImg: placeholder,            // swap with Postimg "Direct link" (https://i.postimg.cc/...)
+        highSchoolImg: placeholder,       // HS photo if different
+        stats: {
+          lastGame: { date:"", stats:"" },
+          seasonStats: { avg:"", hr:"", rbi:"", ops:"", era:"", so:"", whip:"" }
+        },
+        nextGame: { date:"", opponent:"", time:"" },
+        highSchool: { accomplishments: [] }
+      };
+    });
+
+    // --------- UI helpers ----------
+    function levelClass(level){
+      if(!level) return 'lvl-n-a';
+      const k = level.toString().toLowerCase().replace(/[+ ]/g,'-');
+      const map = {
+        'mlb':'lvl-mlb','aaa':'lvl-aaa','aa':'lvl-aa','a+':'lvl-a-plus','a-plus':'lvl-a-plus','a':'lvl-a',
+        'high-a':'lvl-high-a','low-a':'lvl-low-a','rookie':'lvl-rookie','ncaa':'lvl-ncaa','ncaa-d1':'lvl-ncaa-d1',
+        'ncaa-d2':'lvl-ncaa-d2','ncaa-d3':'lvl-ncaa-d3','naia':'lvl-naia','jrcollege':'lvl-jrcollege','njcaa':'lvl-njcaa',
+        'indy':'lvl-indy','n/a':'lvl-n-a'
+      };
+      return map[k] || 'lvl-n-a';
+    }
+
+    function isPitcher(position=''){ return /p(itcher)?/i.test(position); }
+
+    function cardHTML(p){
+      return `
+      <div id="card-${p.id}" class="flip-card card-frame">
+        <div class="flip-inner">
+          <!-- FRONT -->
+          <div class="flip-panel">
+            <div class="relative w-full h-full">
+              <img src="${p.frontImg}" alt="${p.name}" class="w-full h-full object-cover"/>
+              <div class="absolute top-2 right-2 chip ${levelClass(p.currentLevel)}">${p.currentLevel || 'N/A'}</div>
+              <div class="absolute inset-x-0 bottom-0 black-grad text-white p-3">
+                <div class="flex items-start justify-between">
+                  <div>
+                    <div class="text-lg font-bold">${p.name}</div>
+                    <div class="text-xs opacity-90">${p.team || ''} ${p.position?('• '+p.position):''}</div>
+                  </div>
+                  ${p.graduatingClass ? `<span class="text-[11px] bg-white/90 text-neutral-800 px-2 py-0.5 rounded">${p.graduatingClass}</span>`:''}
+                </div>
+                <div class="mt-2 text-[12px] opacity-95">
+                  ${p.stats?.lastGame?.date ? `<div><b>Last:</b> ${p.stats.lastGame.date} — ${p.stats.lastGame.stats}</div>`:''}
+                  ${p.nextGame?.date ? `<div><b>Next:</b> ${p.nextGame.date} • ${p.nextGame.opponent || ''} • ${p.nextGame.time || ''}</div>`:''}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- STATS -->
+          <div class="flip-panel flip-back">
+            <div class="w-full h-full p-3 flex flex-col">
+              <div class="flex items-center justify-between mb-2">
+                <div class="font-semibold">${p.name}</div>
+                ${p.graduatingClass ? `<span class="text-[11px] bg-neutral-100 px-2 py-0.5 rounded">${p.graduatingClass}</span>`:''}
+              </div>
+              <div class="grid grid-cols-3 gap-2 text-center text-sm">
+                ${
+                  isPitcher(p.position)
+                  ? `
+                    <div class="bg-neutral-100 rounded p-2"><div class="text-[11px] text-neutral-500">ERA</div><div class="font-bold">${p.stats.seasonStats.era||'-'}</div></div>
+                    <div class="bg-neutral-100 rounded p-2"><div class="text-[11px] text-neutral-500">SO</div><div class="font-bold">${p.stats.seasonStats.so||'-'}</div></div>
+                    <div class="bg-neutral-100 rounded p-2"><div class="text-[11px] text-neutral-500">WHIP</div><div class="font-bold">${p.stats.seasonStats.whip||'-'}</div></div>
+                  `
+                  : `
+                    <div class="bg-neutral-100 rounded p-2"><div class="text-[11px] text-neutral-500">AVG</div><div class="font-bold">${p.stats.seasonStats.avg||'-'}</div></div>
+                    <div class="bg-neutral-100 rounded p-2"><div class="text-[11px] text-neutral-500">HR</div><div class="font-bold">${p.stats.seasonStats.hr||'-'}</div></div>
+                    <div class="bg-neutral-100 rounded p-2"><div class="text-[11px] text-neutral-500">RBI</div><div class="font-bold">${p.stats.seasonStats.rbi||'-'}</div></div>
+                  `
+                }
+              </div>
+              <div class="mt-auto text-xs text-neutral-600">${p.team || ''} ${p.position?('• '+p.position):''}</div>
+            </div>
+          </div>
+
+          <!-- HIGH SCHOOL -->
+          <div class="flip-panel flip-third">
+            <div class="w-full h-full flex flex-col">
+              <div class="flex-1">
+                <img src="${p.highSchoolImg}" alt="${p.name} HS" class="w-full h-full object-cover"/>
+              </div>
+              <div class="p-3">
+                <div class="font-semibold mb-1">High School Notes</div>
+                <ul class="list-disc list-inside text-sm space-y-0.5">
+                  ${(p.highSchool.accomplishments||[]).map(s=>`<li>${s}</li>`).join('') || '<li>—</li>'}
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>`;
+    }
+
+    function render(playersList){
+      const grid = document.getElementById('roster-grid');
+      grid.innerHTML = playersList.map(cardHTML).join('');
+    }
+
+    function populateFilters(){
+      const gradSet = new Set(), levelSet = new Set();
+      players.forEach(p=>{
+        if(p.graduatingClass) gradSet.add(p.graduatingClass);
+        if(p.currentLevel) levelSet.add(p.currentLevel);
+      });
+
+      const gradSel = document.getElementById('grad-class-select');
+      [...gradSet].sort((a,b)=>b-a).forEach(v=>{
+        const o=document.createElement('option'); o.value=v; o.textContent=v; gradSel.appendChild(o);
+      });
+
+      const levelSel = document.getElementById('level-select');
+      [...levelSet].sort().forEach(v=>{
+        const o=document.createElement('option'); o.value=v.toLowerCase(); o.textContent=v; levelSel.appendChild(o);
+      });
+    }
+
+    function attachFlipBehavior(){
+      document.getElementById('roster-grid').addEventListener('click', (e)=>{
+        const card = e.target.closest('.flip-card'); if(!card) return;
+        const rect = card.getBoundingClientRect();
+        const rightSide = (e.clientX - rect.left) > rect.width/2;
+        const c = card.classList;
+
+        if(rightSide){
+          if(c.contains('flipped-right-1')){ c.remove('flipped-right-1'); c.add('flipped-right-2'); }
+          else if(c.contains('flipped-right-2')){ c.remove('flipped-right-2'); }                 // back to front
+          else if(c.contains('flipped-left-1')){ c.remove('flipped-left-1'); c.add('flipped-right-2'); }
+          else if(c.contains('flipped-left-2')){ c.remove('flipped-left-2'); c.add('flipped-left-1'); }
+          else{ c.add('flipped-right-1'); }                                                      // front -> stats
+        }else{
+          if(c.contains('flipped-left-1')){ c.remove('flipped-left-1'); c.add('flipped-left-2'); }
+          else if(c.contains('flipped-left-2')){ c.remove('flipped-left-2'); }                   // back to front
+          else if(c.contains('flipped-right-1')){ c.remove('flipped-right-1'); c.add('flipped-left-2'); }
+          else if(c.contains('flipped-right-2')){ c.remove('flipped-right-2'); c.add('flipped-right-1'); }
+          else{ c.add('flipped-left-1'); }                                                       // front -> HS
+        }
+      });
+    }
+
+    function wireFilters(){
+      const doFilter = ()=>{
+        const q = document.getElementById('search-input').value.trim().toLowerCase();
+        const lvl = document.getElementById('level-select').value;
+        const grad = document.getElementById('grad-class-select').value;
+        const out = players.filter(p=>{
+          const s = p.name.toLowerCase().includes(q);
+          const l = !lvl || (p.currentLevel && p.currentLevel.toLowerCase()===lvl);
+          const g = !grad || (p.graduatingClass && String(p.graduatingClass)===String(grad));
+          return s && l && g;
+        });
+        render(out);
+      };
+      ['input','change'].forEach(ev=>{
+        document.getElementById('search-input').addEventListener('input', doFilter);
+        document.getElementById('level-select').addEventListener('change', doFilter);
+        document.getElementById('grad-class-select').addEventListener('change', doFilter);
+      });
+    }
+
+    // Boot
+    render(players);
+    populateFilters();
+    attachFlipBehavior();
+    wireFilters();
+  </script>
+</body>
+</html>
