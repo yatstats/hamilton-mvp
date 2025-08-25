@@ -5,19 +5,366 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>YAT?STATS • Hamilton – Where They YAT?</title>
 
-<!-- Tailwind -->
+<!-- Tailwind CDN -->
 <script src="https://cdn.tailwindcss.com"></script>
 
 <!-- Fonts -->
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet" />
+
 <style>
-  :root{
-    --maroon:#7A0019;
-    --ink:#111;
-    --muted:#6b7280;
-    --ring:#E3E6EA;
-  }
+  :root{ --maroon:#7A0019; --ink:#111; --ring:#E3E6EA; }
   *{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+
+  /* Header heights */
   .site-header{height:112px}
   @media (max-width:768px){.site-header{height:75px}}
-  .nav-link{letter-spacing:.06em
+
+  /* Nav look */
+  .nav-link{letter-spacing:.06em;font-weight:700}
+  .nav-link.active{color:var(--maroon);position:relative}
+  .nav-link.active::after{content:"";position:absolute;left:0;right:0;bottom:-2px;height:2px;background:var(--maroon)}
+
+  /* Mobile drawer */
+  #mobile-sidebar{transition:transform .25s ease}
+
+  /* 3-sided flip card */
+  .flip-card{perspective:1200px}
+  .flip-card-inner{position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform .6s}
+  .panel{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden}
+  .panel.side2{transform:rotateY(120deg)}
+  .panel.side3{transform:rotateY(240deg)}
+  .flip-rot-0  .flip-card-inner{transform:rotateY(0deg)}
+  .flip-rot-120 .flip-card-inner{transform:rotateY(120deg)}
+  .flip-rot-240 .flip-card-inner{transform:rotateY(240deg)}
+
+  /* Level tags */
+  .tag{padding:.25rem .5rem;border-radius:.375rem;font-weight:700;font-size:.70rem;color:#fff}
+  .tag-mlb{background:var(--maroon)} .tag-aaa{background:#2563eb}
+  .tag-aa{background:#3b82f6} .tag-a+{background:#4f46e5}
+  .tag-a{background:#4338ca} .tag-ncaa{background:#166534}
+  .tag-njcaa{background:#a16207} .tag-naia{background:#92400e}
+  .tag-indy{background:#3f6212} .tag-kbo{background:#0ea5e9}
+
+  /* Footer */
+  .footer-wrap{height:77px}
+  .footer-img{height:100%;width:100%;object-fit:cover}
+
+  /* Card media */
+  .card-img{aspect-ratio:5/8;object-fit:cover;width:100%;border-radius:.5rem}
+  .logo-yat{height:32px} @media (min-width:768px){ .logo-yat{height:48px} }
+</style>
+</head>
+<body class="bg-neutral-100 text-[15px]">
+
+<!-- Header -->
+<header class="site-header fixed top-0 inset-x-0 z-40 bg-white border-b border-[var(--ring)]">
+  <div class="h-full px-4 md:px-6 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <img src="https://i.postimg.cc/NjRf6nGF/hamilton-log-with-3-lines.png" alt="Hamilton HS" class="h-9 md:h-12 w-auto" />
+      <nav class="hidden md:flex items-center gap-6 ml-6">
+        <a class="nav-link active uppercase text-[12px]" href="javascript:void(0)">Where They YAT?</a>
+        <a class="nav-link uppercase text-[12px] text-neutral-600" href="javascript:void(0)">Active Alumni News</a>
+        <a class="nav-link uppercase text-[12px] text-neutral-600" href="javascript:void(0)">All-Time Huskies Roster</a>
+        <a class="nav-link uppercase text-[12px] text-neutral-600" href="javascript:void(0)">YAT-A-BOY Marketplace</a>
+      </nav>
+    </div>
+    <div class="flex items-center gap-4">
+      <img src="https://i.postimg.cc/76srDfFT/yatstats-logo-stacked.png" alt="YAT?STATS" class="logo-yat w-auto" />
+      <button id="hamburger" class="md:hidden p-2 rounded border border-[var(--ring)]" aria-label="Open menu">
+        <svg width="20" height="20" fill="none" stroke="currentColor"><path stroke-width="2" d="M3 6h14M3 10h14M3 14h14"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- Mobile drawer -->
+<aside id="mobile-sidebar" class="fixed top-0 right-0 bottom-0 z-50 w-[80%] max-w-sm bg-white shadow-2xl translate-x-full md:hidden">
+  <div class="pt-[75px] px-5 pb-6 space-y-6">
+    <div class="relative">
+      <input id="search-input-m" type="text" placeholder="Search by Player Name" class="w-full pl-10 pr-3 py-2 border border-[var(--ring)] rounded" />
+      <svg class="absolute left-3 top-1/2 -translate-y-1/2" width="16" height="16" fill="none" stroke="#9CA3AF"><circle cx="7" cy="7" r="5"/><path d="M11 11l4 4" stroke-width="2"/></svg>
+    </div>
+    <nav class="flex flex-col gap-4 text-right">
+      <a class="nav-link active uppercase text-[14px]" href="javascript:void(0)">Where They YAT?</a>
+      <a class="nav-link uppercase text-[14px] text-neutral-600" href="javascript:void(0)">Active Alumni News</a>
+      <a class="nav-link uppercase text-[14px] text-neutral-600" href="javascript:void(0)">All-Time Huskies Roster</a>
+      <a class="nav-link uppercase text-[14px] text-neutral-600" href="javascript:void(0)">YAT-A-BOY Marketplace</a>
+    </nav>
+  </div>
+</aside>
+<div id="sidebar-overlay" class="fixed inset-0 bg-black/30 hidden md:hidden"></div>
+
+<!-- Main -->
+<main class="pt-[75px] md:pt-[112px] pb-[77px]">
+  <!-- Filters -->
+  <section class="px-4 md:px-6 py-3 flex items-center gap-3 sticky top-[75px] md:top-[112px] bg-white/90 backdrop-blur z-30 border-b border-[var(--ring)]">
+    <div class="relative flex-1">
+      <input id="search-input" type="text" placeholder="Search by Player Name" class="w-full pl-10 pr-3 py-2 border border-[var(--ring)] rounded" />
+      <svg class="absolute left-3 top-1/2 -translate-y-1/2" width="16" height="16" fill="none" stroke="#9CA3AF"><circle cx="7" cy="7" r="5"/><path d="M11 11l4 4" stroke-width="2"/></svg>
+    </div>
+    <select id="grad-filter" class="px-3 py-2 border border-[var(--ring)] rounded text-sm">
+      <option value="">Graduating Class</option>
+    </select>
+    <select id="level-filter" class="px-3 py-2 border border-[var(--ring)] rounded text-sm">
+      <option value="">Current Level</option>
+    </select>
+
+    <!-- CSV Import -->
+    <button id="btn-import" class="px-3 py-2 border border-[var(--ring)] rounded text-sm bg-white hover:bg-neutral-50">
+      Import CSV
+    </button>
+    <input id="file-input" type="file" accept=".csv,text/csv" class="hidden" />
+  </section>
+
+  <!-- Grid -->
+  <section id="roster-grid" class="px-4 md:px-6 py-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+    <!-- cards injected -->
+  </section>
+</main>
+
+<!-- Footer -->
+<footer class="footer-wrap fixed bottom-0 inset-x-0 bg-white border-t border-[var(--ring)]">
+  <img class="footer-img" src="https://i.postimg.cc/05DWb4Fj/bmx-banner.png" alt="Sponsor banner" />
+</footer>
+
+<script>
+/* -------------------- Default seed (fallback) -------------------- */
+let players = [
+  {
+    id:"bellinger",
+    name:"Cody Bellinger",
+    graduatingClass:2013,
+    currentLevel:"MLB",
+    position:"CF/1B",
+    team:"New York Yankees",
+    frontImg:"https://i.postimg.cc/Y2PVpqNK/new-york-yankees-outfielder-cody-bellinger.jpg",
+    highSchoolImg:"https://i.postimg.cc/z3h5j6H9/Bellinger-Hamilton-HS.jpg",
+    seasonStats:{ avg:"—", hr:"—", rbi:"—", ops:"—" },
+    lastGame:{ line:"—" },
+    nextGame:{ opponent:"—", time:"—" }
+  },
+  {
+    id:"patrick-murphy",
+    name:"Patrick Murphy",
+    graduatingClass:2013,
+    currentLevel:"KBO",
+    position:"P",
+    team:"KT Wiz Suwon",
+    frontImg:"https://i.postimg.cc/gc32dtQG/MURPH.avif",
+    highSchoolImg:"https://i.postimg.cc/pL6kR3Fq/21-Murphy-Back-page-00001.jpg",
+    seasonStats:{ era:"—", so:"—", whip:"—" },
+    lastGame:{ line:"—" },
+    nextGame:{ opponent:"—", time:"—" }
+  }
+];
+
+/* -------------------- Helpers -------------------- */
+function levelTag(level){
+  const key=String(level||'').toLowerCase().trim();
+  const map={mlb:'tag-mlb',aaa:'tag-aaa',aa:'tag-aa','a+':'tag-a+','a':'tag-a',ncaa:'tag-ncaa',njcaa:'tag-njcaa',naia:'tag-naia',indy:'tag-indy',kbo:'tag-kbo'};
+  return map[key]||'tag-mlb';
+}
+function safe(s){return (s??'').toString().trim()}
+function toId(name){return safe(name).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'')}
+
+/* -------------------- Card template -------------------- */
+function makeCard(p){
+  const lvlClass=levelTag(p.currentLevel);
+  const hsSide = p.highSchoolImg
+    ? `<img src="${safe(p.highSchoolImg)}" class="w-full h-full object-cover" loading="lazy" decoding="async"
+         onerror="this.src='https://i.postimg.cc/76srDfFT/yatstats-logo-stacked.png'"/>`
+    : `<div class="h-full flex items-center justify-center text-neutral-400">No HS image yet</div>`;
+
+  return `
+  <article tabindex="0" class="flip-card flip-rot-0 bg-white border border-[var(--ring)] rounded-lg shadow-sm overflow-hidden" style="height:460px; position:relative;">
+    <div class="flip-card-inner">
+      <!-- Side 1: Hero -->
+      <div class="panel side1">
+        <div class="relative p-3">
+          <img class="card-img" src="${safe(p.frontImg)}" alt="${safe(p.name)}" loading="lazy" decoding="async"
+               onerror="this.src='https://i.postimg.cc/76srDfFT/yatstats-logo-stacked.png'"/>
+          <span class="tag ${lvlClass} absolute top-4 right-4">${safe(p.currentLevel)}</span>
+          <div class="absolute inset-x-3 bottom-3 rounded bg-gradient-to-t from-black/75 to-transparent p-3 text-white">
+            <div class="text-lg font-extrabold leading-tight">${safe(p.name)}</div>
+            <div class="text-xs opacity-90">${safe(p.team)} • ${safe(p.position)}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Side 2: Stats summary -->
+      <div class="panel side2 bg-white p-4">
+        <div class="flex items-start justify-between mb-3">
+          <div>
+            <div class="text-base font-bold">${safe(p.name)}</div>
+            <div class="text-xs text-neutral-500">${safe(p.team)} • ${safe(p.position)}</div>
+          </div>
+          <span class="tag ${lvlClass}">${safe(p.currentLevel)}</span>
+        </div>
+        ${renderStats(p)}
+        <div class="mt-3 text-xs text-neutral-500">Hamilton Class of ${safe(p.graduatingClass)}</div>
+      </div>
+
+      <!-- Side 3: HS image -->
+      <div class="panel side3 bg-white">${hsSide}</div>
+    </div>
+  </article>`;
+}
+
+function renderStats(p){
+  const isPitcher = /(^p$|\bpitch)/i.test(safe(p.position));
+  const s = p.seasonStats||{};
+  if(isPitcher){
+    return `<div class="grid grid-cols-3 gap-2">
+      ${statBox('ERA', s.era)}
+      ${statBox('SO/K9', s.so ?? s.k9)}
+      ${statBox('WHIP/W‑L', s.whip ?? s.wl)}
+    </div>`;
+  }
+  return `<div class="grid grid-cols-4 gap-2">
+    ${statBox('AVG', s.avg)}
+    ${statBox('HR',  s.hr)}
+    ${statBox('RBI', s.rbi)}
+    ${statBox('OPS', s.ops)}
+  </div>`;
+}
+function statBox(label,val){
+  return `<div class="bg-neutral-100 rounded p-2 text-center">
+    <div class="text-xs text-neutral-500">${label}</div>
+    <div class="font-semibold">${safe(val)||'—'}</div>
+  </div>`;
+}
+
+/* -------------------- Render & Filters -------------------- */
+function render(list){
+  document.getElementById('roster-grid').innerHTML=list.map(makeCard).join('');
+}
+function populateFilters(list){
+  const classes=[...new Set(list.map(p=>p.graduatingClass).filter(Boolean))].sort((a,b)=>b-a);
+  const levels=[...new Set(list.map(p=>p.currentLevel).filter(Boolean))];
+  const gf=document.getElementById('grad-filter'); gf.innerHTML='<option value="">Graduating Class</option>';
+  const lf=document.getElementById('level-filter'); lf.innerHTML='<option value="">Current Level</option>';
+  classes.forEach(c=>gf.insertAdjacentHTML('beforeend', `<option value="${c}">${c}</option>`));
+  levels.forEach(l=>lf.insertAdjacentHTML('beforeend', `<option value="${l}">${l}</option>`));
+}
+function applyFilters(){
+  const q=(document.getElementById('search-input').value||'').toLowerCase();
+  const g=document.getElementById('grad-filter').value;
+  const l=document.getElementById('level-filter').value;
+  const filtered=players.filter(p =>
+    (!q || p.name.toLowerCase().includes(q)) &&
+    (!g || String(p.graduatingClass)===g) &&
+    (!l || p.currentLevel===l)
+  );
+  render(filtered);
+}
+
+/* Flip behavior: click right -> next; click left -> previous */
+function rotateCard(card,right){
+  if(card.classList.contains('flip-rot-0')) card.classList.replace('flip-rot-0',right?'flip-rot-120':'flip-rot-240');
+  else if(card.classList.contains('flip-rot-120')) card.classList.replace('flip-rot-120',right?'flip-rot-240':'flip-rot-0');
+  else card.classList.replace('flip-rot-240',right?'flip-rot-0':'flip-rot-120');
+}
+document.addEventListener('click',e=>{
+  const card=e.target.closest('.flip-card'); if(!card) return;
+  const rect=card.getBoundingClientRect();
+  rotateCard(card,(e.clientX-rect.left)>rect.width/2);
+});
+
+/* -------------------- CSV ingest -------------------- */
+/* CSV headers supported:
+   name, graduatingClass, currentLevel, position, team, frontImg, highSchoolImg,
+   avg, hr, rbi, ops, era, so, whip, wl, k9
+*/
+function parseCSV(text){
+  // Lightweight CSV parser with quotes support
+  const rows=[]; let cur='', inQ=false, row=[];
+  for(let i=0;i<text.length;i++){
+    const c=text[i], n=text[i+1];
+    if(c === '"' ){ if(inQ && n === '"'){cur+='"'; i++;} else {inQ=!inQ;} }
+    else if(c === ',' && !inQ){ row.push(cur); cur=''; }
+    else if((c === '\n' || c === '\r') && !inQ){ if(cur!==''||row.length){row.push(cur); rows.push(row); row=[]; cur='';} }
+    else { cur+=c; }
+  }
+  if(cur!==''||row.length) { row.push(cur); rows.push(row); }
+  // header map
+  const header = rows.shift().map(h=>h.trim());
+  return rows.filter(r=>r.length).map(r=>{
+    const obj={}; header.forEach((h,idx)=> obj[h]= (r[idx]??'').trim() );
+    // normalize
+    const seasonStats = {
+      avg:obj.avg, hr:obj.hr, rbi:obj.rbi, ops:obj.ops,
+      era:obj.era, so:obj.so, whip:obj.whip, wl:obj.wl, k9:obj.k9
+    };
+    const out = {
+      id: toId(obj.name),
+      name: obj.name,
+      graduatingClass: Number(obj.graduatingClass)||obj.graduatingClass||'',
+      currentLevel: obj.currentLevel,
+      position: obj.position,
+      team: obj.team,
+      frontImg: obj.frontImg,
+      highSchoolImg: obj.highSchoolImg,
+      seasonStats
+    };
+    return out;
+  });
+}
+
+async function tryLoadRepoCSV(){
+  try{
+    // If you add a file named players.csv next to index.html, this will load it
+    const res = await fetch('players.csv', {cache:'no-store'});
+    if(!res.ok) return false;
+    const text = await res.text();
+    const parsed = parseCSV(text);
+    if(parsed.length){
+      players = parsed;
+      populateFilters(players);
+      render(players);
+      return true;
+    }
+    return false;
+  }catch(e){ return false; }
+}
+
+function handleLocalCSV(file){
+  const reader = new FileReader();
+  reader.onload = () => {
+    const parsed = parseCSV(reader.result);
+    if(parsed.length){
+      players = parsed;
+      populateFilters(players);
+      render(players);
+    } else {
+      alert('CSV parsed but no rows found. Check headers.');
+    }
+  };
+  reader.readAsText(file);
+}
+
+/* -------------------- Init -------------------- */
+document.addEventListener('DOMContentLoaded', async () => {
+  populateFilters(players);
+  render(players);
+
+  // Filters + search
+  ['search-input','grad-filter','level-filter'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el){ el.addEventListener('input',applyFilters); el.addEventListener('change',applyFilters); }
+  });
+
+  // Import button
+  const btn=document.getElementById('btn-import');
+  const fileInput=document.getElementById('file-input');
+  btn?.addEventListener('click',()=>fileInput.click());
+  fileInput?.addEventListener('change', (e)=>{
+    const file=e.target.files?.[0];
+    if(file) handleLocalCSV(file);
+  });
+
+  // Try auto-loading players.csv from repo
+  await tryLoadRepoCSV();
+});
+</script>
+</body>
+</html>
