@@ -11,12 +11,7 @@
 <!-- Fonts -->
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet" />
 <style>
-  :root{
-    --maroon:#7A0019;
-    --ink:#111;
-    --muted:#6b7280;
-    --ring:#E3E6EA;
-  }
+  :root{ --maroon:#7A0019; --ink:#111; --muted:#6b7280; --ring:#E3E6EA; }
   *{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
   .site-header{height:112px}
   @media (max-width:768px){.site-header{height:75px}}
@@ -59,7 +54,6 @@
 <!-- Header -->
 <header class="site-header fixed top-0 inset-x-0 z-40 bg-white border-b border-[var(--ring)]">
   <div class="h-full px-4 md:px-6 flex items-center justify-between">
-    <!-- Left -->
     <div class="flex items-center gap-3">
       <img src="https://i.postimg.cc/NjRf6nGF/hamilton-log-with-3-lines.png" alt="Hamilton High School • Active Alumni" class="h-9 md:h-12 w-auto" />
       <nav class="hidden md:flex items-center gap-6 ml-6">
@@ -73,7 +67,6 @@
         <a class="nav-link uppercase text-[12px] text-neutral-600 hover:text-[var(--maroon)]" href="#">Register | Login</a>
       </nav>
     </div>
-    <!-- Right -->
     <div class="flex items-center gap-4">
       <img src="https://i.postimg.cc/76srDfFT/yatstats-logo-stacked.png" alt="YAT?STATS" class="logo-yat w-auto" />
       <button id="hamburger" class="md:hidden p-2 rounded border border-[var(--ring)]" aria-label="Open menu">
@@ -130,7 +123,10 @@
 </footer>
 
 <script>
-/* ---------------- DEMO FALLBACK (never leaves you empty) ---------------- */
+/* ====================== CONFIG ====================== */
+const USE_CSV = false; // <— leave FALSE so cards always show. Set to true when ready.
+
+/* ================== DEMO FALLBACK DATA ================== */
 const demoPlayers = [
   {
     id:"bellinger",
@@ -175,63 +171,55 @@ const demoPlayers = [
 
 let players = [...demoPlayers];
 
-/* ---------------- CSV LOADER (safe fallback baked in) ---------------- */
+/* ================= CSV LOADER (opt‑in) ================= */
 async function tryLoadCSV() {
-  // Looks for players.csv at the repo root
-  const url = 'players.csv?v=' + Date.now(); // bypass GH Pages cache
+  if (!USE_CSV) return; // hard stop unless you opt‑in
+
+  const url = 'players.csv?v=' + Date.now(); // bypass cache
   try {
-    const res = await fetch(url, { cache: 'no-store' });
-    if (!res.ok) throw new Error('No CSV found');
+    const res = await fetch(url, { cache:'no-store' });
+    if (!res.ok) throw new Error('CSV not found');
     const text = await res.text();
     const rows = parseCSV(text);
     if (rows.length) {
       players = rows.map(csvToPlayer);
     }
   } catch (e) {
-    // stay on demoPlayers silently
+    // keep demoPlayers silently
   }
 }
-
-/* Small CSV parser (handles plain CSV; for commas in fields, switch to PapaParse later) */
 function parseCSV(text){
   const lines = text.trim().split(/\r?\n/);
   if (!lines.length) return [];
   const headers = lines[0].split(',').map(h=>h.trim());
   return lines.slice(1).map(line=>{
-    const cols = line.split(','); // simple split (no quoted commas)
-    let obj = {};
-    headers.forEach((h,i)=> obj[h] = (cols[i] ?? '').trim());
-    return obj;
-  }).filter(r => Object.values(r).some(v=>v)); // drop empty lines
+    const cols = line.split(',');
+    let o={}; headers.forEach((h,i)=> o[h] = (cols[i] ?? '').trim());
+    return o;
+  }).filter(r => Object.values(r).some(v=>v));
 }
-
-/* Map CSV row => player object
-   Expected headers (camelCase or Exactly as below):
-   id,name,graduatingClass,currentLevel,position,team,frontImg,highSchoolImg,
-   statAVG,statHR,statRBI,statOPS,statERA,statSO,statWHIP,lastLine,nextOpponent,nextTime
-*/
 function csvToPlayer(r){
-  const n = (k) => r[k] ?? r[k.charAt(0).toLowerCase()+k.slice(1)] ?? '';
-  const isPitcher = /p(itcher)?/i.test(n('position'));
-  const seasonStats = isPitcher
-    ? { era:n('statERA')||'—', so:n('statSO')||'—', whip:n('statWHIP')||'—', wl:n('statWL')||undefined }
-    : { avg:n('statAVG')||'—', hr:n('statHR')||'—', rbi:n('statRBI')||'—', ops:n('statOPS')||'—' };
+  const g = k => r[k] ?? '';
+  const isP = /p(itcher)?/i.test(g('position'));
+  const seasonStats = isP
+    ? { era:g('statERA')||'—', so:g('statSO')||'—', whip:g('statWHIP')||'—', wl:g('statWL')||undefined }
+    : { avg:g('statAVG')||'—', hr:g('statHR')||'—', rbi:g('statRBI')||'—', ops:g('statOPS')||'—' };
   return {
-    id: n('id') || (n('name')||'').toLowerCase().replace(/\s+/g,'-'),
-    name: n('name') || 'Unknown',
-    graduatingClass: Number(n('graduatingClass')) || '',
-    currentLevel: n('currentLevel') || '',
-    position: n('position') || '',
-    team: n('team') || '',
-    frontImg: n('frontImg') || '',
-    highSchoolImg: n('highSchoolImg') || '',
+    id: g('id') || g('name').toLowerCase().replace(/\s+/g,'-'),
+    name: g('name') || 'Unknown',
+    graduatingClass: Number(g('graduatingClass')) || '',
+    currentLevel: g('currentLevel') || '',
+    position: g('position') || '',
+    team: g('team') || '',
+    frontImg: g('frontImg') || '',
+    highSchoolImg: g('highSchoolImg') || '',
     seasonStats,
-    lastGame: { line: n('lastLine') || '—' },
-    nextGame: { opponent: n('nextOpponent') || '—', time: n('nextTime') || '—' }
+    lastGame: { line: g('lastLine') || '—' },
+    nextGame: { opponent: g('nextOpponent') || '—', time: g('nextTime') || '—' }
   };
 }
 
-/* ---------------- UI HELPERS ---------------- */
+/* ================= UI HELPERS ================= */
 function levelTag(level){
   const key = String(level||'').toLowerCase();
   const map = { mlb:'tag-mlb', aaa:'tag-aaa', aa:'tag-aa', 'a+':'tag-a+', a:'tag-a', ncaa:'tag-ncaa', njcaa:'tag-njcaa', naia:'tag-naia', indy:'tag-indy', kbo:'tag-kbo' };
@@ -296,7 +284,7 @@ function makeCard(p){
   </article>`;
 }
 
-/* ---------------- RENDER & FILTERS ---------------- */
+/* ================= RENDER & FILTERS ================= */
 function render(list){ document.getElementById('roster-grid').innerHTML = list.map(makeCard).join(''); }
 
 function populateFilters(){
@@ -321,7 +309,7 @@ function applyFilters(){
   render(filtered);
 }
 
-/* ---------------- Flip behavior ---------------- */
+/* ================= Flip behavior ================= */
 function rotateCard(card, toRight){
   if(card.classList.contains('flip-rot-0')){
     card.classList.replace('flip-rot-0', toRight ? 'flip-rot-120' : 'flip-rot-240');
@@ -344,7 +332,7 @@ document.addEventListener('keydown', (e)=>{
   rotateCard(card, e.key==='ArrowRight');
 });
 
-/* ---------------- Mobile drawer ---------------- */
+/* ================= Mobile drawer ================= */
 const hamb = document.getElementById('hamburger');
 const drawer = document.getElementById('mobile-sidebar');
 const overlay = document.getElementById('sidebar-overlay');
@@ -353,19 +341,11 @@ function closeDrawer(){ drawer.classList.add('translate-x-full'); overlay.classL
 hamb?.addEventListener('click', ()=> drawer.classList.contains('translate-x-full') ? openDrawer() : closeDrawer());
 overlay?.addEventListener('click', closeDrawer);
 
-/* ---------------- Boot ---------------- */
-(async function init(){
-  await tryLoadCSV();          // attempt to load players.csv
+/* ================= Boot ================= */
+window.addEventListener('load', async ()=>{
+  await tryLoadCSV();               // no-op while USE_CSV=false
   populateFilters();
   render(players);
 
-  // wire filters
   ['search-input','grad-filter','level-filter'].forEach(id=>{
-    const el = document.getElementById(id);
-    el && el.addEventListener('input', applyFilters);
-    el && el.addEventListener('change', applyFilters);
-  });
-})();
-</script>
-</body>
-</html>
+    const el =
