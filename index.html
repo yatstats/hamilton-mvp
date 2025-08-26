@@ -8,40 +8,43 @@
 <style>
   :root{
     --maroon:#7A0019; --ring:#E3E6EA; --bg:#f3f4f6;
-    --ink:#111827; --navink:#1f2937;
+    --ink:#111827; --navink:#1f2937; --hero:#464646; --chev:#9ca3af;
   }
   *{box-sizing:border-box}
   html,body{margin:0;padding:0}
   body{background:var(--bg);font:15px/1.4 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,"Apple Color Emoji","Segoe UI Emoji";color:var(--ink)}
+  body.no-scroll{overflow:hidden}
 
   /* ===== HEADER ===== */
   .site-header{
-    position:fixed; inset:0 0 auto 0; height:80px; z-index:20;
+    position:fixed; inset:0 0 auto 0; height:72px; z-index:20;
     background:#fff; border-bottom:1px solid var(--ring);
-    display:grid; grid-template-columns:auto 1fr auto; align-items:center; gap:8px; padding:0 12px;
+    display:grid; grid-template-columns:auto 1fr auto; align-items:center; gap:8px; padding:0 10px;
   }
-  .left-fixed{align-self:start; padding-top:12px;}
-  .left-fixed img{height:36px;width:auto;display:block}
+  .left-fixed{align-self:start; padding-top:8px;}
+  .left-fixed img{height:34px;width:auto;display:block}
   .nav-desktop{justify-self:center; display:flex; gap:0}
   .nav-desktop a{font-size:12px;text-transform:uppercase;color:var(--navink);margin:0 12px;text-decoration:none;white-space:nowrap;letter-spacing:.03em}
   .nav-desktop a.active{color:var(--maroon);border-bottom:2px solid var(--maroon);padding-bottom:3px;font-weight:700}
-  .header-right{justify-self:end; display:flex; align-items:center; gap:8px}
-  .iconbtn,.hambtn{width:36px;height:36px;display:grid;place-items:center;border:1px solid var(--ring);border-radius:10px;background:#fff;cursor:pointer}
+  .header-right{justify-self:end; display:flex; align-items:center; gap:6px; min-width:0}
+  .iconbtn,.hambtn{width:28px;height:28px;display:grid;place-items:center;border:0;background:transparent;cursor:pointer}
   .iconbtn svg,.hambtn svg{width:18px;height:18px;color:#111}
-  .ystats-logo{height:36px;width:auto;display:block}
+  .ystats-logo{height:30px;width:auto;display:block}
+  @media (max-width:480px){ .ystats-logo{height:28px} .left-fixed img{height:30px} }
   @media (max-width:1024px){ .nav-desktop{display:none} }
 
   /* ===== GRID ===== */
-  main{padding:80px 0 84px}
+  main{padding:72px 0 84px}
   .grid{padding:16px;display:grid;grid-template-columns:repeat(1,minmax(0,1fr));gap:12px}
-  @media (min-width:640px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
-  @media (min-width:1000px){.grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+  @media (min-width:768px){ .grid{grid-template-columns:repeat(3,minmax(0,1fr))} }    /* tablet 3 */
+  @media (min-width:1280px){ .grid{grid-template-columns:repeat(5,minmax(0,1fr))} }  /* desktop 5 */
+  @media (max-width:767px){ .card-wrap{width:80%; margin:0 auto} }                   /* small mobile 80% */
 
-  /* ===== CARD (5/7, E2E image) ===== */
+  /* ===== CARD (5/7, edge-to-edge) ===== */
   .card-wrap{display:flex;flex-direction:column;align-items:stretch}
   .card{
     background:#000;border:0;border-radius:0;box-shadow:0 2px 10px rgba(0,0,0,.04);
-    overflow:hidden;position:relative;user-select:none;aspect-ratio:5/7;min-height:320px;width:100%;
+    overflow:hidden;position:relative;user-select:none;aspect-ratio:5/7;min-height:280px;width:100%;
   }
   .flip-card{perspective:1200px}
   .flip-card-inner{position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform .6s cubic-bezier(.2,.7,.2,1)}
@@ -51,9 +54,8 @@
   .rot120 .flip-card-inner{transform:rotateY(120deg)}
   .rot240 .flip-card-inner{transform:rotateY(240deg)}
 
-  /* Media layer now absolute so the image truly fills the face */
-  .face-media{position:absolute; inset:0;}
-  .card-img{position:absolute; inset:0; width:100%; height:100%; object-fit:cover; border-radius:0; background:#111}
+  .face-media{position:absolute; inset:0;}               /* image truly fills face */
+  .card-img{position:absolute; inset:0; width:100%; height:100%; object-fit:cover; background:#111}
 
   /* ===== FACE 1 ===== */
   .bottom-grad{
@@ -64,40 +66,45 @@
       rgba(0,0,0,.86) 45%,
       rgba(0,0,0,0) 72%);
     pointer-events:none; z-index:1;
+    transition:height .3s ease;
   }
-  .overlayBL{position:absolute; left:12px; right:140px; bottom:12px; color:#fff; z-index:2}
-  .player-name{font-weight:900;text-transform:uppercase;letter-spacing:.02em;font-size:18px;line-height:1.05}
+  .overlayBL{position:absolute; left:12px; right:140px; bottom:10px; color:#fff; z-index:2}
+  .player-name{font-weight:900;text-transform:uppercase;letter-spacing:.02em;font-size:16px;line-height:1.05}
   .player-team{font-size:12px;opacity:.95}
-  .badge{display:inline-block;border-radius:999px;padding:4px 8px;font-weight:800;font-size:11px;color:#fff}
+  .badge{display:inline-block;border-radius:999px;padding:3px 8px;font-weight:800;font-size:11px;color:#fff}
   .lvl-mlb{background:#7A0019}.lvl-aaa{background:#2563eb}.lvl-aa{background:#3b82f6}
   .lvl-high-a{background:#4f46e5}.lvl-low-a{background:#4338ca}
   .lvl-ncaa-d1{background:#166534}.lvl-kbo{background:#0ea5e9}.lvl-njcaa{background:#a16207}.lvl-naia{background:#9333ea}.lvl-juco{background:#0d9488}
   .badge.dim{background:#374151}
-  .badge-stack{position:absolute; right:12px; bottom:12px; display:flex; flex-direction:column; gap:6px; align-items:flex-end; z-index:2}
+  .badge-stack{position:absolute; right:12px; bottom:10px; display:flex; flex-direction:column; gap:6px; align-items:flex-end; z-index:2}
 
-  /* Right info block – bottom third on phones, a touch higher on desktop */
   .right-info{
     position:absolute; right:12px; color:#fff; text-align:right;
     max-width:64%; z-index:2; text-shadow:0 1px 2px rgba(0,0,0,.48);
+    transition: top .3s ease, transform .3s ease, max-width .3s ease;
   }
-  /* default desktop/tablet */
   .right-info{ top:66%; transform:translateY(-8%) }
-  /* Samsung S25 and similar phones */
-  @media (max-width: 430px){
-    .right-info{ top:82%; transform:translateY(-6%); max-width:74% }
-  }
+  @media (max-width:430px){ .right-info{ top:82%; transform:translateY(-6%); max-width:74% } }
   .info-title{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#e5e7eb}
   .info-line{font-size:14px;font-weight:800;letter-spacing:.01em}
+
+  /* Emphasis on touch/hover */
+  .card.emph .bottom-grad{height:78%}
+  .card.emph .right-info{top:88%; transform:translateY(-10%); max-width:82%}
+  @media (max-width:360px){ .card.emph .right-info{ top:90%; transform:translateY(-12%) } }
+
+  /* ===== FACE 2 (STATS) — white background ===== */
+  .face.s2{ background:#fff; }
 
   /* Flip controls */
   .hit{position:absolute;top:0;bottom:0;width:50%;z-index:3;background:transparent;border:0}
   .hit.left{left:0} .hit.right{right:0}
-  .arrow{position:absolute;top:50%;transform:translateY(-50%);width:34px;height:34px;border-radius:999px;border:0;background:rgba(255,255,255,.85);box-shadow:0 2px 8px rgba(0,0,0,.15);display:grid;place-items:center;z-index:4;opacity:0;transition:opacity .2s}
-  .arrow svg{width:16px;height:16px;color:#111}
-  .arrow.left{left:10px} .arrow.right{right:10px}
-  .card:hover .arrow, .card:focus-within .arrow, .card.show-arrows .arrow{opacity:.65}
+  .arrow{position:absolute;top:50%;transform:translateY(-50%);width:30px;height:30px;border-radius:999px;border:0;background:rgba(255,255,255,.85);box-shadow:0 2px 8px rgba(0,0,0,.15);display:grid;place-items:center;z-index:4;opacity:0;transition:opacity .2s}
+  .arrow svg{width:14px;height:14px;color:#111}
+  .arrow.left{left:8px} .arrow.right{right:8px}
+  .card:hover .arrow, .card:focus-within .arrow, .card.show-arrows .arrow{opacity:.6}
 
-  .dots{position:absolute;left:0;right:0;bottom:10px;display:flex;gap:6px;justify-content:center;z-index:4}
+  .dots{position:absolute;left:0;right:0;bottom:8px;display:flex;gap:6px;justify-content:center;z-index:4}
   .dot{width:6px;height:6px;border-radius:999px;background:#d1d5db}
   .rot0 .dot-1{background:#111827} .rot120 .dot-2{background:#111827} .rot240 .dot-3{background:#111827}
 
@@ -109,44 +116,47 @@
   .muted{color:#6b7280;font-size:12px}
   .small{font-size:12px}
 
-  /* Three mini flip buttons */
-  .card-cta{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px;width:100%}
-  .cta{border:1px solid var(--ring);border-radius:10px;background:#fff;padding:10px 8px;cursor:pointer;display:flex;align-items:center;justify-content:center;text-align:center}
-  .cta .l1{color:#4b5563;font-size:12px;line-height:1.05;letter-spacing:.01em}
-  .cta .l2{margin-top:0;font-size:14px;line-height:1.05;font-weight:900;color:#111;letter-spacing:.02em}
+  /* Mini flip buttons — lower profile */
+  .card-cta{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:6px;width:100%}
+  .cta{border:1px solid var(--ring);border-radius:10px;background:#fff;padding:6px 6px;cursor:pointer;display:flex;align-items:center;justify-content:center;text-align:center;min-height:0}
+  .cta-text{font-size:11px;line-height:1;letter-spacing:.01em;color:#4b5563;white-space:nowrap}
+  .cta-text b{color:#111;font-weight:900}
   .cta:active{transform:translateY(1px)}
 
-  /* ===== DRAWER (FOX-style: left rail + right-aligned hero nav) ===== */
+  /* ===== DRAWER (upgraded) ===== */
   .scrim{position:fixed;inset:0;background:rgba(0,0,0,.35);opacity:0;pointer-events:none;transition:opacity .25s ease;z-index:30}
   .scrim.open{opacity:1;pointer-events:auto}
-  .drawer{position:fixed;top:0;right:0;height:100%;width:420px;max-width:92vw;background:#fff;border-left:1px solid var(--ring);
+  .drawer{position:fixed;top:0;right:0;height:100%;width:440px;max-width:92vw;background:#fff;border-left:1px solid var(--ring);
     transform:translateX(100%);transition:transform .25s ease;z-index:40;display:flex;flex-direction:column}
   .drawer.open{transform:translateX(0)}
-  .drawer-header{height:80px;display:flex;align-items:center;justify-content:flex-end;padding:0 16px;border-bottom:1px solid var(--ring)}
+  .drawer-header{height:72px;display:flex;align-items:center;justify-content:flex-end;padding:0 12px;border-bottom:1px solid var(--ring)}
   .drawer-header .iconbtn{border-radius:999px}
 
   .drawer-body{min-height:0;overflow:auto}
-  /* Two-column grid on >= 400px; stacked on very narrow phones */
-  .drawer-content{display:grid;grid-template-columns:220px 1fr;gap:8px;padding:16px 10px 24px}
+  /* Two-column layout with sticky left rail */
+  .drawer-content{display:grid;grid-template-columns:240px 1fr;gap:8px;padding:14px 10px 24px;min-height:100%}
   @media (max-width:400px){ .drawer-content{grid-template-columns:1fr} }
+  .left-rail{position:relative}
+  .left-rail-inner{position:sticky; top:84px; display:block}
 
-  /* Left rail (Search + Filters) */
-  .rail-title{font-weight:900;font-size:18px;margin:6px 0 8px}
-  .ghost{display:block;width:100%;background:#e5e7eb;border:0;border-radius:6px;padding:12px 14px;font-size:14px;color:#111}
+  .rail-title{font-weight:900;font-size:16px;margin:4px 0 8px}
+  .ghost{display:block;width:100%;background:#e5e7eb;border:0;border-radius:6px;padding:10px 12px;font-size:14px;color:#111}
   .ghost::placeholder{color:#6b7280}
-  .rail-group{margin-bottom:18px}
+  .rail-group{margin-bottom:14px}
   .rail-bullet{position:relative;margin-bottom:8px}
   .rail-bullet::before{content:"•";position:absolute;left:-10px;top:50%;transform:translateY(-50%);color:#9ca3af}
 
-  /* Right column hero nav (RIGHT-JUSTIFIED like the screenshot) */
+  /* Right column hero nav — right aligned, strong hierarchy */
   .nav-hero{padding:0 8px}
-  .hero-link{
-    display:block;text-decoration:none;color:#464646;
-    font-weight:900;text-transform:uppercase;letter-spacing:.06em;
-    font-size:22px;line-height:1.2;margin:26px 0;text-shadow:0 1px 2px rgba(0,0,0,.25);
-    text-align:right; padding-right:6px;
+  .hero-item{display:flex;align-items:center;justify-content:flex-end;gap:8px;text-decoration:none}
+  .hero-text{
+    color:var(--hero); font-weight:900; text-transform:uppercase; letter-spacing:.06em;
+    font-size:22px; line-height:1.2; margin:18px 0; text-shadow:0 1px 2px rgba(0,0,0,.25); text-align:right;
   }
-  .sep{border:0;border-top:1px solid #e5e7eb;margin:18px 0 18px auto;width:82%}
+  .hero-chev{width:16px;height:16px;color:var(--chev);flex:0 0 auto}
+  .hero-item:hover .hero-text{color:#111}
+  .hero-item:active .hero-text{transform:translateY(1px)}
+  .sep{border:0;border-top:1px solid #e5e7eb;margin:16px 0 16px auto;width:82%}
 
   /* Footer */
   .footer{position:fixed;left:0;right:0;bottom:0;height:56px;background:#000;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;letter-spacing:.03em;z-index:10}
@@ -174,9 +184,6 @@
     <button class="hambtn" id="openMenu" aria-label="Open Menu" title="Menu">
       <svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
     </button>
-    <button class="iconbtn" id="openFilter" aria-label="Open Filters" title="Filters">
-      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 6h12a3 3 0 0 0 6 0H3zm0 12h6a3 3 0 0 0 6 0h6H3z"/></svg>
-    </button>
     <button class="iconbtn" id="openSearch" aria-label="Open Search" title="Search">
       <svg viewBox="0 0 24 24" fill="currentColor"><path d="M11 4a7 7 0 1 1 0 14 7 7 0 0 1 0-14zm9.7 15.3-3.4-3.4a9 9 0 1 0-1.4 1.4l3.4 3.4a1 1 0 0 0 1.4-1.4z"/></svg>
     </button>
@@ -186,7 +193,7 @@
 
 <!-- Drawer -->
 <div class="scrim" id="scrim"></div>
-<aside class="drawer" id="drawer" aria-hidden="true">
+<aside class="drawer" id="drawer" aria-hidden="true" aria-modal="true" role="dialog">
   <div class="drawer-header">
     <button class="iconbtn" id="closeDrawer" aria-label="Close">
       <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6.225 4.811 4.811 6.225 10.586 12l-5.775 5.775 1.414 1.414L12 13.414l5.775 5.775 1.414-1.414L13.414 12l5.775-5.775-1.414-1.414L12 10.586 6.225 4.811z"/></svg>
@@ -195,30 +202,40 @@
 
   <div class="drawer-body">
     <div class="drawer-content">
-      <!-- Left rail -->
-      <div>
-        <div class="rail-group">
-          <div class="rail-title">Search</div>
-          <input id="q" type="text" class="ghost" placeholder="Players Name"/>
-        </div>
-        <div class="rail-group">
-          <div class="rail-title">Filters</div>
-          <div class="rail-bullet"><select id="lvl" class="ghost"><option value="">All Levels</option></select></div>
-          <div class="rail-bullet"><select id="grad" class="ghost"><option value="">All Grad Classes</option></select></div>
+      <!-- Left rail (sticky) -->
+      <div class="left-rail">
+        <div class="left-rail-inner">
+          <div class="rail-group">
+            <div class="rail-title">Search</div>
+            <input id="q" type="text" class="ghost" placeholder="Players Name" autocomplete="off"/>
+          </div>
+          <div class="rail-group">
+            <div class="rail-title">Filters</div>
+            <div class="rail-bullet"><select id="lvl" class="ghost"><option value="">All Levels</option></select></div>
+            <div class="rail-bullet"><select id="grad" class="ghost"><option value="">All Grad Classes</option></select></div>
+          </div>
         </div>
       </div>
 
-      <!-- Right column hero nav (RIGHT-ALIGNED) -->
+      <!-- Right column hero nav (right-aligned) -->
       <div class="nav-hero">
-        <a class="hero-link" href="#">Where They YAT?</a>
-        <a class="hero-link" href="#">Active Alumni News</a>
-        <a class="hero-link" href="#">All-Time Next-Level List</a>
-        <a class="hero-link" href="#">YAT-A-BOY Marketplace</a>
-        <a class="hero-link" href="#">Current School Team</a>
-        <a class="hero-link" href="#">Our Partner Program</a>
+        <a class="hero-item" href="#"><span class="hero-text">Where They YAT?</span>
+          <svg class="hero-chev" viewBox="0 0 24 24" fill="currentColor"><path d="M9 18l6-6-6-6"/></svg></a>
+        <a class="hero-item" href="#"><span class="hero-text">Active Alumni News</span>
+          <svg class="hero-chev" viewBox="0 0 24 24" fill="currentColor"><path d="M9 18l6-6-6-6"/></svg></a>
+        <a class="hero-item" href="#"><span class="hero-text">All-Time Next-Level List</span>
+          <svg class="hero-chev" viewBox="0 0 24 24" fill="currentColor"><path d="M9 18l6-6-6-6"/></svg></a>
+        <a class="hero-item" href="#"><span class="hero-text">YAT-A-BOY Marketplace</span>
+          <svg class="hero-chev" viewBox="0 0 24 24" fill="currentColor"><path d="M9 18l6-6-6-6"/></svg></a>
+        <a class="hero-item" href="#"><span class="hero-text">Current School Team</span>
+          <svg class="hero-chev" viewBox="0 0 24 24" fill="currentColor"><path d="M9 18l6-6-6-6"/></svg></a>
+        <a class="hero-item" href="#"><span class="hero-text">Our Partner Program</span>
+          <svg class="hero-chev" viewBox="0 0 24 24" fill="currentColor"><path d="M9 18l6-6-6-6"/></svg></a>
         <hr class="sep">
-        <a class="hero-link" href="#">Global School Search</a>
-        <a class="hero-link" href="#">Register | Login</a>
+        <a class="hero-item" href="#"><span class="hero-text">Global School Search</span>
+          <svg class="hero-chev" viewBox="0 0 24 24" fill="currentColor"><path d="M9 18l6-6-6-6"/></svg></a>
+        <a class="hero-item" href="#"><span class="hero-text">Register | Login</span>
+          <svg class="hero-chev" viewBox="0 0 24 24" fill="currentColor"><path d="M9 18l6-6-6-6"/></svg></a>
       </div>
     </div>
   </div>
@@ -327,9 +344,9 @@ function makeCard(p){
         </div>
       </div>
 
-      <!-- Face 2 -->
+      <!-- Face 2 (white) -->
       <div class="face s2">
-        <div style="padding:16px;">
+        <div style="padding:14px;">
           <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start;margin-bottom:6px;">
             <div>
               <div style="font-weight:900;text-transform:uppercase;letter-spacing:.02em;">${(p.name||'').toUpperCase()}</div>
@@ -358,14 +375,8 @@ function makeCard(p){
             <div style="display:flex;gap:10px;justify-content:space-between;align-items:center;flex-wrap:wrap;">
               <a href="${p.nilUrl||'#'}" target="_blank" style="background:var(--maroon);color:#fff;border-radius:999px;padding:8px 12px;font-size:12px;font-weight:800;text-decoration:none;">Give a YAT-A-BOY</a>
               <div style="display:flex;gap:8px;">
-                ${p.twitterUrl?`<a href="${p.twitterUrl}" target="_blank" aria-label="X/Twitter" style="display:grid;place-items:center;width:32px;height:32px;background:#111;border-radius:999px;color:#fff;text-decoration:none;">X</a>`:''}
-                ${p.instagramUrl?`<a href="${p.instagramUrl}" target="_blank" aria-label="Instagram" style="display:grid;place-items:center;width:32px;height:32px;background:linear-gradient(45deg,#fbbf24,#ec4899,#8b5cf6);border-radius:999px;color:#fff;text-decoration:none;">IG</a>`:''}
-              </div>
-            </div>
-            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:6px;">
-              <div style="background:#f3f4f6;border-radius:10px;padding:8px 10px;font-size:12px;">
-                <span style="color:#6b7280">NIL YAT-A-BOY SCORE:</span>
-                <span style="font-weight:900;color:#111">${p.nilScore||"—"}</span>
+                ${p.twitterUrl?`<a href="${p.twitterUrl}" target="_blank" aria-label="X/Twitter" style="display:grid;place-items:center;width:28px;height:28px;background:#111;border-radius:999px;color:#fff;text-decoration:none;font-size:12px;">X</a>`:''}
+                ${p.instagramUrl?`<a href="${p.instagramUrl}" target="_blank" aria-label="Instagram" style="display:grid;place-items:center;width:28px;height:28px;background:linear-gradient(45deg,#fbbf24,#ec4899,#8b5cf6);border-radius:999px;color:#fff;text-decoration:none;font-size:12px;">IG</a>`:''}
               </div>
             </div>
             ${(p.news && p.news.length)?`
@@ -381,16 +392,16 @@ function makeCard(p){
     </div>
   </article>
 
-  <!-- THREE mini flip buttons -->
+  <!-- Mini flip buttons (correct links) -->
   <div class="card-cta" role="group" aria-label="Card controls">
     <button class="cta" data-action="show-yat" aria-label="Show Where's He YAT?">
-      <div><div class="l1">WHERE'S HE</div><div class="l2">YAT?</div></div>
+      <span class="cta-text"><b>WHERE'S HE YAT?</b></span>
     </button>
     <button class="cta" data-action="show-stats" aria-label="Show Stats">
-      <div><div class="l1">SHOW ME HIS</div><div class="l2">STATS</div></div>
+      <span class="cta-text">SHOW ME HIS <b>STATS</b></span>
     </button>
     <button class="cta" data-action="show-gift" aria-label="Show YAT-A-BOY">
-      <div><div class="l1">HE DESERVES A</div><div class="l2">YAT-A-BOY</div></div>
+      <span class="cta-text">HE DESERVES A <b>YAT-A-BOY</b></span>
     </button>
   </div>
 </div>`;
@@ -430,16 +441,34 @@ function rotate(card, dir){
 
 /* ==== Interactions ==== */
 function setupInteractions(){
+  // Mini buttons -> faces
   document.addEventListener('click', e=>{
-    const cta=e.target.closest('[data-action]'); if(cta){ const card=cta.closest('.card-wrap').querySelector('.card'); const a=cta.dataset.action; if(a==='show-yat') setFace(card,1); if(a==='show-stats') setFace(card,2); if(a==='show-gift') setFace(card,3); return; }
+    const cta=e.target.closest('[data-action]');
+    if(cta){
+      const card=cta.closest('.card-wrap').querySelector('.card');
+      const a=cta.dataset.action;
+      if(a==='show-yat')   setFace(card,1);
+      if(a==='show-stats') setFace(card,2);
+      if(a==='show-gift')  setFace(card,3);
+      return;
+    }
     const btn=e.target.closest('[data-dir]'); if(btn){ rotate(btn.closest('.card'), btn.dataset.dir); }
   });
-  // reveal arrows briefly on touch
-  let t;
+
+  // emphasize overlay on hover/touch
+  let emphTimer;
+  document.addEventListener('mouseenter', e=>{
+    const c=e.target.closest('.card'); if(!c) return; c.classList.add('emph');
+  }, true);
+  document.addEventListener('mouseleave', e=>{
+    const c=e.target.closest('.card'); if(!c) return; c.classList.remove('emph');
+  }, true);
   document.addEventListener('touchstart', e=>{
-    const c=e.target.closest('.card'); if(!c) return; c.classList.add('show-arrows'); clearTimeout(t); t=setTimeout(()=>c.classList.remove('show-arrows'),1500);
+    const c=e.target.closest('.card'); if(!c) return; c.classList.add('emph');
+    clearTimeout(emphTimer); emphTimer=setTimeout(()=>c.classList.remove('emph'),1400);
   },{passive:true});
-  // keyboard + swipe
+
+  // keyboard + swipe rotate
   document.addEventListener('keydown', e=>{
     if(e.key==='Escape'){ closeDrawer(); return; }
     if(e.key==='ArrowLeft'||e.key==='ArrowRight'){ const card=document.activeElement?.closest?.('.card'); if(card) rotate(card, e.key==='ArrowRight'?'next':'prev'); }
@@ -449,18 +478,48 @@ function setupInteractions(){
   document.addEventListener('touchend', e=>{ if(!card) return; const dx=e.changedTouches[0].clientX-sx; if(Math.abs(dx)>40) rotate(card, dx<0?'next':'prev'); card=null; });
 }
 
-/* ==== Drawer ==== */
+/* ==== Drawer: open/close + focus trap + swipe-to-close ==== */
 const drawer = byId('drawer'), scrim = byId('scrim');
-function openDrawer(focusSearch=false){
-  drawer.classList.add('open'); scrim.classList.add('open'); drawer.setAttribute('aria-hidden','false');
-  if(focusSearch) setTimeout(()=>byId('q').focus(),150);
+let lastFocus = null;
+
+function trapFocus(e){
+  if(!drawer.classList.contains('open')) return;
+  const focusables = drawer.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+  const first = focusables[0], last = focusables[focusables.length - 1];
+  if(e.key !== 'Tab') return;
+  if(e.shiftKey && document.activeElement === first){ e.preventDefault(); last.focus(); }
+  else if(!e.shiftKey && document.activeElement === last){ e.preventDefault(); first.focus(); }
 }
-function closeDrawer(){ drawer.classList.remove('open'); scrim.classList.remove('open'); drawer.setAttribute('aria-hidden','true'); }
+
+function openDrawer(focusSearch=false){
+  lastFocus = document.activeElement;
+  drawer.classList.add('open'); scrim.classList.add('open'); drawer.setAttribute('aria-hidden','false');
+  document.body.classList.add('no-scroll');
+  document.addEventListener('keydown', trapFocus);
+  if(focusSearch) setTimeout(()=>byId('q').focus(),150);
+  else setTimeout(()=>drawer.querySelector('button, [href], input, select')?.focus(), 120);
+}
+function closeDrawer(){
+  drawer.classList.remove('open'); scrim.classList.remove('open'); drawer.setAttribute('aria-hidden','true');
+  document.body.classList.remove('no-scroll');
+  document.removeEventListener('keydown', trapFocus);
+  if(lastFocus) lastFocus.focus();
+}
+
 document.getElementById('openMenu').addEventListener('click', ()=>openDrawer(false));
-document.getElementById('openFilter').addEventListener('click', ()=>openDrawer(false));
 document.getElementById('openSearch').addEventListener('click', ()=>openDrawer(true));
 document.getElementById('closeDrawer').addEventListener('click', closeDrawer);
 scrim.addEventListener('click', closeDrawer);
+
+/* swipe-to-close (drag right) */
+let dxStart=null;
+drawer.addEventListener('touchstart', e=>{ dxStart=e.touches[0].clientX; }, {passive:true});
+drawer.addEventListener('touchend', e=>{
+  if(dxStart==null) return;
+  const dx=e.changedTouches[0].clientX - dxStart;
+  if(dx>50) closeDrawer();
+  dxStart=null;
+}, {passive:true});
 
 /* ==== Boot ==== */
 document.addEventListener('DOMContentLoaded', ()=>{
