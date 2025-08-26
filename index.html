@@ -1,216 +1,73 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>YAT?STATS • Hamilton – Where They YAT?</title>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>YAT?STATS • Hamilton — 3-Face Virtual Card</title>
 
-<!-- Tailwind -->
-<script src="https://cdn.tailwindcss.com"></script>
-
-<!-- Fonts -->
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet" />
 <style>
   :root{
-    --maroon:#7A0019;
-    --ink:#111;
-    --muted:#6b7280;
-    --ring:#E3E6EA;
+    --maroon:#7A0019; --ring:#E3E6EA; --bg:#f3f4f6;
+    --ink:#111827; --muted:#6b7280; --navink:#1f2937; /* darker gray for nav */
   }
-  *{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
-  .site-header{height:112px}
-  @media (max-width:768px){.site-header{height:75px}}
-  .nav-link{letter-spacing:.06em;font-weight:700}
-  .nav-link.active{color:var(--maroon);position:relative}
-  .nav-link.active::after{content:"";position:absolute;left:0;right:0;bottom:-2px;height:2px;background:var(--maroon)}
-  #mobile-sidebar{transition:transform .25s ease}
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{background:var(--bg);font:15px/1.4 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,"Apple Color Emoji","Segoe UI Emoji";color:var(--ink)}
+
+  /* Header */
+  .site-header{position:fixed;top:0;left:0;right:0;height:80px;background:#fff;border-bottom:1px solid var(--ring);z-index:20;display:flex;align-items:center;justify-content:space-between;padding:0 16px}
+  .brand{display:flex;align-items:center;gap:12px}
+  .brand img{height:36px;width:auto}
+  .nav-desktop{display:flex;flex-wrap:wrap;gap:0}
+  .nav-desktop a{
+    font-size:12px;text-transform:uppercase;color:var(--navink);
+    margin-right:24px;text-decoration:none;white-space:nowrap;letter-spacing:.02em
+  }
+  .nav-desktop a.active{color:var(--maroon);border-bottom:2px solid var(--maroon);padding-bottom:3px;font-weight:700}
+
+  .header-right{display:flex;align-items:center;gap:8px}
+  .iconbtn,.hambtn{width:36px;height:36px;display:grid;place-items:center;border:1px solid var(--ring);border-radius:10px;background:#fff;cursor:pointer}
+  .iconbtn svg,.hambtn svg{width:18px;height:18px;color:#111}
+
+  /* Responsive breakpoint:
+     - At <= 1024px (tablets & down), move desktop nav into drawer (hamburger shows).
+     - Keep search/filter icons visible at all sizes. */
+  .nav-mobile{display:none}
+  @media (max-width:1024px){
+    .nav-desktop{display:none}
+    .nav-mobile{display:flex;gap:8px;align-items:center}
+  }
+
+  /* Main grid */
+  main{padding:80px 0 84px}
+  .grid{padding:16px;display:grid;grid-template-columns:repeat(1,minmax(0,1fr));gap:12px}
+  @media (min-width:640px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+  @media (min-width:1000px){.grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+
+  /* Card */
+  .card-wrap{display:flex;flex-direction:column;align-items:stretch}
+  .card{
+    background:#fff;border:1px solid var(--ring);border-radius:12px;box-shadow:0 2px 10px rgba(0,0,0,.04);
+    overflow:hidden;position:relative;user-select:none;aspect-ratio:5/8;min-height:320px;width:100%
+  }
   .flip-card{perspective:1200px}
-  .flip-card-inner{position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform .6s}
-  .panel{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden}
-  .panel.side2{transform:rotateY(120deg)}
-  .panel.side3{transform:rotateY(240deg)}
-  .flip-rot-0  .flip-card-inner{transform:rotateY(0deg)}
-  .flip-rot-120 .flip-card-inner{transform:rotateY(120deg)}
-  .flip-rot-240 .flip-card-inner{transform:rotateY(240deg)}
-  .tag{padding:.25rem .5rem;border-radius:.375rem;font-weight:700;font-size:.70rem;color:#fff}
-  .tag-mlb{background:var(--maroon)}
-  .tag-aaa{background:#2563eb}
-  .tag-aa{background:#3b82f6}
-  .tag-a+{background:#4f46e5}
-  .tag-a{background:#4338ca}
-  .tag-ncaa{background:#166534}
-  .tag-naia{background:#92400e}
-  .tag-njcaa{background:#a16207}
-  .tag-indy{background:#3f6212}
-  .tag-kbo{background:#0ea5e9}
-  .footer-wrap{height:77px}
-  .footer-img{height:100%;width:100%;object-fit:cover}
-  .card-img{aspect-ratio:5/8;object-fit:cover;width:100%;border-radius:.5rem}
-  .logo-yat{height:32px}
-  @media (min-width:768px){ .logo-yat{height:48px} }
-</style>
-</head>
-<body class="bg-neutral-100 text-[15px]">
+  .flip-card-inner{position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform .6s cubic-bezier(.2,.7,.2,1)}
+  .face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden}
+  .s2{transform:rotateY(120deg)} .s3{transform:rotateY(240deg)}
+  .rot0  .flip-card-inner{transform:rotateY(0deg)}
+  .rot120 .flip-card-inner{transform:rotateY(120deg)}
+  .rot240 .flip-card-inner{transform:rotateY(240deg)}
+  .p-3{padding:12px} .p-4{padding:16px}
 
-<!-- Header -->
-<header class="site-header fixed top-0 inset-x-0 z-40 bg-white border-b border-[var(--ring)]">
-  <div class="h-full px-4 md:px-6 flex items-center justify-between">
-    <div class="flex items-center gap-3">
-      <img src="https://i.postimg.cc/NjRf6nGF/hamilton-log-with-3-lines.png" alt="Hamilton HS" class="h-9 md:h-12 w-auto" />
-      <nav class="hidden md:flex items-center gap-6 ml-6">
-        <a class="nav-link active uppercase text-[12px]" href="#">Where They YAT?</a>
-        <a class="nav-link uppercase text-[12px] text-neutral-600" href="#">Active Alumni News</a>
-        <a class="nav-link uppercase text-[12px] text-neutral-600" href="#">All-Time Huskies Roster</a>
-      </nav>
-    </div>
-    <div class="flex items-center gap-4">
-      <img src="https://i.postimg.cc/76srDfFT/yatstats-logo-stacked.png" alt="YAT?STATS" class="logo-yat w-auto" />
-      <button id="hamburger" class="md:hidden p-2 rounded border border-[var(--ring)]">
-        <svg width="20" height="20" fill="none" stroke="currentColor"><path stroke-width="2" d="M3 6h14M3 10h14M3 14h14"/></svg>
-      </button>
-    </div>
-  </div>
-</header>
+  .badge{display:inline-block;border-radius:999px;padding:4px 8px;font-weight:800;font-size:11px;color:#fff}
+  .lvl-mlb{background:#7A0019}.lvl-aaa{background:#2563eb}.lvl-aa{background:#3b82f6}
+  .lvl-high-a{background:#4f46e5}.lvl-low-a{background:#4338ca}
+  .lvl-ncaa-d1{background:#166534}.lvl-kbo{background:#0ea5e9}.lvl-njcaa{background:#a16207}.lvl-naia{background:#9333ea}.lvl-juco{background:#0d9488}
 
-<!-- Mobile drawer -->
-<aside id="mobile-sidebar" class="fixed top-0 right-0 bottom-0 z-50 w-[80%] max-w-sm bg-white shadow-2xl translate-x-full md:hidden">
-  <div class="pt-[75px] px-5 pb-6 space-y-6">
-    <input id="search-input-m" type="text" placeholder="Search by Player Name" class="w-full border p-2 rounded" />
-  </div>
-</aside>
-<div id="sidebar-overlay" class="fixed inset-0 bg-black/30 hidden md:hidden"></div>
+  .card-img{width:100%;aspect-ratio:5/8;object-fit:cover;border-radius:12px;background:#e5e7eb}
+  .ph{display:grid;place-items:center;color:#9ca3af;font-weight:700;font-size:12px;letter-spacing:.05em}
 
-<!-- Main -->
-<main class="pt-[75px] md:pt-[112px] pb-[77px]">
-  <!-- Filters -->
-  <section class="px-4 md:px-6 py-3 flex items-center gap-3 sticky top-[75px] md:top-[112px] bg-white/90 border-b border-[var(--ring)]">
-    <input id="search-input" type="text" placeholder="Search by Player Name" class="flex-1 border p-2 rounded" />
-    <select id="grad-filter" class="px-3 py-2 border rounded text-sm"><option value="">Graduating Class</option></select>
-    <select id="level-filter" class="px-3 py-2 border rounded text-sm"><option value="">Current Level</option></select>
-  </section>
-
-  <!-- Grid -->
-  <section id="roster-grid" class="px-4 md:px-6 py-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 border border-dashed border-neutral-300">
-  </section>
-</main>
-
-<!-- Footer -->
-<footer class="footer-wrap fixed bottom-0 inset-x-0 bg-white border-t border-[var(--ring)]">
-  <img class="footer-img" src="https://i.postimg.cc/05DWb4Fj/bmx-banner.png" alt="Sponsor banner" />
-</footer>
-
-<script>
-/* ---------- DATA ---------- */
-const players = [
-  {
-    id:"bellinger",
-    name:"Cody Bellinger",
-    graduatingClass:2013,
-    currentLevel:"MLB",
-    position:"CF/1B",
-    team:"New York Yankees",
-    frontImg:"https://i.postimg.cc/Y2PVpqNK/new-york-yankees-outfielder-cody-bellinger.jpg",
-    highSchoolImg:"https://i.postimg.cc/z3h5j6H9/Bellinger-Hamilton-HS.jpg",
-    seasonStats:{ avg:"—", hr:"—", rbi:"—", ops:"—" },
-    lastGame:{ line:"—" },
-    nextGame:{ opponent:"—", time:"—" }
-  },
-  {
-    id:"patrick-murphy",
-    name:"Patrick Murphy",
-    graduatingClass:2013,
-    currentLevel:"KBO",
-    position:"P",
-    team:"KT Wiz Suwon",
-    frontImg:"https://i.postimg.cc/gc32dtQG/MURPH.avif",
-    highSchoolImg:"https://i.postimg.cc/pL6kR3Fq/21-Murphy-Back-page-00001.jpg",
-    seasonStats:{ era:"—", so:"—", whip:"—" },
-    lastGame:{ line:"—" },
-    nextGame:{ opponent:"—", time:"—" }
-  }
-];
-
-/* ---------- HELPERS ---------- */
-function levelTag(level){
-  const key=String(level||'').toLowerCase();
-  const map={mlb:'tag-mlb',aaa:'tag-aaa',aa:'tag-aa','a+':'tag-a+','a':'tag-a',ncaa:'tag-ncaa',njcaa:'tag-njcaa',naia:'tag-naia',indy:'tag-indy',kbo:'tag-kbo'};
-  return map[key]||'tag-mlb';
-}
-
-function makeCard(p){
-  const lvlClass=levelTag(p.currentLevel);
-  return `
-  <article tabindex="0" class="flip-card flip-rot-0 bg-white border border-[var(--ring)] rounded-lg shadow-sm overflow-hidden" style="height:460px; position:relative;">
-    <div class="flip-card-inner">
-      <div class="panel side1">
-        <div class="relative p-3">
-          <img class="card-img" src="${p.frontImg}" alt="${p.name}" />
-          <span class="tag ${lvlClass} absolute top-4 right-4">${p.currentLevel}</span>
-          <div class="absolute inset-x-3 bottom-3 bg-gradient-to-t from-black/70 to-transparent p-3 text-white rounded">
-            <div class="text-lg font-extrabold">${p.name}</div>
-            <div class="text-xs opacity-90">${p.team} • ${p.position}</div>
-          </div>
-        </div>
-      </div>
-      <div class="panel side2 bg-white p-4">
-        <div class="font-bold">${p.name}</div>
-        <div class="text-xs text-neutral-500">${p.team} • ${p.position}</div>
-        <div class="mt-3 text-xs text-neutral-500">Class of ${p.graduatingClass}</div>
-      </div>
-      <div class="panel side3 bg-white">
-        ${p.highSchoolImg?`<img src="${p.highSchoolImg}" class="w-full h-full object-cover" />`:`<div class="h-full flex items-center justify-center text-neutral-400">No HS image yet</div>`}
-      </div>
-    </div>
-  </article>`;
-}
-
-/* ---------- RENDER ---------- */
-function render(list){
-  const grid=document.getElementById('roster-grid');
-  grid.innerHTML=list.map(makeCard).join('');
-}
-function populateFilters(){
-  const classes=[...new Set(players.map(p=>p.graduatingClass))].sort((a,b)=>b-a);
-  const gf=document.getElementById('grad-filter');
-  classes.forEach(c=>{let o=document.createElement('option');o.value=c;o.textContent=c;gf.appendChild(o);});
-  const levels=[...new Set(players.map(p=>p.currentLevel))];
-  const lf=document.getElementById('level-filter');
-  levels.forEach(l=>{let o=document.createElement('option');o.value=l;o.textContent=l;lf.appendChild(o);});
-}
-function applyFilters(){
-  const q=(document.getElementById('search-input').value||'').toLowerCase();
-  const g=document.getElementById('grad-filter').value;
-  const l=document.getElementById('level-filter').value;
-  const filtered=players.filter(p=>
-    (!q||p.name.toLowerCase().includes(q)) &&
-    (!g||String(p.graduatingClass)===g) &&
-    (!l||p.currentLevel===l)
-  );
-  render(filtered);
-}
-
-/* Flip click */
-function rotateCard(card,right){
-  if(card.classList.contains('flip-rot-0')) card.classList.replace('flip-rot-0',right?'flip-rot-120':'flip-rot-240');
-  else if(card.classList.contains('flip-rot-120')) card.classList.replace('flip-rot-120',right?'flip-rot-240':'flip-rot-0');
-  else card.classList.replace('flip-rot-240',right?'flip-rot-0':'flip-rot-120');
-}
-document.addEventListener('click',e=>{
-  const card=e.target.closest('.flip-card'); if(!card) return;
-  const rect=card.getBoundingClientRect();
-  rotateCard(card,(e.clientX-rect.left)>rect.width/2);
-});
-
-/* Init after DOM ready */
-document.addEventListener('DOMContentLoaded',()=>{
-  populateFilters();
-  render(players);
-  ['search-input','grad-filter','level-filter'].forEach(id=>{
-    const el=document.getElementById(id);
-    if(el){el.addEventListener('input',applyFilters);el.addEventListener('change',applyFilters);}
-  });
-  console.log('Players loaded:',players.length);
-});
-</script>
-</body>
-</html>
+  /* Face 1 overlay (bottom third gradient) */
+  .bottom-grad{position:absolute;left:12px;right:12px;bottom:12px;height:35%;border-radius:10px;pointer-events:none;
+               background:linear-gradient(to top, rgba(0,0,0,.85), rgba(0,0,0,.0))}
+  .overlay{position:absolute;
