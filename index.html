@@ -9,6 +9,7 @@
   :root{
     --maroon:#7A0019; --ring:#E3E6EA; --bg:#f3f4f6;
     --ink:#111827; --navink:#1f2937; --hero:#464646; --chev:#9ca3af;
+    --headerH:72px;
   }
   *{box-sizing:border-box}
   html,body{margin:0;padding:0}
@@ -17,7 +18,7 @@
 
   /* ===== HEADER ===== */
   .site-header{
-    position:fixed; inset:0 0 auto 0; height:72px; z-index:20;
+    position:fixed; left:0; right:0; top:0; height:var(--headerH); z-index:50;
     background:#fff; border-bottom:1px solid var(--ring);
     display:grid; grid-template-columns:auto 1fr auto; align-items:center; gap:8px; padding:0 10px;
   }
@@ -34,11 +35,11 @@
   @media (max-width:1024px){ .nav-desktop{display:none} }
 
   /* ===== GRID ===== */
-  main{padding:72px 0 84px}
+  main{padding:var(--headerH) 0 84px}
   .grid{padding:16px;display:grid;grid-template-columns:repeat(1,minmax(0,1fr));gap:12px}
-  @media (min-width:768px){ .grid{grid-template-columns:repeat(3,minmax(0,1fr))} }    /* tablet 3 */
-  @media (min-width:1280px){ .grid{grid-template-columns:repeat(5,minmax(0,1fr))} }  /* desktop 5 */
-  @media (max-width:767px){ .card-wrap{width:80%; margin:0 auto} }                   /* small mobile ~80% */
+  @media (min-width:768px){ .grid{grid-template-columns:repeat(3,minmax(0,1fr))} }
+  @media (min-width:1280px){ .grid{grid-template-columns:repeat(5,minmax(0,1fr))} }
+  @media (max-width:767px){ .card-wrap{width:80%; margin:0 auto} }
 
   /* ===== CARD (5/7, edge-to-edge) ===== */
   .card-wrap{display:flex;flex-direction:column;align-items:stretch}
@@ -54,7 +55,7 @@
   .rot120 .flip-card-inner{transform:rotateY(120deg)}
   .rot240 .flip-card-inner{transform:rotateY(240deg)}
 
-  .face-media{position:absolute; inset:0;}               /* image truly fills face */
+  .face-media{position:absolute; inset:0;}
   .card-img{position:absolute; inset:0; width:100%; height:100%; object-fit:cover; background:#111}
 
   /* ===== FACE 1 ===== */
@@ -71,28 +72,34 @@
   .overlayBL{position:absolute; left:12px; right:140px; bottom:10px; color:#fff; z-index:2}
   .player-name{font-weight:900;text-transform:uppercase;letter-spacing:.02em;font-size:16px;line-height:1.05}
   .player-team{font-size:12px;opacity:.95}
+
   .badge{display:inline-block;border-radius:999px;padding:3px 8px;font-weight:800;font-size:11px;color:#fff}
   .lvl-mlb{background:#7A0019}.lvl-aaa{background:#2563eb}.lvl-aa{background:#3b82f6}
   .lvl-high-a{background:#4f46e5}.lvl-low-a{background:#4338ca}
   .lvl-ncaa-d1{background:#166534}.lvl-kbo{background:#0ea5e9}.lvl-njcaa{background:#a16207}.lvl-naia{background:#9333ea}.lvl-juco{background:#0d9488}
   .badge.dim{background:#374151}
-  .badge-stack{position:absolute; right:12px; bottom:10px; display:flex; flex-direction:column; gap:6px; align-items:flex-end; z-index:2}
 
+  /* NEW: tags moved into overlay left, stacked and flush-left */
+  .tag-stack{display:flex;flex-direction:column;align-items:flex-start;gap:6px;margin-top:8px}
+
+  /* RIGHT info block (keep in bottom third, stable on rotate) */
   .right-info{
     position:absolute; right:12px; color:#fff; text-align:right;
     max-width:64%; z-index:2; text-shadow:0 1px 2px rgba(0,0,0,.48);
-    transition: top .3s ease, transform .3s ease, max-width .3s ease;
+    top:70%; transform:translateY(-14%);              /* slightly lower, more stable */
+    transition: top .2s ease, transform .2s ease, max-width .2s ease;
   }
-  .right-info{ top:66%; transform:translateY(-8%) }
-  @media (max-width:430px){ .right-info{ top:82%; transform:translateY(-6%); max-width:74% } }
   .info-title{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#e5e7eb}
   .info-line{font-size:14px;font-weight:800;letter-spacing:.01em}
 
-  .card.emph .bottom-grad{height:78%}
-  .card.emph .right-info{top:88%; transform:translateY(-10%); max-width:82%}
-  @media (max-width:360px){ .card.emph .right-info{ top:90%; transform:translateY(-12%) } }
+  /* Hover/touch emphasis keeps it in the bottom third without crashing into left tags */
+  .card.emph .right-info{ top:84%; transform:translateY(-16%); max-width:80% }
+  @media (max-width:430px){
+    .right-info{ top:78%; transform:translateY(-10%); max-width:78% }
+    .card.emph .right-info{ top:82%; transform:translateY(-12%); max-width:82% }
+  }
 
-  /* ===== FACE 2 (STATS) — white background ===== */
+  /* ===== FACE 2 (STATS ONLY) ===== */
   .face.s2{ background:#fff; }
 
   /* Flip controls */
@@ -115,25 +122,42 @@
   .muted{color:#6b7280;font-size:12px}
   .small{font-size:12px}
 
-  /* ===== Mini flip buttons — shorter, single-line ===== */
+  /* Mini flip buttons */
   .card-cta{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:6px;width:100%}
   .cta{border:1px solid var(--ring);border-radius:10px;background:#fff;padding:6px 6px;cursor:pointer;display:flex;align-items:center;justify-content:center;text-align:center;min-height:0}
   .cta-text{font-size:11px;line-height:1;letter-spacing:.01em;color:#4b5563;white-space:nowrap}
   .cta-text b{color:#111;font-weight:900}
   .cta:active{transform:translateY(1px)}
 
-  /* ===== DRAWER ===== */
-  .scrim{position:fixed;inset:0;background:rgba(0,0,0,.35);opacity:0;pointer-events:none;transition:opacity .25s ease;z-index:30}
+  /* ===== SCRIM & DRAWERS (unchanged) ===== */
+  .scrim{position:fixed;left:0;right:0;top:var(--headerH);bottom:0;background:rgba(0,0,0,.35);opacity:0;pointer-events:none;transition:opacity .25s ease;z-index:40}
   .scrim.open{opacity:1;pointer-events:auto}
-  .drawer{position:fixed;top:0;right:0;height:100%;width:440px;max-width:92vw;background:#fff;border-left:1px solid var(--ring);
-    transform:translateX(100%);transition:transform .25s ease;z-index:40;display:flex;flex-direction:column}
-  .drawer.open{transform:translateX(0)}
-  .drawer-header{height:72px;display:flex;align-items:center;justify-content:flex-end;padding:0 12px;border-bottom:1px solid var(--ring)}
-  .drawer-body{min-height:0;overflow:auto}
-  .drawer-content{display:grid;grid-template-columns:240px 1fr;gap:8px;padding:14px 10px 24px;min-height:100%}
-  @media (max-width:400px){ .drawer-content{grid-template-columns:1fr} }
-  .left-rail{position:relative}
-  .left-rail-inner{position:sticky; top:84px; display:block}
+
+  .drawer-left{
+    position:fixed; top:var(--headerH); bottom:0; left:0; width:360px; max-width:90vw;
+    background:#fff; border-right:1px solid var(--ring); transform:translateX(-100%);
+    transition:transform .25s ease; z-index:45; display:flex; flex-direction:column; padding:10px 14px;
+  }
+  .drawer-left.open{ transform:translateX(0); }
+  .nav-left-title{font-size:11px; color:#9aa1ab; letter-spacing:.18em; text-transform:uppercase; margin:2px 0 8px 2px}
+  .nav-left-list{display:flex; flex-direction:column; gap:10px}
+  .nav-left-link{
+    text-decoration:none; color:#2b2b2b; text-transform:uppercase; letter-spacing:.12em;
+    font-weight:400; font-size:13px; line-height:1; padding:10px 6px 8px 4px; border-radius:6px;
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  }
+  .nav-left-link:hover{background:#f5f6f8}
+  .nav-left-sep{height:1px; background:#eceff3; margin:8px 0}
+
+  .drawer-right{
+    position:fixed; top:var(--headerH); bottom:0; right:0; width:420px; max-width:92vw;
+    background:#fff; border-left:1px solid var(--ring); transform:translateX(100%);
+    transition:transform .25s ease; z-index:45; display:flex; flex-direction:column;
+  }
+  .drawer-right.open{ transform:translateX(0); }
+  .drawer-right .drawer-header{height:56px; border-bottom:1px solid var(--ring); display:flex; align-items:center; justify-content:flex-end; padding:0 12px}
+  .drawer-body{min-height:0; overflow:auto}
+  .drawer-content{display:block; padding:14px 12px 24px}
   .rail-title{font-weight:900;font-size:16px;margin:4px 0 8px}
   .ghost{display:block;width:100%;background:#e5e7eb;border:0;border-radius:6px;padding:10px 12px;font-size:14px;color:#111}
   .ghost::placeholder{color:#6b7280}
@@ -141,11 +165,22 @@
   .rail-bullet{position:relative;margin-bottom:8px}
   .rail-bullet::before{content:"•";position:absolute;left:-10px;top:50%;transform:translateY(-50%);color:#9ca3af}
 
-  .nav-hero{padding:0 8px}
-  .hero-item{display:flex;align-items:center;justify-content:flex-end;gap:8px;text-decoration:none}
-  .hero-text{color:var(--hero);font-weight:900;text-transform:uppercase;letter-spacing:.06em;font-size:22px;line-height:1.2;margin:18px 0;text-shadow:0 1px 2px rgba(0,0,0,.25);text-align:right;padding-right:6px}
-  .hero-chev{width:16px;height:16px;color:var(--chev);flex:0 0 auto}
-  .sep{border:0;border-top:1px solid #e5e7eb;margin:16px 0 16px auto;width:82%}
+  /* Face 3 (gifting) */
+  .frame-overlay{position:absolute; inset:0; z-index:2; pointer-events:none; object-fit:cover; width:100%; height:100%}
+  .icon-stack{position:absolute; right:10px; top:14%; z-index:3; display:flex; flex-direction:column; gap:14px; align-items:center}
+  .nil-box{width:64px;height:64px;border-radius:16px;background:#e5e7eb;display:grid;place-items:center;color:#111;font-weight:900;font-size:12px}
+  .nil-cap{font-size:10px;color:#111;text-align:center;line-height:1.15;margin-top:4px;font-weight:700}
+  .soc{display:grid;place-items:center;width:48px;height:48px;border-radius:14px;color:#fff;text-decoration:none;font-weight:900}
+  .soc.x{background:#111} .soc.ig{background:linear-gradient(45deg,#fbbf24,#ec4899,#8b5cf6)}
+  .gift-panel{position:absolute; left:12px; right:12px; bottom:12px; background:rgba(255,255,255,.96); backdrop-filter:saturate(150%) blur(2px); padding:12px; z-index:3; border-radius:8px; box-shadow:0 6px 18px rgba(0,0,0,.18)}
+  .gift-title{font-weight:900; letter-spacing:.02em; font-size:14px; margin:0 0 6px; color:#111}
+  .gift-line{font-size:12px; color:#4b5563}
+  .gift-row{display:flex; gap:10px; align-items:center; justify-content:space-between; flex-wrap:wrap; margin-top:6px}
+  .gift-action{background:var(--maroon); color:#fff; border-radius:999px; padding:8px 12px; font-size:12px; font-weight:800; text-decoration:none; white-space:nowrap}
+  .gift-news{margin-top:8px}
+  .gift-news h5{margin:0; font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:#4b5563}
+  .gift-news ul{margin:6px 0 0 18px; font-size:13px}
+  .gift-news a{color:#075985; text-decoration:none}
 
   .footer{position:fixed;left:0;right:0;bottom:0;height:56px;background:#000;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;letter-spacing:.03em;z-index:10}
 </style>
@@ -160,61 +195,60 @@
   <nav class="nav-desktop">
     <a class="active" href="#">Where They YAT?</a>
     <a href="#">Active Alumni News</a>
-    <a href="#">All-Time Next-Level List</a>
+    <a href="#">All-Time Huskies Roster</a>
     <a href="#">YAT-A-BOY Marketplace</a>
-    <a href="#">Current School Team</a>
-    <a href="#">Our Partner Program</a>
-    <a href="#">Global School Search</a>
+    <a href="#">Current High School Team</a>
+    <a href="#">PCDAction Partner Program</a>
+    <a href="#">YATSTATS Global School Search</a>
     <a href="#">Register | Login</a>
   </nav>
 
   <div class="header-right">
-    <button class="hambtn" id="openMenu" aria-label="Open Menu" title="Menu">
+    <button class="hambtn" id="openLeft" aria-label="Open Navigation" title="Menu">
       <svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
     </button>
-    <button class="iconbtn" id="openSearch" aria-label="Open Search" title="Search">
+    <button class="iconbtn" id="openRight" aria-label="Open Search & Filters" title="Search & Filters">
       <svg viewBox="0 0 24 24" fill="currentColor"><path d="M11 4a7 7 0 1 1 0 14 7 7 0 0 1 0-14zm9.7 15.3-3.4-3.4a9 9 0 1 0-1.4 1.4l3.4 3.4a1 1 0 0 0 1.4-1.4z"/></svg>
     </button>
     <img class="ystats-logo" src="https://i.postimg.cc/76srDfFT/yatstats-logo-stacked.png" alt="YAT?STATS"/>
   </div>
 </header>
 
-<!-- Drawer -->
 <div class="scrim" id="scrim"></div>
-<aside class="drawer" id="drawer" aria-hidden="true" aria-modal="true" role="dialog">
+
+<!-- LEFT NAV DRAWER -->
+<aside class="drawer-left" id="drawerLeft" aria-hidden="true" role="navigation">
+  <div class="nav-left-title">Navigation</div>
+  <div class="nav-left-list">
+    <a class="nav-left-link" href="#">Where They YAT?</a>
+    <a class="nav-left-link" href="#">Active Alumni News</a>
+    <a class="nav-left-link" href="#">All-Time Huskies Roster</a>
+    <a class="nav-left-link" href="#">YAT-A-BOY Marketplace</a>
+    <a class="nav-left-link" href="#">Current High School Team</a>
+    <a class="nav-left-link" href="#">PCDAction Partner Program</a>
+    <div class="nav-left-sep"></div>
+    <a class="nav-left-link" href="#">YATSTATS Global School Search</a>
+    <a class="nav-left-link" href="#">Register | Login</a>
+  </div>
+</aside>
+
+<!-- RIGHT FILTER/SEARCH DRAWER -->
+<aside class="drawer-right" id="drawerRight" aria-hidden="true" role="dialog" aria-modal="true">
   <div class="drawer-header">
-    <button class="iconbtn" id="closeDrawer" aria-label="Close">
+    <button class="iconbtn" id="closeRight" aria-label="Close">
       <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6.225 4.811 4.811 6.225 10.586 12l-5.775 5.775 1.414 1.414L12 13.414l5.775 5.775 1.414-1.414L13.414 12l5.775-5.775-1.414-1.414L12 10.586 6.225 4.811z"/></svg>
     </button>
   </div>
   <div class="drawer-body">
     <div class="drawer-content">
-      <!-- Left rail -->
-      <div class="left-rail">
-        <div class="left-rail-inner">
-          <div class="rail-group">
-            <div class="rail-title">Search</div>
-            <input id="q" type="text" class="ghost" placeholder="Players Name" autocomplete="off"/>
-          </div>
-          <div class="rail-group">
-            <div class="rail-title">Filters</div>
-            <div class="rail-bullet"><select id="lvl" class="ghost"><option value="">All Levels</option></select></div>
-            <div class="rail-bullet"><select id="grad" class="ghost"><option value="">All Grad Classes</option></select></div>
-          </div>
-        </div>
+      <div class="rail-group">
+        <div class="rail-title">Search</div>
+        <input id="q" type="text" class="ghost" placeholder="Players Name" autocomplete="off"/>
       </div>
-
-      <!-- Right column hero nav -->
-      <div class="nav-hero">
-        <a class="hero-item" href="#"><span class="hero-text">Where They YAT?</span><svg class="hero-chev" viewBox="0 0 24 24" fill="currentColor"><path d="M9 18l6-6-6-6"/></svg></a>
-        <a class="hero-item" href="#"><span class="hero-text">Active Alumni News</span><svg class="hero-chev" viewBox="0 0 24 24" fill="currentColor"><path d="M9 18l6-6-6-6"/></svg></a>
-        <a class="hero-item" href="#"><span class="hero-text">All-Time Next-Level List</span><svg class="hero-chev" viewBox="0 0 24 24" fill="currentColor"><path d="M9 18l6-6-6-6"/></svg></a>
-        <a class="hero-item" href="#"><span class="hero-text">YAT-A-BOY Marketplace</span><svg class="hero-chev" viewBox="0 0 24 24" fill="currentColor"><path d="M9 18l6-6-6-6"/></svg></a>
-        <a class="hero-item" href="#"><span class="hero-text">Current School Team</span><svg class="hero-chev" viewBox="0 0 24 24" fill="currentColor"><path d="M9 18l6-6-6-6"/></svg></a>
-        <a class="hero-item" href="#"><span class="hero-text">Our Partner Program</span><svg class="hero-chev" viewBox="0 0 24 24" fill="currentColor"><path d="M9 18l6-6-6-6"/></svg></a>
-        <hr class="sep">
-        <a class="hero-item" href="#"><span class="hero-text">Global School Search</span><svg class="hero-chev" viewBox="0 0 24 24" fill="currentColor"><path d="M9 18l6-6-6-6"/></svg></a>
-        <a class="hero-item" href="#"><span class="hero-text">Register | Login</span><svg class="hero-chev" viewBox="0 0 24 24" fill="currentColor"><path d="M9 18l6-6-6-6"/></svg></a>
+      <div class="rail-group">
+        <div class="rail-title">Filters</div>
+        <div class="rail-bullet"><select id="lvl" class="ghost"><option value="">All Levels</option></select></div>
+        <div class="rail-bullet"><select id="grad" class="ghost"><option value="">All Grad Classes</option></select></div>
       </div>
     </div>
   </div>
@@ -227,10 +261,21 @@
 <footer class="footer">SPONSOR AD BANNER</footer>
 
 <script>
-/* ==== DATA ==== */
+/* ========= CONFIG ========= */
+const FACE3_TEMPLATE = "https://i.postimg.cc/NfTnLGvC/Screenshot-20250826-015101-Gallery.jpg";
+
+/* ========= DATA ========= */
+function imgTag(src, alt, fallbackSrc){
+  const f = fallbackSrc ? fallbackSrc.replace(/"/g,'&quot;') : '';
+  const s = (src||'').replace(/"/g,'&quot;');
+  const onerr = fallbackSrc
+    ? `this.onerror=null; this.src='${f}';`
+    : `this.onerror=null; this.outerHTML='<div class=&quot;card-img&quot; style=&quot;display:grid;place-items:center;color:#9ca3af;font-weight:700;font-size:12px;&quot;>NO IMAGE</div>';`;
+  return `<img class="card-img" src="${s}" alt="${(alt||'').replace(/"/g,'&quot;')}" onerror="${onerr}">`;
+}
+
 const players = [
-  /* Existing stars with updated HS images + NIL points */
-  { id:"bellinger", name:"CODY BELLINGER", graduatingClass:2013, currentLevel:"MLB",
+  { id:"cody-bellinger", name:"CODY BELLINGER", graduatingClass:2013, currentLevel:"MLB",
     position:"CF/1B", team:"New York Yankees",
     frontImg:"https://i.postimg.cc/Y2PVpqNK/new-york-yankees-outfielder-cody-bellinger.jpg",
     highSchoolImg:"https://i.postimg.cc/63NyR1qh/01-Bellinger-Front-page-00001.jpg",
@@ -261,40 +306,57 @@ const players = [
     nilScore:"—", profileUrl:"#", nilUrl:"#", twitterUrl:"#", instagramUrl:"#"
   },
 
-  /* NEW CARDS (using provided HS images; other fields are placeholders for now) */
-  { id:"drew-swift", name:"DREW SWIFT",
+  { id:"brock-selvidge", name:"BROCK SELVIDGE",
     graduatingClass:null, currentLevel:"", position:"", team:"",
-    frontImg:"https://i.postimg.cc/zXf3nhz4/04-Swift-Front-page-00001.jpg",
-    highSchoolImg:"https://i.postimg.cc/zXf3nhz4/04-Swift-Front-page-00001.jpg",
+    frontImg:"https://i.postimg.cc/W3K6jZ9W/image.jpg",
+    highSchoolImg:"https://i.postimg.cc/xdLd0y5N/22-Selvidge-Front-page-00001.jpg",
+    lastGame:{line:"—"}, nextGame:{opponent:"—",time:"—"}, last3:[], nilScore:"—"
+  },
+  { id:"luke-theil", name:"LUKE THEIL",
+    graduatingClass:null, currentLevel:"", position:"", team:"",
+    frontImg:"https://i.postimg.cc/43pTpvct/luke-theil.webp",
+    highSchoolImg:"https://i.postimg.cc/43pTpvct/luke-theil.webp",
     lastGame:{line:"—"}, nextGame:{opponent:"—",time:"—"}, last3:[], nilScore:"—"
   },
   { id:"logan-boyer", name:"LOGAN BOYER",
     graduatingClass:null, currentLevel:"", position:"", team:"",
-    frontImg:"https://i.postimg.cc/mgzDnGFw/11-Boyer-Front-page-00001.jpg",
+    frontImg:"https://www.gettyimages.com.au/detail/news-photo/logan-boyer-of-the-tulsa-drillers-pitches-during-the-game-news-photo/2157224642",
     highSchoolImg:"https://i.postimg.cc/mgzDnGFw/11-Boyer-Front-page-00001.jpg",
-    lastGame:{line:"—"}, nextGame:{opponent:"—",time:"—"}, last3:[], nilScore:"—"
-  },
-  { id:"brock-selvidge", name:"BROCK SELVIDGE",
-    graduatingClass:null, currentLevel:"", position:"", team:"",
-    frontImg:"https://i.postimg.cc/xdLd0y5N/22-Selvidge-Front-page-00001.jpg",
-    highSchoolImg:"https://i.postimg.cc/xdLd0y5N/22-Selvidge-Front-page-00001.jpg",
     lastGame:{line:"—"}, nextGame:{opponent:"—",time:"—"}, last3:[], nilScore:"—"
   },
   { id:"shane-murphy", name:"SHANE MURPHY",
     graduatingClass:null, currentLevel:"", position:"", team:"",
-    frontImg:"https://i.postimg.cc/90gmxxmK/26-Murphy-Front-page-00001.jpg",
+    frontImg:"https://i.postimg.cc/HL7zvBWZ/Shane-Murphy-Birmingham-Barons-Chicago-White-Sox.jpg",
     highSchoolImg:"https://i.postimg.cc/90gmxxmK/26-Murphy-Front-page-00001.jpg",
+    lastGame:{line:"—"}, nextGame:{opponent:"—",time:"—"}, last3:[], nilScore:"—"
+  },
+  { id:"drew-swift", name:"DREW SWIFT",
+    graduatingClass:null, currentLevel:"", position:"", team:"",
+    frontImg:"https://i.postimg.cc/GmmSKFsV/AISelect-20250826-023939-Instagram.jpg",
+    highSchoolImg:"https://i.postimg.cc/zXf3nhz4/04-Swift-Front-page-00001.jpg",
     lastGame:{line:"—"}, nextGame:{opponent:"—",time:"—"}, last3:[], nilScore:"—"
   },
   { id:"tyler-wilson", name:"TYLER WILSON",
     graduatingClass:null, currentLevel:"", position:"", team:"",
-    frontImg:"https://i.postimg.cc/m2h2cGVs/34-Wilson-Front-page-00001.jpg",
-    highSchoolImg:"https://i.postimg.cc/m2h2cGVs/34-Wilson-Front-page-00001.jpg",
+    frontImg:"https://i.postimg.cc/0Qh0Ymqg/Tyler-Wilson-Now.jpg",
+    highSchoolImg:"https://i.postimg.cc/1XZJx67G/34-Wilson-Front-page-00001.jpg",
+    lastGame:{line:"—"}, nextGame:{opponent:"—",time:"—"}, last3:[], nilScore:"—"
+  },
+  { id:"roch-cholowsky", name:"ROCH CHOLOWSKY",
+    graduatingClass:null, currentLevel:"", position:"", team:"",
+    frontImg:"https://i.postimg.cc/xdvPvq1q/Roch2.jpg",
+    highSchoolImg:"https://i.postimg.cc/xdvPvq1q/Roch2.jpg",
+    lastGame:{line:"—"}, nextGame:{opponent:"—",time:"—"}, last3:[], nilScore:"—"
+  },
+  { id:"shane-anderson", name:"SHANE ANDERSON",
+    graduatingClass:null, currentLevel:"", position:"", team:"",
+    frontImg:"https://i.postimg.cc/J4j5XP4M/IMG-20250826-030341.jpg",
+    highSchoolImg:"https://i.postimg.cc/SNj7TkrQ/AISelect-20250826-031127-Gallery-1.jpg",
     lastGame:{line:"—"}, nextGame:{opponent:"—",time:"—"}, last3:[], nilScore:"—"
   }
 ];
 
-/* ==== Helpers ==== */
+/* ========= HELPERS ========= */
 const byId = id => document.getElementById(id);
 const lvlClass = s => 'lvl-'+String(s||'').toLowerCase().replace(/\s+/g,'-');
 const makeKV = (k,v)=>`<div style="background:#f3f4f6;border-radius:10px;text-align:center;padding:8px;">
@@ -304,13 +366,13 @@ const icon = {
   right:`<svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M7.707 4.293a1 1 0 0 1 1.414 0l5 5a1 1 0 0 1 0 1.414l-5 5a1 1 0 1 1-1.414-1.414L11.586 11H4a1 1 0 1 1 0-2h7.586L7.707 5.707a1 1 0 0 1 0-1.414z"/></svg>`
 };
 
-/* ==== Card builder ==== */
+/* ========= CARD BUILDER ========= */
 function makeCard(p){
   const lvl = lvlClass(p.currentLevel);
   const teamPos = (p.team||'') + (p.position?(' • '+p.position):'');
-  const imgOrPH = (src,alt)=> src
-    ? `<img class="card-img" src="${src}" alt="${alt}" onerror="this.outerHTML='<div class=&quot;card-img&quot; style=&quot;display:grid;place-items:center;color:#9ca3af;font-weight:700;font-size:12px;&quot;>NO IMAGE</div>'">`
-    : `<div class="card-img" style="display:grid;place-items:center;color:#9ca3af;font-weight:700;font-size:12px;">NO IMAGE</div>`;
+
+  const imgFront = imgTag(p.frontImg || p.highSchoolImg, p.name||'', p.highSchoolImg || '');
+  const imgHS    = imgTag(p.highSchoolImg || p.frontImg, (p.name||'')+' — Hamilton HS', p.frontImg || '');
 
   const stats = p.batting ? `
     <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:8px;">
@@ -333,7 +395,7 @@ function makeCard(p){
       <!-- Face 1 -->
       <div class="face s1">
         <div class="face-media">
-          ${imgOrPH(p.frontImg || p.highSchoolImg, p.name||'')}
+          ${imgFront}
           <div class="bottom-grad"></div>
 
           <div class="right-info">
@@ -347,16 +409,15 @@ function makeCard(p){
           <div class="overlayBL">
             <div class="player-name">${(p.name||'').toUpperCase()}</div>
             <div class="player-team">${teamPos}</div>
-          </div>
-
-          <div class="badge-stack">
-            ${p.currentLevel? `<span class="badge ${lvl}">${p.currentLevel}</span>` : ``}
-            ${p.graduatingClass? `<span class="badge dim">CLASS OF ${p.graduatingClass}</span>` : ``}
+            <div class="tag-stack">
+              ${p.currentLevel? `<span class="badge ${lvl}">${p.currentLevel}</span>` : ``}
+              ${p.graduatingClass? `<span class="badge dim">CLASS OF ${p.graduatingClass}</span>` : ``}
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- Face 2 (white) -->
+      <!-- Face 2 (STATS ONLY) -->
       <div class="face s2">
         <div style="padding:14px;">
           <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start;margin-bottom:6px;">
@@ -379,51 +440,40 @@ function makeCard(p){
         </div>
       </div>
 
-      <!-- Face 3 (HS image + NIL total + links) -->
+      <!-- Face 3 (HS + template + gifts) -->
       <div class="face s3">
         <div class="face-media">
-          ${imgOrPH(p.highSchoolImg || p.frontImg,(p.name||'')+' — Hamilton HS')}
-          <div style="position:absolute;left:12px;right:12px;bottom:12px;background:rgba(255,255,255,.95);backdrop-filter:saturate(150%) blur(2px);padding:12px;z-index:2;">
-            <div style="display:flex;gap:10px;justify-content:space-between;align-items:center;flex-wrap:wrap;">
-              <div style="background:#f3f4f6;border-radius:10px;padding:8px 10px;font-size:12px;flex:1 1 auto;">
-                <span style="color:#6b7280">NIL YAT-A-BOY SCORE:</span>
-                <span style="font-weight:900;color:#111">${p.nilScore||"—"}</span>
-              </div>
-              <a href="${p.nilUrl||'#'}" target="_blank" style="background:var(--maroon);color:#fff;border-radius:999px;padding:8px 12px;font-size:12px;font-weight:800;text-decoration:none;white-space:nowrap;">Give a YAT-A-BOY</a>
-              <div style="display:flex;gap:8px;">
-                ${p.twitterUrl?`<a href="${p.twitterUrl}" target="_blank" aria-label="X/Twitter" style="display:grid;place-items:center;width:28px;height:28px;background:#111;border-radius:999px;color:#fff;text-decoration:none;font-size:12px;">X</a>`:''}
-                ${p.instagramUrl?`<a href="${p.instagramUrl}" target="_blank" aria-label="Instagram" style="display:grid;place-items:center;width:28px;height:28px;background:linear-gradient(45deg,#fbbf24,#ec4899,#8b5cf6);border-radius:999px;color:#fff;text-decoration:none;font-size:12px;">IG</a>`:''}
-              </div>
+          ${imgHS}
+          <img class="frame-overlay" src="${FACE3_TEMPLATE}" alt="YAT-A-BOY frame" />
+          <div class="icon-stack">
+            <div>
+              <div class="nil-box">${(p.nilScore||'—')}</div>
+              <div class="nil-cap">YAT-A-BOY<br>NIL POINTS</div>
             </div>
-            ${(p.news && p.news.length)?`
-              <div style="margin-top:8px;">
-                <div class="small" style="font-weight:800;color:#4b5563;text-transform:uppercase;">Top Headlines</div>
-                <ul style="margin:6px 0 0 18px;font-size:13px;">
-                  ${p.news.slice(0,3).map(n=>`<li><a href="${n.url}" target="_blank" style="color:#075985;text-decoration:none;">${n.title}</a></li>`).join('')}
-                </ul>
-              </div>`:''}
+            ${p.twitterUrl?`<a class="soc x" href="${p.twitterUrl}" target="_blank" aria-label="X/Twitter">X</a>`:''}
+            ${p.instagramUrl?`<a class="soc ig" href="${p.instagramUrl}" target="_blank" aria-label="Instagram">IG</a>`:''}
+          </div>
+          <div class="gift-panel">
+            <h4 class="gift-title">VIRTUAL YAT-A-BOY GIFTS</h4>
+            <div class="gift-line"><b>NIL TOTAL:</b> <span style="font-weight:900;color:#111">${p.nilScore||"—"}</span></div>
+            <div class="gift-row"><a href="${p.nilUrl||'#'}" target="_blank" class="gift-action">Give a YAT-A-BOY</a></div>
+            ${(p.news && p.news.length)?`<div class="gift-news"><h5>Top Headlines</h5><ul>${p.news.slice(0,3).map(n=>`<li><a href="${n.url||'#'}" target="_blank">${n.title}</a></li>`).join('')}</ul></div>`:''}
           </div>
         </div>
       </div>
     </div>
   </article>
 
-  <!-- Mini flip buttons (correct mapping via data-face) -->
+  <!-- Mini flip buttons -->
   <div class="card-cta" role="group" aria-label="Card controls">
-    <button class="cta" data-face="1" aria-label="Show Where's He YAT?">
-      <span class="cta-text"><b>WHERE'S HE YAT?</b></span>
-    </button>
-    <button class="cta" data-face="2" aria-label="Show Stats">
-      <span class="cta-text">SHOW ME HIS <b>STATS</b></span>
-    </button>
-    <button class="cta" data-face="3" aria-label="Show YAT-A-BOY">
-      <span class="cta-text"><b>VIRTUAL YAT-A-BOY GIFTS</b></span>
-    </button>
+    <button class="cta" data-face="1" aria-label="Show Where's He YAT?"><span class="cta-text"><b>WHERE'S HE YAT?</b></span></button>
+    <button class="cta" data-face="2" aria-label="Show Stats"><span class="cta-text">SHOW ME HIS <b>STATS</b></span></button>
+    <button class="cta" data-face="3" aria-label="Show Virtual YAT-A-BOY Gifts"><span class="cta-text"><b>VIRTUAL YAT-A-BOY GIFTS</b></span></button>
   </div>
 </div>`;
 }
 
-/* ==== Render + Filters ==== */
+/* ========= RENDER + FILTERS ========= */
 function render(list){ byId('grid').innerHTML = list.map(makeCard).join(''); }
 function populateFilters(){
   const classes={}, levels={};
@@ -445,7 +495,7 @@ function applyFilters(){
   render(out);
 }
 
-/* ==== Rotation ==== */
+/* ========= ROTATION ========= */
 function setFace(card, face){ if(!card) return; card.classList.remove('rot0','rot120','rot240'); card.classList.add(face===1?'rot0':face===2?'rot120':'rot240'); }
 function rotate(card, dir){
   if(card.classList.contains('rot0')) card.classList.replace('rot0', dir==='next'?'rot120':'rot240');
@@ -453,36 +503,26 @@ function rotate(card, dir){
   else card.classList.replace('rot240', dir==='next'?'rot0':'rot120');
 }
 
-/* ==== Interactions ==== */
+/* ========= INTERACTIONS ========= */
 function setupInteractions(){
-  // Mini buttons -> faces (bulletproof mapping)
   document.addEventListener('click', e=>{
     const faceBtn=e.target.closest('[data-face]');
-    if(faceBtn){
-      const face=Number(faceBtn.dataset.face)||1;
-      const card=faceBtn.closest('.card-wrap').querySelector('.card');
-      setFace(card, face);
-      return;
-    }
+    if(faceBtn){ const face=Number(faceBtn.dataset.face)||1; const card=faceBtn.closest('.card-wrap').querySelector('.card'); setFace(card, face); return; }
     const btn=e.target.closest('[data-dir]'); if(btn){ rotate(btn.closest('.card'), btn.dataset.dir); }
   });
 
-  // emphasize overlay on hover/touch
+  // Gentle emphasis without big jumps
   let emphTimer;
-  document.addEventListener('mouseenter', e=>{
-    const c=e.target.closest('.card'); if(!c) return; c.classList.add('emph');
-  }, true);
-  document.addEventListener('mouseleave', e=>{
-    const c=e.target.closest('.card'); if(!c) return; c.classList.remove('emph');
-  }, true);
+  document.addEventListener('mouseenter', e=>{ const c=e.target.closest('.card'); if(!c) return; c.classList.add('emph'); }, true);
+  document.addEventListener('mouseleave', e=>{ const c=e.target.closest('.card'); if(!c) return; c.classList.remove('emph'); }, true);
   document.addEventListener('touchstart', e=>{
-    const c=e.target.closest('.card'); if(!c) return; c.classList.add('emph');
-    clearTimeout(emphTimer); emphTimer=setTimeout(()=>c.classList.remove('emph'),1400);
+    const c=e.target.closest('.card'); if(!c) return;
+    c.classList.add('emph'); clearTimeout(emphTimer); emphTimer=setTimeout(()=>c.classList.remove('emph'),900); // shorter to avoid drift
   },{passive:true});
 
-  // keyboard + swipe rotate
+  // keyboard + swipe
   document.addEventListener('keydown', e=>{
-    if(e.key==='Escape'){ closeDrawer(); return; }
+    if(e.key==='Escape'){ closeDrawers(); return; }
     if(e.key==='ArrowLeft'||e.key==='ArrowRight'){ const card=document.activeElement?.closest?.('.card'); if(card) rotate(card, e.key==='ArrowRight'?'next':'prev'); }
   });
   let sx=0, card=null;
@@ -490,27 +530,24 @@ function setupInteractions(){
   document.addEventListener('touchend', e=>{ if(!card) return; const dx=e.changedTouches[0].clientX-sx; if(Math.abs(dx)>40) rotate(card, dx<0?'next':'prev'); card=null; });
 }
 
-/* ==== Drawer ==== */
-const drawer = byId('drawer'), scrim = byId('scrim');
+/* ========= DRAWERS ========= */
+const scrim = byId('scrim');
+const drawerLeft  = byId('drawerLeft');
+const drawerRight = byId('drawerRight');
 let lastFocus = null;
 
-function openDrawer(focusSearch=false){
-  lastFocus = document.activeElement;
-  drawer.classList.add('open'); scrim.classList.add('open'); drawer.setAttribute('aria-hidden','false');
-  document.body.classList.add('no-scroll');
-  if(focusSearch) setTimeout(()=>byId('q')?.focus(),150);
-}
-function closeDrawer(){
-  drawer.classList.remove('open'); scrim.classList.remove('open'); drawer.setAttribute('aria-hidden','true');
-  document.body.classList.remove('no-scroll');
-  lastFocus?.focus?.();
-}
-document.getElementById('openMenu').addEventListener('click', ()=>openDrawer(false));
-document.getElementById('openSearch').addEventListener('click', ()=>openDrawer(true));
-document.getElementById('closeDrawer').addEventListener('click', closeDrawer);
-scrim.addEventListener('click', closeDrawer);
+function openLeft(){ closeRight(false); lastFocus=document.activeElement; drawerLeft.classList.add('open'); scrim.classList.add('open'); document.body.classList.add('no-scroll'); }
+function closeLeft(focus=true){ drawerLeft.classList.remove('open'); if(!drawerRight.classList.contains('open')){ scrim.classList.remove('open'); document.body.classList.remove('no-scroll'); } if(focus) lastFocus?.focus?.(); }
+function openRight(){ closeLeft(false); lastFocus=document.activeElement; drawerRight.classList.add('open'); scrim.classList.add('open'); document.body.classList.add('no-scroll'); setTimeout(()=>byId('q')?.focus(),150); }
+function closeRight(focus=true){ drawerRight.classList.remove('open'); if(!drawerLeft.classList.contains('open')){ scrim.classList.remove('open'); document.body.classList.remove('no-scroll'); } if(focus) lastFocus?.focus?.(); }
+function closeDrawers(){ closeLeft(false); closeRight(); }
 
-/* ==== Boot ==== */
+byId('openLeft').addEventListener('click', openLeft);
+byId('openRight').addEventListener('click', openRight);
+byId('closeRight').addEventListener('click', ()=>closeRight());
+scrim.addEventListener('click', closeDrawers);
+
+/* ========= BOOT ========= */
 document.addEventListener('DOMContentLoaded', ()=>{
   populateFilters();
   render(players);
