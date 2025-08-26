@@ -37,7 +37,7 @@
   @media (min-width:640px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
   @media (min-width:1000px){.grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 
-  /* ===== CARD (5/7, edge-to-edge image, no border) ===== */
+  /* ===== CARD (5/7, E2E image) ===== */
   .card-wrap{display:flex;flex-direction:column;align-items:stretch}
   .card{
     background:#000;border:0;border-radius:0;box-shadow:0 2px 10px rgba(0,0,0,.04);
@@ -51,13 +51,18 @@
   .rot120 .flip-card-inner{transform:rotateY(120deg)}
   .rot240 .flip-card-inner{transform:rotateY(240deg)}
 
-  .face-media{position:relative}
-  .card-img{width:100%;height:100%;object-fit:cover;border-radius:0;background:#111}
+  /* Media layer now absolute so the image truly fills the face */
+  .face-media{position:absolute; inset:0;}
+  .card-img{position:absolute; inset:0; width:100%; height:100%; object-fit:cover; border-radius:0; background:#111}
 
   /* ===== FACE 1 ===== */
   .bottom-grad{
-    position:absolute; left:0; right:0; bottom:0; height:52%;
-    background:linear-gradient(to top, rgba(0,0,0,.96) 0%, rgba(0,0,0,.88) 25%, rgba(0,0,0,0) 70%);
+    position:absolute; left:0; right:0; bottom:0; height:60%;
+    background:linear-gradient(to top,
+      rgba(0,0,0,.98) 0%,
+      rgba(0,0,0,.92) 28%,
+      rgba(0,0,0,.86) 45%,
+      rgba(0,0,0,0) 72%);
     pointer-events:none; z-index:1;
   }
   .overlayBL{position:absolute; left:12px; right:140px; bottom:12px; color:#fff; z-index:2}
@@ -70,14 +75,21 @@
   .badge.dim{background:#374151}
   .badge-stack{position:absolute; right:12px; bottom:12px; display:flex; flex-direction:column; gap:6px; align-items:flex-end; z-index:2}
 
-  /* right info block: bottom third on phones */
-  .right-info{position:absolute; right:12px; color:#fff; text-align:right; max-width:58%; z-index:2; text-shadow:0 1px 2px rgba(0,0,0,.45)}
-  .right-info{ top:66%; transform:translateY(-10%) }
-  @media (max-width:420px){ .right-info{ top:72%; transform:translateY(-8%) } }
+  /* Right info block – bottom third on phones, a touch higher on desktop */
+  .right-info{
+    position:absolute; right:12px; color:#fff; text-align:right;
+    max-width:64%; z-index:2; text-shadow:0 1px 2px rgba(0,0,0,.48);
+  }
+  /* default desktop/tablet */
+  .right-info{ top:66%; transform:translateY(-8%) }
+  /* Samsung S25 and similar phones */
+  @media (max-width: 430px){
+    .right-info{ top:82%; transform:translateY(-6%); max-width:74% }
+  }
   .info-title{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#e5e7eb}
   .info-line{font-size:14px;font-weight:800;letter-spacing:.01em}
 
-  /* Flip interactions */
+  /* Flip controls */
   .hit{position:absolute;top:0;bottom:0;width:50%;z-index:3;background:transparent;border:0}
   .hit.left{left:0} .hit.right{right:0}
   .arrow{position:absolute;top:50%;transform:translateY(-50%);width:34px;height:34px;border-radius:999px;border:0;background:rgba(255,255,255,.85);box-shadow:0 2px 8px rgba(0,0,0,.15);display:grid;place-items:center;z-index:4;opacity:0;transition:opacity .2s}
@@ -104,7 +116,7 @@
   .cta .l2{margin-top:0;font-size:14px;line-height:1.05;font-weight:900;color:#111;letter-spacing:.02em}
   .cta:active{transform:translateY(1px)}
 
-  /* ===== DRAWER (matches screenshot) ===== */
+  /* ===== DRAWER (FOX-style: left rail + right-aligned hero nav) ===== */
   .scrim{position:fixed;inset:0;background:rgba(0,0,0,.35);opacity:0;pointer-events:none;transition:opacity .25s ease;z-index:30}
   .scrim.open{opacity:1;pointer-events:auto}
   .drawer{position:fixed;top:0;right:0;height:100%;width:420px;max-width:92vw;background:#fff;border-left:1px solid var(--ring);
@@ -114,24 +126,27 @@
   .drawer-header .iconbtn{border-radius:999px}
 
   .drawer-body{min-height:0;overflow:auto}
-  .drawer-content{padding:16px 12px 24px}
+  /* Two-column grid on >= 400px; stacked on very narrow phones */
+  .drawer-content{display:grid;grid-template-columns:220px 1fr;gap:8px;padding:16px 10px 24px}
+  @media (max-width:400px){ .drawer-content{grid-template-columns:1fr} }
 
-  /* LEFT RAIL (Search + Filters) */
-  .rail-title{font-weight:900;font-size:18px;margin:12px 0 8px}
-  .ghost{display:block;width:300px;max-width:100%;background:#e5e7eb;border:0;border-radius:6px;padding:12px 14px;font-size:14px;color:#111}
+  /* Left rail (Search + Filters) */
+  .rail-title{font-weight:900;font-size:18px;margin:6px 0 8px}
+  .ghost{display:block;width:100%;background:#e5e7eb;border:0;border-radius:6px;padding:12px 14px;font-size:14px;color:#111}
   .ghost::placeholder{color:#6b7280}
   .rail-group{margin-bottom:18px}
-  .rail-bullet{position:relative}
-  .rail-bullet::before{content:"•";position:absolute;left:-12px;top:50%;transform:translateY(-50%);color:#9ca3af}
+  .rail-bullet{position:relative;margin-bottom:8px}
+  .rail-bullet::before{content:"•";position:absolute;left:-10px;top:50%;transform:translateY(-50%);color:#9ca3af}
 
-  /* BIG CENTERED NAV */
-  .nav-hero{margin-top:8px}
+  /* Right column hero nav (RIGHT-JUSTIFIED like the screenshot) */
+  .nav-hero{padding:0 8px}
   .hero-link{
-    display:block;text-align:center;text-decoration:none;color:#464646;
+    display:block;text-decoration:none;color:#464646;
     font-weight:900;text-transform:uppercase;letter-spacing:.06em;
     font-size:22px;line-height:1.2;margin:26px 0;text-shadow:0 1px 2px rgba(0,0,0,.25);
+    text-align:right; padding-right:6px;
   }
-  .sep{border:0;border-top:1px solid #e5e7eb;margin:18px auto;width:74%}
+  .sep{border:0;border-top:1px solid #e5e7eb;margin:18px 0 18px auto;width:82%}
 
   /* Footer */
   .footer{position:fixed;left:0;right:0;bottom:0;height:56px;background:#000;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;letter-spacing:.03em;z-index:10}
@@ -181,17 +196,19 @@
   <div class="drawer-body">
     <div class="drawer-content">
       <!-- Left rail -->
-      <div class="rail-group">
-        <div class="rail-title">Search</div>
-        <input id="q" type="text" class="ghost" placeholder="Players Name"/>
-      </div>
-      <div class="rail-group">
-        <div class="rail-title">Filters</div>
-        <div class="rail-bullet"><select id="lvl" class="ghost"><option value="">All Levels</option></select></div>
-        <div class="rail-bullet" style="margin-top:8px"><select id="grad" class="ghost"><option value="">All Grad Classes</option></select></div>
+      <div>
+        <div class="rail-group">
+          <div class="rail-title">Search</div>
+          <input id="q" type="text" class="ghost" placeholder="Players Name"/>
+        </div>
+        <div class="rail-group">
+          <div class="rail-title">Filters</div>
+          <div class="rail-bullet"><select id="lvl" class="ghost"><option value="">All Levels</option></select></div>
+          <div class="rail-bullet"><select id="grad" class="ghost"><option value="">All Grad Classes</option></select></div>
+        </div>
       </div>
 
-      <!-- Big centered nav -->
+      <!-- Right column hero nav (RIGHT-ALIGNED) -->
       <div class="nav-hero">
         <a class="hero-link" href="#">Where They YAT?</a>
         <a class="hero-link" href="#">Active Alumni News</a>
@@ -364,6 +381,7 @@ function makeCard(p){
     </div>
   </article>
 
+  <!-- THREE mini flip buttons -->
   <div class="card-cta" role="group" aria-label="Card controls">
     <button class="cta" data-action="show-yat" aria-label="Show Where's He YAT?">
       <div><div class="l1">WHERE'S HE</div><div class="l2">YAT?</div></div>
@@ -416,10 +434,12 @@ function setupInteractions(){
     const cta=e.target.closest('[data-action]'); if(cta){ const card=cta.closest('.card-wrap').querySelector('.card'); const a=cta.dataset.action; if(a==='show-yat') setFace(card,1); if(a==='show-stats') setFace(card,2); if(a==='show-gift') setFace(card,3); return; }
     const btn=e.target.closest('[data-dir]'); if(btn){ rotate(btn.closest('.card'), btn.dataset.dir); }
   });
+  // reveal arrows briefly on touch
   let t;
   document.addEventListener('touchstart', e=>{
     const c=e.target.closest('.card'); if(!c) return; c.classList.add('show-arrows'); clearTimeout(t); t=setTimeout(()=>c.classList.remove('show-arrows'),1500);
   },{passive:true});
+  // keyboard + swipe
   document.addEventListener('keydown', e=>{
     if(e.key==='Escape'){ closeDrawer(); return; }
     if(e.key==='ArrowLeft'||e.key==='ArrowRight'){ const card=document.activeElement?.closest?.('.card'); if(card) rotate(card, e.key==='ArrowRight'?'next':'prev'); }
