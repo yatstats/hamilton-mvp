@@ -1,4 +1,4 @@
-  <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8"/>
@@ -8,46 +8,40 @@
 <style>
   :root{
     --maroon:#7A0019; --ring:#E3E6EA; --bg:#f3f4f6;
-    --ink:#111827; --muted:#6b7280; --navink:#1f2937; --icon:#0f172a;
+    --ink:#111827; --navink:#1f2937;
   }
   *{box-sizing:border-box}
   html,body{margin:0;padding:0}
   body{background:var(--bg);font:15px/1.4 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,"Apple Color Emoji","Segoe UI Emoji";color:var(--ink)}
 
-  /* Header */
-  .site-header{position:fixed;top:0;left:0;right:0;height:80px;background:#fff;border-bottom:1px solid var(--ring);z-index:20;display:flex;align-items:center;justify-content:space-between;padding:0 16px}
-  .brand{display:flex;align-items:center;gap:12px}
-  .brand img{height:36px;width:auto}
-  .nav-desktop{display:flex;flex-wrap:wrap;gap:0}
-  .nav-desktop a{
-    font-size:12px;text-transform:uppercase;color:var(--navink);
-    margin-right:24px;text-decoration:none;white-space:nowrap;letter-spacing:.03em
+  /* ===== HEADER ===== */
+  .site-header{
+    position:fixed; inset:0 0 auto 0; height:80px; z-index:20;
+    background:#fff; border-bottom:1px solid var(--ring);
+    display:grid; grid-template-columns:auto 1fr auto; align-items:center; gap:8px; padding:0 12px;
   }
+  .left-fixed{align-self:start; padding-top:12px;}
+  .left-fixed img{height:36px;width:auto;display:block}
+  .nav-desktop{justify-self:center; display:flex; gap:0}
+  .nav-desktop a{font-size:12px;text-transform:uppercase;color:var(--navink);margin:0 12px;text-decoration:none;white-space:nowrap;letter-spacing:.03em}
   .nav-desktop a.active{color:var(--maroon);border-bottom:2px solid var(--maroon);padding-bottom:3px;font-weight:700}
-
-  .header-right{display:flex;align-items:center;gap:8px}
+  .header-right{justify-self:end; display:flex; align-items:center; gap:8px}
   .iconbtn,.hambtn{width:36px;height:36px;display:grid;place-items:center;border:1px solid var(--ring);border-radius:10px;background:#fff;cursor:pointer}
   .iconbtn svg,.hambtn svg{width:18px;height:18px;color:#111}
+  .ystats-logo{height:36px;width:auto;display:block}
+  @media (max-width:1024px){ .nav-desktop{display:none} }
 
-  /* Tablet & down use drawer for nav; keep search/filter icons visible */
-  .nav-mobile{display:none}
-  @media (max-width:1024px){
-    .nav-desktop{display:none}
-    .nav-mobile{display:flex;gap:8px;align-items:center}
-  }
-
-  /* Main grid */
+  /* ===== GRID ===== */
   main{padding:80px 0 84px}
   .grid{padding:16px;display:grid;grid-template-columns:repeat(1,minmax(0,1fr));gap:12px}
   @media (min-width:640px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
   @media (min-width:1000px){.grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 
-  /* Card (5/7 ratio, square corners) */
+  /* ===== CARD (5/7, edge-to-edge image, no border) ===== */
   .card-wrap{display:flex;flex-direction:column;align-items:stretch}
   .card{
-    background:#fff;border:1px solid var(--ring);border-radius:0;
-    box-shadow:0 2px 10px rgba(0,0,0,.04);
-    overflow:hidden;position:relative;user-select:none;aspect-ratio:5/7;min-height:320px;width:100%
+    background:#000;border:0;border-radius:0;box-shadow:0 2px 10px rgba(0,0,0,.04);
+    overflow:hidden;position:relative;user-select:none;aspect-ratio:5/7;min-height:320px;width:100%;
   }
   .flip-card{perspective:1200px}
   .flip-card-inner{position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform .6s cubic-bezier(.2,.7,.2,1)}
@@ -56,203 +50,158 @@
   .rot0  .flip-card-inner{transform:rotateY(0deg)}
   .rot120 .flip-card-inner{transform:rotateY(120deg)}
   .rot240 .flip-card-inner{transform:rotateY(240deg)}
-  .p-3{padding:12px} .p-4{padding:16px}
 
+  .face-media{position:relative}
+  .card-img{width:100%;height:100%;object-fit:cover;border-radius:0;background:#111}
+
+  /* ===== FACE 1 ===== */
+  .bottom-grad{
+    position:absolute; left:0; right:0; bottom:0; height:52%;
+    background:linear-gradient(to top, rgba(0,0,0,.96) 0%, rgba(0,0,0,.88) 25%, rgba(0,0,0,0) 70%);
+    pointer-events:none; z-index:1;
+  }
+  .overlayBL{position:absolute; left:12px; right:140px; bottom:12px; color:#fff; z-index:2}
+  .player-name{font-weight:900;text-transform:uppercase;letter-spacing:.02em;font-size:18px;line-height:1.05}
+  .player-team{font-size:12px;opacity:.95}
   .badge{display:inline-block;border-radius:999px;padding:4px 8px;font-weight:800;font-size:11px;color:#fff}
   .lvl-mlb{background:#7A0019}.lvl-aaa{background:#2563eb}.lvl-aa{background:#3b82f6}
   .lvl-high-a{background:#4f46e5}.lvl-low-a{background:#4338ca}
   .lvl-ncaa-d1{background:#166534}.lvl-kbo{background:#0ea5e9}.lvl-njcaa{background:#a16207}.lvl-naia{background:#9333ea}.lvl-juco{background:#0d9488}
-
-  /* Image */
-  .card-img{width:100%;aspect-ratio:5/7;object-fit:cover;border-radius:0;background:#e5e7eb}
-  .ph{display:grid;place-items:center;color:#9ca3af;font-weight:700;font-size:12px;letter-spacing:.05em}
-
-  /* Face 1: overlays and placements */
-  .bottom-grad{
-    position:absolute;left:12px;right:12px;bottom:12px;height:40%;
-    border-radius:0;pointer-events:none;
-    background:linear-gradient(to top, rgba(0,0,0,.92) 0%, rgba(0,0,0,.0) 85%)
-  }
-  .overlayBL{ /* bottom-left block: name + team */
-    position:absolute;left:12px;right:140px; /* leave room for right badges */
-    bottom:12px;color:#fff;padding:0;border-radius:0
-  }
-  .player-name{font-weight:900;text-transform:uppercase;letter-spacing:.02em;font-size:18px;line-height:1.05}
-  .player-team{font-size:12px;opacity:.95}
-  .badge-stack{ /* bottom-right stacked badges */
-    position:absolute;right:12px;bottom:12px;display:flex;flex-direction:column;gap:6px;align-items:flex-end;z-index:6
-  }
   .badge.dim{background:#374151}
-  /* RIGHT info block: starts near lower third, right-aligned */
-  .right-info{
-    position:absolute;right:12px;bottom:33%; /* ~top of block starts around lower third */
-    color:#fff;text-align:right;z-index:5;max-width:55%;
-    text-shadow:0 1px 2px rgba(0,0,0,.4);
-  }
+  .badge-stack{position:absolute; right:12px; bottom:12px; display:flex; flex-direction:column; gap:6px; align-items:flex-end; z-index:2}
+
+  /* right info block: bottom third on phones */
+  .right-info{position:absolute; right:12px; color:#fff; text-align:right; max-width:58%; z-index:2; text-shadow:0 1px 2px rgba(0,0,0,.45)}
+  .right-info{ top:66%; transform:translateY(-10%) }
+  @media (max-width:420px){ .right-info{ top:72%; transform:translateY(-8%) } }
   .info-title{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#e5e7eb}
   .info-line{font-size:14px;font-weight:800;letter-spacing:.01em}
 
-  /* Dots */
-  .dots{position:absolute;left:0;right:0;bottom:10px;display:flex;gap:6px;justify-content:center;z-index:6}
-  .dot{width:6px;height:6px;border-radius:999px;background:#d1d5db}
-  .rot0 .dot-1{background:#111827} .rot120 .dot-2{background:#111827} .rot240 .dot-3{background:#111827}
-
-  /* Flip hit areas + subtle arrows */
-  .hit{position:absolute;top:0;bottom:0;width:50%;z-index:4;background:transparent;border:0}
+  /* Flip interactions */
+  .hit{position:absolute;top:0;bottom:0;width:50%;z-index:3;background:transparent;border:0}
   .hit.left{left:0} .hit.right{right:0}
-  .arrow{
-    position:absolute;top:50%;transform:translateY(-50%);width:34px;height:34px;border-radius:999px;border:0;
-    background:rgba(255,255,255,.85);box-shadow:0 2px 8px rgba(0,0,0,.15);display:grid;place-items:center;z-index:6;
-    opacity:0;transition:opacity .2s ease
-  }
+  .arrow{position:absolute;top:50%;transform:translateY(-50%);width:34px;height:34px;border-radius:999px;border:0;background:rgba(255,255,255,.85);box-shadow:0 2px 8px rgba(0,0,0,.15);display:grid;place-items:center;z-index:4;opacity:0;transition:opacity .2s}
   .arrow svg{width:16px;height:16px;color:#111}
   .arrow.left{left:10px} .arrow.right{right:10px}
   .card:hover .arrow, .card:focus-within .arrow, .card.show-arrows .arrow{opacity:.65}
-  .arrow:focus{outline:2px solid var(--ring);opacity:.85}
 
-  /* Table */
+  .dots{position:absolute;left:0;right:0;bottom:10px;display:flex;gap:6px;justify-content:center;z-index:4}
+  .dot{width:6px;height:6px;border-radius:999px;background:#d1d5db}
+  .rot0 .dot-1{background:#111827} .rot120 .dot-2{background:#111827} .rot240 .dot-3{background:#111827}
+
+  /* Stats table */
   table{width:100%;border:1px solid var(--ring);border-radius:8px;overflow:hidden;border-collapse:collapse;font-size:12px}
   thead{background:#f8fafc;color:#475569}
   th,td{text-align:left;padding:8px;border-top:1px solid var(--ring)}
   thead th{border-top:0}
+  .muted{color:#6b7280;font-size:12px}
+  .small{font-size:12px}
 
-  /* Three mini flip buttons: always one row (no wrap) */
+  /* Three mini flip buttons */
   .card-cta{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px;width:100%}
   .cta{border:1px solid var(--ring);border-radius:10px;background:#fff;padding:10px 8px;cursor:pointer;display:flex;align-items:center;justify-content:center;text-align:center}
   .cta .l1{color:#4b5563;font-size:12px;line-height:1.05;letter-spacing:.01em}
   .cta .l2{margin-top:0;font-size:14px;line-height:1.05;font-weight:900;color:#111;letter-spacing:.02em}
   .cta:active{transform:translateY(1px)}
 
-  /* Footer */
-  .footer{position:fixed;left:0;right:0;bottom:0;height:56px;background:#000;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;letter-spacing:.03em;z-index:10}
-
-  /* Drawer (FoxSports-ish) */
+  /* ===== DRAWER (matches screenshot) ===== */
   .scrim{position:fixed;inset:0;background:rgba(0,0,0,.35);opacity:0;pointer-events:none;transition:opacity .25s ease;z-index:30}
   .scrim.open{opacity:1;pointer-events:auto}
-  .drawer{
-    position:fixed;top:0;right:0;height:100%;width:380px;max-width:92vw;background:#fff;border-left:1px solid var(--ring);
-    transform:translateX(100%);transition:transform .25s ease;z-index:40;display:flex;flex-direction:column
-  }
+  .drawer{position:fixed;top:0;right:0;height:100%;width:420px;max-width:92vw;background:#fff;border-left:1px solid var(--ring);
+    transform:translateX(100%);transition:transform .25s ease;z-index:40;display:flex;flex-direction:column}
   .drawer.open{transform:translateX(0)}
-  .drawer-header{height:80px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;border-bottom:1px solid var(--ring)}
-  .drawer-title{font-weight:900;letter-spacing:.02em}
-  .drawer-body{display:flex;flex-direction:column;min-height:0}
-  .drawer-search{position:sticky;top:0;background:#fff;padding:16px;border-bottom:1px solid var(--ring);z-index:1}
-  .drawer-content{padding:16px;overflow:auto;display:grid;gap:18px}
+  .drawer-header{height:80px;display:flex;align-items:center;justify-content:flex-end;padding:0 16px;border-bottom:1px solid var(--ring)}
+  .drawer-header .iconbtn{border-radius:999px}
 
-  .section-title{font-size:11px;color:#374151;letter-spacing:.12em;text-transform:uppercase;margin-bottom:10px}
-  .nav-list{display:grid;gap:10px}
-  .nav-link{
-    display:flex;align-items:center;gap:12px;justify-content:space-between;
-    padding:14px 14px;border:1px solid var(--ring);border-radius:12px;text-decoration:none;color:#111;letter-spacing:.02em
+  .drawer-body{min-height:0;overflow:auto}
+  .drawer-content{padding:16px 12px 24px}
+
+  /* LEFT RAIL (Search + Filters) */
+  .rail-title{font-weight:900;font-size:18px;margin:12px 0 8px}
+  .ghost{display:block;width:300px;max-width:100%;background:#e5e7eb;border:0;border-radius:6px;padding:12px 14px;font-size:14px;color:#111}
+  .ghost::placeholder{color:#6b7280}
+  .rail-group{margin-bottom:18px}
+  .rail-bullet{position:relative}
+  .rail-bullet::before{content:"•";position:absolute;left:-12px;top:50%;transform:translateY(-50%);color:#9ca3af}
+
+  /* BIG CENTERED NAV */
+  .nav-hero{margin-top:8px}
+  .hero-link{
+    display:block;text-align:center;text-decoration:none;color:#464646;
+    font-weight:900;text-transform:uppercase;letter-spacing:.06em;
+    font-size:22px;line-height:1.2;margin:26px 0;text-shadow:0 1px 2px rgba(0,0,0,.25);
   }
-  .nav-left{display:flex;align-items:center;gap:12px;color:#111}
-  .nav-left svg{width:18px;height:18px;color:var(--icon)}
-  .nav-right svg{width:16px;height:16px;color:#9ca3af}
+  .sep{border:0;border-top:1px solid #e5e7eb;margin:18px auto;width:74%}
 
-  .field{display:grid;gap:6px}
-  .input,.select{width:100%;border:1px solid var(--ring);border-radius:10px;padding:12px 14px;font-size:14px;background:#fff;color:#1f2937}
+  /* Footer */
+  .footer{position:fixed;left:0;right:0;bottom:0;height:56px;background:#000;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;letter-spacing:.03em;z-index:10}
 </style>
 </head>
 <body>
 
 <header class="site-header">
-  <div class="brand">
-    <button class="hambtn nav-mobile" id="openMenu" aria-label="Open Menu" title="Menu">
-      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
-    </button>
+  <div class="left-fixed">
     <img src="https://i.postimg.cc/NjRf6nGF/hamilton-log-with-3-lines.png" alt="Hamilton HS"/>
-    <!-- DESKTOP NAV -->
-    <nav class="nav-desktop">
-      <a class="active" href="#">Where They YAT?</a>
-      <a href="#">Active Alumni News</a>
-      <a href="#">All-Time Huskies Roster</a>
-      <a href="#">YAT-A-BOY Marketplace</a>
-      <a href="#">Current High School Team</a>
-      <a href="#">PCDAction Partner Program</a>
-      <a href="#">YATSTATS Global School Search</a>
-      <a href="#">Register | Login</a>
-    </nav>
   </div>
 
+  <nav class="nav-desktop">
+    <a class="active" href="#">Where They YAT?</a>
+    <a href="#">Active Alumni News</a>
+    <a href="#">All-Time Next-Level List</a>
+    <a href="#">YAT-A-BOY Marketplace</a>
+    <a href="#">Current School Team</a>
+    <a href="#">Our Partner Program</a>
+    <a href="#">Global School Search</a>
+    <a href="#">Register | Login</a>
+  </nav>
+
   <div class="header-right">
-    <!-- Always visible -->
+    <button class="hambtn" id="openMenu" aria-label="Open Menu" title="Menu">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+    </button>
     <button class="iconbtn" id="openFilter" aria-label="Open Filters" title="Filters">
       <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 6h12a3 3 0 0 0 6 0H3zm0 12h6a3 3 0 0 0 6 0h6H3z"/></svg>
     </button>
     <button class="iconbtn" id="openSearch" aria-label="Open Search" title="Search">
       <svg viewBox="0 0 24 24" fill="currentColor"><path d="M11 4a7 7 0 1 1 0 14 7 7 0 0 1 0-14zm9.7 15.3-3.4-3.4a9 9 0 1 0-1.4 1.4l3.4 3.4a1 1 0 0 0 1.4-1.4z"/></svg>
     </button>
-    <img src="https://i.postimg.cc/76srDfFT/yatstats-logo-stacked.png" alt="YAT?STATS" style="height:36px;width:auto"/>
+    <img class="ystats-logo" src="https://i.postimg.cc/76srDfFT/yatstats-logo-stacked.png" alt="YAT?STATS"/>
   </div>
 </header>
 
-<!-- Side drawer -->
+<!-- Drawer -->
 <div class="scrim" id="scrim"></div>
 <aside class="drawer" id="drawer" aria-hidden="true">
   <div class="drawer-header">
-    <div class="drawer-title">YAT?STATS</div>
     <button class="iconbtn" id="closeDrawer" aria-label="Close">
       <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6.225 4.811 4.811 6.225 10.586 12l-5.775 5.775 1.414 1.414L12 13.414l5.775 5.775 1.414-1.414L13.414 12l5.775-5.775-1.414-1.414L12 10.586 6.225 4.811z"/></svg>
     </button>
   </div>
 
   <div class="drawer-body">
-    <!-- Sticky search -->
-    <div class="drawer-search">
-      <div class="section-title">Search</div>
-      <div class="field"><input id="q" type="text" class="input" placeholder="Search by name…"/></div>
-    </div>
-
     <div class="drawer-content">
-      <div>
-        <div class="section-title">Navigation</div>
-        <div class="nav-list">
-          <a class="nav-link" href="#"><span class="nav-left">
-              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 12l2-2 4 4 10-10 2 2-12 12z"/></svg>
-              Where They YAT?
-            </span><span class="nav-right"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M9 18l6-6-6-6"/></svg></span></a>
-          <a class="nav-link" href="#"><span class="nav-left">
-              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 5h16v2H4zm0 6h16v2H4zm0 6h10v2H4z"/></svg>
-              Active Alumni News
-            </span><span class="nav-right"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M9 18l6-6-6-6"/></svg></span></a>
-          <a class="nav-link" href="#"><span class="nav-left">
-              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 4h12v2H6zM4 8h16v12H4z"/></svg>
-              All-Time Huskies Roster
-            </span><span class="nav-right"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M9 18l6-6-6-6"/></svg></span></a>
-          <a class="nav-link" href="#"><span class="nav-left">
-              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l7 7-7 7-7-7 7-7z"/></svg>
-              YAT-A-BOY Marketplace
-            </span><span class="nav-right"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M9 18l6-6-6-6"/></svg></span></a>
-          <a class="nav-link" href="#"><span class="nav-left">
-              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 12m-8 0a8 8 0 1 0 16 0A8 8 0 1 0 4 12z"/></svg>
-              Current High School Team
-            </span><span class="nav-right"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M9 18l6-6-6-6"/></svg></span></a>
-          <a class="nav-link" href="#"><span class="nav-left">
-              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 7h18v10H3zM5 9v6h14V9z"/></svg>
-              PCDAction Partner Program
-            </span><span class="nav-right"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M9 18l6-6-6-6"/></svg></span></a>
-          <a class="nav-link" href="#"><span class="nav-left">
-              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6H4v-4h6V4h4v6h6v4h-6v6z"/></svg>
-              YATSTATS Global School Search
-            </span><span class="nav-right"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M9 18l6-6-6-6"/></svg></span></a>
-          <a class="nav-link" href="#"><span class="nav-left">
-              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5zm0 2c-4 0-8 2-8 6v2h16v-2c0-4-4-6-8-6z"/></svg>
-              Register | Login
-            </span><span class="nav-right"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M9 18l6-6-6-6"/></svg></span></a>
-        </div>
+      <!-- Left rail -->
+      <div class="rail-group">
+        <div class="rail-title">Search</div>
+        <input id="q" type="text" class="ghost" placeholder="Players Name"/>
+      </div>
+      <div class="rail-group">
+        <div class="rail-title">Filters</div>
+        <div class="rail-bullet"><select id="lvl" class="ghost"><option value="">All Levels</option></select></div>
+        <div class="rail-bullet" style="margin-top:8px"><select id="grad" class="ghost"><option value="">All Grad Classes</option></select></div>
       </div>
 
-      <div>
-        <div class="section-title">Filters</div>
-        <div class="field">
-          <label class="section-title" for="grad">ALL CLASSES</label>
-          <select id="grad" class="select"><option value="">ALL CLASSES</option></select>
-        </div>
-        <div class="field">
-          <label class="section-title" for="lvl">ALL LEVELS</label>
-          <select id="lvl" class="select"><option value="">ALL LEVELS</option></select>
-        </div>
+      <!-- Big centered nav -->
+      <div class="nav-hero">
+        <a class="hero-link" href="#">Where They YAT?</a>
+        <a class="hero-link" href="#">Active Alumni News</a>
+        <a class="hero-link" href="#">All-Time Next-Level List</a>
+        <a class="hero-link" href="#">YAT-A-BOY Marketplace</a>
+        <a class="hero-link" href="#">Current School Team</a>
+        <a class="hero-link" href="#">Our Partner Program</a>
+        <hr class="sep">
+        <a class="hero-link" href="#">Global School Search</a>
+        <a class="hero-link" href="#">Register | Login</a>
       </div>
     </div>
   </div>
@@ -267,8 +216,7 @@
 <script>
 /* ==== Demo Data ==== */
 const players = [
-  {
-    id:"bellinger", name:"CODY BELLINGER", graduatingClass:2013, currentLevel:"MLB", /* Name in caps just to show */
+  { id:"bellinger", name:"CODY BELLINGER", graduatingClass:2013, currentLevel:"MLB",
     position:"CF/1B", team:"New York Yankees",
     frontImg:"https://i.postimg.cc/Y2PVpqNK/new-york-yankees-outfielder-cody-bellinger.jpg",
     highSchoolImg:"https://i.postimg.cc/z3h5j6H9/Bellinger-Hamilton-HS.jpg",
@@ -278,8 +226,7 @@ const players = [
     news:[{title:"Walk-off bomb lifts Yanks",url:"#"}, {title:"Bellinger tweaks swing",url:"#"}, {title:"CF defense pops",url:"#"}],
     nilScore:"1,240", profileUrl:"#", nilUrl:"#", twitterUrl:"#", instagramUrl:"#"
   },
-  {
-    id:"patrick-murphy", name:"PATRICK MURPHY", graduatingClass:2013, currentLevel:"KBO",
+  { id:"patrick-murphy", name:"PATRICK MURPHY", graduatingClass:2013, currentLevel:"KBO",
     position:"P", team:"KT Wiz Suwon",
     frontImg:"https://i.postimg.cc/gc32dtQG/MURPH.avif",
     highSchoolImg:"https://i.postimg.cc/pL6kR3Fq/21-Murphy-Back-page-00001.jpg",
@@ -289,8 +236,7 @@ const players = [
     news:[{title:"Murphy earns KBO weekly",url:"#"}, {title:"Splitter usage up",url:"#"}, {title:"Wiz rotation steadies",url:"#"}],
     nilScore:"980", profileUrl:"#", nilUrl:"#", twitterUrl:"#", instagramUrl:"#"
   },
-  {
-    id:"dom-hamel", name:"DOM HAMEL", graduatingClass:2017, currentLevel:"AAA",
+  { id:"dom-hamel", name:"DOM HAMEL", graduatingClass:2017, currentLevel:"AAA",
     position:"P", team:"Syracuse Mets",
     frontImg:"https://i.postimg.cc/Vv9fR5nJ/dom.webp",
     highSchoolImg:"https://i.postimg.cc/85zK09qS/23-Hamel-Back-page-00001.jpg",
@@ -312,13 +258,13 @@ const icon = {
   right:`<svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M7.707 4.293a1 1 0 0 1 1.414 0l5 5a1 1 0 0 1 0 1.414l-5 5a1 1 0 1 1-1.414-1.414L11.586 11H4a1 1 0 1 1 0-2h7.586L7.707 5.707a1 1 0 0 1 0-1.414z"/></svg>`
 };
 
-/* ==== Card ==== */
+/* ==== Card builder ==== */
 function makeCard(p){
   const lvl = lvlClass(p.currentLevel);
   const teamPos = (p.team||'') + (p.position?(' • '+p.position):'');
   const imgOrPH = (src,alt)=> src
-    ? `<img class="card-img" src="${src}" alt="${alt}" onerror="this.outerHTML='<div class=&quot;card-img ph&quot;>NO IMAGE</div>'">`
-    : `<div class="card-img ph">NO IMAGE</div>`;
+    ? `<img class="card-img" src="${src}" alt="${alt}" onerror="this.outerHTML='<div class=&quot;card-img&quot; style=&quot;display:grid;place-items:center;color:#9ca3af;font-weight:700;font-size:12px;&quot;>NO IMAGE</div>'">`
+    : `<div class="card-img" style="display:grid;place-items:center;color:#9ca3af;font-weight:700;font-size:12px;">NO IMAGE</div>`;
 
   const stats = p.batting ? `
     <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:8px;">
@@ -330,10 +276,8 @@ function makeCard(p){
   return `
 <div class="card-wrap">
   <article class="card flip-card rot0" tabindex="0" aria-label="${p.name} card">
-    <!-- left/right hit areas -->
     <button class="hit left"  data-dir="prev" aria-label="Previous face"></button>
     <button class="hit right" data-dir="next" aria-label="Next face"></button>
-    <!-- subtle arrows -->
     <button class="arrow left"  data-dir="prev" aria-label="Previous">${icon.left}</button>
     <button class="arrow right" data-dir="next" aria-label="Next">${icon.right}</button>
 
@@ -342,27 +286,23 @@ function makeCard(p){
     <div class="flip-card-inner">
       <!-- Face 1 -->
       <div class="face s1">
-        <div class="p-3" style="position:relative;">
+        <div class="face-media">
           ${imgOrPH(p.frontImg, p.name||'')}
-          <!-- darker gradient -->
           <div class="bottom-grad"></div>
 
-          <!-- Right info block (lower third) -->
           <div class="right-info">
-            <div class="info-title">Last Game</div>
+            <div class="info-title">LAST GAME</div>
             <div class="info-line">${(p.lastGame&&p.lastGame.line)||'—'}</div>
             <div style="height:8px"></div>
-            <div class="info-title">Upcoming Game</div>
+            <div class="info-title">NEXT GAME</div>
             <div class="info-line">${(p.nextGame&&p.nextGame.opponent)||'—'} • ${(p.nextGame&&p.nextGame.time)||'—'}</div>
           </div>
 
-          <!-- Bottom-left name + team -->
           <div class="overlayBL">
             <div class="player-name">${(p.name||'').toUpperCase()}</div>
             <div class="player-team">${teamPos}</div>
           </div>
 
-          <!-- Bottom-right stacked badges -->
           <div class="badge-stack">
             <span class="badge ${lvl}">${p.currentLevel||''}</span>
             <span class="badge dim">CLASS OF ${p.graduatingClass||'—'}</span>
@@ -372,7 +312,7 @@ function makeCard(p){
 
       <!-- Face 2 -->
       <div class="face s2">
-        <div class="p-4">
+        <div style="padding:16px;">
           <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start;margin-bottom:6px;">
             <div>
               <div style="font-weight:900;text-transform:uppercase;letter-spacing:.02em;">${(p.name||'').toUpperCase()}</div>
@@ -395,9 +335,9 @@ function makeCard(p){
 
       <!-- Face 3 -->
       <div class="face s3">
-        <div class="p-3" style="position:relative;">
+        <div class="face-media">
           ${imgOrPH(p.highSchoolImg||p.frontImg,(p.name||'')+' — Hamilton HS')}
-          <div style="position:absolute;left:12px;right:12px;bottom:12px;background:rgba(255,255,255,.95);backdrop-filter:saturate(150%) blur(2px);border-radius:0;padding:12px;z-index:5;">
+          <div style="position:absolute;left:12px;right:12px;bottom:12px;background:rgba(255,255,255,.95);backdrop-filter:saturate(150%) blur(2px);padding:12px;z-index:2;">
             <div style="display:flex;gap:10px;justify-content:space-between;align-items:center;flex-wrap:wrap;">
               <a href="${p.nilUrl||'#'}" target="_blank" style="background:var(--maroon);color:#fff;border-radius:999px;padding:8px 12px;font-size:12px;font-weight:800;text-decoration:none;">Give a YAT-A-BOY</a>
               <div style="display:flex;gap:8px;">
@@ -424,7 +364,6 @@ function makeCard(p){
     </div>
   </article>
 
-  <!-- THREE mini flip buttons -->
   <div class="card-cta" role="group" aria-label="Card controls">
     <button class="cta" data-action="show-yat" aria-label="Show Where's He YAT?">
       <div><div class="l1">WHERE'S HE</div><div class="l2">YAT?</div></div>
@@ -447,8 +386,8 @@ function populateFilters(){
   const grads = Object.keys(classes).map(Number).filter(n=>!Number.isNaN(n)).sort((a,b)=>b-a);
   const lvls  = Object.keys(levels);
   const gSel = byId('grad'), lSel = byId('lvl');
-  gSel.innerHTML = '<option value="">ALL CLASSES</option>';
-  lSel.innerHTML = '<option value="">ALL LEVELS</option>';
+  gSel.innerHTML = '<option value="">All Grad Classes</option>';
+  lSel.innerHTML = '<option value="">All Levels</option>';
   grads.forEach(c=>{ const o=document.createElement('option'); o.value=c; o.textContent=c; gSel.appendChild(o); });
   lvls.forEach(l=>{ const o=document.createElement('option'); o.value=l; o.textContent=l; lSel.appendChild(o); });
 }
@@ -463,12 +402,8 @@ function applyFilters(){
   render(out);
 }
 
-/* ==== Rotation helpers ==== */
-function setFace(card, face){ // 1|2|3
-  if(!card) return;
-  card.classList.remove('rot0','rot120','rot240');
-  card.classList.add(face===1?'rot0':face===2?'rot120':'rot240');
-}
+/* ==== Rotation ==== */
+function setFace(card, face){ card.classList.remove('rot0','rot120','rot240'); card.classList.add(face===1?'rot0':face===2?'rot120':'rot240'); }
 function rotate(card, dir){
   if(card.classList.contains('rot0')) card.classList.replace('rot0', dir==='next'?'rot120':'rot240');
   else if(card.classList.contains('rot120')) card.classList.replace('rot120', dir==='next'?'rot240':'rot0');
@@ -477,62 +412,34 @@ function rotate(card, dir){
 
 /* ==== Interactions ==== */
 function setupInteractions(){
-  // Mini buttons
   document.addEventListener('click', e=>{
-    const cta = e.target.closest('[data-action]'); if(!cta) return;
-    const wrap = cta.closest('.card-wrap'); const card = wrap.querySelector('.card');
-    const a = cta.dataset.action;
-    if(a==='show-yat')   { setFace(card,1); return; }
-    if(a==='show-stats') { setFace(card,2); return; }
-    if(a==='show-gift')  { setFace(card,3); return; }
+    const cta=e.target.closest('[data-action]'); if(cta){ const card=cta.closest('.card-wrap').querySelector('.card'); const a=cta.dataset.action; if(a==='show-yat') setFace(card,1); if(a==='show-stats') setFace(card,2); if(a==='show-gift') setFace(card,3); return; }
+    const btn=e.target.closest('[data-dir]'); if(btn){ rotate(btn.closest('.card'), btn.dataset.dir); }
   });
-
-  // Click/tap on left/right of card or arrow buttons
-  document.addEventListener('click', e=>{
-    const btn = e.target.closest('[data-dir]'); if(!btn) return;
-    const card = btn.closest('.card'); if(!card) return;
-    rotate(card, btn.dataset.dir);
-  });
-
-  // Show arrows briefly on touch
-  let arrowTimer;
+  let t;
   document.addEventListener('touchstart', e=>{
-    const c=e.target.closest('.card'); if(!c) return;
-    c.classList.add('show-arrows');
-    clearTimeout(arrowTimer);
-    arrowTimer=setTimeout(()=>c.classList.remove('show-arrows'), 1500);
-  }, {passive:true});
-
-  // Keyboard flip + Esc close drawer
+    const c=e.target.closest('.card'); if(!c) return; c.classList.add('show-arrows'); clearTimeout(t); t=setTimeout(()=>c.classList.remove('show-arrows'),1500);
+  },{passive:true});
   document.addEventListener('keydown', e=>{
     if(e.key==='Escape'){ closeDrawer(); return; }
-    if(e.key!=='ArrowLeft' && e.key!=='ArrowRight') return;
-    const card=document.activeElement?.closest?.('.card'); if(!card) return;
-    rotate(card, e.key==='ArrowRight'?'next':'prev');
+    if(e.key==='ArrowLeft'||e.key==='ArrowRight'){ const card=document.activeElement?.closest?.('.card'); if(card) rotate(card, e.key==='ArrowRight'?'next':'prev'); }
   });
-
-  // Swipe flip
-  let startX=0, swipingCard=null;
-  document.addEventListener('touchstart', e=>{
-    const c=e.target.closest('.card'); if(!c) return; swipingCard=c; startX=e.touches[0].clientX;
-  },{passive:true});
-  document.addEventListener('touchend', e=>{
-    if(!swipingCard) return; const dx=e.changedTouches[0].clientX-startX;
-    if(Math.abs(dx)>40) rotate(swipingCard, dx<0?'next':'prev'); swipingCard=null;
-  });
+  let sx=0, card=null;
+  document.addEventListener('touchstart', e=>{ card=e.target.closest('.card'); if(card) sx=e.touches[0].clientX; },{passive:true});
+  document.addEventListener('touchend', e=>{ if(!card) return; const dx=e.changedTouches[0].clientX-sx; if(Math.abs(dx)>40) rotate(card, dx<0?'next':'prev'); card=null; });
 }
 
 /* ==== Drawer ==== */
 const drawer = byId('drawer'), scrim = byId('scrim');
 function openDrawer(focusSearch=false){
   drawer.classList.add('open'); scrim.classList.add('open'); drawer.setAttribute('aria-hidden','false');
-  if(focusSearch) setTimeout(()=>byId('q').focus(), 180);
+  if(focusSearch) setTimeout(()=>byId('q').focus(),150);
 }
 function closeDrawer(){ drawer.classList.remove('open'); scrim.classList.remove('open'); drawer.setAttribute('aria-hidden','true'); }
-byId('openMenu').addEventListener('click', ()=>openDrawer(false));
-byId('openFilter').addEventListener('click', ()=>openDrawer(false));
-byId('openSearch').addEventListener('click', ()=>openDrawer(true));
-byId('closeDrawer').addEventListener('click', closeDrawer);
+document.getElementById('openMenu').addEventListener('click', ()=>openDrawer(false));
+document.getElementById('openFilter').addEventListener('click', ()=>openDrawer(false));
+document.getElementById('openSearch').addEventListener('click', ()=>openDrawer(true));
+document.getElementById('closeDrawer').addEventListener('click', closeDrawer);
 scrim.addEventListener('click', closeDrawer);
 
 /* ==== Boot ==== */
