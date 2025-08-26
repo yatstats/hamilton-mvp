@@ -265,6 +265,273 @@ function makeCard(p){
       ${makeKV('AVG',p.batting.avg)}${makeKV('HR',p.batting.hr)}${makeKV('RBI',p.batting.rbi)}${makeKV('OPS',p.batting.ops)}
     </div>` :
     p.pitching ? `<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px;">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>YAT?STATS • Hamilton — 3-Face Virtual Card</title>
+
+<style>
+  :root{
+    --maroon:#7A0019; --ring:#E3E6EA; --bg:#f3f4f6;
+    --ink:#111827; --muted:#6b7280; --navink:#1f2937; /* darker gray for nav */
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{background:var(--bg);font:15px/1.4 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,"Apple Color Emoji","Segoe UI Emoji";color:var(--ink)}
+
+  /* Header */
+  .site-header{position:fixed;top:0;left:0;right:0;height:80px;background:#fff;border-bottom:1px solid var(--ring);z-index:20;display:flex;align-items:center;justify-content:space-between;padding:0 16px}
+  .brand{display:flex;align-items:center;gap:12px}
+  .brand img{height:36px;width:auto}
+  .nav-desktop{display:flex;flex-wrap:wrap;gap:0}
+  .nav-desktop a{
+    font-size:12px;text-transform:uppercase;color:var(--navink);
+    margin-right:24px;text-decoration:none;white-space:nowrap;letter-spacing:.02em
+  }
+  .nav-desktop a.active{color:var(--maroon);border-bottom:2px solid var(--maroon);padding-bottom:3px;font-weight:700}
+
+  .header-right{display:flex;align-items:center;gap:8px}
+  .iconbtn,.hambtn{width:36px;height:36px;display:grid;place-items:center;border:1px solid var(--ring);border-radius:10px;background:#fff;cursor:pointer}
+  .iconbtn svg,.hambtn svg{width:18px;height:18px;color:#111}
+
+  /* Responsive breakpoint:
+     - At <= 1024px (tablets & down), move desktop nav into drawer (hamburger shows).
+     - Keep search/filter icons visible at all sizes. */
+  .nav-mobile{display:none}
+  @media (max-width:1024px){
+    .nav-desktop{display:none}
+    .nav-mobile{display:flex;gap:8px;align-items:center}
+  }
+
+  /* Main grid */
+  main{padding:80px 0 84px}
+  .grid{padding:16px;display:grid;grid-template-columns:repeat(1,minmax(0,1fr));gap:12px}
+  @media (min-width:640px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+  @media (min-width:1000px){.grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+
+  /* Card */
+  .card-wrap{display:flex;flex-direction:column;align-items:stretch}
+  .card{
+    background:#fff;border:1px solid var(--ring);border-radius:12px;box-shadow:0 2px 10px rgba(0,0,0,.04);
+    overflow:hidden;position:relative;user-select:none;aspect-ratio:5/8;min-height:320px;width:100%
+  }
+  .flip-card{perspective:1200px}
+  .flip-card-inner{position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform .6s cubic-bezier(.2,.7,.2,1)}
+  .face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden}
+  .s2{transform:rotateY(120deg)} .s3{transform:rotateY(240deg)}
+  .rot0  .flip-card-inner{transform:rotateY(0deg)}
+  .rot120 .flip-card-inner{transform:rotateY(120deg)}
+  .rot240 .flip-card-inner{transform:rotateY(240deg)}
+  .p-3{padding:12px} .p-4{padding:16px}
+
+  .badge{display:inline-block;border-radius:999px;padding:4px 8px;font-weight:800;font-size:11px;color:#fff}
+  .lvl-mlb{background:#7A0019}.lvl-aaa{background:#2563eb}.lvl-aa{background:#3b82f6}
+  .lvl-high-a{background:#4f46e5}.lvl-low-a{background:#4338ca}
+  .lvl-ncaa-d1{background:#166534}.lvl-kbo{background:#0ea5e9}.lvl-njcaa{background:#a16207}.lvl-naia{background:#9333ea}.lvl-juco{background:#0d9488}
+
+  .card-img{width:100%;aspect-ratio:5/8;object-fit:cover;border-radius:12px;background:#e5e7eb}
+  .ph{display:grid;place-items:center;color:#9ca3af;font-weight:700;font-size:12px;letter-spacing:.05em}
+
+  /* Face 1 overlay (bottom third gradient) */
+  .bottom-grad{position:absolute;left:12px;right:12px;bottom:12px;height:35%;border-radius:10px;pointer-events:none;
+               background:linear-gradient(to top, rgba(0,0,0,.85), rgba(0,0,0,.0))}
+  .overlay{position:absolute;left:12px;right:12px;bottom:12px;color:#fff;padding:12px;border-radius:10px}
+  .muted{color:#6b7280;font-size:12px}
+  .small{font-size:12px}
+
+  /* Dots */
+  .dots{position:absolute;left:0;right:0;bottom:10px;display:flex;gap:6px;justify-content:center;z-index:6}
+  .dot{width:6px;height:6px;border-radius:999px;background:#d1d5db}
+  .rot0 .dot-1{background:#111827} .rot120 .dot-2{background:#111827} .rot240 .dot-3{background:#111827}
+
+  /* Table */
+  table{width:100%;border:1px solid var(--ring);border-radius:8px;overflow:hidden;border-collapse:collapse;font-size:12px}
+  thead{background:#f8fafc;color:#475569}
+  th,td{text-align:left;padding:8px;border-top:1px solid var(--ring)}
+  thead th{border-top:0}
+
+  /* Below-card mini flip buttons
+     - ALWAYS 3 columns, one row, stretching to card width (no wrapping). */
+  .card-cta{
+    display:grid; grid-template-columns:repeat(3,1fr); gap:8px;
+    margin-top:8px; width:100%;
+  }
+  .cta{
+    border:1px solid var(--ring); border-radius:10px; background:#fff;
+    padding:10px 8px; cursor:pointer; display:flex; align-items:center; justify-content:center; text-align:center;
+  }
+  .cta .l1{color:#4b5563; /* darker gray */ font-size:12px; line-height:1.05; letter-spacing:.01em}
+  .cta .l2{margin-top:0;font-size:14px;line-height:1.05;font-weight:900;color:#111;letter-spacing:.02em}
+  .cta:active{transform:translateY(1px)}
+
+  /* Footer */
+  .footer{position:fixed;left:0;right:0;bottom:0;height:56px;background:#000;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;letter-spacing:.03em;z-index:10}
+
+  /* Drawer (nav + search + filters) */
+  .scrim{position:fixed;inset:0;background:rgba(0,0,0,.35);opacity:0;pointer-events:none;transition:opacity .25s ease;z-index:30}
+  .scrim.open{opacity:1;pointer-events:auto}
+  .drawer{
+    position:fixed;top:0;right:0;height:100%;width:360px;max-width:92vw;background:#fff;border-left:1px solid var(--ring);
+    transform:translateX(100%);transition:transform .25s ease;z-index:40;display:flex;flex-direction:column
+  }
+  .drawer.open{transform:translateX(0)}
+  .drawer-header{height:80px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;border-bottom:1px solid var(--ring)}
+  .drawer-title{font-weight:900;letter-spacing:.02em}
+  .drawer-body{padding:16px;display:grid;gap:16px;overflow:auto}
+  .section-title{font-size:11px;color:#4b5563; /* darker */ letter-spacing:.10em;text-transform:uppercase;margin-bottom:8px}
+  .nav-list{display:grid;gap:10px}
+  .nav-link{
+    display:block;padding:12px 14px;border:1px solid var(--ring);border-radius:10px;text-decoration:none;
+    color:#1f2937; letter-spacing:.02em
+  }
+  .field{display:grid;gap:6px}
+  .input,.select{width:100%;border:1px solid var(--ring);border-radius:10px;padding:12px 14px;font-size:14px;background:#fff;color:#1f2937}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="brand">
+    <button class="hambtn nav-mobile" id="openMenu" aria-label="Open Menu" title="Menu">
+      <!-- hamburger -->
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+    </button>
+    <img src="https://i.postimg.cc/NjRf6nGF/hamilton-log-with-3-lines.png" alt="Hamilton HS"/>
+    <!-- DESKTOP NAV -->
+    <nav class="nav-desktop">
+      <a class="active" href="#">Where They YAT?</a>
+      <a href="#">Active Alumni News</a>
+      <a href="#">All-Time Huskies Roster</a>
+      <a href="#">YAT-A-BOY Marketplace</a>
+      <a href="#">Current High School Team</a>
+      <a href="#">PCDAction Partner Program</a>
+      <a href="#">YATSTATS Global School Search</a>
+      <a href="#">Register | Login</a>
+    </nav>
+  </div>
+
+  <div class="header-right">
+    <!-- Keep icons visible at all sizes -->
+    <button class="iconbtn" id="openFilter" aria-label="Open Filters" title="Filters">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 6h12a3 3 0 0 0 6 0H3zm0 12h6a3 3 0 0 0 6 0h6H3z"/></svg>
+    </button>
+    <button class="iconbtn" id="openSearch" aria-label="Open Search" title="Search">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M11 4a7 7 0 1 1 0 14 7 7 0 0 1 0-14zm9.7 15.3-3.4-3.4a9 9 0 1 0-1.4 1.4l3.4 3.4a1 1 0 0 0 1.4-1.4z"/></svg>
+    </button>
+    <img src="https://i.postimg.cc/76srDfFT/yatstats-logo-stacked.png" alt="YAT?STATS" style="height:36px;width:auto"/>
+  </div>
+</header>
+
+<!-- Side drawer: NAV + Search + Filters -->
+<div class="scrim" id="scrim"></div>
+<aside class="drawer" id="drawer" aria-hidden="true">
+  <div class="drawer-header">
+    <div class="drawer-title">YAT?STATS</div>
+    <button class="iconbtn" id="closeDrawer" aria-label="Close">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6.225 4.811 4.811 6.225 10.586 12l-5.775 5.775 1.414 1.414L12 13.414l5.775 5.775 1.414-1.414L13.414 12l5.775-5.775-1.414-1.414L12 10.586 6.225 4.811z"/></svg>
+    </button>
+  </div>
+  <div class="drawer-body">
+    <div>
+      <div class="section-title">Navigation</div>
+      <div class="nav-list">
+        <a class="nav-link" href="#">Where They YAT?</a>
+        <a class="nav-link" href="#">Active Alumni News</a>
+        <a class="nav-link" href="#">All-Time Huskies Roster</a>
+        <a class="nav-link" href="#">YAT-A-BOY Marketplace</a>
+        <a class="nav-link" href="#">Current High School Team</a>
+        <a class="nav-link" href="#">PCDAction Partner Program</a>
+        <a class="nav-link" href="#">YATSTATS Global School Search</a>
+        <a class="nav-link" href="#">Register | Login</a>
+      </div>
+    </div>
+
+    <div>
+      <div class="section-title">Search</div>
+      <div class="field">
+        <input id="q" type="text" class="input" placeholder="Search by name…"/>
+      </div>
+    </div>
+
+    <div>
+      <div class="section-title">Filters</div>
+      <div class="field">
+        <label class="section-title" for="grad">ALL CLASSES</label>
+        <select id="grad" class="select"><option value="">ALL CLASSES</option></select>
+      </div>
+      <div class="field">
+        <label class="section-title" for="lvl">ALL LEVELS</label>
+        <select id="lvl" class="select"><option value="">ALL LEVELS</option></select>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<main>
+  <section id="grid" class="grid"></section>
+</main>
+
+<footer class="footer">SPONSOR AD BANNER</footer>
+
+<script>
+/* ==== Demo Data (unchanged) ==== */
+const players = [
+  {
+    id:"bellinger", name:"Cody Bellinger", graduatingClass:2013, currentLevel:"MLB",
+    position:"CF/1B", team:"New York Yankees",
+    frontImg:"https://i.postimg.cc/Y2PVpqNK/new-york-yankees-outfielder-cody-bellinger.jpg",
+    highSchoolImg:"https://i.postimg.cc/z3h5j6H9/Bellinger-Hamilton-HS.jpg",
+    batting:{avg:".284",hr:"22",rbi:"68",ops:".852"},
+    lastGame:{line:"2-4, HR, 2 RBI"}, nextGame:{opponent:"@ BOS",time:"7:10 PM ET"},
+    last3:[{date:"7/12",opp:"@ BOS",line:"2-4, HR, 2 RBI"},{date:"7/11",opp:"@ BOS",line:"1-3, BB"},{date:"7/10",opp:"vs TOR",line:"0-4"}],
+    news:[{title:"Walk-off bomb lifts Yanks",url:"#"}, {title:"Bellinger tweaks swing",url:"#"}, {title:"CF defense pops",url:"#"}],
+    nilScore:"1,240", profileUrl:"#", nilUrl:"#", twitterUrl:"#", instagramUrl:"#"
+  },
+  {
+    id:"patrick-murphy", name:"Patrick Murphy", graduatingClass:2013, currentLevel:"KBO",
+    position:"P", team:"KT Wiz Suwon",
+    frontImg:"https://i.postimg.cc/gc32dtQG/MURPH.avif",
+    highSchoolImg:"https://i.postimg.cc/pL6kR3Fq/21-Murphy-Back-page-00001.jpg",
+    pitching:{era:"3.22",so:"71",whip:"1.09"},
+    lastGame:{line:"6.0 IP, 1 ER, 7 K"}, nextGame:{opponent:"vs LG",time:"Sat 5:00 PM"},
+    last3:[{date:"7/12",opp:"vs LG",line:"6.0 IP, 1 ER, 7 K"},{date:"7/06",opp:"@ KIA",line:"5.2 IP, 2 ER, 5 K"},{date:"7/01",opp:"vs SSG",line:"7.0 IP, 0 ER, 8 K"}],
+    news:[{title:"Murphy earns KBO weekly",url:"#"}, {title:"Splitter usage up",url:"#"}, {title:"Wiz rotation steadies",url:"#"}],
+    nilScore:"980", profileUrl:"#", nilUrl:"#", twitterUrl:"#", instagramUrl:"#"
+  },
+  {
+    id:"dom-hamel", name:"Dom Hamel", graduatingClass:2017, currentLevel:"AAA",
+    position:"P", team:"Syracuse Mets",
+    frontImg:"https://i.postimg.cc/Vv9fR5nJ/dom.webp",
+    highSchoolImg:"https://i.postimg.cc/85zK09qS/23-Hamel-Back-page-00001.jpg",
+    pitching:{era:"3.89",so:"93",whip:"1.18"},
+    lastGame:{line:"5.0 IP, 2 ER, 9 K"}, nextGame:{opponent:"@ WOR",time:"Sun 1:05 PM"},
+    last3:[{date:"7/13",opp:"@ WOR",line:"5.0 IP, 2 ER, 9 K"},{date:"7/08",opp:"vs ROC",line:"6.0 IP, 1 ER, 6 K"},{date:"7/02",opp:"vs ROC",line:"4.2 IP, 4 ER, 5 K"}],
+    news:[{title:"Hamel sharpening slider",url:"#"}, {title:"AAA East recap",url:"#"}, {title:"Call-up watch",url:"#"}],
+    nilScore:"—", profileUrl:"#", nilUrl:"#", twitterUrl:"#", instagramUrl:"#"
+  }
+];
+
+/* ==== Helpers ==== */
+const byId = id => document.getElementById(id);
+const lvlClass = s => 'lvl-'+String(s||'').toLowerCase().replace(/\s+/g,'-');
+const makeKV = (k,v)=>`<div style="background:#f3f4f6;border-radius:10px;text-align:center;padding:8px;">
+  <div style="font-size:11px;color:#6b7280;">${k}</div><div style="font-weight:800;">${(v ?? "—") || "—"}</div></div>`;
+
+/* ==== Card ==== */
+function makeCard(p){
+  const lvl = lvlClass(p.currentLevel);
+  const teamPos = (p.team||'') + (p.position?(' • '+p.position):'');
+  const imgOrPH = (src,alt)=> src
+    ? `<img class="card-img" src="${src}" alt="${alt}" onerror="this.outerHTML='<div class=&quot;card-img ph&quot;>NO IMAGE</div>'">`
+    : `<div class="card-img ph">NO IMAGE</div>`;
+
+  const stats = p.batting ? `
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:8px;">
+      ${makeKV('AVG',p.batting.avg)}${makeKV('HR',p.batting.hr)}${makeKV('RBI',p.batting.rbi)}${makeKV('OPS',p.batting.ops)}
+    </div>` :
+    p.pitching ? `<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px;">
       ${makeKV('ERA',p.pitching.era)}${makeKV('SO',p.pitching.so)}${makeKV('WHIP',p.pitching.whip)}</div>` : '';
 
   const nilScore = `
@@ -367,6 +634,95 @@ function makeCard(p){
 function render(list){ byId('grid').innerHTML = list.map(makeCard).join(''); }
 function populateFilters(){
   const classes={}, levels={};
+  players.forEach(p=>{ if(p.graduatingClass) classes[p.graduatingClass]=1; if(p.currentLevel) levels[p.currentLevel]=1; });
+  const grads = Object.keys(classes).map(Number).filter(n=>!Number.isNaN(n)).sort((a,b)=>b-a);
+  const lvls  = Object.keys(levels);
+  const gSel = byId('grad'), lSel = byId('lvl');
+  gSel.innerHTML = '<option value="">ALL CLASSES</option>';
+  lSel.innerHTML = '<option value="">ALL LEVELS</option>';
+  grads.forEach(c=>{ const o=document.createElement('option'); o.value=c; o.textContent=c; gSel.appendChild(o); });
+  lvls.forEach(l=>{ const o=document.createElement('option'); o.value=l; o.textContent=l; lSel.appendChild(o); });
+}
+function applyFilters(){
+  const q=(byId('q').value||'').toLowerCase(), g=byId('grad').value, l=byId('lvl').value;
+  const out=players.filter(p=>{
+    if(q && !(p.name||'').toLowerCase().includes(q)) return false;
+    if(g && String(p.graduatingClass)!==g) return false;
+    if(l && p.currentLevel!==l) return false;
+    return true;
+  });
+  render(out);
+}
+
+/* ==== Rotation helpers ==== */
+function setFace(card, face){ // 1|2|3
+  if(!card) return;
+  card.classList.remove('rot0','rot120','rot240');
+  card.classList.add(face===1?'rot0':face===2?'rot120':'rot240');
+}
+function rotate(card, dir){
+  if(card.classList.contains('rot0')) card.classList.replace('rot0', dir==='next'?'rot120':'rot240');
+  else if(card.classList.contains('rot120')) card.classList.replace('rot120', dir==='next'?'rot240':'rot0');
+  else card.classList.replace('rot240', dir==='next'?'rot0':'rot120');
+}
+
+/* ==== Interactions ==== */
+function setupInteractions(){
+  // Mini buttons under card (fixed mappings)
+  document.addEventListener('click', e=>{
+    const cta = e.target.closest('[data-action]'); if(!cta) return;
+    const wrap = cta.closest('.card-wrap'); const card = wrap.querySelector('.card');
+    const a = cta.dataset.action;
+    if(a==='show-yat')   { setFace(card,1); return; }
+    if(a==='show-stats') { setFace(card,2); return; }
+    if(a==='show-gift')  { setFace(card,3); return; }
+  });
+
+  // Keyboard: left/right flips current focused card; Esc closes drawer
+  document.addEventListener('keydown', e=>{
+    if(e.key==='Escape'){ closeDrawer(); return; }
+    if(e.key!=='ArrowLeft' && e.key!=='ArrowRight') return;
+    const card=document.activeElement?.closest?.('.card'); if(!card) return;
+    rotate(card, e.key==='ArrowRight'?'next':'prev');
+  });
+
+  // Swipe to rotate (still supported)
+  let startX=0, swipingCard=null;
+  document.addEventListener('touchstart', e=>{
+    const c=e.target.closest('.card'); if(!c) return; swipingCard=c; startX=e.touches[0].clientX;
+  },{passive:true});
+  document.addEventListener('touchend', e=>{
+    if(!swipingCard) return; const dx=e.changedTouches[0].clientX-startX;
+    if(Math.abs(dx)>40) rotate(swipingCard, dx<0?'next':'prev'); swipingCard=null;
+  });
+}
+
+/* ==== Drawer (nav + search + filters) ==== */
+const drawer = byId('drawer'), scrim = byId('scrim');
+function openDrawer(focusSearch=false){
+  drawer.classList.add('open'); scrim.classList.add('open'); drawer.setAttribute('aria-hidden','false');
+  if(focusSearch) setTimeout(()=>byId('q').focus(), 180);
+}
+function closeDrawer(){ drawer.classList.remove('open'); scrim.classList.remove('open'); drawer.setAttribute('aria-hidden','true'); }
+byId('openMenu').addEventListener('click', ()=>openDrawer(false));
+byId('openFilter').addEventListener('click', ()=>openDrawer(false));
+byId('openSearch').addEventListener('click', ()=>openDrawer(true));
+byId('closeDrawer').addEventListener('click', closeDrawer);
+scrim.addEventListener('click', closeDrawer);
+
+/* ==== Boot ==== */
+document.addEventListener('DOMContentLoaded', ()=>{
+  populateFilters();
+  render(players);
+  // Drawer inputs
+  byId('q').addEventListener('input', applyFilters);
+  byId('grad').addEventListener('change', applyFilters);
+  byId('lvl').addEventListener('change', applyFilters);
+  setupInteractions();
+});
+</script>
+</body>
+</html>
   players.forEach(p=>{ if(p.graduatingClass) classes[p.graduatingClass]=1; if(p.currentLevel) levels[p.currentLevel]=1; });
   const grads = Object.keys(classes).map(Number).filter(n=>!Number.isNaN(n)).sort((a,b)=>b-a);
   const lvls  = Object.keys(levels);
