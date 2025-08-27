@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>YAT?STATS • Hamilton — Two-Side Flip Card (v3.2.2)</title>
+<title>YAT?STATS • Hamilton — Two-Side Flip Card (v3.3.0)</title>
 
 <style>
   :root{
@@ -68,20 +68,13 @@
   .front-face{transform:rotateY(0)}
   .card-img{position:absolute; inset:0; width:100%; height:100%; object-fit:cover; background:#111}
   .bottom-grad{
-    position:absolute; left:0; right:0; bottom:0; height:70%;
-    background:linear-gradient(to top,
-      rgba(0,0,0,1.0) 0%,
-      rgba(0,0,0,0.95) 32%,
-      rgba(0,0,0,0.88) 55%,
-      rgba(0,0,0,0.00) 80%);
+    position:absolute; left:0; right:0; bottom:0; height:60%;
+    background:linear-gradient(to top, rgba(0,0,0,.98) 0%, rgba(0,0,0,.92) 28%, rgba(0,0,0,.86) 45%, rgba(0,0,0,0) 72%);
     pointer-events:none; z-index:1;
   }
-
-  /* anchored layout (moved from 66% -> 70%) */
   .front-anchor{position:absolute; top:70%; transform:translateY(-50%); z-index:3; color:#fff; text-shadow:0 1px 2px rgba(0,0,0,.45)}
   .info-left{left:12px; right:52%}
   .info-right{right:12px; left:52%; text-align:right}
-
   .name{font-weight:900;text-transform:uppercase;letter-spacing:.02em;font-size:18px;line-height:1.1}
   .team{font-size:13px;opacity:.98}
   .parent{font-size:12px;opacity:.9}
@@ -94,34 +87,56 @@
   .status{background:#16a34a}
   .status.retired{background:#6b7280}
   .class-chip{background:#374151}
-
   .right-block-title{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#e5e7eb}
   .right-line{font-size:14px;font-weight:800;letter-spacing:.01em}
   .last3{margin-top:10px}
   .last3 .item{font-size:12px;color:#e5e7eb;white-space:nowrap}
 
-  /* BACK (stats) */
-  .back-face{transform:rotateY(180deg);background:#fff;color:#111;display:flex;flex-direction:row;height:100%}
-  .stats-main{flex:1 1 auto; padding:14px; min-width:0}
-  .stats-head{display:flex;align-items:flex-start;gap:8px;justify-content:space-between;margin-bottom:6px}
-  .stats-name{font-weight:900;text-transform:uppercase;letter-spacing:.02em}
-  .muted{color:#6b7280;font-size:12px}
-  .badge-inline{align-self:flex-start}
-  .small{font-size:12px}
-  .hs-thumb{display:none;width:44px;height:58px;object-fit:cover;border:2px solid #cbd5e1;border-radius:6px;margin-left:8px;background:#222}
-  .kv-wrap{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:8px}
-  .kv{background:#f3f4f6;border-radius:10px;text-align:center;padding:8px}
-  .kv .k{font-size:11px;color:#6b7280}
-  .kv .v{font-weight:800}
-  table{width:100%;border:1px solid var(--ring);border-radius:8px;overflow:hidden;border-collapse:collapse;font-size:12px;margin-top:10px}
-  thead{background:#f8fafc;color:#475569}
-  th,td{text-align:left;padding:8px;border-top:1px solid var(--ring)}
-  thead th{border-top:0}
+  /* ===== BACK (mockup #2) ===== */
+  .back-face{transform:rotateY(180deg);background:#fff;color:#111;display:block}
+  .back-grid{display:grid;grid-template-columns:3fr 2.1fr;grid-template-rows:auto 1fr auto;gap:14px;height:100%;padding:16px}
+  @media (max-width:900px){
+    .back-grid{grid-template-columns:1fr;grid-template-rows:auto auto auto;gap:12px}
+  }
 
-  .stats-aside{width:32%; min-width:160px; position:relative; background:#f8fafc; border-left:1px solid var(--ring); display:flex; align-items:center; justify-content:center; padding:12px}
-  .hs-frame{width:100%; aspect-ratio:3/4; background:#dfe3e8; border:2px solid #b5b9bf; box-shadow:inset 0 0 0 6px #e9ecef; position:relative}
-  .hs-img{position:absolute; inset:10px; width:calc(100% - 20px); height:calc(100% - 20px); object-fit:cover; background:#222}
-  @media (max-width:640px){ .stats-aside{display:none} .hs-thumb{display:inline-block} }
+  /* left column: bio + icons + news */
+  .bio{
+    grid-column:1; align-self:start;
+  }
+  .bio .title{display:flex;align-items:center;gap:10px;margin-bottom:2px}
+  .bio .name{color:#111;font-size:18px;text-transform:uppercase;letter-spacing:.02em}
+  .bio .sub{color:#6b7280;font-size:12px}
+  .pill-row{display:flex;gap:8px;margin:8px 0 10px;flex-wrap:wrap}
+  .pill{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;background:#eef1f5;border:1px solid #d7dce2;border-radius:999px;font-size:11px;color:#1f2937;text-decoration:none}
+  .pill:hover{background:#e7ebf1}
+  .pill.dot::before{content:"•";color:#94a3b8}
+
+  .news-list{display:flex;flex-direction:column;gap:8px;margin-top:6px}
+  .news-item{display:grid;grid-template-columns:56px 1fr;gap:8px;align-items:center}
+  .news-thumb{width:56px;height:40px;object-fit:cover;border-radius:6px;background:#d1d5db}
+  .news-link{font-size:13px;color:#0b5cab;text-decoration:none}
+  .news-link:hover{text-decoration:underline}
+  .more-news{margin-top:6px;display:inline-block;background:#111;color:#fff;padding:8px 10px;border-radius:8px;font-weight:800;font-size:12px;text-decoration:none}
+
+  /* right column: HS mini-card */
+  .hs-col{grid-column:2; align-self:start}
+  .hs-card{width:100%;aspect-ratio:3/4;background:#fafafa;border:2px solid #cbd5e1;border-radius:12px;box-shadow:inset 0 0 0 6px #eef2f7;position:relative;overflow:hidden}
+  .hs-card img{position:absolute;inset:12px 12px 48px 12px;width:calc(100% - 24px);height:calc(100% - 60px);object-fit:cover;background:#222;border-radius:6px}
+  .hs-top{position:absolute;left:12px;top:10px;background:#7A0019;color:#fff;font-weight:900;font-size:12px;border-radius:6px;padding:6px 10px;letter-spacing:.03em}
+  .hs-bottom{position:absolute;right:12px;bottom:10px;background:#7A0019;color:#fff;font-weight:900;font-size:12px;border-radius:6px;padding:6px 10px;letter-spacing:.03em}
+  @media (max-width:900px){
+    .hs-col{grid-column:1}
+    .hs-card{max-width:360px}
+  }
+
+  /* bottom: stats grid */
+  .stats-wrap{grid-column:1 / -1}
+  .stats-h{font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#374151;margin-bottom:6px}
+  .statgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+  .stat{background:#f3f4f6;border:1px solid #e5e7eb;border-radius:10px;padding:10px;text-align:center}
+  .stat .k{font-size:11px;color:#6b7280}
+  .stat .v{font-weight:800;margin-top:4px}
+  @media (max-width:520px){ .statgrid{grid-template-columns:repeat(2,1fr)} }
 
   /* Arrows + dots */
   .hit{position:absolute;top:0;bottom:0;width:28%;z-index:2;background:transparent;border:0}
@@ -162,7 +177,7 @@
 </head>
 <body>
 
-<div class="build">BUILD: ham-v3.2.2</div>
+<div class="build">BUILD: ham-v3.3.0</div>
 
 <header class="site-header">
   <div class="left-fixed">
@@ -250,136 +265,236 @@ function imgTag(src, alt, fallbackSrc){
   return `<img class="card-img" src="${s}" alt="${(alt||'').replace(/"/g,'&quot;')}" onerror="${onerr}">`;
 }
 const lvlClass = s => 'lvl-' + String(s||'').toLowerCase().replace(/\s+/g,'-');
-function makeKV(k,v){ return `<div class="kv"><div class="k">${k}</div><div class="v">${v??'—'}</div></div>`; }
+const cap = s => String(s||'').toUpperCase();
+const dash = v => (v ?? '—') || '—';
+
 function teamAndParent(p){
   const raw=String(p.team||'');
   const parts = raw.split('—');
   const team = parts[0]?.trim() || raw;
   let parent = (parts[1]||'').trim();
-  if(!parent && (p.currentLevel||'').toUpperCase()==='MLB') parent='MLB';
+  if(!parent && cap(p.currentLevel)==='MLB') parent='MLB';
   return {team, parent};
 }
 function fmtOpp(s){ return s||'—'; }
 function fmtLast3(g){ return `${g.date||'—'} • ${g.opp||'—'} — ${g.line||'—'}`; }
 
-/* ===== DUMMY DEMO DATA (fictional for preview) ===== */
+/* demo data (+news) */
 const players = [
   { id:"cody-bellinger", name:"CODY BELLINGER", graduatingClass:2013, currentLevel:"MLB", status:"Active",
     position:"CF/1B", team:"New York Yankees",
     frontImg:"https://i.postimg.cc/Y2PVpqNK/new-york-yankees-outfielder-cody-bellinger.jpg",
     highSchoolImg:"https://i.postimg.cc/63NyR1qh/01-Bellinger-Front-page-00001.jpg",
-    batting:{avg:".286",hr:"24",rbi:"72",ops:".865"},
+    batting:{avg:".284",obp:".357",slg:".495",ops:".852",hits:"—",runs:"—",hr:"22",rbi:"68"},
     lastGame:{line:"2-4, HR, 2 RBI"},
-    nextGame:{opponent:"@ BOS", date:"08/27 TUE 7:10 PM ET"},
-    last3:[{date:"08/24",opp:"@ BOS",line:"2-4, HR, 2 RBI"},{date:"08/23",opp:"@ BOS",line:"1-3, BB"},{date:"08/22",opp:"vs TOR",line:"0-4"}]
+    nextGame:{opponent:"@ BOS", date:"07/15 TUE 7:10 PM ET"},
+    last3:[{date:"07/12",opp:"@ BOS",line:"2-4, HR, 2 RBI"},{date:"07/11",opp:"@ BOS",line:"1-3, BB"},{date:"07/10",opp:"vs TOR",line:"0-4"}],
+    news:[
+      {title:"Walk-off bomb lifts Yanks",url:"#",img:"https://i.postimg.cc/Y2PVpqNK/new-york-yankees-outfielder-cody-bellinger.jpg"},
+      {title:"Bellinger tweaks swing",url:"#",img:"https://i.postimg.cc/Y2PVpqNK/new-york-yankees-outfielder-cody-bellinger.jpg"},
+      {title:"CF defense pops",url:"#",img:"https://i.postimg.cc/Y2PVpqNK/new-york-yankees-outfielder-cody-bellinger.jpg"}
+    ],
+    twitterUrl:"#", instagramUrl:"#", nilUrl:"#"
   },
   { id:"patrick-murphy", name:"PATRICK MURPHY", graduatingClass:2013, currentLevel:"KBO", status:"Active",
     position:"P", team:"KT Wiz Suwon — KBO",
     frontImg:"https://i.postimg.cc/gc32dtQG/MURPH.avif",
     highSchoolImg:"https://i.postimg.cc/50qjmqFW/02-Murphy-Front-page-00001.jpg",
-    pitching:{era:"3.18",so:"78",whip:"1.11"},
+    pitching:{era:"3.22",so:"71",whip:"1.09",ip:"—"},
     lastGame:{line:"6.0 IP, 1 ER, 7 K"},
-    nextGame:{opponent:"vs LG", date:"08/28 WED 5:00 PM"},
-    last3:[{date:"08/24",opp:"vs LG",line:"6.0 IP, 1 ER, 7 K"},{date:"08/18",opp:"@ KIA",line:"5.2 IP, 2 ER, 5 K"},{date:"08/12",opp:"vs SSG",line:"7.0 IP, 0 ER, 8 K"}]
+    nextGame:{opponent:"vs LG", date:"07/19 SAT 5:00 PM"},
+    last3:[{date:"07/12",opp:"vs LG",line:"6.0 IP, 1 ER, 7 K"},{date:"07/06",opp:"@ KIA",line:"5.2 IP, 2 ER, 5 K"},{date:"07/01",opp:"vs SSG",line:"7.0 IP, 0 ER, 8 K"}],
+    news:[{title:"Murphy earns KBO weekly",url:"#",img:"https://i.postimg.cc/gc32dtQG/MURPH.avif"}],
+    twitterUrl:"#", instagramUrl:"#", nilUrl:"#"
   },
   { id:"dom-hamel", name:"DOM HAMEL", graduatingClass:2017, currentLevel:"Triple-A", status:"Active",
     position:"P", team:"Syracuse Mets — New York Mets",
     frontImg:"https://i.postimg.cc/rwYchfnt/20250804-151814.jpg",
     highSchoolImg:"https://i.postimg.cc/5012jYK7/23-Hamel-Front-page-00001.jpg",
-    pitching:{era:"3.92",so:"101",whip:"1.20"},
+    pitching:{era:"3.89",so:"93",whip:"1.18",ip:"—"},
     lastGame:{line:"5.0 IP, 2 ER, 9 K"},
-    nextGame:{opponent:"@ WOR", date:"08/29 THU 1:05 PM"},
-    last3:[{date:"08/25",opp:"@ WOR",line:"5.0 IP, 2 ER, 9 K"},{date:"08/20",opp:"vs ROC",line:"6.0 IP, 1 ER, 6 K"},{date:"08/14",opp:"vs ROC",line:"4.2 IP, 4 ER, 5 K"}]
+    nextGame:{opponent:"@ WOR", date:"07/20 SUN 1:05 PM"},
+    last3:[{date:"07/13",opp:"@ WOR",line:"5.0 IP, 2 ER, 9 K"},{date:"07/08",opp:"vs ROC",line:"6.0 IP, 1 ER, 6 K"},{date:"07/02",opp:"vs ROC",line:"4.2 IP, 4 ER, 5 K"}],
+    news:[{title:"Call-up watch heats up",url:"#",img:"https://i.postimg.cc/rwYchfnt/20250804-151814.jpg"}]
   },
   { id:"brock-selvidge", name:"BROCK SELVIDGE", graduatingClass:2021, currentLevel:"Double-A", status:"Active",
     position:"P", team:"Somerset Patriots — New York Yankees",
     frontImg:"https://i.postimg.cc/W3K6jZ9W/image.jpg",
     highSchoolImg:"https://i.postimg.cc/xdLd0y5N/22-Selvidge-Front-page-00001.jpg",
-    pitching:{era:"3.45",so:"87",whip:"1.22"},
-    lastGame:{line:"5.1 IP, 2 ER, 6 K"},
-    nextGame:{opponent:"vs POR", date:"08/27 TUE 7:05 PM"},
-    last3:[{date:"08/22",opp:"vs POR",line:"5.1 IP, 2 ER, 6 K"},{date:"08/16",opp:"@ HFD",line:"6.0 IP, 1 ER, 7 K"},{date:"08/10",opp:"vs RIC",line:"5.0 IP, 3 ER, 5 K"}]
+    lastGame:{line:"—"}, nextGame:{opponent:"—",date:"—"}, last3:[],
+    news:[]
   },
   { id:"luke-thiele", name:"LUKE THIELE", graduatingClass:2021, currentLevel:"NCAA-D1", status:"Active",
     position:"IF", team:"Washington State — Pac-12",
     frontImg:"https://i.postimg.cc/3wWnWwYz/luke-theil.webp",
     highSchoolImg:"https://i.postimg.cc/LXYrnvvj/45-Thiele-Front-page-00001.jpg",
-    batting:{avg:".302",hr:"6",rbi:"31",ops:".823"},
-    lastGame:{line:"1-4, 2B, RBI"},
-    nextGame:{opponent:"vs ORE", date:"09/01 SUN 1:00 PM"},
-    last3:[{date:"08/24",opp:"vs ORE",line:"1-4, 2B, RBI"},{date:"08/22",opp:"@ WASH",line:"2-5, R"},{date:"08/20",opp:"vs USC",line:"0-3, BB"}]
+    lastGame:{line:"—"}, nextGame:{opponent:"—",date:"—"}, last3:[], news:[]
   },
   { id:"logan-boyer", name:"LOGAN BOYER", graduatingClass:2016, currentLevel:"Triple-A", status:"Active",
     position:"P", team:"Oklahoma City — Los Angeles Dodgers",
     frontImg:"https://i.postimg.cc/c1Kq8Dkv/Logan-Boyer.jpg",
     highSchoolImg:"https://i.postimg.cc/mgzDnGFw/11-Boyer-Front-page-00001.jpg",
-    pitching:{era:"3.60",so:"64",whip:"1.19"},
-    lastGame:{line:"1.2 IP, 0 ER, 3 K"},
-    nextGame:{opponent:"@ ABQ", date:"08/27 TUE 7:05 PM"},
-    last3:[{date:"08/24",opp:"@ ABQ",line:"1.2 IP, 0 ER, 3 K"},{date:"08/21",opp:"vs SAC",line:"1.0 IP, 1 ER, 2 K"},{date:"08/18",opp:"vs SAC",line:"2.0 IP, 0 ER, 1 K"}]
+    lastGame:{line:"—"}, nextGame:{opponent:"—",date:"—"}, last3:[], news:[]
   },
   { id:"shane-murphy", name:"SHANE MURPHY", graduatingClass:2019, currentLevel:"Triple-A", status:"Active",
     position:"P", team:"Birmingham Barons — Chicago White Sox",
     frontImg:"https://i.postimg.cc/HL7zvBWZ/Shane-Murphy-Birmingham-Barons-Chicago-White-Sox.jpg",
     highSchoolImg:"https://i.postimg.cc/90gmxxmK/26-Murphy-Front-page-00001.jpg",
-    pitching:{era:"4.05",so:"92",whip:"1.28"},
-    lastGame:{line:"6.0 IP, 3 ER, 8 K"},
-    nextGame:{opponent:"vs TNS", date:"08/30 FRI 7:30 PM"},
-    last3:[{date:"08/24",opp:"vs TNS",line:"6.0 IP, 3 ER, 8 K"},{date:"08/18",opp:"@ PNS",line:"5.0 IP, 2 ER, 5 K"},{date:"08/12",opp:"vs RCT",line:"7.0 IP, 1 ER, 7 K"}]
+    lastGame:{line:"—"}, nextGame:{opponent:"—",date:"—"}, last3:[], news:[]
   },
   { id:"drew-swift", name:"DREW SWIFT", graduatingClass:2017, currentLevel:"Triple-A", status:"Active",
     position:"SS", team:"Las Vegas Aviators — Athletics",
     frontImg:"https://i.postimg.cc/GmmSKFsV/AISelect-20250826-023939-Instagram.jpg",
     highSchoolImg:"https://i.postimg.cc/zXf3nhz4/04-Swift-Front-page-00001.jpg",
-    batting:{avg:".276",hr:"9",rbi:"44",ops:".781"},
-    lastGame:{line:"2-5, 2B, RBI"},
-    nextGame:{opponent:"@ SL", date:"08/27 TUE 6:35 PM"},
-    last3:[{date:"08/24",opp:"@ SL",line:"2-5, 2B, RBI"},{date:"08/23",opp:"@ SL",line:"1-3, BB, SB"},{date:"08/22",opp:"vs REN",line:"1-4"}]
+    batting:{avg:"—",obp:"—",slg:"—",ops:"—",hits:"—",runs:"—",hr:"—",rbi:"—"},
+    lastGame:{line:"—"}, nextGame:{opponent:"—",date:"—"}, last3:[], news:[]
   },
   { id:"tyler-wilson", name:"TYLER WILSON", graduatingClass:2021, currentLevel:"High-A", status:"Active",
     position:"LF/RF", team:"Hudson Valley Renegades — New York Yankees",
     frontImg:"https://i.postimg.cc/0Qh0Ymqg/Tyler-Wilson-Now.jpg",
     highSchoolImg:"https://i.postimg.cc/1XZJx67G/34-Wilson-Front-page-00001.jpg",
-    batting:{avg:".268",hr:"11",rbi:"39",ops:".762"},
-    lastGame:{line:"1-4, HR, 2 RBI"},
-    nextGame:{opponent:"vs BRK", date:"08/28 WED 7:05 PM"},
-    last3:[{date:"08/24",opp:"vs BRK",line:"1-4, HR, 2 RBI"},{date:"08/23",opp:"@ HV",line:"2-4, 2B"},{date:"08/22",opp:"@ HV",line:"0-4"}]
+    lastGame:{line:"—"}, nextGame:{opponent:"—",date:"—"}, last3:[], news:[]
   },
   { id:"roch-cholowsky", name:"ROCH CHOLOWSKY", graduatingClass:2023, currentLevel:"NCAA-D1", status:"Active",
     position:"SS", team:"UCLA — Big Ten",
     frontImg:"https://i.postimg.cc/xdvPvq1q/Roch2.jpg",
     highSchoolImg:"https://i.postimg.cc/fyXng59M/roch2.jpg",
-    batting:{avg:".291",hr:"7",rbi:"36",ops:".807"},
-    lastGame:{line:"3-5, 2B, RBI"},
-    nextGame:{opponent:"@ NEB", date:"09/05 THU 6:30 PM"},
-    last3:[{date:"08/24",opp:"@ NEB",line:"3-5, 2B, RBI"},{date:"08/22",opp:"@ IOWA",line:"1-4"},{date:"08/20",opp:"vs MSU",line:"2-4, R"}]
+    lastGame:{line:"—"}, nextGame:{opponent:"—",date:"—"}, last3:[], news:[]
   },
   { id:"shane-anderson", name:"SHANE ANDERSON", graduatingClass:2020, currentLevel:"NAIA", status:"Active",
     position:"P", team:"Georgia Gwinnett — CAC",
     frontImg:"https://i.postimg.cc/J4j5XP4M/IMG-20250826-030341.jpg",
     highSchoolImg:"https://i.postimg.cc/SNj7TkrQ/AISelect-20250826-031127-Gallery-1.jpg",
-    pitching:{era:"2.88",so:"74",whip:"1.06"},
-    lastGame:{line:"7.0 IP, 1 ER, 8 K"},
-    nextGame:{opponent:"vs CIU", date:"09/02 MON 6:00 PM"},
-    last3:[{date:"08/23",opp:"vs CIU",line:"7.0 IP, 1 ER, 8 K"},{date:"08/17",opp:"@ CU",line:"6.1 IP, 2 ER, 7 K"},{date:"08/10",opp:"vs WU",line:"5.0 IP, 0 ER, 5 K"}]
+    lastGame:{line:"—"}, nextGame:{opponent:"—",date:"—"}, last3:[], news:[]
   },
   { id:"chaz-deluca", name:"CHAZ DELUCA", graduatingClass:2017, currentLevel:"Retired", status:"Retired",
     position:"P • Player Development", team:"Aberdeen IronBirds — Orioles",
     frontImg:"https://i.postimg.cc/rp0T753Z/IMG-7630.jpg",
     highSchoolImg:"https://i.postimg.cc/v8xHxwmx/AISelect-20250729-224953-System-UI.jpg",
-    pitching:{era:"6.17",so:"129",whip:"1.73"},
-    lastGame:{line:"N/A — Retired"},
-    nextGame:{opponent:"—", date:"—"},
-    last3:[{date:"—",opp:"—",line:"—"},{date:"—",opp:"—",line:"—"},{date:"—",opp:"—",line:"—"}]
+    pitching:{era:"6.17",so:"129",whip:"1.73",ip:"132.2"},
+    lastGame:{line:"—"}, nextGame:{opponent:"—",date:"—"}, last3:[],
+    news:[{title:"From mound to development: Chaz’s path",url:"#",img:"https://i.postimg.cc/rp0T753Z/IMG-7630.jpg"}]
   }
 ];
 
 /* render */
-function makeCard(p){
-  const lvl = lvlClass(p.currentLevel);
-  const {team, parent} = teamAndParent(p);
-  const imgFront = imgTag(p.frontImg || p.highSchoolImg, p.name||'', p.highSchoolImg || '');
+function statTile(k,v){ return `<div class="stat"><div class="k">${k}</div><div class="v">${dash(v)}</div></div>`; }
 
+function makeBackFace(p){
+  const lvl = lvlClass(p.currentLevel);
+  const {team,parent} = teamAndParent(p);
+  const isPitcher = !!p.pitching;
+
+  // news
+  const newsHTML = (p.news && p.news.length)
+    ? p.news.slice(0,3).map(n=>`
+        <div class="news-item">
+          <img class="news-thumb" src="${(n.img||p.frontImg||'').replace(/"/g,'&quot;')}" alt="" onerror="this.style.display='none'">
+          <a class="news-link" href="${n.url||'#'}" target="_blank" rel="noopener">${n.title||'Headline'}</a>
+        </div>`).join('')
+    : `<div class="news-item"><div class="news-thumb" style="background:#e5e7eb"></div><div class="news-link" style="color:#6b7280">No headlines yet</div></div>`;
+
+  // stats grid
+  let statGrid='';
+  if (p.batting){
+    const b=p.batting;
+    statGrid = `
+      ${statTile('AVG',b.avg)}${statTile('OBP',b.obp)}${statTile('SLG',b.slg)}${statTile('OPS',b.ops)}
+      ${statTile('HITS',b.hits)}${statTile('RUNS',b.runs)}${statTile('HR',b.hr)}${statTile('RBI',b.rbi)}
+    `;
+  } else if (p.pitching){
+    const x=p.pitching;
+    statGrid = `
+      ${statTile('ERA',x.era)}${statTile('SO',x.so)}${statTile('WHIP',x.whip)}${statTile('IP',x.ip)}
+      ${statTile('K/9','—')}${statTile('BB/9','—')}${statTile('HR/9','—')}${statTile('—','—')}
+    `;
+  } else {
+    statGrid = `${statTile('—','—').repeat(8)}`;
+  }
+
+  return `
+  <section class="face back-face">
+    <div class="back-grid">
+      <!-- left: bio + icons + news -->
+      <div class="bio">
+        <div class="title">
+          <div class="name">${cap(p.name)}</div>
+        </div>
+        <div class="sub">${team}${parent?` — ${parent}`:''}</div>
+        <div class="sub" style="margin-top:2px;">Hamilton Class of ${dash(p.graduatingClass)}</div>
+
+        <div class="pill-row">
+          ${p.currentLevel?`<span class="pill">LEVEL: ${cap(p.currentLevel)}</span>`:''}
+          ${p.status?`<span class="pill">STATUS: ${cap(p.status)}</span>`:''}
+          <a class="pill dot" href="${p.twitterUrl||'#'}" target="_blank" rel="noopener">X</a>
+          <a class="pill dot" href="${p.instagramUrl||'#'}" target="_blank" rel="noopener">IG</a>
+          <a class="pill dot" href="${p.nilUrl||'#'}" target="_blank" rel="noopener">YAB/NIL</a>
+        </div>
+
+        <div class="news-list">
+          ${newsHTML}
+        </div>
+        <a class="more-news" href="#" target="_blank" rel="noopener">MORE NEWS</a>
+      </div>
+
+      <!-- right: HS mini card -->
+      <div class="hs-col">
+        <div class="hs-card" aria-hidden="true">
+          <div class="hs-top">HAMILTON</div>
+          <img src="${(p.highSchoolImg||p.frontImg||'').replace(/"/g,'&quot;')}" alt="">
+          <div class="hs-bottom">HUSKIES</div>
+        </div>
+      </div>
+
+      <!-- bottom: stats grid -->
+      <div class="stats-wrap">
+        <div class="stats-h">SEASON STATS</div>
+        <div class="statgrid">
+          ${statGrid}
+        </div>
+      </div>
+    </div>
+  </section>`;
+}
+
+function makeFrontFace(p){
+  const lvl = lvlClass(p.currentLevel);
+  const {team,parent} = teamAndParent(p);
+  const imgFront = imgTag(p.frontImg || p.highSchoolImg, p.name||'', p.highSchoolImg || '');
+  return `
+  <section class="face front-face">
+    ${imgFront}
+    <div class="bottom-grad"></div>
+
+    <!-- LEFT block -->
+    <div class="front-anchor info-left">
+      <div class="name">${cap(p.name)}</div>
+      <div class="team">${team}</div>
+      <div class="parent">${parent||' '}</div>
+      <div class="tag-row">
+        ${p.currentLevel? `<span class="badge xs ${lvl}">${cap(p.currentLevel)}</span>` : ``}
+        ${p.status? `<span class="badge xs status ${cap(p.status)==='RETIRED'?'retired':''}">${cap(p.status)}</span>`:``}
+        ${p.graduatingClass? `<span class="badge xs class-chip">CLASS OF ${p.graduatingClass}</span>`:``}
+      </div>
+    </div>
+
+    <!-- RIGHT block -->
+    <div class="front-anchor info-right">
+      <div class="right-block-title">NEXT GAME</div>
+      <div class="right-line">${fmtOpp(p.nextGame?.opponent||'—')}</div>
+      <div class="right-line">${p.nextGame?.date || '—'}</div>
+
+      <div class="last3">
+        <div class="right-block-title">LAST 3 GAMES</div>
+        <div class="item">${p.last3?.[0] ? fmtLast3(p.last3[0]) : '—'}</div>
+        <div class="item">${p.last3?.[1] ? fmtLast3(p.last3[1]) : '—'}</div>
+        <div class="item">${p.last3?.[2] ? fmtLast3(p.last3[2]) : '—'}</div>
+      </div>
+    </div>
+  </section>`;
+}
+
+function makeCard(p){
   return `
 <div class="card-wrap">
 <article class="card flip-card front" tabindex="0" aria-label="${p.name} card">
@@ -394,87 +509,8 @@ function makeCard(p){
   <div class="dots"><span class="dot dot-1"></span><span class="dot dot-2"></span></div>
 
   <div class="flip-inner">
-    <!-- FRONT -->
-    <section class="face front-face">
-      ${imgFront}
-      <div class="bottom-grad"></div>
-
-      <!-- LEFT block -->
-      <div class="front-anchor info-left">
-        <div class="name">${(p.name||'').toUpperCase()}</div>
-        <div class="team">${team}</div>
-        <div class="parent">${parent||' '}</div>
-        <div class="tag-row">
-          ${p.currentLevel? `<span class="badge xs ${lvl}">${String(p.currentLevel).toUpperCase()}</span>` : ``}
-          ${p.status? `<span class="badge xs status ${String(p.status).toLowerCase()==='retired'?'retired':''}">${String(p.status).toUpperCase()}</span>`:``}
-          ${p.graduatingClass? `<span class="badge xs class-chip">CLASS OF ${p.graduatingClass}</span>`:``}
-        </div>
-      </div>
-
-      <!-- RIGHT block -->
-      <div class="front-anchor info-right">
-        <div class="right-block-title">NEXT GAME</div>
-        <div class="right-line">${fmtOpp(p.nextGame?.opponent||'—')}</div>
-        <div class="right-line">${p.nextGame?.date || '—'}</div>
-
-        <div class="last3">
-          <div class="right-block-title">LAST 3 GAMES</div>
-          <div class="item">${p.last3?.[0] ? fmtLast3(p.last3[0]) : '—'}</div>
-          <div class="item">${p.last3?.[1] ? fmtLast3(p.last3[1]) : '—'}</div>
-          <div class="item">${p.last3?.[2] ? fmtLast3(p.last3[2]) : '—'}</div>
-        </div>
-      </div>
-    </section>
-
-    <!-- BACK -->
-    <section class="face back-face">
-      <div class="stats-main">
-        <div class="stats-head">
-          <div>
-            <div class="stats-name">${(p.name||'').toUpperCase()}</div>
-            <div class="muted">${p.team||''}</div>
-            <div class="muted" style="margin-top:4px;">Hamilton Class of ${p.graduatingClass||'—'}</div>
-          </div>
-
-          <img class="hs-thumb"
-               src="${(p.highSchoolImg||p.frontImg||'').replace(/"/g,'&quot;')}"
-               alt="${(p.name||'HS').replace(/"/g,'&quot;')}">
-
-          <div>
-            ${p.currentLevel? `<span class="badge ${lvl} badge-inline">${p.currentLevel}</span>` : ``}
-            ${p.status? `<span class="badge status badge-inline ${String(p.status).toLowerCase()==='retired'?'retired':''}" style="margin-left:6px">${String(p.status).toUpperCase()}</span>`:``}
-          </div>
-        </div>
-
-        <div class="small" style="font-weight:800;letter-spacing:.02em;color:#374151;text-transform:uppercase;">Season Stats</div>
-
-        ${
-          p.batting ? `
-            <div class="kv-wrap">
-              ${makeKV('AVG',p.batting.avg)}${makeKV('HR',p.batting.hr)}${makeKV('RBI',p.batting.rbi)}${makeKV('OPS',p.batting.ops)}
-            </div>` :
-          p.pitching ? `
-            <div class="kv-wrap">
-              ${makeKV('ERA',p.pitching.era)}${makeKV('SO',p.pitching.so)}${makeKV('WHIP',p.pitching.whip)}${makeKV('IP','—')}
-            </div>` :
-          `<div class="kv-wrap">${makeKV('—','—')}${makeKV('—','—')}${makeKV('—','—')}${makeKV('—','—')}</div>`
-        }
-
-        <div style="font-weight:800;margin:10px 0 6px;">Last 3 Games</div>
-        <table>
-          <thead><tr><th>Date</th><th>OPP</th><th>Line</th></tr></thead>
-          <tbody>
-            ${(p.last3||[]).map(g=>`<tr><td>${g.date||'—'}</td><td>${g.opp||'—'}</td><td>${g.line||'—'}</td></tr>`).join('') || '<tr><td colspan="3">—</td></tr>'}
-          </tbody>
-        </table>
-      </div>
-
-      <aside class="stats-aside" aria-hidden="true">
-        <div class="hs-frame">
-          <img class="hs-img" src="${(p.highSchoolImg||'').replace(/"/g,'&quot;')}" alt="${(p.name||'HS').replace(/"/g,'&quot;')}" onerror="this.onerror=null;this.style.display='none';">
-        </div>
-      </aside>
-    </section>
+    ${makeFrontFace(p)}
+    ${makeBackFace(p)}
   </div>
 </article>
 </div>`;
@@ -503,7 +539,7 @@ function applyFilters(){
   render(out); attachInteractions();
 }
 
-/* flip interactions */
+/* flip interactions (click/edge/swipe, links safe) */
 function toggle(card){
   if(!card) return;
   card.classList.contains('front')
@@ -515,8 +551,7 @@ function isInteractiveTarget(t){ return !!t.closest?.(INTERACTIVE_SEL); }
 
 document.addEventListener('click', e=>{
   if(isInteractiveTarget(e.target)) return;
-  const edge = e.target.closest?.('[data-toggle]');
-  if(edge){ toggle(edge.closest('.card')); }
+  const edge = e.target.closest?.('[data-toggle]'); if(edge){ toggle(edge.closest('.card')); }
 }, true);
 
 let sx=0, swipeCard=null;
@@ -525,8 +560,10 @@ document.addEventListener('touchstart', e=>{
   const c = e.target.closest?.('.card'); if(!c) return; swipeCard = c; sx = e.touches[0].clientX;
 },{passive:true});
 document.addEventListener('touchend', e=>{
-  if(!swipeCard) return; const dx=e.changedTouches[0].clientX-sx;
-  if(Math.abs(dx)>40) toggle(swipeCard); swipeCard=null;
+  if(!swipingCard && !swipeCard) return;
+  const dx=e.changedTouches[0].clientX-sx;
+  if(Math.abs(dx)>40) toggle(swipeCard);
+  swipeCard=null;
 });
 
 function attachInteractions(){
