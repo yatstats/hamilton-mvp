@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>YATSTATS • Hamilton — Two-Side Flip Card (ham-v3.4.4)</title>
+<title>YAT?STATS • Hamilton — Two-Side Flip Card (ham-v3.4.6)</title>
 
 <style>
   :root{
@@ -33,9 +33,9 @@
   .ystats-logo{height:32px;width:auto}
   @media (max-width:480px){ .left-fixed img{height:32px} .ystats-logo{height:28px} }
 
-  /* ===== TAGLINE (gray with bold YAT?/STATS!) ===== */
+  /* ===== TAGLINE ===== */
   .tagline-wrap{position:sticky; top:var(--headerH); z-index:40; background:#fff; border-bottom:1px solid var(--ring)}
-  .tagline{padding:8px 14px; white-space:nowrap; overflow:hidden; text-overflow:clip; letter-spacing:.06em}
+  .tagline{padding:8px 14px; white-space:nowrap; overflow:hidden; letter-spacing:.06em}
   .tagline .soft{color:#6b7280; font-weight:700}
   .tagline .hard{color:#111; font-weight:900}
   @media (max-width:560px){ .tagline{letter-spacing:.02em} }
@@ -45,10 +45,9 @@
   .grid{padding:12px;display:grid;grid-template-columns:repeat(1,minmax(0,1fr));gap:12px}
   @media (min-width:768px){ .grid{grid-template-columns:repeat(3,minmax(0,1fr))} }
   @media (min-width:1280px){ .grid{grid-template-columns:repeat(5,minmax(0,1fr))} }
-  /* mobile: card fills nearly full width (fixes “image too small”) */
   @media (max-width:767px){ .card-wrap{width:100%; margin:0 auto} }
 
-  /* ===== CARD (flip 2-sides, 5/7) ===== */
+  /* ===== CARD ===== */
   .card-wrap{display:flex;flex-direction:column;gap:10px}
   .card{
     background:#000;border:0;border-radius:0;box-shadow:var(--shadow);
@@ -71,56 +70,56 @@
   .front-anchor{position:absolute; top:70%; transform:translateY(-50%); z-index:3; color:#fff; text-shadow:0 1px 2px rgba(0,0,0,.5)}
   .info-left{left:12px; right:52%}
   .info-right{right:12px; left:auto; text-align:right; width:min(76%, 420px)}
-
   .name{font-weight:900;text-transform:uppercase;letter-spacing:.02em;font-size:18px;line-height:1.12}
   .team{font-size:13px;opacity:.98}
   .parent{font-size:12px;opacity:.9}
   .tag-stack{display:flex;flex-direction:column;gap:6px;margin-top:8px}
   .chip{display:inline-block;border-radius:999px;padding:3px 7px;font-weight:900;font-size:10px;letter-spacing:.06em;color:#fff}
-  .lvl-mlb{background:#7A0019}.lvl-triple-a{background:#2563eb}.lvl-aaa{background:#2563eb}.lvl-double-a{background:#3b82f6}.lvl-aa{background:#3b82f6}
+  .lvl-mlb{background:#7A0019}.lvl-triple-a,.lvl-aaa{background:#2563eb}.lvl-double-a,.lvl-aa{background:#3b82f6}
   .lvl-high-a{background:#4338ca}.lvl-low-a{background:#3730a3}
   .lvl-ncaa-d1{background:#166534}.lvl-kbo{background:#0ea5e9}.lvl-naia{background:#9333ea}.lvl-njcaa{background:#a16207}.lvl-juco{background:#0d9488}
   .chip.status{background:#16a34a}
   .chip.status.retired{background:#6b7280}
   .chip.class{background:#374151}
-
   .rb-title{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#e5e7eb}
   .rb-line{font-size:14px;font-weight:800;letter-spacing:.01em}
   .last3{margin-top:10px}
   .last3 .item{font-size:12px;color:#e5e7eb;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:right}
 
-  /* ===== BACK ===== */
-  .back-face{transform:rotateY(180deg);background:#fff;color:#111;display:flex;flex-direction:row;height:100%}
-  /* left: stats column */
-  .stats-main{flex:1 1 auto; padding:14px; min-width:0; display:flex; flex-direction:column}
-  .stats-head{display:flex;align-items:flex-start;gap:10px;justify-content:space-between;margin-bottom:8px}
+  /* ===== BACK (grid) ===== */
+  .back-face{transform:rotateY(180deg);background:#fff;color:#111}
+  .back-grid{
+    height:100%;
+    display:grid;
+    grid-template-columns: 1fr 36%;
+    grid-template-rows: auto auto 1fr auto; /* header | tabs | panel | STATS (full width) */
+    gap:10px; padding:12px;
+  }
+  @media (max-width:740px){
+    .back-grid{grid-template-columns: 1fr 42%}
+  }
+  /* header (left) */
+  .stats-head{grid-column:1; grid-row:1; display:flex; justify-content:space-between; gap:10px}
   .stats-name{font-weight:900;text-transform:uppercase;letter-spacing:.02em}
   .muted{color:var(--muted);font-size:12px}
-  /* right: HS image in top-right quadrant */
-  .rhs{width:36%; min-width:140px; padding:12px; display:flex; align-items:flex-start; justify-content:center}
+  /* HS image (right, top quadrant) */
+  .rhs{grid-column:2; grid-row:1 / span 3; display:flex; align-items:flex-start; justify-content:center}
   .rhs img{width:100%; height:auto; object-fit:cover; border-radius:8px; background:#222}
-  @media (max-width:740px){
-    .rhs{width:38%}
-  }
-  @media (max-width:600px){
-    .rhs{width:42%}
-  }
-
-  /* 2 rows x 4 stats */
-  .kv-wrap{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:8px}
+  /* tabs + panel (left middle) */
+  .content-tabs{grid-column:1; grid-row:2; display:flex; gap:8px; flex-wrap:wrap}
+  .tab{display:inline-flex;align-items:center;gap:6px;padding:8px 10px;border:1px solid var(--ring);border-radius:999px;background:#fff;font-weight:700;font-size:12px;cursor:pointer}
+  .tab svg{width:14px;height:14px}     /* smaller icons */
+  .tab.active{border-color:var(--brand)}
+  @media (max-width:560px){ .tab span{display:none} } /* icons-only on mobile */
+  .below-content{grid-column:1; grid-row:3; border:1px solid var(--ring);border-radius:10px;min-height:84px;padding:10px;background:#fff}
+  .panel{display:none}
+  .panel.active{display:block}
+  /* stats strip across entire bottom */
+  .stats-strip{grid-column:1 / -1; grid-row:4}
+  .kv-wrap{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
   .kv{background:#f3f4f6;border-radius:10px;text-align:center;padding:10px}
   .kv .k{font-size:11px;color:#6b7280}
   .kv .v{font-weight:800}
-
-  /* content tabs (icons) + panel */
-  .content-tabs{display:flex; gap:8px; margin-top:auto; flex-wrap:wrap}
-  .tab{display:inline-flex;align-items:center;gap:6px;padding:8px 10px;border:1px solid var(--ring);border-radius:999px;background:#fff;font-weight:700;font-size:12px;cursor:pointer}
-  .tab svg{width:16px;height:16px}
-  .tab.active{border-color:var(--brand)}
-  @media (max-width:560px){ .tab span{display:none} } /* icons only on mobile */
-  .below-content{margin-top:10px;border:1px solid var(--ring);border-radius:10px;min-height:84px;padding:10px;background:#fff}
-  .panel{display:none}
-  .panel.active{display:block}
 
   /* flip edges + arrows */
   .hit{position:absolute;top:0;bottom:0;width:28%;z-index:2;background:transparent;border:0}
@@ -143,7 +142,6 @@
   .nav-left-link{ text-decoration:none; color:#2b2b2b; text-transform:uppercase; letter-spacing:.12em; font-weight:400; font-size:13px; line-height:1; padding:10px 6px 8px 4px; border-radius:6px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis }
   .nav-left-link:hover{background:#f5f6f8}
   .nav-left-sep{height:1px; background:#eceff3; margin:8px 0}
-
   .drawer-right{position:fixed; top:var(--headerH); bottom:0; right:0; width:420px; max-width:92vw;background:#fff; border-left:1px solid var(--ring); transform:translateX(100%);transition:transform .25s; z-index:55; display:flex; flex-direction:column;}
   .drawer-right.open{ transform:translateX(0) }
   .drawer-right .drawer-header{height:56px; border-bottom:1px solid var(--ring); display:flex; align-items:center; justify-content:flex-end; padding:0 12px}
@@ -163,7 +161,7 @@
 </head>
 <body>
 
-<div class="build">BUILD: ham-v3.4.4</div>
+<div class="build">BUILD: ham-v3.4.6</div>
 
 <header class="site-header">
   <div class="left-fixed">
@@ -264,11 +262,9 @@ function teamAndParent(p){
   if(!parent && (p.currentLevel||'').toUpperCase()==='MLB') parent='MLB';
   return {team, parent};
 }
+const NEWS_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 8h10M7 12h6M7 16h10"/></svg>`;
 const X_ICON    = `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h3l-7.5 9.5L22 22h-3l-6-7.6L7 22H4l7.9-10.1L2 2h3l6.2 8L18 2z"/></svg>`;
 const IG_ICON   = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1"/></svg>`;
-const NEWS_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 8h10M7 12h6M7 16h10"/></svg>`;
-const NIL_ICON  = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 7v10M8 9v6M16 9v6"/></svg>`;
-const YAB_ICON  = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="7" width="18" height="10" rx="2"/><path d="M8 7a4 4 0 0 1 8 0"/></svg>`;
 function fmtLast3(g){ return `${g.date||'—'} • ${g.opp||'—'} — ${g.line||'—'}`; }
 
 /* ===== DATA ===== */
@@ -409,7 +405,7 @@ function makeCard(p){
 
       <!-- BACK -->
       <section class="face back-face">
-        <div class="stats-main">
+        <div class="back-grid">
           <div class="stats-head">
             <div>
               <div class="stats-name">${(p.name||'').toUpperCase()}</div>
@@ -418,54 +414,70 @@ function makeCard(p){
             </div>
           </div>
 
-          ${
-            p.batting ? `
-              <div class="kv-wrap">
-                <div class="kv"><div class="k">AVG</div><div class="v">${p.batting.avg||'—'}</div></div>
-                <div class="kv"><div class="k">HR</div><div class="v">${p.batting.hr||'—'}</div></div>
-                <div class="kv"><div class="k">RBI</div><div class="v">${p.batting.rbi||'—'}</div></div>
-                <div class="kv"><div class="k">OPS</div><div class="v">${p.batting.ops||'—'}</div></div>
-                <div class="kv"><div class="k">—</div><div class="v">—</div></div>
-                <div class="kv"><div class="k">—</div><div class="v">—</div></div>
-                <div class="kv"><div class="k">—</div><div class="v">—</div></div>
-                <div class="kv"><div class="k">—</div><div class="v">—</div></div>
-              </div>` :
-            p.pitching ? `
-              <div class="kv-wrap">
-                <div class="kv"><div class="k">ERA</div><div class="v">${p.pitching.era||'—'}</div></div>
-                <div class="kv"><div class="k">SO</div><div class="v">${p.pitching.so||p.pitching.ko||'—'}</div></div>
-                <div class="kv"><div class="k">WHIP</div><div class="v">${p.pitching.whip||'—'}</div></div>
-                <div class="kv"><div class="k">IP</div><div class="v">${p.pitching.ip||'—'}</div></div>
-                <div class="kv"><div class="k">APP</div><div class="v">${p.pitching.app||'—'}</div></div>
-                <div class="kv"><div class="k">ER</div><div class="v">${p.pitching.er||'—'}</div></div>
-                <div class="kv"><div class="k">K/9</div><div class="v">${p.pitching.k9||'—'}</div></div>
-                <div class="kv"><div class="k">—</div><div class="v">—</div></div>
-              </div>` :
-            `<div class="kv-wrap">
-               ${Array.from({length:8}).map(()=>`<div class="kv"><div class="k">—</div><div class="v">—</div></div>`).join('')}
-             </div>`
-          }
+          <aside class="rhs">
+            <img src="${(p.highSchoolImg||p.frontImg||'').replace(/"/g,'&quot;')}" alt="${(p.name||'HS').replace(/"/g,'&quot;')}" onerror="this.onerror=null;this.style.display='none';">
+          </aside>
 
-          <!-- content tabs (icons) -->
+          <!-- tabs + panel -->
           <div class="content-tabs" data-tabs>
-            <button class="tab active" data-action="news"     aria-label="News">${NEWS_ICON}<span>News</span></button>
-            <button class="tab"         data-action="x"        aria-label="X">${`<svg viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h3l-7.5 9.5L22 22h-3l-6-7.6L7 22H4l7.9-10.1L2 2h3l6.2 8L18 2z"/></svg>`}<span>X</span></button>
-            <button class="tab"         data-action="ig"       aria-label="Instagram">${`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1"/></svg>`}<span>Instagram</span></button>
-            <button class="tab"         data-action="nil"      aria-label="NIL">${NIL_ICON}<span>NIL</span></button>
-            <button class="tab"         data-action="yab"      aria-label="YAT-A-BOY">${YAB_ICON}<span>YAT-A-BOY</span></button>
+            <button class="tab active" data-action="news" aria-label="News">${NEWS_ICON}<span>News</span></button>
+            <button class="tab" data-action="x" aria-label="X">${X_ICON}<span>X</span></button>
+            <button class="tab" data-action="ig" aria-label="Instagram">${IG_ICON}<span>Instagram</span></button>
+            <button class="tab" data-action="nil" aria-label="NIL">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 7v10M8 9v6M16 9v6"/></svg>
+              <span>NIL</span>
+            </button>
+            <button class="tab" data-action="yab" aria-label="YAT-A-BOY">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="7" width="18" height="10" rx="2"/><path d="M8 7a4 4 0 0 1 8 0"/></svg>
+              <span>YAT-A-BOY</span>
+            </button>
           </div>
+
           <div class="below-content">
-            <div class="panel active" data-panel="news"><div style="font-weight:700;margin-bottom:6px">Latest Headlines</div><ul style="margin:0;padding-left:16px"><li><a href="${p.newsUrl||'#'}">Sample headline about ${p.name}</a></li><li><a href="${p.newsUrl||'#'}">Another relevant story</a></li></ul></div>
+            <div class="panel active" data-panel="news">
+              <div style="font-weight:700;margin-bottom:6px">Latest Headlines</div>
+              <ul style="margin:0;padding-left:16px">
+                <li><a href="${p.newsUrl||'#'}">Sample headline about ${p.name}</a></li>
+                <li><a href="${p.newsUrl||'#'}">Another relevant story</a></li>
+              </ul>
+            </div>
             <div class="panel" data-panel="x"><a href="${p.xUrl||'#'}" target="_blank" rel="noopener">Open player posts on X ↗</a></div>
             <div class="panel" data-panel="ig"><a href="${p.igUrl||'#'}" target="_blank" rel="noopener">Open Instagram feed ↗</a></div>
             <div class="panel" data-panel="nil"><div><strong>NIL Points:</strong> ${Number.isFinite(p.nilPoints)? p.nilPoints.toLocaleString() : '—'}</div></div>
             <div class="panel" data-panel="yab"><div>Marketplace module coming soon.</div></div>
           </div>
-        </div>
 
-        <aside class="rhs">
-          <img src="${(p.highSchoolImg||p.frontImg||'').replace(/"/g,'&quot;')}" alt="${(p.name||'HS').replace(/"/g,'&quot;')}" onerror="this.onerror=null;this.style.display='none';">
-        </aside>
+          <!-- stats strip spans full bottom -->
+          <div class="stats-strip">
+            ${
+              p.batting ? `
+                <div class="kv-wrap">
+                  <div class="kv"><div class="k">AVG</div><div class="v">${p.batting.avg||'—'}</div></div>
+                  <div class="kv"><div class="k">HR</div><div class="v">${p.batting.hr||'—'}</div></div>
+                  <div class="kv"><div class="k">RBI</div><div class="v">${p.batting.rbi||'—'}</div></div>
+                  <div class="kv"><div class="k">OPS</div><div class="v">${p.batting.ops||'—'}</div></div>
+                  <div class="kv"><div class="k">—</div><div class="v">—</div></div>
+                  <div class="kv"><div class="k">—</div><div class="v">—</div></div>
+                  <div class="kv"><div class="k">—</div><div class="v">—</div></div>
+                  <div class="kv"><div class="k">—</div><div class="v">—</div></div>
+                </div>` :
+              p.pitching ? `
+                <div class="kv-wrap">
+                  <div class="kv"><div class="k">ERA</div><div class="v">${p.pitching.era||'—'}</div></div>
+                  <div class="kv"><div class="k">SO</div><div class="v">${p.pitching.so||p.pitching.ko||'—'}</div></div>
+                  <div class="kv"><div class="k">WHIP</div><div class="v">${p.pitching.whip||'—'}</div></div>
+                  <div class="kv"><div class="k">IP</div><div class="v">${p.pitching.ip||'—'}</div></div>
+                  <div class="kv"><div class="k">APP</div><div class="v">${p.pitching.app||'—'}</div></div>
+                  <div class="kv"><div class="k">ER</div><div class="v">${p.pitching.er||'—'}</div></div>
+                  <div class="kv"><div class="k">K/9</div><div class="v">${p.pitching.k9||'—'}</div></div>
+                  <div class="kv"><div class="k">—</div><div class="v">—</div></div>
+                </div>` :
+              `<div class="kv-wrap">
+                 ${Array.from({length:8}).map(()=>`<div class="kv"><div class="k">—</div><div class="v">—</div></div>`).join('')}
+               </div>`
+            }
+          </div>
+        </div>
       </section>
     </div>
   </article>
@@ -502,7 +514,7 @@ function applyFilters(){
   render(out);
 }
 
-/* ===== flip + tabs (don’t flip when clicking controls) ===== */
+/* ===== flip + tabs ===== */
 function toggle(card){
   if(!card) return;
   card.classList.contains('front')
