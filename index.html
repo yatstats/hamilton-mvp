@@ -7,8 +7,7 @@
 <style>
   :root{
     --maroon:#7A0019; --ring:#E5E7EB; --bg:#f3f4f6; --ink:#111827; --muted:#6b7280;
-    --headerH:66px; --taglineH:44px;
-    --rightStart:70%; /* where NEXT GAME begins on the front */
+    --headerH:66px; --taglineH:42px; --rightStart:70%;
   }
   *{box-sizing:border-box}
   html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font:15px/1.4 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial}
@@ -16,21 +15,37 @@
 
   /* ===== Header ===== */
   .site-header{
-    position:sticky;top:0;z-index:50;background:#fff;border-bottom:1px solid var(--ring);
+    position:sticky;top:0;z-index:70;background:#fff;border-bottom:1px solid var(--ring);
     height:var(--headerH);display:flex;align-items:center;justify-content:space-between;padding:0 12px
   }
   .brand{height:34px}
   .ystats{height:32px}
-  .iconbtn{width:32px;height:32px;border:0;background:transparent;display:grid;place-items:center;cursor:pointer}
-  .iconbtn svg{width:18px;height:18px;color:#111}
+  .iconbtn{width:34px;height:34px;border:0;background:transparent;display:grid;place-items:center;cursor:pointer}
+  .iconbtn svg{width:20px;height:20px;color:#111}
+
   /* Tagline */
-  .tagline-wrap{position:sticky; top:var(--headerH); z-index:30; background:#fff; border-bottom:1px solid var(--ring)}
+  .tagline-wrap{position:sticky; top:var(--headerH); z-index:60; background:#fff; border-bottom:1px solid var(--ring)}
   .tagline{height:var(--taglineH);display:flex;align-items:center; padding:0 14px; gap:6px; font-weight:800; letter-spacing:.02em}
   .tagline .lite{color:#6b7280}
   .tagline .bold{color:#111}
 
+  /* ===== Right Drawer (Search & Filters) ===== */
+  .scrim{position:fixed;inset:var(--headerH) 0 0 0;background:rgba(0,0,0,.35);opacity:0;pointer-events:none;transition:.2s;z-index:65}
+  .scrim.open{opacity:1;pointer-events:auto}
+  .drawer-right{
+    position:fixed;top:var(--headerH);bottom:0;right:0;width:380px;max-width:92vw;background:#fff;
+    border-left:1px solid var(--ring);transform:translateX(100%);transition:transform .25s ease;z-index:80;display:flex;flex-direction:column
+  }
+  .drawer-right.open{transform:translateX(0)}
+  .drawer-head{height:46px;border-bottom:1px solid var(--ring);display:flex;align-items:center;justify-content:flex-end;padding:0 8px}
+  .drawer-content{padding:12px;overflow:auto}
+  .rail-h{font-weight:800;letter-spacing:.14em;text-transform:uppercase;font-size:13px;color:#374151;margin:2px 2px 8px}
+  .ghost{display:block;width:100%;height:42px;background:#fff;border:1px solid var(--ring);border-radius:8px;padding:0 12px;font-size:14px}
+  .group{margin-bottom:12px}
+  .note{font-size:12px;color:#6b7280;margin-top:6px}
+
   /* ===== Grid ===== */
-  main{padding:6px 0 84px} /* no gap at top */
+  main{padding:2px 0 84px} /* tight top */
   .grid{padding:12px;display:grid;grid-template-columns:repeat(1,minmax(0,1fr));gap:12px}
   @media (min-width:700px){ .grid{grid-template-columns:repeat(2,1fr)} }
   @media (min-width:1100px){ .grid{grid-template-columns:repeat(3,1fr)} }
@@ -102,18 +117,20 @@
   .dot{width:6px;height:6px;border-radius:999px;background:#d1d5db}
   .front .dot-1{background:#111827} .back .dot-2{background:#111827}
 
-  /* footer */
+  /* footer + badge */
   .footer{position:fixed;left:0;right:0;bottom:0;height:56px;background:#000;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;letter-spacing:.03em;z-index:5}
-  .build{position:fixed;left:10px;top:8px;background:rgba(0,0,0,.85);color:#fff;font-size:12px;padding:6px 10px;border-radius:12px;z-index:60}
+  .build{position:fixed;left:10px;top:8px;background:rgba(0,0,0,.85);color:#fff;font-size:12px;padding:6px 10px;border-radius:12px;z-index:90}
 </style>
 </head>
 <body>
-<div class="build">BUILD: ham-v3.5.1</div>
+<div class="build">BUILD: ham-v3.5.2</div>
 
 <header class="site-header">
   <img class="brand" src="https://i.postimg.cc/NjRf6nGF/hamilton-log-with-3-lines.png" alt="Hamilton HS Active Alumni">
   <div style="display:flex;align-items:center;gap:10px">
-    <button class="iconbtn" aria-label="Search"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M11 4a7 7 0 1 1 0 14 7 7 0 0 1 0-14zm9.7 15.3-3.4-3.4a9 9 0 1 0-1.4 1.4l3.4 3.4a1 1 0 0 0 1.4-1.4z"/></svg></button>
+    <button class="iconbtn" id="openRight" aria-label="Open Search & Filters" title="Search & Filters">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M11 4a7 7 0 1 1 0 14 7 7 0 0 1 0-14zm9.7 15.3-3.4-3.4a9 9 0 1 0-1.4 1.4l3.4 3.4a1 1 0 0 0 1.4-1.4z"/></svg>
+    </button>
     <img class="ystats" src="https://i.postimg.cc/76srDfFT/yatstats-logo-stacked.png" alt="YAT?STATS">
   </div>
 </header>
@@ -127,6 +144,31 @@
   </div>
 </div>
 
+<!-- Right Drawer -->
+<div id="scrim" class="scrim"></div>
+<aside id="drawerRight" class="drawer-right" aria-hidden="true" role="dialog" aria-modal="true">
+  <div class="drawer-head">
+    <button class="iconbtn" id="closeRight" aria-label="Close"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M6.225 4.811 4.811 6.225 10.586 12l-5.775 5.775 1.414 1.414L12 13.414l5.775 5.775 1.414-1.414L13.414 12l5.775-5.775-1.414-1.414L12 10.586 6.225 4.811z"/></svg></button>
+  </div>
+  <div class="drawer-content">
+    <div class="group">
+      <div class="rail-h">SEARCH</div>
+      <input id="q" class="ghost" placeholder="PLAYER NAME" autocomplete="off">
+    </div>
+    <div class="group">
+      <div class="rail-h">FILTERS</div>
+      <select id="lvl" class="ghost"><option value="">ALL LEVELS</option></select>
+    </div>
+    <div class="group">
+      <select id="grad" class="ghost"><option value="">ALL GRAD CLASSES</option></select>
+    </div>
+    <div class="group">
+      <select id="roster" class="ghost"><option value="">ALL ROSTER YEARS</option></select>
+      <div class="note">Matches the high-school years a player lettered.</div>
+    </div>
+  </div>
+</aside>
+
 <main>
   <section id="grid" class="grid"></section>
 </main>
@@ -138,11 +180,8 @@
 const $id = id => document.getElementById(id);
 const lvlClass = s => 'lvl-' + String(s||'').toLowerCase().replace(/\s+/g,'-');
 function onImgError(img){
-  img.onerror=null;
-  img.removeAttribute('src');
-  img.setAttribute('data-fallback','1');
-  img.className='card-img';
-  img.innerHTML='IMG';
+  img.onerror=null; img.removeAttribute('src'); img.setAttribute('data-fallback','1');
+  img.className='card-img'; img.innerHTML='IMG';
 }
 function teamSplit(raw){
   const s=String(raw||''); const parts=s.split('—');
@@ -159,14 +198,15 @@ const players = [
     nextGame:{opponent:"@ BOS", date:"07/15 TUE 7:10 PM ET"},
     last3:[{date:"07/12",opp:"@ BOS",line:"2-4, HR, 2 RBI"},{date:"07/11",opp:"@ BOS",line:"1-3, BB"},{date:"07/10",opp:"vs TOR",line:"0-4"}],
     news:[["Sample headline about CODY BELLINGER","#"],["Another relevant story","#"]],
-    x:"#", ig:"#"
+    x:"#", ig:"#", letterWinnerYears:[2012,2013]
   },
   { id:"patrick-murphy", name:"PATRICK MURPHY", graduatingClass:2013, currentLevel:"KBO", status:"Active",
     team:"KT Wiz Suwon — KBO", frontImg:"https://i.postimg.cc/gc32dtQG/MURPH.avif",
     highSchoolImg:"https://i.postimg.cc/50qjmqFW/02-Murphy-Front-page-00001.jpg",
     pitching:{era:"3.22",so:"71",whip:"1.09",ip:"—"},
-    nextGame:{opponent:"vs LG", date:"07/19 SAT 5:00 PM"}, last3:[{date:"07/12",opp:"vs LG",line:"6.0 IP, 1 ER, 7 K"},{date:"07/06",opp:"@ KIA",line:"5.2 IP, 2 ER, 5 K"},{date:"07/01",opp:"vs SSG",line:"7.0 IP, 0 ER, 8 K"}],
-    news:[["Wiz roll; Murphy shoves","#"]], x:"#", ig:"#"
+    nextGame:{opponent:"vs LG", date:"07/19 SAT 5:00 PM"},
+    last3:[{date:"07/12",opp:"vs LG",line:"6.0 IP, 1 ER, 7 K"},{date:"07/06",opp:"@ KIA",line:"5.2 IP, 2 ER, 5 K"},{date:"07/01",opp:"vs SSG",line:"7.0 IP, 0 ER, 8 K"}],
+    news:[["Wiz roll; Murphy shoves","#"]], x:"#", ig:"#", letterWinnerYears:[2012,2013]
   },
   { id:"dom-hamel", name:"DOM HAMEL", graduatingClass:2017, currentLevel:"Triple-A", status:"Active",
     team:"Syracuse Mets — New York Mets", frontImg:"https://i.postimg.cc/rwYchfnt/20250804-151814.jpg",
@@ -174,54 +214,62 @@ const players = [
     pitching:{era:"3.89",so:"93",whip:"1.18",ip:"—"},
     nextGame:{opponent:"@ WOR", date:"07/20 SUN 1:05 PM"},
     last3:[{date:"07/13",opp:"@ WOR",line:"5.0 IP, 2 ER, 9 K"},{date:"07/08",opp:"vs ROC",line:"6.0 IP, 1 ER, 6 K"},{date:"07/02",opp:"vs ROC",line:"4.2 IP, 4 ER, 5 K"}],
-    news:[["Hamel fans 9 in win","#"]], x:"#", ig:"#"
+    news:[["Hamel fans 9 in win","#"]], x:"#", ig:"#", letterWinnerYears:[2016,2017]
   },
   { id:"brock-selvidge", name:"BROCK SELVIDGE", graduatingClass:2021, currentLevel:"Double-A", status:"Active",
     team:"Somerset Patriots — New York Yankees", frontImg:"https://i.postimg.cc/W3K6jZ9W/image.jpg",
     highSchoolImg:"https://i.postimg.cc/xdLd0y5N/22-Selvidge-Front-page-00001.jpg",
-    pitching:{era:"—",so:"—",whip:"—",ip:"—"}, nextGame:{opponent:"—",date:"—"}, last3:[], news:[], x:"#", ig:"#"
+    pitching:{era:"—",so:"—",whip:"—",ip:"—"}, nextGame:{opponent:"—",date:"—"}, last3:[], news:[], x:"#", ig:"#",
+    letterWinnerYears:[2018,2019,2020,2021]
   },
   { id:"luke-thiele", name:"LUKE THIELE", graduatingClass:2021, currentLevel:"NCAA-D1", status:"Active",
     team:"Washington State — Pac-12", frontImg:"https://i.postimg.cc/3wWnWwYz/luke-theil.webp",
     highSchoolImg:"https://i.postimg.cc/LXYrnvvj/45-Thiele-Front-page-00001.jpg",
-    batting:{avg:"—",hr:"—",rbi:"—",ops:"—"}, nextGame:{opponent:"—",date:"—"}, last3:[], news:[], x:"#", ig:"#"
+    batting:{avg:"—",hr:"—",rbi:"—",ops:"—"}, nextGame:{opponent:"—",date:"—"}, last3:[], news:[], x:"#", ig:"#",
+    letterWinnerYears:[2020,2021]
   },
   { id:"logan-boyer", name:"LOGAN BOYER", graduatingClass:2016, currentLevel:"Triple-A", status:"Active",
     team:"Oklahoma City — Los Angeles Dodgers", frontImg:"https://i.postimg.cc/c1Kq8Dkv/Logan-Boyer.jpg",
     highSchoolImg:"https://i.postimg.cc/mgzDnGFw/11-Boyer-Front-page-00001.jpg",
-    pitching:{era:"—",so:"—",whip:"—",ip:"—"}, nextGame:{opponent:"—",date:"—"}, last3:[], news:[], x:"#", ig:"#"
+    pitching:{era:"—",so:"—",whip:"—",ip:"—"}, nextGame:{opponent:"—",date:"—"}, last3:[], news:[], x:"#", ig:"#",
+    letterWinnerYears:[2014,2015,2016]
   },
   { id:"shane-murphy", name:"SHANE MURPHY", graduatingClass:2019, currentLevel:"Triple-A", status:"Active",
     team:"Birmingham Barons — Chicago White Sox", frontImg:"https://i.postimg.cc/HL7zvBWZ/Shane-Murphy-Birmingham-Barons-Chicago-White-Sox.jpg",
     highSchoolImg:"https://i.postimg.cc/90gmxxmK/26-Murphy-Front-page-00001.jpg",
-    pitching:{era:"—",so:"—",whip:"—",ip:"—"}, nextGame:{opponent:"—",date:"—"}, last3:[], news:[], x:"#", ig:"#"
+    pitching:{era:"—",so:"—",whip:"—",ip:"—"}, nextGame:{opponent:"—",date:"—"}, last3:[], news:[], x:"#", ig:"#",
+    letterWinnerYears:[2016,2017,2018,2019]
   },
   { id:"drew-swift", name:"DREW SWIFT", graduatingClass:2017, currentLevel:"Triple-A", status:"Active",
     team:"Las Vegas Aviators — Athletics", frontImg:"https://i.postimg.cc/GmmSKFsV/AISelect-20250826-023939-Instagram.jpg",
     highSchoolImg:"https://i.postimg.cc/zXf3nhz4/04-Swift-Front-page-00001.jpg",
-    batting:{avg:"—",hr:"—",rbi:"—",ops:"—"}, nextGame:{opponent:"—",date:"—"}, last3:[], news:[], x:"#", ig:"#"
+    batting:{avg:"—",hr:"—",rbi:"—",ops:"—"}, nextGame:{opponent:"—",date:"—"}, last3:[], news:[], x:"#", ig:"#",
+    letterWinnerYears:[2014,2015,2016,2017]
   },
   { id:"tyler-wilson", name:"TYLER WILSON", graduatingClass:2021, currentLevel:"High-A", status:"Active",
     team:"Hudson Valley Renegades — New York Yankees", frontImg:"https://i.postimg.cc/0Qh0Ymqg/Tyler-Wilson-Now.jpg",
     highSchoolImg:"https://i.postimg.cc/1XZJx67G/34-Wilson-Front-page-00001.jpg",
-    batting:{avg:"—",hr:"—",rbi:"—",ops:"—"}, nextGame:{opponent:"—",date:"—"}, last3:[], news:[], x:"#", ig:"#"
+    batting:{avg:"—",hr:"—",rbi:"—",ops:"—"}, nextGame:{opponent:"—",date:"—"}, last3:[], news:[], x:"#", ig:"#",
+    letterWinnerYears:[2018,2019,2020]
   },
   { id:"roch-cholowsky", name:"ROCH CHOLOWSKY", graduatingClass:2023, currentLevel:"NCAA-D1", status:"Active",
     team:"UCLA — Big Ten", frontImg:"https://i.postimg.cc/xdvPvq1q/Roch2.jpg",
     highSchoolImg:"https://i.postimg.cc/fyXng59M/roch2.jpg",
-    batting:{avg:"—",hr:"—",rbi:"—",ops:"—"}, nextGame:{opponent:"—",date:"—"}, last3:[], news:[], x:"#", ig:"#"
+    batting:{avg:"—",hr:"—",rbi:"—",ops:"—"}, nextGame:{opponent:"—",date:"—"}, last3:[], news:[], x:"#", ig:"#",
+    letterWinnerYears:[2020,2021,2022,2023]
   },
   { id:"shane-anderson", name:"SHANE ANDERSON", graduatingClass:2020, currentLevel:"NAIA", status:"Active",
     team:"Georgia Gwinnett — CAC", frontImg:"https://i.postimg.cc/J4j5XP4M/IMG-20250826-030341.jpg",
     highSchoolImg:"https://i.postimg.cc/SNj7TkrQ/AISelect-20250826-031127-Gallery-1.jpg",
-    pitching:{era:"—",so:"—",whip:"—",ip:"—"}, nextGame:{opponent:"—",date:"—"}, last3:[], news:[], x:"#", ig:"#"
+    pitching:{era:"—",so:"—",whip:"—",ip:"—"}, nextGame:{opponent:"—",date:"—"}, last3:[], news:[], x:"#", ig:"#",
+    letterWinnerYears:[2020]
   },
   { id:"chaz-deluca", name:"CHAZ DELUCA", graduatingClass:2017, currentLevel:"High-A", status:"Retired",
     team:"Aberdeen IronBirds — Orioles (Player Development)", frontImg:"https://i.postimg.cc/rp0T753Z/IMG-7630.jpg",
     highSchoolImg:"https://i.postimg.cc/v8xHxwmx/AISelect-20250729-224953-System-UI.jpg",
     pitching:{era:"6.17",so:"129",whip:"1.73",ip:"132.2"},
-    nextGame:{opponent:"—",date:"—"},
-    last3:[], news:[["TBC profile for DeLuca","#"]], x:"#", ig:"#", nil:14200
+    nextGame:{opponent:"—",date:"—"}, last3:[], news:[["TBC profile for DeLuca","#"]], x:"#", ig:"#", nil:14200,
+    letterWinnerYears:[2016,2017]
   }
 ];
 
@@ -347,9 +395,7 @@ function makeCard(p){
                 <div class="kv"><div class="k">K/9</div><div class="v">—</div></div>
                 <div class="kv"><div class="k">SV</div><div class="v">—</div></div>
               ` :
-              `
-                ${Array.from({length:8}).map(()=>`<div class="kv"><div class="k">—</div><div class="v">—</div></div>`).join('')}
-              `
+              `${Array.from({length:8}).map(()=>`<div class="kv"><div class="k">—</div><div class="v">—</div></div>`).join('')}`
             }
           </div>
         </div>
@@ -358,24 +404,23 @@ function makeCard(p){
   </article>`;
 }
 
-/* ---------- render + interactions ---------- */
+/* ---------- rendering + interactions ---------- */
+let currentList = [];
 function render(list){
-  const grid = $id('grid');
-  grid.innerHTML = list.map(makeCard).join('');
-  attach();
+  currentList = list;
+  $id('grid').innerHTML = list.map(makeCard).join('');
+  attachCardBehaviors();
 }
-function attach(){
+function attachCardBehaviors(){
   document.querySelectorAll('.card').forEach(card=>{
     if(!card.classList.contains('front') && !card.classList.contains('back')) card.classList.add('front');
-    // flip on edge tap/click (not on links/buttons)
+
     card.addEventListener('click', e=>{
       if(e.target.closest('a,button,[data-view]')) return;
-      const t = e.target.closest('[data-toggle]');
-      if(!t) return;
+      const t = e.target.closest('[data-toggle]'); if(!t) return;
       card.classList.toggle('front'); card.classList.toggle('back');
     });
 
-    // back toolbar switching
     const content = card.querySelector('.content');
     if(content){
       const panels = {
@@ -394,9 +439,53 @@ function attach(){
   });
 }
 
-/* sort oldest grad first on load (so page order is by class regardless of code order) */
-const initial = [...players].sort((a,b)=>(a.graduatingClass||0)-(b.graduatingClass||0));
-render(initial);
+/* ---------- Filters (Right Drawer) ---------- */
+const scrim = $id('scrim');
+const drawerRight = $id('drawerRight');
+const openRight = $id('openRight');
+const closeRight = $id('closeRight');
+function openDrawer(){ drawerRight.classList.add('open'); scrim.classList.add('open'); }
+function closeDrawer(){ drawerRight.classList.remove('open'); scrim.classList.remove('open'); }
+openRight.addEventListener('click', openDrawer);
+closeRight.addEventListener('click', closeDrawer);
+scrim.addEventListener('click', closeDrawer);
+
+function populateFilters(data){
+  const levels={}, classes={}, roster={};
+  data.forEach(p=>{
+    if(p.currentLevel) levels[p.currentLevel]=1;
+    if(p.graduatingClass) classes[p.graduatingClass]=1;
+    (p.letterWinnerYears||[]).forEach(y=> roster[y]=1);
+  });
+  const lvlSel = $id('lvl'), gradSel=$id('grad'), rosSel=$id('roster');
+  lvlSel.innerHTML = '<option value="">ALL LEVELS</option>' + Object.keys(levels).sort().map(l=>`<option>${l}</option>`).join('');
+  gradSel.innerHTML = '<option value="">ALL GRAD CLASSES</option>' + Object.keys(classes).map(Number).sort((a,b)=>b-a).map(y=>`<option>${y}</option>`).join('');
+  rosSel.innerHTML  = '<option value="">ALL ROSTER YEARS</option>' + Object.keys(roster).map(Number).sort((a,b)=>b-a).map(y=>`<option>${y}</option>`).join('');
+}
+function applyFilters(){
+  const q = ($id('q').value||'').toLowerCase();
+  const l = $id('lvl').value;
+  const g = $id('grad').value;
+  const r = $id('roster').value;
+  const out = initialData.filter(p=>{
+    if(q && !(p.name||'').toLowerCase().includes(q)) return false;
+    if(l && p.currentLevel!==l) return false;
+    if(g && String(p.graduatingClass)!==g) return false;
+    if(r && !(p.letterWinnerYears||[]).includes(Number(r))) return false;
+    return true;
+  });
+  render(out);
+}
+
+/* ---------- Boot ---------- */
+/* Sort by graduating class (earliest → most recent) regardless of code order */
+const initialData = [...players].sort((a,b)=>(a.graduatingClass||0)-(b.graduatingClass||0));
+populateFilters(initialData);
+render(initialData);
+
+['q','lvl','grad','roster'].forEach(id=>{
+  const el=$id(id); if(el){ el.addEventListener(id==='q'?'input':'change', applyFilters); }
+});
 </script>
 </body>
 </html>
