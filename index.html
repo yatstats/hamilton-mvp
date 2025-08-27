@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>YAT?STATS • Hamilton — Two-Side Flip Card (ham-v3.4.6)</title>
+<title>YAT?STATS • Hamilton — Two-Side Flip Card (ham-v3.4.7)</title>
 
 <style>
   :root{
@@ -73,8 +73,14 @@
   .name{font-weight:900;text-transform:uppercase;letter-spacing:.02em;font-size:18px;line-height:1.12}
   .team{font-size:13px;opacity:.98}
   .parent{font-size:12px;opacity:.9}
+
+  /* stacked tags (now equal width via JS) */
   .tag-stack{display:flex;flex-direction:column;gap:6px;margin-top:8px}
-  .chip{display:inline-block;border-radius:999px;padding:3px 7px;font-weight:900;font-size:10px;letter-spacing:.06em;color:#fff}
+  .tag-stack .chip{
+    display:inline-flex;align-items:center;justify-content:center;
+    border-radius:999px;padding:3px 7px;font-weight:900;font-size:10px;letter-spacing:.06em;color:#fff;
+    white-space:nowrap; width:var(--chipW, auto);
+  }
   .lvl-mlb{background:#7A0019}.lvl-triple-a,.lvl-aaa{background:#2563eb}.lvl-double-a,.lvl-aa{background:#3b82f6}
   .lvl-high-a{background:#4338ca}.lvl-low-a{background:#3730a3}
   .lvl-ncaa-d1{background:#166534}.lvl-kbo{background:#0ea5e9}.lvl-naia{background:#9333ea}.lvl-njcaa{background:#a16207}.lvl-juco{background:#0d9488}
@@ -92,29 +98,23 @@
     height:100%;
     display:grid;
     grid-template-columns: 1fr 36%;
-    grid-template-rows: auto auto 1fr auto; /* header | tabs | panel | STATS (full width) */
+    grid-template-rows: auto auto 1fr auto;
     gap:10px; padding:12px;
   }
-  @media (max-width:740px){
-    .back-grid{grid-template-columns: 1fr 42%}
-  }
-  /* header (left) */
+  @media (max-width:740px){ .back-grid{grid-template-columns: 1fr 42%} }
   .stats-head{grid-column:1; grid-row:1; display:flex; justify-content:space-between; gap:10px}
   .stats-name{font-weight:900;text-transform:uppercase;letter-spacing:.02em}
   .muted{color:var(--muted);font-size:12px}
-  /* HS image (right, top quadrant) */
   .rhs{grid-column:2; grid-row:1 / span 3; display:flex; align-items:flex-start; justify-content:center}
   .rhs img{width:100%; height:auto; object-fit:cover; border-radius:8px; background:#222}
-  /* tabs + panel (left middle) */
   .content-tabs{grid-column:1; grid-row:2; display:flex; gap:8px; flex-wrap:wrap}
   .tab{display:inline-flex;align-items:center;gap:6px;padding:8px 10px;border:1px solid var(--ring);border-radius:999px;background:#fff;font-weight:700;font-size:12px;cursor:pointer}
-  .tab svg{width:14px;height:14px}     /* smaller icons */
+  .tab svg{width:14px;height:14px}
   .tab.active{border-color:var(--brand)}
-  @media (max-width:560px){ .tab span{display:none} } /* icons-only on mobile */
+  @media (max-width:560px){ .tab span{display:none} }
   .below-content{grid-column:1; grid-row:3; border:1px solid var(--ring);border-radius:10px;min-height:84px;padding:10px;background:#fff}
   .panel{display:none}
   .panel.active{display:block}
-  /* stats strip across entire bottom */
   .stats-strip{grid-column:1 / -1; grid-row:4}
   .kv-wrap{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
   .kv{background:#f3f4f6;border-radius:10px;text-align:center;padding:10px}
@@ -161,7 +161,7 @@
 </head>
 <body>
 
-<div class="build">BUILD: ham-v3.4.6</div>
+<div class="build">BUILD: ham-v3.4.7</div>
 
 <header class="site-header">
   <div class="left-fixed">
@@ -190,14 +190,12 @@
   </div>
 </header>
 
-<!-- Tagline -->
 <div class="tagline-wrap">
   <div class="tagline">
     <span class="soft">WHERE THEY </span><span class="hard">YAT?</span><span class="soft"> FLIP FOR THEIR </span><span class="hard">STATS!</span>
   </div>
 </div>
 
-<!-- Scrim + Drawers -->
 <div class="scrim" id="scrim"></div>
 
 <aside class="drawer-left" id="drawerLeft" aria-hidden="true" role="navigation">
@@ -418,7 +416,6 @@ function makeCard(p){
             <img src="${(p.highSchoolImg||p.frontImg||'').replace(/"/g,'&quot;')}" alt="${(p.name||'HS').replace(/"/g,'&quot;')}" onerror="this.onerror=null;this.style.display='none';">
           </aside>
 
-          <!-- tabs + panel -->
           <div class="content-tabs" data-tabs>
             <button class="tab active" data-action="news" aria-label="News">${NEWS_ICON}<span>News</span></button>
             <button class="tab" data-action="x" aria-label="X">${X_ICON}<span>X</span></button>
@@ -437,8 +434,8 @@ function makeCard(p){
             <div class="panel active" data-panel="news">
               <div style="font-weight:700;margin-bottom:6px">Latest Headlines</div>
               <ul style="margin:0;padding-left:16px">
-                <li><a href="${p.newsUrl||'#'}">Sample headline about ${p.name}</a></li>
-                <li><a href="${p.newsUrl||'#'}">Another relevant story</a></li>
+                <li><a href="${'#'/* p.newsUrl */}">Sample headline about ${p.name}</a></li>
+                <li><a href="${'#'/* p.newsUrl */}">Another relevant story</a></li>
               </ul>
             </div>
             <div class="panel" data-panel="x"><a href="${p.xUrl||'#'}" target="_blank" rel="noopener">Open player posts on X ↗</a></div>
@@ -447,7 +444,6 @@ function makeCard(p){
             <div class="panel" data-panel="yab"><div>Marketplace module coming soon.</div></div>
           </div>
 
-          <!-- stats strip spans full bottom -->
           <div class="stats-strip">
             ${
               p.batting ? `
@@ -484,7 +480,31 @@ function makeCard(p){
 </div>`;
 }
 
-function render(list){ $('grid').innerHTML = list.map(makeCard).join(''); attachInteractions(); attachTabHandlers(); }
+function render(list){
+  $('grid').innerHTML = list.map(makeCard).join('');
+  attachInteractions();
+  attachTabHandlers();
+  equalizeChipWidths();    // <<< make chips equal width after render
+}
+
+/* ===== Equalize chip widths per card ===== */
+function equalizeChipWidths(){
+  // wait for layout to settle
+  requestAnimationFrame(()=>{
+    document.querySelectorAll('.tag-stack').forEach(stack=>{
+      const chips=[...stack.querySelectorAll('.chip')];
+      if(!chips.length) return;
+      // reset first
+      chips.forEach(c=>c.style.width='auto');
+      // measure widest
+      let max=0;
+      chips.forEach(c=>{ max=Math.max(max, c.offsetWidth); });
+      // apply to all (set custom property so media queries could override if needed)
+      stack.style.setProperty('--chipW', max+'px');
+      chips.forEach(c=>c.style.width=max+'px');
+    });
+  });
+}
 
 /* ===== filters ===== */
 function populateFilters(){
