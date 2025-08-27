@@ -3,33 +3,29 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>YAT?STATS • Hamilton — Where They YAT? (v3.4.8)</title>
+<title>YAT?STATS • Hamilton — Where They YAT? (v3.5.0)</title>
 
 <style>
   :root{
-    --maroon:#7A0019; --ring:#E3E6EA; --bg:#f3f4f6; --ink:#111827; --muted:#6b7280;
+    --ink:#111827; --muted:#6b7280; --ring:#E3E6EA; --bg:#f3f4f6; --brand:#7A0019;
+    --chip:#111; --chipDim:#374151; --ok:#16a34a; --link:#0ea5e9;
     --headerH:72px;
-    --chipW:92px; /* <<< shorter chips; tweak if needed */
   }
   *{box-sizing:border-box}
-  html,body{margin:0;padding:0}
-  body{background:var(--bg);font:15px/1.4 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,"Apple Color Emoji","Segoe UI Emoji";color:var(--ink)}
-  body.no-scroll{overflow:hidden}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font:15px/1.4 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial}
+  a{color:inherit;text-decoration:none}
 
   /* ===== HEADER ===== */
   .site-header{
-    position:fixed; inset:0 0 auto 0; height:var(--headerH); z-index:50;
+    position:fixed; inset:0 0 auto 0; height:var(--headerH); z-index:60;
     background:#fff; border-bottom:1px solid var(--ring);
     display:grid; grid-template-columns:auto 1fr auto; align-items:center; gap:10px; padding:0 12px;
   }
   .left-fixed{display:flex;align-items:center}
   .left-fixed img{height:36px;width:auto;display:block}
   .nav-desktop{justify-self:center; display:flex; gap:0}
-  .nav-desktop a{
-    font-size:12px;text-transform:uppercase;color:#1f2937;margin:0 12px;
-    text-decoration:none;white-space:nowrap;letter-spacing:.03em
-  }
-  .nav-desktop a.active{color:var(--maroon);border-bottom:2px solid var(--maroon);padding-bottom:3px;font-weight:700}
+  .nav-desktop a{font-size:12px;text-transform:uppercase;color:#1f2937;margin:0 12px;letter-spacing:.03em}
+  .nav-desktop a.active{color:var(--brand);border-bottom:2px solid var(--brand);padding-bottom:3px;font-weight:700}
   .header-right{display:flex;align-items:center;gap:10px}
   .iconbtn,.hambtn{width:32px;height:32px;display:grid;place-items:center;border:0;background:transparent;cursor:pointer}
   .iconbtn svg,.hambtn svg{width:18px;height:18px;color:#111}
@@ -37,31 +33,28 @@
   @media (max-width:1024px){ .nav-desktop{display:none} }
   @media (max-width:480px){ .left-fixed img{height:32px} .ystats-logo{height:30px} }
 
-  /* ===== TAGLINE (grey except bold black YAT? / STATS!) ===== */
-  .tagline-wrap{position:sticky; top:var(--headerH); z-index:20; background:#fff; border-bottom:1px solid var(--ring)}
+  /* ===== TAGLINE ===== */
+  .tagline-wrap{position:sticky; top:var(--headerH); z-index:40; background:#fff; border-bottom:1px solid var(--ring)}
   .tagline{
-    padding:8px 14px; text-transform:uppercase; white-space:nowrap; overflow:hidden;
-    font-weight:800; letter-spacing:.08em; font-size:clamp(12px,1vw + 10px,16px);
-    color:#6b7280;
+    padding:10px 14px; text-transform:uppercase; white-space:nowrap; overflow:hidden;
+    font-weight:800; letter-spacing:.04em; color:#6b7280; display:flex; gap:.35em; align-items:baseline;
   }
-  .tagline .ink{color:#111}
-  @media (max-width:920px){ .tagline{letter-spacing:.04em} }
-  @media (max-width:720px){ .tagline{letter-spacing:.02em} }
-  @media (max-width:560px){ .tagline{letter-spacing:0} }
-  @media (max-width:420px){ .tagline{letter-spacing:-.01em} }
+  .tagline b{color:#000}
+  @media (max-width:560px){ .tagline{letter-spacing:.01em} }
 
   /* ===== GRID ===== */
-  main{padding:calc(var(--headerH) + 40px) 0 84px}
-  .grid{padding:12px;display:grid;grid-template-columns:repeat(1,minmax(0,1fr));gap:12px}
+  main{padding:calc(var(--headerH) + 42px) 0 84px}
+  .grid{padding:12px;display:grid;grid-template-columns:repeat(1,minmax(0,1fr));gap:12px; margin-top:0} /* no gap under header */
   @media (min-width:768px){ .grid{grid-template-columns:repeat(3,minmax(0,1fr))} }
   @media (min-width:1280px){ .grid{grid-template-columns:repeat(5,minmax(0,1fr))} }
-  @media (max-width:767px){ .card-wrap{width:80%; margin:0 auto} }
+  @media (max-width:767px){ .card-wrap{width:86%; margin:0 auto} }
 
   /* ===== CARD ===== */
-  .card-wrap{display:flex;flex-direction:column;align-items:stretch}
+  .card-wrap{display:flex;flex-direction:column}
   .card{
-    background:#000;border:0;border-radius:0;box-shadow:0 2px 10px rgba(0,0,0,.04);
-    overflow:hidden;position:relative;user-select:none;aspect-ratio:5/7;min-height:280px;width:100%;
+    background:#000;border:0;border-radius:10px;overflow:hidden;position:relative;
+    aspect-ratio:5/7;min-height:300px;width:100%;
+    box-shadow:0 8px 22px rgba(0,0,0,.08);
   }
   .flip-card{perspective:1200px}
   .flip-inner{position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform .55s cubic-bezier(.2,.7,.2,1)}
@@ -69,82 +62,90 @@
   .card.back   .flip-inner{ transform:rotateY(180deg) }
   .face{position:absolute; inset:0; backface-visibility:hidden; -webkit-backface-visibility:hidden; overflow:hidden}
 
-  /* FRONT */
-  .front-face{transform:rotateY(0)}
+  /* ===== FRONT ===== */
+  .front-face{transform:rotateY(0); position:relative}
   .card-img{position:absolute; inset:0; width:100%; height:100%; object-fit:cover; background:#111}
   .bottom-grad{
-    position:absolute; left:0; right:0; bottom:0; height:60%;
-    background:linear-gradient(to top, rgba(0,0,0,.98) 0%, rgba(0,0,0,.92) 28%, rgba(0,0,0,.86) 45%, rgba(0,0,0,0) 72%);
+    position:absolute; left:0; right:0; bottom:0; height:63%;
+    background:linear-gradient(to top, rgba(0,0,0,.98) 0%, rgba(0,0,0,.92) 30%, rgba(0,0,0,.86) 48%, rgba(0,0,0,0) 75%);
     pointer-events:none; z-index:1;
   }
-
-  /* anchored info blocks */
   .front-anchor{position:absolute; top:70%; transform:translateY(-50%); z-index:3; color:#fff; text-shadow:0 1px 2px rgba(0,0,0,.45)}
   .info-left{left:12px; right:52%}
-  .info-right{right:12px; left:52%; text-align:right}
-  .name{font-weight:900;text-transform:uppercase;letter-spacing:.02em;font-size:18px;line-height:1.1}
+  .name{font-weight:900;text-transform:uppercase;letter-spacing:.02em;font-size:clamp(16px,2.4vw,20px);line-height:1.1}
   .team{font-size:13px;opacity:.98}
   .parent{font-size:12px;opacity:.9}
-
-  /* compact stacked chips (short + left aligned) */
-  .tag-stack{display:flex;flex-direction:column;gap:4px;margin-top:6px}
-  .chip{
-    display:inline-flex; align-items:center; justify-content:flex-start;
-    width:var(--chipW);
-    padding:3px 8px; font-weight:900; font-size:10px; letter-spacing:.05em; color:#fff;
-    border-radius:999px; white-space:nowrap; text-align:left;
-  }
+  .chip{display:inline-block;border-radius:999px;padding:4px 10px;font-weight:800;font-size:10px;letter-spacing:.06em;color:#fff;background:var(--chip); margin-top:6px}
+  .chip.dim{background:var(--chipDim)}
+  .chip.ok{background:var(--ok)}
+  .chips{display:flex;flex-direction:column;gap:6px;margin-top:6px;align-items:flex-start}
   .lvl-mlb{background:#7A0019}.lvl-triple-a,.lvl-aaa{background:#2563eb}.lvl-double-a,.lvl-aa{background:#3b82f6}
-  .lvl-high-a{background:#4338ca}.lvl-low-a{background:#3730a3}.lvl-ncaa-d1{background:#166534}
-  .lvl-kbo{background:#0ea5e9}.lvl-naia{background:#9333ea}.lvl-njcaa{background:#a16207}
-  .chip.status{background:#16a34a}.chip.status.retired{background:#6b7280}
-  .chip.class{background:#374151}
+  .lvl-high-a{background:#4338ca}.lvl-low-a{background:#3730a3}.lvl-ncaa-d1{background:#166534}.lvl-kbo{background:#0ea5e9}.lvl-naia{background:#9333ea}.lvl-njcaa{background:#a16207}
 
-  .right-block-title{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#e5e7eb}
-  .right-line{font-size:14px;font-weight:800;letter-spacing:.01em}
-  .last3{margin-top:10px}
-  .last3 .item{font-size:12px;color:#e5e7eb;white-space:nowrap;text-align:right}
+  .info-right{right:12px; left:56%; text-align:right}
+  .next-title{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#e5e7eb}
+  .next-line{font-size:14px;font-weight:800;letter-spacing:.01em}
+  .last3{position:absolute; right:12px; bottom:12px; text-align:right; z-index:3; max-width:46%}
+  .last3 .ttl{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#e5e7eb;margin-bottom:4px}
+  .last3 .row{font-size:12px;color:#e5e7eb;line-height:1.25;white-space:normal}
 
-  /* BACK (stats white) */
-  .back-face{transform:rotateY(180deg);background:#fff;color:#111;display:flex;flex-direction:row;height:100%}
-  .stats-main{flex:1 1 auto; padding:14px; min-width:0}
-  .stats-head{display:flex;align-items:flex-start;gap:8px;justify-content:space-between;margin-bottom:6px}
-  .stats-name{font-weight:900;text-transform:uppercase;letter-spacing:.02em}
-  .muted{color:var(--muted);font-size:12px}
-  .kv-wrap{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:8px}
-  .kv{background:#f3f4f6;border-radius:10px;text-align:center;padding:8px}
+  /* ===== BACK ===== */
+  .back-face{transform:rotateY(180deg);background:#fff;color:#111;display:flex;flex-direction:column;height:100%}
+  .back-top{display:flex;gap:12px;padding:12px 12px 8px 12px;align-items:flex-start}
+  .back-title{flex:1 1 auto}
+  .back-name{font-weight:900;text-transform:uppercase;letter-spacing:.02em}
+  .back-sub{color:#6b7280;font-size:12px;margin-top:2px}
+  .hs-thumb{flex:0 0 auto;width:128px;aspect-ratio:3/4;border-radius:8px;object-fit:cover;background:#222}
+  @media (max-width:640px){ .hs-thumb{width:110px} }
+
+  .actbar{display:flex;gap:10px;padding:4px 12px 10px}
+  .actbtn{
+    display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:999px;border:1px solid var(--ring);
+    background:#fff;cursor:pointer;color:#111;box-shadow:0 1px 2px rgba(0,0,0,.04)
+  }
+  .actbtn.active{outline:2px solid #111}
+  .actbtn svg{width:18px;height:18px;display:block}
+
+  .content-area{padding:0 12px 8px;min-height:110px}
+  .pane{display:none}
+  .pane.active{display:block}
+  .news-list{padding:8px 10px;border:1px solid var(--ring);border-radius:10px;background:#f9fafb}
+  .news-list a{color:#1d4ed8;text-decoration:underline}
+
+  .kv-wrap{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:8px 12px 12px}
+  .kv{background:#f3f4f6;border-radius:10px;text-align:center;padding:10px}
   .kv .k{font-size:11px;color:#6b7280}
   .kv .v{font-weight:800}
-  .hs-topright{position:absolute;top:10px;right:10px;width:32%;max-width:160px;aspect-ratio:3/4;border-radius:6px;object-fit:cover;background:#e5e7eb}
-  @media (max-width:640px){ .hs-topright{position:static;width:64px;height:84px;aspect-ratio:auto;margin-left:8px} }
 
-  table{width:100%;border:1px solid var(--ring);border-radius:8px;overflow:hidden;border-collapse:collapse;font-size:12px;margin-top:10px}
-  thead{background:#f8fafc;color:#475569}
-  th,td{text-align:left;padding:8px;border-top:1px solid var(--ring)}
-  thead th{border-top:0}
-
-  /* flip UI */
-  .hit{position:absolute;top:0;bottom:0;width:28%;z-index:2;background:transparent;border:0}
+  /* ===== ARROWS & DOTS ===== */
+  .hit{position:absolute;top:0;bottom:0;width:28%;z-index:5;background:transparent;border:0}
   @media (max-width:480px){ .hit{width:34%} }
   .hit.left{left:0} .hit.right{right:0}
-  .arrow{position:absolute;top:50%;transform:translateY(-50%);width:28px;height:28px;border-radius:999px;border:0;background:rgba(255,255,255,.85);box-shadow:0 2px 8px rgba(0,0,0,.15);display:grid;place-items:center;z-index:4;opacity:0;transition:opacity .2s}
+  .arrow{position:absolute;top:50%;transform:translateY(-50%);width:28px;height:28px;border-radius:999px;border:0;background:rgba(255,255,255,.85);box-shadow:0 2px 8px rgba(0,0,0,.15);display:grid;place-items:center;z-index:6;opacity:0;transition:opacity .2s}
   .arrow svg{width:14px;height:14px;color:#111}
   .arrow.left{left:8px} .arrow.right{right:8px}
   .card:hover .arrow, .card:focus-within .arrow{opacity:.55}
-  .dots{position:absolute;left:0;right:0;bottom:8px;display:flex;gap:6px;justify-content:center;z-index:4}
+  .dots{position:absolute;left:0;right:0;bottom:8px;display:flex;gap:6px;justify-content:center;z-index:6}
   .dot{width:6px;height:6px;border-radius:999px;background:#d1d5db}
   .front .dot-1{background:#111827} .back .dot-2{background:#111827}
 
-  /* Drawers (unchanged baseline) */
-  .scrim{position:fixed;left:0;right:0;top:var(--headerH);bottom:0;background:rgba(0,0,0,.35);opacity:0;pointer-events:none;transition:opacity .25s ease;z-index:40}
+  /* ===== DRAWERS ===== */
+  .scrim{position:fixed;left:0;right:0;top:var(--headerH);bottom:0;background:rgba(0,0,0,.35);opacity:0;pointer-events:none;transition:opacity .25s ease;z-index:50}
   .scrim.open{opacity:1;pointer-events:auto}
-  .drawer-left{position:fixed; top:var(--headerH); bottom:0; left:0; width:360px; max-width:90vw;background:#fff; border-right:1px solid var(--ring); transform:translateX(-100%);transition:transform .25s ease; z-index:45; display:flex; flex-direction:column; padding:10px 14px;}
+  .drawer-left{
+    position:fixed; top:var(--headerH); bottom:0; left:0; width:360px; max-width:90vw;background:#fff; border-right:1px solid var(--ring);
+    transform:translateX(-100%);transition:transform .25s ease; z-index:55; display:flex; flex-direction:column; padding:10px 14px;
+  }
   .drawer-left.open{ transform:translateX(0) }
   .nav-left-list{display:flex; flex-direction:column; gap:12px}
   .nav-left-link{ text-decoration:none; color:#2b2b2b; text-transform:uppercase; letter-spacing:.12em; font-weight:400; font-size:13px; line-height:1; padding:10px 6px 8px 4px; border-radius:6px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis }
   .nav-left-link:hover{background:#f5f6f8}
   .nav-left-sep{height:1px; background:#eceff3; margin:8px 0}
-  .drawer-right{position:fixed; top:var(--headerH); bottom:0; right:0; width:420px; max-width:92vw;background:#fff; border-left:1px solid var(--ring); transform:translateX(100%);transition:transform .25s ease; z-index:45; display:flex; flex-direction:column;}
+
+  .drawer-right{
+    position:fixed; top:var(--headerH); bottom:0; right:0; width:420px; max-width:92vw;background:#fff; border-left:1px solid var(--ring);
+    transform:translateX(100%);transition:transform .25s ease; z-index:55; display:flex; flex-direction:column;
+  }
   .drawer-right.open{ transform:translateX(0) }
   .drawer-right .drawer-header{height:56px; border-bottom:1px solid var(--ring); display:flex; align-items:center; justify-content:flex-end; padding:0 12px}
   .drawer-body{min-height:0; overflow:auto}
@@ -156,13 +157,14 @@
   .rail-bullet{position:relative;margin-bottom:10px}
   .rail-bullet::before{content:"•";position:absolute;left:-10px;top:50%;transform:translateY(-50%);color:#9ca3af}
 
+  /* ===== FOOTER ===== */
   .footer{position:fixed;left:0;right:0;bottom:0;height:56px;background:#000;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;letter-spacing:.03em;z-index:10}
-  .build{position:fixed;left:10px;top:8px;background:rgba(0,0,0,.8);color:#fff;font-size:12px;padding:6px 10px;border-radius:12px;z-index:60}
+  .build{position:fixed;left:10px;top:8px;background:rgba(0,0,0,.85);color:#fff;font-size:12px;padding:6px 10px;border-radius:12px;z-index:70}
 </style>
 </head>
 <body>
 
-<div class="build">BUILD: ham-v3.4.8</div>
+<div class="build">BUILD: ham-v3.5.0</div>
 
 <header class="site-header">
   <div class="left-fixed">
@@ -191,12 +193,17 @@
   </div>
 </header>
 
+<!-- Tagline -->
 <div class="tagline-wrap">
-  <div class="tagline">WHERE THEY <span class="ink">YAT?</span> FLIP FOR THEIR <span class="ink">STATS!</span></div>
+  <div class="tagline">
+    <span>Where they</span><b>YAT?</b><span>Flip for their</span><b>STATS!</b>
+  </div>
 </div>
 
+<!-- Scrim -->
 <div class="scrim" id="scrim"></div>
 
+<!-- LEFT NAV -->
 <aside class="drawer-left" id="drawerLeft" aria-hidden="true" role="navigation">
   <div class="nav-left-list">
     <a class="nav-left-link" href="#">WHERE THEY YAT?</a>
@@ -211,6 +218,7 @@
   </div>
 </aside>
 
+<!-- RIGHT FILTER/SEARCH -->
 <aside class="drawer-right" id="drawerRight" aria-hidden="true" role="dialog" aria-modal="true">
   <div class="drawer-header">
     <button class="iconbtn" id="closeRight" aria-label="Close">
@@ -247,105 +255,132 @@ function imgTag(src, alt, fallbackSrc){
   const s = (src||'').replace(/"/g,'&quot;');
   const onerr = fallbackSrc
     ? `this.onerror=null; this.src='${f}';`
-    : `this.onerror=null; this.outerHTML='<div class=&quot;card-img&quot; style=&quot;display:grid;place-items:center;color:#9ca3af;font-weight:700;font-size:12px;&quot;>NO IMAGE</div>';`;
+    : `this.onerror=null; this.style.display='none';`;
   return `<img class="card-img" src="${s}" alt="${(alt||'').replace(/"/g,'&quot;')}" onerror="${onerr}">`;
 }
 const lvlClass = s => 'lvl-'+String(s||'').toLowerCase().replace(/\s+/g,'-');
 function makeKV(k,v){ return `<div class="kv"><div class="k">${k}</div><div class="v">${v??'—'}</div></div>`; }
-function teamAndParent(p){
-  const raw=String(p.team||'');
-  const parts = raw.split('—');
-  const team = parts[0]?.trim() || raw;
-  let parent = (parts[1]||'').trim();
-  if(!parent && (p.currentLevel||'').toUpperCase()==='MLB') parent='MLB';
-  return {team, parent};
+function teamParent(p){
+  const raw=String(p.team||''); const parts=raw.split('—');
+  const t=parts[0]?.trim()||raw; const par=(parts[1]||'').trim();
+  return {team:t, parent:par};
 }
-function fmtLast3(g){ return `${g.date||'—'} • ${g.opp||'—'} — ${g.line||'—'}`; }
+const fmtL3 = g => `${g.date||'—'} • ${g.opp||'—'} — ${g.line||'—'}`;
 
-/* ===== data (trimmed; add more as needed) ===== */
+/* ===== data ===== */
 const players = [
   { id:"cody-bellinger", name:"CODY BELLINGER", graduatingClass:2013, currentLevel:"MLB", status:"Active",
-    team:"New York Yankees",
-    frontImg:"https://i.postimg.cc/Y2PVpqNK/new-york-yankees-outfielder-cody-bellinger.jpg",
+    team:"New York Yankees", frontImg:"https://i.postimg.cc/Y2PVpqNK/new-york-yankees-outfielder-cody-bellinger.jpg",
     highSchoolImg:"https://i.postimg.cc/63NyR1qh/01-Bellinger-Front-page-00001.jpg",
-    batting:{avg:".284",hr:"22",rbi:"68",ops:".852"},
+    letterWinnerYears:[2012,2013],
+    batting:{avg:".284",hr:"22",rbi:"68",ops:".852",hits:"—",runs:"—",obp:"—",slg:"—"},
     nextGame:{opponent:"@ BOS", date:"07/15 TUE 7:10 PM ET"},
     last3:[{date:"07/12",opp:"@ BOS",line:"2-4, HR, 2 RBI"},{date:"07/11",opp:"@ BOS",line:"1-3, BB"},{date:"07/10",opp:"vs TOR",line:"0-4"}],
-    rosterYears:[2012,2013]
+    news:[
+      {t:"Sample headline about CODY BELLINGER",u:"#"},
+      {t:"Another relevant story",u:"#"}
+    ],
+    nilPoints:14200
   },
   { id:"patrick-murphy", name:"PATRICK MURPHY", graduatingClass:2013, currentLevel:"KBO", status:"Active",
-    team:"KT Wiz Suwon — KBO",
-    frontImg:"https://i.postimg.cc/gc32dtQG/MURPH.avif",
+    team:"KT Wiz Suwon — KBO", frontImg:"https://i.postimg.cc/gc32dtQG/MURPH.avif",
     highSchoolImg:"https://i.postimg.cc/50qjmqFW/02-Murphy-Front-page-00001.jpg",
-    pitching:{era:"3.22",so:"71",whip:"1.09"},
+    letterWinnerYears:[2012,2013],
+    pitching:{era:"3.22",so:"71",whip:"1.09",ip:"—"},
     nextGame:{opponent:"vs LG", date:"07/19 SAT 5:00 PM"},
-    last3:[{date:"07/12",opp:"vs LG",line:"6.0 IP, 1 ER, 7 K"}],
-    rosterYears:[2012,2013]
+    last3:[{date:"07/13",opp:"vs LG",line:"6.0 IP, 1 ER, 7 K"},{date:"07/06",opp:"@ KIA",line:"5.2 IP, 2 ER, 5 K"},{date:"07/01",opp:"vs SSG",line:"7.0 IP, 0 ER, 8 K"}],
+    news:[{t:"Murphy deals 7K in win",u:"#"}], nilPoints:7800
   },
   { id:"dom-hamel", name:"DOM HAMEL", graduatingClass:2017, currentLevel:"Triple-A", status:"Active",
-    team:"Syracuse Mets — New York Mets",
-    frontImg:"https://i.postimg.cc/rwYchfnt/20250804-151814.jpg",
+    team:"Syracuse Mets — New York Mets", frontImg:"https://i.postimg.cc/rwYchfnt/20250804-151814.jpg",
     highSchoolImg:"https://i.postimg.cc/5012jYK7/23-Hamel-Front-page-00001.jpg",
-    pitching:{era:"3.89",so:"93",whip:"1.18"},
+    letterWinnerYears:[2016,2017],
+    pitching:{era:"3.89",so:"93",whip:"1.18",ip:"—"},
     nextGame:{opponent:"@ WOR", date:"07/20 SUN 1:05 PM"},
-    last3:[{date:"07/13",opp:"@ WOR",line:"5.0 IP, 2 ER, 9 K"}],
-    rosterYears:[2016,2017]
+    last3:[{date:"07/13",opp:"@ WOR",line:"5.0 IP, 2 ER, 9 K"},{date:"07/08",opp:"vs ROC",line:"6.0 IP, 1 ER, 6 K"},{date:"07/02",opp:"vs ROC",line:"4.2 IP, 4 ER, 5 K"}],
+    news:[{t:"Hamel punches out nine",u:"#"}], nilPoints:6200
   },
   { id:"brock-selvidge", name:"BROCK SELVIDGE", graduatingClass:2021, currentLevel:"Double-A", status:"Active",
-    team:"Somerset Patriots — New York Yankees",
-    frontImg:"https://i.postimg.cc/W3K6jZ9W/image.jpg",
+    team:"Somerset Patriots — New York Yankees", frontImg:"https://i.postimg.cc/W3K6jZ9W/image.jpg",
     highSchoolImg:"https://i.postimg.cc/xdLd0y5N/22-Selvidge-Front-page-00001.jpg",
-    last3:[], rosterYears:[2018,2019,2020,2021]
+    letterWinnerYears:[2018,2019,2020,2021],
+    news:[], nilPoints:4100
   },
   { id:"luke-thiele", name:"LUKE THIELE", graduatingClass:2021, currentLevel:"NCAA-D1", status:"Active",
-    team:"Washington State — Pac-12",
-    frontImg:"https://i.postimg.cc/3wWnWwYz/luke-theil.webp",
+    team:"Washington State — Pac-12", frontImg:"https://i.postimg.cc/3wWnWwYz/luke-theil.webp",
     highSchoolImg:"https://i.postimg.cc/LXYrnvvj/45-Thiele-Front-page-00001.jpg",
-    last3:[], rosterYears:[2020,2021]
+    letterWinnerYears:[2020,2021],
+    news:[], nilPoints:1200
   },
   { id:"logan-boyer", name:"LOGAN BOYER", graduatingClass:2016, currentLevel:"Triple-A", status:"Active",
-    team:"Oklahoma City — Los Angeles Dodgers",
-    frontImg:"https://i.postimg.cc/c1Kq8Dkv/Logan-Boyer.jpg",
+    team:"Oklahoma City — Los Angeles Dodgers", frontImg:"https://i.postimg.cc/c1Kq8Dkv/Logan-Boyer.jpg",
     highSchoolImg:"https://i.postimg.cc/mgzDnGFw/11-Boyer-Front-page-00001.jpg",
-    last3:[], rosterYears:[2014,2015,2016]
+    letterWinnerYears:[2014,2015,2016],
+    news:[], nilPoints:3000
   },
   { id:"shane-murphy", name:"SHANE MURPHY", graduatingClass:2019, currentLevel:"Triple-A", status:"Active",
-    team:"Birmingham Barons — Chicago White Sox",
-    frontImg:"https://i.postimg.cc/HL7zvBWZ/Shane-Murphy-Birmingham-Barons-Chicago-White-Sox.jpg",
+    team:"Birmingham Barons — Chicago White Sox", frontImg:"https://i.postimg.cc/HL7zvBWZ/Shane-Murphy-Birmingham-Barons-Chicago-White-Sox.jpg",
     highSchoolImg:"https://i.postimg.cc/90gmxxmK/26-Murphy-Front-page-00001.jpg",
-    last3:[], rosterYears:[2016,2017,2018,2019]
+    letterWinnerYears:[2016,2017,2018,2019],
+    news:[], nilPoints:2200
   },
   { id:"drew-swift", name:"DREW SWIFT", graduatingClass:2017, currentLevel:"Triple-A", status:"Active",
-    team:"Las Vegas Aviators — Athletics",
-    frontImg:"https://i.postimg.cc/GmmSKFsV/AISelect-20250826-023939-Instagram.jpg",
+    team:"Las Vegas Aviators — Athletics", frontImg:"https://i.postimg.cc/GmmSKFsV/AISelect-20250826-023939-Instagram.jpg",
     highSchoolImg:"https://i.postimg.cc/zXf3nhz4/04-Swift-Front-page-00001.jpg",
-    last3:[], rosterYears:[2014,2015,2016,2017]
+    letterWinnerYears:[2014,2015,2016,2017],
+    news:[], nilPoints:5100
   },
   { id:"tyler-wilson", name:"TYLER WILSON", graduatingClass:2021, currentLevel:"High-A", status:"Active",
-    team:"Hudson Valley Renegades — New York Yankees",
-    frontImg:"https://i.postimg.cc/0Qh0Ymqg/Tyler-Wilson-Now.jpg",
+    team:"Hudson Valley Renegades — New York Yankees", frontImg:"https://i.postimg.cc/0Qh0Ymqg/Tyler-Wilson-Now.jpg",
     highSchoolImg:"https://i.postimg.cc/1XZJx67G/34-Wilson-Front-page-00001.jpg",
-    last3:[], rosterYears:[2018,2019,2020]
+    letterWinnerYears:[2018,2019,2020],
+    news:[], nilPoints:1800
   },
   { id:"roch-cholowsky", name:"ROCH CHOLOWSKY", graduatingClass:2023, currentLevel:"NCAA-D1", status:"Active",
-    team:"UCLA — Big Ten",
-    frontImg:"https://i.postimg.cc/xdvPvq1q/Roch2.jpg",
+    team:"UCLA — Big Ten", frontImg:"https://i.postimg.cc/xdvPvq1q/Roch2.jpg",
     highSchoolImg:"https://i.postimg.cc/fyXng59M/roch2.jpg",
-    last3:[], rosterYears:[2020,2021,2022,2023]
+    letterWinnerYears:[2020,2021,2022,2023],
+    news:[], nilPoints:1400
   },
   { id:"shane-anderson", name:"SHANE ANDERSON", graduatingClass:2020, currentLevel:"NAIA", status:"Active",
-    team:"Georgia Gwinnett — CAC",
-    frontImg:"https://i.postimg.cc/J4j5XP4M/IMG-20250826-030341.jpg",
+    team:"Georgia Gwinnett — CAC", frontImg:"https://i.postimg.cc/J4j5XP4M/IMG-20250826-030341.jpg",
     highSchoolImg:"https://i.postimg.cc/SNj7TkrQ/AISelect-20250826-031127-Gallery-1.jpg",
-    last3:[], rosterYears:[2020]
+    letterWinnerYears:[2020],
+    news:[], nilPoints:900
+  },
+  { id:"chaz-deluca", name:"CHAZ DELUCA", graduatingClass:2017, currentLevel:"High-A", status:"Retired",
+    team:"Aberdeen IronBirds — Orioles (Player Development)", frontImg:"https://i.postimg.cc/rp0T753Z/IMG-7630.jpg",
+    highSchoolImg:"https://i.postimg.cc/v8xHxwmx/AISelect-20250729-224953-System-UI.jpg",
+    letterWinnerYears:[2016,2017],
+    pitching:{era:"6.17",so:"129",whip:"1.73",ip:"132.2"},
+    news:[{t:"DeLuca joins IronBirds staff",u:"#"}], nilPoints:0
   }
 ];
 
 /* ===== render ===== */
 function makeCard(p){
   const lvl = lvlClass(p.currentLevel);
-  const {team, parent} = teamAndParent(p);
+  const {team, parent} = teamParent(p);
   const imgFront = imgTag(p.frontImg || p.highSchoolImg, p.name||'', p.highSchoolImg || '');
+
+  // social icons (compact SVG)
+  const svgX = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 4h3l5 7 6-7h2l-6.6 7.6L20 20h-3l-5.4-7-6 7H3l6.8-7.9L4 4z"/></svg>';
+  const svgIG = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5zm0 2a3 3 0 0 0-3 3v10a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3V7a3 3 0 0 0-3-3H7zm5 4.5A4.5 4.5 0 1 1 7.5 13 4.5 4.5 0 0 1 12 8.5zm0 2A2.5 2.5 0 1 0 14.5 13 2.5 2.5 0 0 0 12 10.5zm5-3a1 1 0 1 1-1 1 1 1 0 0 1 1-1z"/></svg>';
+  const svgNews = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 5h14a2 2 0 0 1 2 2v9a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3V7a2 2 0 0 1 2-2zm2 3v2h10V8H6zm0 4v2h7v-2H6z"/></svg>';
+  const svgNil = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 12a8 8 0 1 1 8 8H9a1 1 0 0 1 0-2h3a6 6 0 1 0-6-6 1 1 0 1 1-2 0z"/></svg>';
+  const svgShop = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 7h18l-1 12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2L3 7zm2-4h14l2 4H3l2-4z"/></svg>';
+
+  const statsBlock = p.batting
+    ? (makeKV('AVG',p.batting.avg)+makeKV('HR',p.batting.hr)+makeKV('RBI',p.batting.rbi)+makeKV('OPS',p.batting.ops)+
+       makeKV('HITS',p.batting.hits)+makeKV('RUNS',p.batting.runs)+makeKV('OBP',p.batting.obp)+makeKV('SLG',p.batting.slg))
+    : (makeKV('ERA',p.pitching?.era)+makeKV('SO',p.pitching?.so)+makeKV('WHIP',p.pitching?.whip)+makeKV('IP',p.pitching?.ip||'—')+
+       makeKV('APP',p.pitching?.app||'—')+makeKV('ER',p.pitching?.er||'—')+makeKV('K/9',p.pitching?.k9||'—')+makeKV('BB',p.pitching?.bb||'—'));
+
+  const l3 = (p.last3&&p.last3.length)
+    ? `<div class="row">${fmtL3(p.last3[0])}</div>
+       <div class="row">${fmtL3(p.last3[1]||{})}</div>
+       <div class="row">${fmtL3(p.last3[2]||{})}</div>`
+    : `<div class="row">—</div>`;
 
   return `
 <div class="card-wrap">
@@ -370,105 +405,111 @@ function makeCard(p){
       <div class="front-anchor info-left">
         <div class="name">${(p.name||'').toUpperCase()}</div>
         <div class="team">${team}</div>
-        <div class="parent">${parent||' '}</div>
-        <div class="tag-stack">
+        <div class="parent">${parent||''}</div>
+        <div class="chips">
           ${p.currentLevel? `<span class="chip ${lvl}">${String(p.currentLevel).toUpperCase()}</span>` : ``}
-          ${p.status? `<span class="chip status ${String(p.status).toLowerCase()==='retired'?'retired':''}">${String(p.status).toUpperCase()}</span>`:``}
-          ${p.graduatingClass? `<span class="chip class">CLASS OF ${p.graduatingClass}</span>`:``}
+          ${p.status? `<span class="chip ${String(p.status).toLowerCase()==='active'?'ok':'dim'}">${String(p.status).toUpperCase()}</span>`:``}
+          ${p.graduatingClass? `<span class="chip dim">CLASS OF ${p.graduatingClass}</span>`:``}
         </div>
       </div>
 
       <!-- RIGHT block -->
-      <div class="front-anchor info-right" style="top:75%">
-        <div class="right-block-title">NEXT GAME</div>
-        <div class="right-line">${p.nextGame?.opponent || '—'}</div>
-        <div class="right-line">${p.nextGame?.date || '—'}</div>
+      <div class="front-anchor info-right">
+        <div class="next-title">NEXT GAME</div>
+        <div class="next-line">${p.nextGame?.opponent || '—'}</div>
+        <div class="next-line">${p.nextGame?.date || '—'}</div>
+      </div>
 
-        <div class="last3">
-          <div class="right-block-title">LAST 3 GAMES</div>
-          <div class="item">${p.last3?.[0] ? fmtLast3(p.last3[0]) : '—'}</div>
-          <div class="item">${p.last3?.[1] ? fmtLast3(p.last3[1]) : '—'}</div>
-          <div class="item">${p.last3?.[2] ? fmtLast3(p.last3[2]) : '—'}</div>
-        </div>
+      <div class="last3">
+        <div class="ttl">LAST 3 GAMES</div>
+        ${l3}
       </div>
     </section>
 
     <!-- BACK -->
     <section class="face back-face">
-      <div class="stats-main">
-        <div class="stats-head">
-          <div>
-            <div class="stats-name">${(p.name||'').toUpperCase()}</div>
-            <div class="muted">${p.team||''}</div>
-            <div class="muted" style="margin-top:4px;">Hamilton Class of ${p.graduatingClass||'—'}</div>
-          </div>
+      <div class="back-top">
+        <div class="back-title">
+          <div class="back-name">${(p.name||'').toUpperCase()}</div>
+          <div class="back-sub">${p.team||''}</div>
+          <div class="back-sub">Hamilton Class of ${p.graduatingClass||'—'}</div>
         </div>
-
-        <div class="small" style="font-weight:800;letter-spacing:.02em;color:#374151;text-transform:uppercase;">Season Stats</div>
-
-        ${
-          p.batting ? `
-            <div class="kv-wrap">
-              ${makeKV('AVG',p.batting.avg)}${makeKV('HR',p.batting.hr)}${makeKV('RBI',p.batting.rbi)}${makeKV('OPS',p.batting.ops)}
-              ${makeKV('—','—')}${makeKV('—','—')}${makeKV('—','—')}${makeKV('—','—')}
-            </div>` :
-          p.pitching ? `
-            <div class="kv-wrap">
-              ${makeKV('ERA',p.pitching.era)}${makeKV('SO',p.pitching.so)}${makeKV('WHIP',p.pitching.whip)}${makeKV('IP','—')}
-              ${makeKV('—','—')}${makeKV('—','—')}${makeKV('—','—')}${makeKV('—','—')}
-            </div>` :
-          `<div class="kv-wrap">${makeKV('—','—')}${makeKV('—','—')}${makeKV('—','—')}${makeKV('—','—')}${makeKV('—','—')}${makeKV('—','—')}${makeKV('—','—')}${makeKV('—','—')}</div>`
-        }
-
-        <div style="font-weight:800;margin:10px 0 6px;">Last 3 Games</div>
-        <table>
-          <thead><tr><th>Date</th><th>OPP</th><th>Line</th></tr></thead>
-          <tbody>
-            ${(p.last3||[]).map(g=>`<tr><td>${g.date||'—'}</td><td>${g.opp||'—'}</td><td>${g.line||'—'}</td></tr>`).join('') || '<tr><td colspan="3">—</td></tr>'}
-          </tbody>
-        </table>
+        <img class="hs-thumb" src="${(p.highSchoolImg||p.frontImg||'').replace(/"/g,'&quot;')}" alt="${(p.name||'HS').replace(/"/g,'&quot;')}">
       </div>
 
-      <img class="hs-topright" src="${(p.highSchoolImg||'').replace(/"/g,'&quot;')}" alt="${(p.name||'HS').replace(/"/g,'&quot;')}"
-           onerror="this.onerror=null;this.style.display='none';">
+      <div class="actbar" data-player="${p.id}">
+        <button class="actbtn active" data-pane="news" title="News">${svgNews}</button>
+        <button class="actbtn" data-pane="x" title="X (Twitter)">${svgX}</button>
+        <button class="actbtn" data-pane="ig" title="Instagram">${svgIG}</button>
+        <button class="actbtn" data-pane="nil" title="NIL Points">${svgNil}</button>
+        <button class="actbtn" data-pane="yab" title="YAT-A-BOY">${svgShop}</button>
+      </div>
+
+      <div class="content-area">
+        <div class="pane active" data-pane="news">
+          <div class="news-list">
+            ${(p.news&&p.news.length)? `<ul>${p.news.map(n=>`<li><a href="${n.u}">${n.t}</a></li>`).join('')}</ul>` : 'No headlines yet.'}
+          </div>
+        </div>
+        <div class="pane" data-pane="x">
+          <div class="news-list">Embedded X feed coming soon.</div>
+        </div>
+        <div class="pane" data-pane="ig">
+          <div class="news-list">Embedded Instagram feed coming soon.</div>
+        </div>
+        <div class="pane" data-pane="nil">
+          <div class="news-list"><b>NIL Points:</b> ${ (p.nilPoints??0).toLocaleString() }</div>
+        </div>
+        <div class="pane" data-pane="yab">
+          <div class="news-list">Marketplace items will appear here.</div>
+        </div>
+      </div>
+
+      <div class="kv-wrap">
+        ${statsBlock}
+      </div>
     </section>
   </div>
 </article>
 </div>`;
 }
 
-function render(list){ byId('grid').innerHTML = list.map(makeCard).join(''); }
+function render(list){
+  const grid = byId('grid');
+  grid.innerHTML = list.map(makeCard).join('');
+  attachInteractions();
+}
 
-/* ===== filters ===== */
+/* ===== filters & sorting ===== */
 function populateFilters(){
-  const classes={}, levels={}, rosterY={};
+  const classes={}, levels={}, rosterYears={};
   players.forEach(p=>{
     if(p.graduatingClass) classes[p.graduatingClass]=1;
     if(p.currentLevel) levels[p.currentLevel]=1;
-    (p.rosterYears||[]).forEach(y=> rosterY[y]=1);
+    (p.letterWinnerYears||[]).forEach(y=> rosterYears[y]=1);
   });
-  const grads = Object.keys(classes).map(Number).filter(n=>!Number.isNaN(n)).sort((a,b)=>b-a);
+  const grads = Object.keys(classes).map(Number).filter(n=>!Number.isNaN(n)).sort((a,b)=>a-b); // earliest -> recent
   const lvls  = Object.keys(levels);
-  const years = Object.keys(rosterY).map(Number).sort((a,b)=>b-a);
+  const years = Object.keys(rosterYears).map(Number).sort((a,b)=>a-b);
 
-  const gSel = byId('grad'), lSel = byId('lvl'), rSel=byId('roster');
-  if(gSel){ gSel.innerHTML = '<option value="">ALL GRAD CLASSES</option>'; grads.forEach(c=>{ const o=document.createElement('option'); o.value=c; o.textContent=c; gSel.appendChild(o); }); }
-  if(lSel){ lSel.innerHTML = '<option value="">ALL LEVELS</option>'; lvls.forEach(l=>{ const o=document.createElement('option'); o.value=l; o.textContent=l; lSel.appendChild(o); }); }
-  if(rSel){ rSel.innerHTML = '<option value="">ROSTER YEAR</option>'; years.forEach(y=>{ const o=document.createElement('option'); o.value=y; o.textContent=y; rSel.appendChild(o); }); }
+  const gSel = byId('grad'), lSel = byId('lvl'), rSel = byId('roster');
+  if(gSel){ gSel.innerHTML = '<option value="">ALL GRAD CLASSES</option>'+grads.map(c=>`<option value="${c}">${c}</option>`).join(''); }
+  if(lSel){ lSel.innerHTML = '<option value="">ALL LEVELS</option>'+lvls.map(l=>`<option value="${l}">${l}</option>`).join(''); }
+  if(rSel){ rSel.innerHTML = '<option value="">ROSTER YEAR</option>'+years.map(y=>`<option value="${y}">${y}</option>`).join(''); }
 }
 function applyFilters(){
-  const q=(byId('q')?.value||'').toLowerCase(), g=byId('grad')?.value, l=byId('lvl')?.value, ry=byId('roster')?.value;
+  const q=(byId('q')?.value||'').toLowerCase(), g=byId('grad')?.value, l=byId('lvl')?.value, r=byId('roster')?.value;
   const out=players.filter(p=>{
     if(q && !(p.name||'').toLowerCase().includes(q)) return false;
     if(g && String(p.graduatingClass)!==g) return false;
     if(l && p.currentLevel!==l) return false;
-    if(ry && !(p.rosterYears||[]).includes(Number(ry))) return false;
+    if(r && !(p.letterWinnerYears||[]).includes(Number(r))) return false;
     return true;
-  });
-  render(out); attachInteractions();
+  }).sort((a,b)=>a.graduatingClass-b.graduatingClass); // earliest -> recent
+  render(out);
 }
 
-/* ===== flip interactions ===== */
+/* ===== flip interactions (links-safe) ===== */
 function toggle(card){
   if(!card) return;
   card.classList.contains('front')
@@ -497,6 +538,17 @@ document.addEventListener('touchend', e=>{
 function attachInteractions(){
   document.querySelectorAll('.card').forEach(card=>{
     if(!card.classList.contains('front') && !card.classList.contains('back')) card.classList.add('front');
+    // action buttons on back
+    card.querySelectorAll('.actbar .actbtn').forEach(btn=>{
+      btn.addEventListener('click', (ev)=>{
+        const bar = btn.closest('.actbar');
+        bar.querySelectorAll('.actbtn').forEach(b=>b.classList.remove('active'));
+        btn.classList.add('active');
+        const pane = btn.getAttribute('data-pane');
+        const content = card.querySelector('.content-area');
+        content.querySelectorAll('.pane').forEach(p => p.classList.toggle('active', p.getAttribute('data-pane')===pane));
+      });
+    });
   });
 }
 
@@ -518,12 +570,12 @@ scrim.addEventListener('click', closeDrawers);
 /* ===== boot ===== */
 document.addEventListener('DOMContentLoaded', ()=>{
   populateFilters();
-  render(players);
+  // initial render sorted by earliest -> most recent grads
+  render([...players].sort((a,b)=>a.graduatingClass-b.graduatingClass));
   byId('q')?.addEventListener('input', applyFilters);
   byId('grad')?.addEventListener('change', applyFilters);
   byId('lvl')?.addEventListener('change', applyFilters);
   byId('roster')?.addEventListener('change', applyFilters);
-  attachInteractions();
 });
 </script>
 </body>
