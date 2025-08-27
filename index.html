@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>YAT?STATS • Hamilton — Two-Side Flip Card (v3.2.1)</title>
+<title>YAT?STATS • Hamilton — Two-Side Flip Card (v3.2.2)</title>
 
 <style>
   :root{
@@ -67,7 +67,6 @@
   /* FRONT */
   .front-face{transform:rotateY(0)}
   .card-img{position:absolute; inset:0; width:100%; height:100%; object-fit:cover; background:#111}
-  /* darker + taller gradient */
   .bottom-grad{
     position:absolute; left:0; right:0; bottom:0; height:70%;
     background:linear-gradient(to top,
@@ -78,8 +77,8 @@
     pointer-events:none; z-index:1;
   }
 
-  /* anchored layout */
-  .front-anchor{position:absolute; top:66%; transform:translateY(-50%); z-index:3; color:#fff; text-shadow:0 1px 2px rgba(0,0,0,.45)}
+  /* anchored layout (moved from 66% -> 70%) */
+  .front-anchor{position:absolute; top:70%; transform:translateY(-50%); z-index:3; color:#fff; text-shadow:0 1px 2px rgba(0,0,0,.45)}
   .info-left{left:12px; right:52%}
   .info-right{right:12px; left:52%; text-align:right}
 
@@ -121,7 +120,6 @@
 
   .stats-aside{width:32%; min-width:160px; position:relative; background:#f8fafc; border-left:1px solid var(--ring); display:flex; align-items:center; justify-content:center; padding:12px}
   .hs-frame{width:100%; aspect-ratio:3/4; background:#dfe3e8; border:2px solid #b5b9bf; box-shadow:inset 0 0 0 6px #e9ecef; position:relative}
-  /* fill the frame now that ribbon is gone */
   .hs-img{position:absolute; inset:10px; width:calc(100% - 20px); height:calc(100% - 20px); object-fit:cover; background:#222}
   @media (max-width:640px){ .stats-aside{display:none} .hs-thumb{display:inline-block} }
 
@@ -164,7 +162,7 @@
 </head>
 <body>
 
-<div class="build">BUILD: ham-v3.2.1</div>
+<div class="build">BUILD: ham-v3.2.2</div>
 
 <header class="site-header">
   <div class="left-fixed">
@@ -258,97 +256,121 @@ function teamAndParent(p){
   const parts = raw.split('—');
   const team = parts[0]?.trim() || raw;
   let parent = (parts[1]||'').trim();
-  if(!parent){
-    if((p.currentLevel||'').toUpperCase()==='MLB') parent='MLB';
-  }
+  if(!parent && (p.currentLevel||'').toUpperCase()==='MLB') parent='MLB';
   return {team, parent};
 }
 function fmtOpp(s){ return s||'—'; }
 function fmtLast3(g){ return `${g.date||'—'} • ${g.opp||'—'} — ${g.line||'—'}`; }
 
-/* data */
+/* ===== DUMMY DEMO DATA (fictional for preview) ===== */
 const players = [
   { id:"cody-bellinger", name:"CODY BELLINGER", graduatingClass:2013, currentLevel:"MLB", status:"Active",
     position:"CF/1B", team:"New York Yankees",
     frontImg:"https://i.postimg.cc/Y2PVpqNK/new-york-yankees-outfielder-cody-bellinger.jpg",
     highSchoolImg:"https://i.postimg.cc/63NyR1qh/01-Bellinger-Front-page-00001.jpg",
-    batting:{avg:".284",hr:"22",rbi:"68",ops:".852"},
+    batting:{avg:".286",hr:"24",rbi:"72",ops:".865"},
     lastGame:{line:"2-4, HR, 2 RBI"},
-    nextGame:{opponent:"@ BOS", date:"07/15 TUE 7:10 PM ET"},
-    last3:[{date:"07/12",opp:"@ BOS",line:"2-4, HR, 2 RBI"},{date:"07/11",opp:"@ BOS",line:"1-3, BB"},{date:"07/10",opp:"vs TOR",line:"0-4"}]
+    nextGame:{opponent:"@ BOS", date:"08/27 TUE 7:10 PM ET"},
+    last3:[{date:"08/24",opp:"@ BOS",line:"2-4, HR, 2 RBI"},{date:"08/23",opp:"@ BOS",line:"1-3, BB"},{date:"08/22",opp:"vs TOR",line:"0-4"}]
   },
   { id:"patrick-murphy", name:"PATRICK MURPHY", graduatingClass:2013, currentLevel:"KBO", status:"Active",
     position:"P", team:"KT Wiz Suwon — KBO",
     frontImg:"https://i.postimg.cc/gc32dtQG/MURPH.avif",
     highSchoolImg:"https://i.postimg.cc/50qjmqFW/02-Murphy-Front-page-00001.jpg",
-    pitching:{era:"3.22",so:"71",whip:"1.09"},
+    pitching:{era:"3.18",so:"78",whip:"1.11"},
     lastGame:{line:"6.0 IP, 1 ER, 7 K"},
-    nextGame:{opponent:"vs LG", date:"07/19 SAT 5:00 PM"},
-    last3:[{date:"07/12",opp:"vs LG",line:"6.0 IP, 1 ER, 7 K"},{date:"07/06",opp:"@ KIA",line:"5.2 IP, 2 ER, 5 K"},{date:"07/01",opp:"vs SSG",line:"7.0 IP, 0 ER, 8 K"}]
+    nextGame:{opponent:"vs LG", date:"08/28 WED 5:00 PM"},
+    last3:[{date:"08/24",opp:"vs LG",line:"6.0 IP, 1 ER, 7 K"},{date:"08/18",opp:"@ KIA",line:"5.2 IP, 2 ER, 5 K"},{date:"08/12",opp:"vs SSG",line:"7.0 IP, 0 ER, 8 K"}]
   },
   { id:"dom-hamel", name:"DOM HAMEL", graduatingClass:2017, currentLevel:"Triple-A", status:"Active",
     position:"P", team:"Syracuse Mets — New York Mets",
     frontImg:"https://i.postimg.cc/rwYchfnt/20250804-151814.jpg",
     highSchoolImg:"https://i.postimg.cc/5012jYK7/23-Hamel-Front-page-00001.jpg",
-    pitching:{era:"3.89",so:"93",whip:"1.18"},
+    pitching:{era:"3.92",so:"101",whip:"1.20"},
     lastGame:{line:"5.0 IP, 2 ER, 9 K"},
-    nextGame:{opponent:"@ WOR", date:"07/20 SUN 1:05 PM"},
-    last3:[{date:"07/13",opp:"@ WOR",line:"5.0 IP, 2 ER, 9 K"},{date:"07/08",opp:"vs ROC",line:"6.0 IP, 1 ER, 6 K"},{date:"07/02",opp:"vs ROC",line:"4.2 IP, 4 ER, 5 K"}]
+    nextGame:{opponent:"@ WOR", date:"08/29 THU 1:05 PM"},
+    last3:[{date:"08/25",opp:"@ WOR",line:"5.0 IP, 2 ER, 9 K"},{date:"08/20",opp:"vs ROC",line:"6.0 IP, 1 ER, 6 K"},{date:"08/14",opp:"vs ROC",line:"4.2 IP, 4 ER, 5 K"}]
   },
   { id:"brock-selvidge", name:"BROCK SELVIDGE", graduatingClass:2021, currentLevel:"Double-A", status:"Active",
     position:"P", team:"Somerset Patriots — New York Yankees",
     frontImg:"https://i.postimg.cc/W3K6jZ9W/image.jpg",
     highSchoolImg:"https://i.postimg.cc/xdLd0y5N/22-Selvidge-Front-page-00001.jpg",
-    lastGame:{line:"—"}, nextGame:{opponent:"—",date:"—"}, last3:[]
+    pitching:{era:"3.45",so:"87",whip:"1.22"},
+    lastGame:{line:"5.1 IP, 2 ER, 6 K"},
+    nextGame:{opponent:"vs POR", date:"08/27 TUE 7:05 PM"},
+    last3:[{date:"08/22",opp:"vs POR",line:"5.1 IP, 2 ER, 6 K"},{date:"08/16",opp:"@ HFD",line:"6.0 IP, 1 ER, 7 K"},{date:"08/10",opp:"vs RIC",line:"5.0 IP, 3 ER, 5 K"}]
   },
   { id:"luke-thiele", name:"LUKE THIELE", graduatingClass:2021, currentLevel:"NCAA-D1", status:"Active",
     position:"IF", team:"Washington State — Pac-12",
     frontImg:"https://i.postimg.cc/3wWnWwYz/luke-theil.webp",
     highSchoolImg:"https://i.postimg.cc/LXYrnvvj/45-Thiele-Front-page-00001.jpg",
-    lastGame:{line:"—"}, nextGame:{opponent:"—",date:"—"}, last3:[]
+    batting:{avg:".302",hr:"6",rbi:"31",ops:".823"},
+    lastGame:{line:"1-4, 2B, RBI"},
+    nextGame:{opponent:"vs ORE", date:"09/01 SUN 1:00 PM"},
+    last3:[{date:"08/24",opp:"vs ORE",line:"1-4, 2B, RBI"},{date:"08/22",opp:"@ WASH",line:"2-5, R"},{date:"08/20",opp:"vs USC",line:"0-3, BB"}]
   },
   { id:"logan-boyer", name:"LOGAN BOYER", graduatingClass:2016, currentLevel:"Triple-A", status:"Active",
     position:"P", team:"Oklahoma City — Los Angeles Dodgers",
     frontImg:"https://i.postimg.cc/c1Kq8Dkv/Logan-Boyer.jpg",
     highSchoolImg:"https://i.postimg.cc/mgzDnGFw/11-Boyer-Front-page-00001.jpg",
-    lastGame:{line:"—"}, nextGame:{opponent:"—",date:"—"}, last3:[]
+    pitching:{era:"3.60",so:"64",whip:"1.19"},
+    lastGame:{line:"1.2 IP, 0 ER, 3 K"},
+    nextGame:{opponent:"@ ABQ", date:"08/27 TUE 7:05 PM"},
+    last3:[{date:"08/24",opp:"@ ABQ",line:"1.2 IP, 0 ER, 3 K"},{date:"08/21",opp:"vs SAC",line:"1.0 IP, 1 ER, 2 K"},{date:"08/18",opp:"vs SAC",line:"2.0 IP, 0 ER, 1 K"}]
   },
   { id:"shane-murphy", name:"SHANE MURPHY", graduatingClass:2019, currentLevel:"Triple-A", status:"Active",
     position:"P", team:"Birmingham Barons — Chicago White Sox",
     frontImg:"https://i.postimg.cc/HL7zvBWZ/Shane-Murphy-Birmingham-Barons-Chicago-White-Sox.jpg",
     highSchoolImg:"https://i.postimg.cc/90gmxxmK/26-Murphy-Front-page-00001.jpg",
-    lastGame:{line:"—"}, nextGame:{opponent:"—",date:"—"}, last3:[]
+    pitching:{era:"4.05",so:"92",whip:"1.28"},
+    lastGame:{line:"6.0 IP, 3 ER, 8 K"},
+    nextGame:{opponent:"vs TNS", date:"08/30 FRI 7:30 PM"},
+    last3:[{date:"08/24",opp:"vs TNS",line:"6.0 IP, 3 ER, 8 K"},{date:"08/18",opp:"@ PNS",line:"5.0 IP, 2 ER, 5 K"},{date:"08/12",opp:"vs RCT",line:"7.0 IP, 1 ER, 7 K"}]
   },
   { id:"drew-swift", name:"DREW SWIFT", graduatingClass:2017, currentLevel:"Triple-A", status:"Active",
     position:"SS", team:"Las Vegas Aviators — Athletics",
     frontImg:"https://i.postimg.cc/GmmSKFsV/AISelect-20250826-023939-Instagram.jpg",
     highSchoolImg:"https://i.postimg.cc/zXf3nhz4/04-Swift-Front-page-00001.jpg",
-    lastGame:{line:"—"}, nextGame:{opponent:"—",date:"—"}, last3:[]
+    batting:{avg:".276",hr:"9",rbi:"44",ops:".781"},
+    lastGame:{line:"2-5, 2B, RBI"},
+    nextGame:{opponent:"@ SL", date:"08/27 TUE 6:35 PM"},
+    last3:[{date:"08/24",opp:"@ SL",line:"2-5, 2B, RBI"},{date:"08/23",opp:"@ SL",line:"1-3, BB, SB"},{date:"08/22",opp:"vs REN",line:"1-4"}]
   },
   { id:"tyler-wilson", name:"TYLER WILSON", graduatingClass:2021, currentLevel:"High-A", status:"Active",
     position:"LF/RF", team:"Hudson Valley Renegades — New York Yankees",
     frontImg:"https://i.postimg.cc/0Qh0Ymqg/Tyler-Wilson-Now.jpg",
     highSchoolImg:"https://i.postimg.cc/1XZJx67G/34-Wilson-Front-page-00001.jpg",
-    lastGame:{line:"—"}, nextGame:{opponent:"—",date:"—"}, last3:[]
+    batting:{avg:".268",hr:"11",rbi:"39",ops:".762"},
+    lastGame:{line:"1-4, HR, 2 RBI"},
+    nextGame:{opponent:"vs BRK", date:"08/28 WED 7:05 PM"},
+    last3:[{date:"08/24",opp:"vs BRK",line:"1-4, HR, 2 RBI"},{date:"08/23",opp:"@ HV",line:"2-4, 2B"},{date:"08/22",opp:"@ HV",line:"0-4"}]
   },
   { id:"roch-cholowsky", name:"ROCH CHOLOWSKY", graduatingClass:2023, currentLevel:"NCAA-D1", status:"Active",
     position:"SS", team:"UCLA — Big Ten",
     frontImg:"https://i.postimg.cc/xdvPvq1q/Roch2.jpg",
     highSchoolImg:"https://i.postimg.cc/fyXng59M/roch2.jpg",
-    lastGame:{line:"—"}, nextGame:{opponent:"—",date:"—"}, last3:[]
+    batting:{avg:".291",hr:"7",rbi:"36",ops:".807"},
+    lastGame:{line:"3-5, 2B, RBI"},
+    nextGame:{opponent:"@ NEB", date:"09/05 THU 6:30 PM"},
+    last3:[{date:"08/24",opp:"@ NEB",line:"3-5, 2B, RBI"},{date:"08/22",opp:"@ IOWA",line:"1-4"},{date:"08/20",opp:"vs MSU",line:"2-4, R"}]
   },
   { id:"shane-anderson", name:"SHANE ANDERSON", graduatingClass:2020, currentLevel:"NAIA", status:"Active",
     position:"P", team:"Georgia Gwinnett — CAC",
     frontImg:"https://i.postimg.cc/J4j5XP4M/IMG-20250826-030341.jpg",
     highSchoolImg:"https://i.postimg.cc/SNj7TkrQ/AISelect-20250826-031127-Gallery-1.jpg",
-    lastGame:{line:"—"}, nextGame:{opponent:"—",date:"—"}, last3:[]
+    pitching:{era:"2.88",so:"74",whip:"1.06"},
+    lastGame:{line:"7.0 IP, 1 ER, 8 K"},
+    nextGame:{opponent:"vs CIU", date:"09/02 MON 6:00 PM"},
+    last3:[{date:"08/23",opp:"vs CIU",line:"7.0 IP, 1 ER, 8 K"},{date:"08/17",opp:"@ CU",line:"6.1 IP, 2 ER, 7 K"},{date:"08/10",opp:"vs WU",line:"5.0 IP, 0 ER, 5 K"}]
   },
   { id:"chaz-deluca", name:"CHAZ DELUCA", graduatingClass:2017, currentLevel:"Retired", status:"Retired",
     position:"P • Player Development", team:"Aberdeen IronBirds — Orioles",
     frontImg:"https://i.postimg.cc/rp0T753Z/IMG-7630.jpg",
     highSchoolImg:"https://i.postimg.cc/v8xHxwmx/AISelect-20250729-224953-System-UI.jpg",
     pitching:{era:"6.17",so:"129",whip:"1.73"},
-    lastGame:{line:"—"}, nextGame:{opponent:"—",date:"—"}, last3:[]
+    lastGame:{line:"N/A — Retired"},
+    nextGame:{opponent:"—", date:"—"},
+    last3:[{date:"—",opp:"—",line:"—"},{date:"—",opp:"—",line:"—"},{date:"—",opp:"—",line:"—"}]
   }
 ];
 
