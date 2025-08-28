@@ -1,3 +1,27 @@
+/* --- back: icon-only toolbar --- */
+.icon-row{display:flex;gap:8px;margin-top:8px}
+.icon-pill{
+  width:34px;height:34px;padding:0;border-radius:999px;
+  display:grid;place-items:center;border:1px solid #e5e7eb;background:#fff;
+  font-size:0; /* hide text labels */
+}
+.icon-pill.active{border-color:#111;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.icon-pill .icon{width:18px;height:18px}
+
+/* --- back: mini meta block on the left (DRAFTED / ALSO ATTENDED) --- */
+.mini-meta{margin-top:6px}
+.mini-line{font-size:11px;color:#2b2b2b;line-height:1.25}
+.mini-line .label{font-weight:800;text-transform:uppercase;color:#1f2937;margin-right:6px}
+
+/* --- back: “2025 SEASON STATS” chip next to the toolbar --- */
+.stats-chip{
+  margin-left:auto; align-self:center;
+  display:inline-block; padding:5px 10px; border-radius:999px;
+  background:#0f172a; color:#fff; font-weight:900; font-size:10px; letter-spacing:.12em;
+}
+@media (max-width:520px){ .stats-chip{display:none} } /* hide chip on very small phones */
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -179,15 +203,48 @@
 </head>
 <body>
 
-<div class="build">BUILD: ham-v4.0.3</div>
+<div class="back-top">
+  <div class="back-meta">
+    <div class="stats-name">${(p.name||'').toUpperCase()}</div>
+    <div class="muted">${p.team||''}</div>
 
-<header class="site-header">
-  <div class="left-pack">
-    <button class="hambtn" id="openLeft" aria-label="Open Navigation" title="Menu">
-      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
-    </button>
-    <img class="ham-logo" src="https://i.postimg.cc/NjRf6nGF/hamilton-log-with-3-lines.png" alt="Hamilton HS"/>
+    <!-- extra meta lines (optional) -->
+    <div class="mini-meta">
+      ${p.drafted ? `<div class="mini-line"><span class="label">Drafted</span>${p.drafted}</div>` : ``}
+      ${p.alsoAttended ? `<div class="mini-line"><span class="label">Also Attended</span>${p.alsoAttended}</div>` : ``}
+      ${p.profileUrl ? `<div class="mini-line"><a href="${p.profileUrl}" target="_blank" rel="noopener" class="label">Player Profile Page</a></div>` : ``}
+    </div>
+
+    <!-- toolbar: icon-only -->
+    <div class="icon-row" role="tablist" aria-label="Content tabs">
+      <button class="icon-pill active" data-pane="stats" aria-label="Season Stats">
+        <svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M5 3h2v18H5zM11 10h2v11h-2zM17 6h2v15h-2z"/></svg>
+      </button>
+      <button class="icon-pill" data-pane="news" aria-label="News">
+        <svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M4 5h16v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5zM7 8h10v3H7z"/></svg>
+      </button>
+      <button class="icon-pill" data-pane="x" aria-label="X / Twitter">
+        <svg class="icon" viewBox="0 0 1200 1227" fill="currentColor"><path d="M714 511 1160 0H996L689 356 420 0H0l463 607L0 1227h164l329-379 286 379h420zM327 120h154l646 873H973z"/></svg>
+      </button>
+      <button class="icon-pill" data-pane="ig" aria-label="Instagram">
+        <svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5zm5 5a5 5 0 1 0 0 10 5 5 0 0 0 0-10zM19 6a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"/></svg>
+      </button>
+      <button class="icon-pill" data-pane="nil" aria-label="NIL">
+        <svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l9 4v6c0 5-4 9-9 10C7 21 3 17 3 12V6z"/></svg>
+      </button>
+      <button class="icon-pill" data-pane="yab" aria-label="YAT-A-BOY">
+        <svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M2 12l10-9 10 9-2 0-2 9H6l-2-9z"/></svg>
+      </button>
+
+      <!-- the chip sits at far right of the row -->
+      <span class="stats-chip">2025 SEASON STATS</span>
+    </div>
   </div>
+
+  <div class="hs-quad" aria-hidden="true">
+    <img src="${(p.highSchoolImg||p.frontImg||'').replace(/"/g,'&quot;')}" alt="${(p.name||'HS').replace(/"/g,'&quot;')}" onerror="this.onerror=null;this.style.display='none'">
+  </div>
+</div>
 
   <nav class="nav-desktop">
     <a class="active" href="#">Where They YAT?</a>
