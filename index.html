@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>hamilton.yatstats.com / wheretheyyat — Pilot Microsite • ham-v4.0.4-tabs4-icons</title>
+<title>hamilton.yatstats.com / wheretheyyat — Pilot Microsite • ham-v4.0.5-panes-lock</title>
 
 <style>
   :root{
@@ -16,7 +16,7 @@
 
   .build{position:fixed;left:10px;top:8px;z-index:99;background:rgba(0,0,0,.84);color:#fff;font-size:12px;font-weight:700;border-radius:14px;padding:6px 10px}
 
-  /* Header */
+  /* Header (unchanged basics) */
   .site-header{position:sticky;top:0;z-index:60;height:var(--headerH);background:#fff;border-bottom:1px solid var(--ring);display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:10px;padding:0 10px}
   .left{display:flex;align-items:center;gap:8px}
   .hambtn{width:34px;height:34px;border:0;background:transparent;display:grid;place-items:center;cursor:pointer}
@@ -71,7 +71,7 @@
   .last3 .ttl{font-size:10px;letter-spacing:.16em;color:#e5e7eb}
   .last3 .row{font-size:12px;color:#e5e7eb;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
-  /* edge tap zones (front only) */
+  /* edge tap zones (front only so we don't steal taps from back icons) */
   .edge{position:absolute;top:0;bottom:0;width:28%;background:transparent;border:0;z-index:3}
   .edge.left{left:0}.edge.right{right:0}
   .card.front .edge{pointer-events:auto}
@@ -79,34 +79,41 @@
 
   /* BACK */
   .back-face{transform:rotateY(180deg);background:#fff;color:#111;display:flex;flex-direction:column;height:100%}
-  .back-top{display:flex;gap:12px;align-items:flex-start;padding:12px 12px 8px}
+  /* top area becomes compact + scrollable if needed */
+  .back-top{display:flex;gap:10px;align-items:flex-start;padding:10px 10px 6px;flex:1 1 auto;min-height:0;overflow:auto}
   .meta{flex:1 1 auto;min-width:0}
-  .bt-name{font-weight:900;text-transform:uppercase;letter-spacing:.02em;font-size:16px}
-  .bt-sub{color:#374151;font-size:13px;margin-top:2px}
-  .mini{margin-top:8px}
-  .mini .row{font-size:12px;color:#2b2b2b}
-  .mini .label{font-weight:800;text-transform:uppercase;margin-right:6px}
+  .bt-name{font-weight:900;text-transform:uppercase;letter-spacing:.02em;font-size:16px;line-height:1.1;margin-bottom:2px}
+  .bt-sub{color:#374151;font-size:12px;margin-top:0}
+  .mini{margin-top:6px}
+  .mini .row{font-size:11px;line-height:1.25;color:#222}
+  .mini .label{font-weight:800;text-transform:uppercase;margin-right:6px;color:#1f2937}
 
-  .profile-link{display:inline-block;margin-top:8px;background:#0f172a;color:#fff;border-radius:6px;padding:6px 10px;font-size:11px;font-weight:900;letter-spacing:.06em}
+  .profile-link{display:inline-block;margin-top:6px;background:#0f172a;color:#fff;border-radius:6px;padding:5px 10px;font-size:10px;font-weight:900;letter-spacing:.06em}
 
-  .hs{flex:0 0 34%;aspect-ratio:3/4;border-radius:8px;overflow:hidden;background:#e5e7eb}
+  .hs{flex:0 0 32%;aspect-ratio:3/4;border-radius:8px;overflow:hidden;background:#e5e7eb}
   .hs img{width:100%;height:100%;object-fit:cover}
 
-  /* back: toolbar (4 icons) + text stats chip */
-  .bar{display:flex;gap:10px;align-items:center;margin-top:10px;flex-wrap:wrap}
-  .pill{width:36px;height:36px;padding:0;border-radius:999px;display:grid;place-items:center;border:1px solid #e5e7eb;background:#fff;font-size:0;cursor:pointer}
-  .pill.active{border-color:#111;box-shadow:0 1px 4px rgba(0,0,0,.06)}
-  .pill .icon{width:19px;height:19px;display:block}
-  .stats-link{margin-left:auto;display:inline-block;padding:6px 12px;border-radius:999px;background:#0f172a;color:#fff;font-weight:900;font-size:10px;letter-spacing:.12em;cursor:pointer;user-select:none}
-  @media (max-width:520px){.stats-link{order:-1;margin-left:0}}
+  /* toolbar: 4 icons (flattened) + stats link + FRONT chip */
+  .bar{display:flex;gap:8px;align-items:center;margin-top:8px;flex-wrap:wrap}
+  .pill{width:34px;height:34px;padding:0;border-radius:8px;display:grid;place-items:center;border:1px solid #d9dde3;background:#fff;box-shadow:none;cursor:pointer}
+  .pill.active{border-color:#111}
+  .pill .icon{width:18px;height:18px;display:block}
+  .stats-link{margin-left:auto;display:inline-block;padding:6px 10px;border-radius:999px;background:#0f172a;color:#fff;font-weight:900;font-size:10px;letter-spacing:.12em;cursor:pointer;user-select:none}
+  .flip-link{display:inline-block;padding:6px 10px;border-radius:999px;border:1px solid #d9dde3;background:#fff;font-weight:900;font-size:10px;letter-spacing:.12em;color:#111;cursor:pointer}
 
-  .back-bottom{margin-top:auto;border-top:1px solid var(--ring);padding:12px;min-height:52%;display:flex;flex-direction:column}
-  .panel-title{font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:#374151;margin-bottom:6px;font-size:12px}
-  .pane{display:none;min-height:0;overflow:auto}
+  /* bottom content: LOCKED to bottom (fixed flex-basis), never falls off */
+  .back-bottom{
+    flex:0 0 56%;  /* <- anchor: always this tall */
+    border-top:1px solid var(--ring);padding:10px;display:flex;flex-direction:column;min-height:0;overflow:hidden;
+  }
+  /* panes fill the box */
+  .pane{display:none;min-height:0;height:100%;overflow:auto}
   .pane.active{display:block}
+  .panel-title{font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:#374151;margin:0 0 6px;font-size:12px}
 
+  /* stats tiles (flattened) — 3 rows × 4 columns */
   .kv-wrap{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
-  .kv{background:#f3f4f6;border-radius:10px;text-align:center;padding:10px 6px}
+  .kv{background:#fff;border:1px solid #e5e7eb;border-radius:8px;text-align:center;padding:8px 6px}
   .kv .k{font-size:11px;color:#6b7280}
   .kv .v{font-weight:800}
 
@@ -114,7 +121,7 @@
 </style>
 </head>
 <body>
-<div class="build">BUILD: ham-v4.0.4-tabs4-icons</div>
+<div class="build">BUILD: ham-v4.0.5-panes-lock</div>
 
 <header class="site-header">
   <div class="left">
@@ -144,7 +151,7 @@
 <footer class="footer">SPONSOR AD BANNER</footer>
 
 <script>
-/* ===== Demo data (replace later) ===== */
+/* ===== Demo data (trimmed) ===== */
 const players = [
   {
     id:"cody-bellinger", name:"Cody Bellinger", graduatingClass:2013, currentLevel:"MLB", status:"Active",
@@ -209,13 +216,15 @@ const kv=(k,v)=>`<div class="kv"><div class="k">${k}</div><div class="v">${v??'�
 
 /* ===== Front ===== */
 function frontHTML(p){
+  const [team,parentRaw]=String(p.team||'').split('—');
+  const parent=(p.currentLevel==='MLB')?'':(parentRaw||'').trim();
   return `
   <section class="face front-face">
     <img class="img" src="${p.frontImg||p.highSchoolImg||''}" alt="${p.name}"><div class="grad"></div>
     <div class="leftcol">
       <div class="name">${(p.name||'').toUpperCase()}</div>
-      <div class="team">${(p.team||'').split('—')[0].trim()}</div>
-      <div class="parent">${p.currentLevel==='MLB'?'':((p.team||'').split('—')[1]||'').trim()}</div>
+      <div class="team">${(team||'').trim()}</div>
+      <div class="parent">${parent||'&nbsp;'}</div>
       <div class="stack">${chipLevel(p.currentLevel)}${chipStatus(p.status)}${chipClass(p.graduatingClass)}</div>
       ${letters(p.letterWinnerYears)}
     </div>
@@ -262,12 +271,12 @@ function backHTML(p){
         <div class="bt-name">${(p.name||'').toUpperCase()}</div>
         <div class="bt-sub">${p.team||''}</div>
         <div class="mini">${drafted}${attended}</div>
+
         ${p.profileUrl?`<a class="profile-link" href="${p.profileUrl}" target="_blank" rel="noopener">PLAYER PROFILE PAGE</a>`:''}
 
         <div class="bar" role="tablist">
-          <!-- 4 icons -->
+          <!-- icon-only tabs (flattened) -->
           <button class="pill tabbtn active" data-tab="stats" aria-pressed="true" title="Season Stats (default)">
-            <!-- visual dot (keeps pill height even when hidden) -->
             <svg class="icon" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="3"/></svg>
           </button>
           <button class="pill tabbtn" data-tab="news" title="News">
@@ -283,8 +292,8 @@ function backHTML(p){
             <svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M6 7h12l1 12a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2L6 7zM9 7V6a3 3 0 0 1 6 0v1"/></svg>
           </button>
 
-          <!-- clickable text chip to get back to stats -->
           <span class="stats-link" data-tab="stats">2025 SEASON STATS</span>
+          <span class="flip-link" data-flip="front">FRONT ↺</span>
         </div>
       </div>
 
@@ -355,12 +364,13 @@ function render(list){
   initTabs();
 }
 
-/* ===== Flip behaviour (front only has hit zones) ===== */
+/* ===== Flip behaviour ===== */
 function initFlip(){
   $$('.card').forEach(card=>{
     const toggle=()=>card.classList.toggle('back');
+    // front-edge click
     $$('.edge',card).forEach(btn=>btn.addEventListener('click',toggle));
-    // swipe
+    // swipe both faces
     let sx=0, active=false;
     card.addEventListener('touchstart',e=>{active=true;sx=e.touches[0].clientX},{passive:true});
     card.addEventListener('touchend',e=>{
@@ -368,26 +378,23 @@ function initFlip(){
       const dx=e.changedTouches[0].clientX - sx;
       if(Math.abs(dx)>40) toggle();
     });
+    // flip-link on back
+    card.addEventListener('click',e=>{
+      const f=e.target.closest('[data-flip="front"]');
+      if(f){ card.classList.remove('back'); card.classList.add('front'); }
+    });
   });
 }
 
 /* ===== Icon toolbar => pane switching ===== */
 function initTabs(){
-  // Ensure defaults
-  $$('.back-face').forEach(back=>{
-    const activeBtn = back.querySelector('.tabbtn.active');
-    const key = activeBtn ? activeBtn.dataset.tab : 'stats';
-    $$('.pane', back).forEach(p=>p.classList.toggle('active', p.dataset.pane===key));
-  });
-
-  // Single delegated listener for icons + the “2025 Season Stats” link
   document.addEventListener('click', e=>{
-    const btn = e.target.closest('.back-face .tabbtn, .back-face .stats-link');
-    if(!btn) return;
-    const back = btn.closest('.back-face');
-    const key = btn.dataset.tab || 'stats';
+    const trigger = e.target.closest('.back-face .tabbtn, .back-face .stats-link');
+    if(!trigger) return;
+    const back = trigger.closest('.back-face');
+    const key = trigger.dataset.tab || 'stats';
 
-    // update buttons
+    // activate the matching button
     $$('.tabbtn', back).forEach(b=>{
       const on = b.dataset.tab===key;
       b.classList.toggle('active', on);
