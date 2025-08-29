@@ -200,7 +200,7 @@ main{padding:calc(var(--headerH) + 44px) 0 84px}
 <div class="tagline-wrap">
   <div class="tagline">
     <div>
-      <span class="tag-grey">WHERE THEY</span><span class="tag-strong"> YAT?</span>
+      <span class="tag-grey">   WHERE THEY</span><span class="tag-strong"> YAT.   ?</span>
       <span class="tag-grey"> SWIPE FOR</span><span class="tag-strong"> STATS!</span>
       <span class="tag-note"> (Click the edge of a card to flip)</span>
     </div>
@@ -379,6 +379,28 @@ const playersRaw = [
     letterWinnerYears:[2016,2017]
   }
 ];
+
+// Dev-only: basic sanity check so the page doesn't silently blank
+(function validatePlayers(){
+  try {
+    if (!Array.isArray(playersRaw)) throw new Error("playersRaw is not an array");
+    playersRaw.forEach((p, i) => {
+      ["id","name","graduatingClass"].forEach(k=>{
+        if (!(k in p)) console.warn(`Player[${i}] missing '${k}'`, p);
+      });
+      if (!p.frontImg && !p.highSchoolImg) {
+        console.warn(`Player[${i}] ${p.name||p.id} has no image`);
+      }
+    });
+  } catch(err){
+    const msg = document.createElement('pre');
+    msg.style.cssText = "position:fixed;left:10px;top:80px;background:#fee;border:1px solid #f99;padding:10px;z-index:99999;max-width:90vw;white-space:pre-wrap";
+    msg.textContent = "⚠️ playersRaw parse/logic error:\n" + err.message;
+    document.body.appendChild(msg);
+    throw err; // still stop script so you see it in the console
+  }
+})();
+
 /* sort earliest -> recent */
 const players = [...playersRaw].sort((a,b)=>(+a.graduatingClass||0)-(+b.graduatingClass||0));
 
