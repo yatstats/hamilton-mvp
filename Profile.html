@@ -3,78 +3,78 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Player Profile — YATSTATS</title>
+<title>Player Profile • YAT?STATS</title>
 <style>
-  body{margin:0;font:15px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;color:#111;background:#f6f7f9}
-  header{display:flex;align-items:center;justify-content:space-between;background:#111;color:#fff;padding:10px 14px}
-  header a{color:#fff;text-decoration:none;font-weight:800}
-  .wrap{max-width:980px;margin:18px auto;padding:0 14px}
-  .hero{display:grid;grid-template-columns:140px 1fr;gap:16px;align-items:center;background:#fff;border-radius:12px;padding:14px}
-  .hero img{width:140px;height:140px;object-fit:cover;border-radius:10px;background:#ddd}
-  .name{font-weight:900;font-size:22px}
-  .sub{color:#444;margin-top:4px}
-  .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:14px}
-  .kv{background:#f1f3f6;border-radius:10px;padding:10px;text-align:center}
-  .k{color:#667085;font-size:12px}.v{font-weight:900}
-  .back{display:inline-block;margin-top:16px;font-weight:800}
+body{margin:0;background:#0b0d10;color:#e5e7eb;font:15px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial}
+.wrap{max-width:1100px;margin:0 auto;padding:18px}
+.head{display:grid;grid-template-columns:140px 1fr auto;gap:14px;align-items:center}
+.head img{width:140px;height:140px;object-fit:cover;border-radius:12px}
+.h-name{font-size:28px;font-weight:900;letter-spacing:.01em}
+.h-sub{color:#aab1ba}
+.badge{display:inline-block;background:#7A0019;border:1px solid #7A0019;border-radius:999px;padding:3px 8px;font-weight:800;font-size:11px;letter-spacing:.08em;margin-right:6px}
+.section{background:#11141a;border:1px solid #1f2430;border-radius:12px;padding:14px;margin-top:14px}
+.kv{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.cell{background:#161b25;border:1px solid #222835;border-radius:10px;text-align:center;padding:10px}
+.k{font-size:11px;color:#9aa1ab}.v{font-size:18px;font-weight:800}
+a.back{color:#fff;text-decoration:none;border:1px solid #444;border-radius:8px;padding:10px 12px}
 </style>
 </head>
 <body>
-<header>
-  <a href="index.html">← Back to gallery</a>
-  <div>YATSTATS — Profile</div>
-</header>
+<div class="wrap">
+  <div class="head">
+    <img id="hero" alt="Player">
+    <div>
+      <div class="h-name" id="pname"></div>
+      <div class="h-sub" id="psub"></div>
+      <div id="chips"></div>
+    </div>
+    <a href="index.html" class="back">← Back to gallery</a>
+  </div>
 
-<div class="wrap" id="app">Loading…</div>
+  <div class="section">
+    <div style="font-weight:900;letter-spacing:.14em;text-transform:uppercase;margin-bottom:8px">Quick Stats</div>
+    <div class="kv" id="kv"></div>
+  </div>
+</div>
 
 <script>
-/* minimal dataset mirror — keep in sync with index for demos */
-const players = (()=>{
-  try{ return JSON.parse(localStorage.getItem('playersCache')||'[]'); }catch{ return []; }
+/* same data as index (trimmed to what's needed here) */
+const players = (function(){
+  return JSON.parse(localStorage.getItem('YAT_PLAYERS')||'null') || [];
 })();
-function setCache(list){ try{ localStorage.setItem('playersCache', JSON.stringify(list)); }catch{} }
+const params = new URLSearchParams(location.search);
+const id = params.get('id');
+const p = (players.find(x=>x.id===id) || {});
+function teamAndParent(raw){
+  const parts = String(raw||'').split('—'); return {team:(parts[0]||raw).trim(), parent:(parts[1]||'').trim()};
+}
+function kv(k,v){ return `<div class="cell"><div class="k">${k}</div><div class="v">${v??'—'}</div></div>`; }
 
-(async function boot(){
-  // If no cache, try to fetch from same directory by scraping from opener (best-effort)
-  if(!players.length && window.opener && window.opener.players){
-    setCache(window.opener.players);
-  }
-  const id = new URL(location.href).searchParams.get('id');
-  const p = (players||[]).find(x=>x.id===id) || {};
-  const {team,parent} = (()=>{
-    const raw=String(p.team||''); const [t,pr]=raw.split('—'); return {team:(t||raw).trim(), parent:(pr||'').trim()};
-  })();
-
-  const app=document.getElementById('app');
-  if(!p.id){ app.textContent='Player not found.'; return; }
-
-  const heroImg = p.frontImg || p.highSchoolImg || '';
-  const statCells = [];
-  const kv=(k,v)=>`<div class="kv"><div class="k">${k}</div><div class="v">${v??'—'}</div></div>`;
+if(p && p.id){
+  const {team,parent} = teamAndParent(p.team);
+  document.title = `${p.name} • Player Profile`;
+  document.getElementById('hero').src = p.frontImg || p.highSchoolImg || '';
+  document.getElementById('pname').textContent = p.name;
+  document.getElementById('psub').textContent = `${team}${parent?` — ${parent}`:''} • Class of ${p.graduatingClass||'—'}`;
+  document.getElementById('chips').innerHTML =
+    `<span class="badge">${(p.currentLevel||'').toUpperCase()}</span><span class="badge">${(p.status||'').toUpperCase()}</span>`;
+  const box = document.getElementById('kv');
   if(p.batting){
-    const b=p.batting; statCells.push(
-      kv('AVG',b.avg),kv('OBP',b.obp),kv('SLG',b.slg),kv('OPS',b.ops),
-      kv('H',b.hits),kv('R',b.runs),kv('HR',b.hr),kv('RBI',b.rbi)
-    );
+    const b=p.batting; box.innerHTML = `${kv('AVG',b.avg)}${kv('OBP',b.obp)}${kv('SLG',b.slg)}${kv('OPS',b.ops)}
+      ${kv('H',b.hits)}${kv('R',b.runs)}${kv('HR',b.hr)}${kv('RBI',b.rbi)}`;
   }else{
-    const x=p.pitching||{}; statCells.push(
-      kv('ERA',x.era),kv('WHIP',x.whip),kv('OBA',x.oba||'—'),kv('K/BB',x.kbb||'—'),
-      kv('IP',x.ip||'—'),kv('ER',x.er||'—'),kv('K',x.so||x.ko||'—'),kv('W',x.w||'—')
-    );
+    const x=p.pitching||{};
+    box.innerHTML = `${kv('ERA',x.era)}${kv('WHIP',x.whip)}${kv('K',x.so||x.ko||'—')}${kv('IP',x.ip||'—')}
+      ${kv('ER',x.er||'—')}${kv('W',x.w||'—')}${kv('SV',x.sv||'—')}${kv('HR',x.hr||'—')}`;
   }
+}else{
+  document.querySelector('.wrap').innerHTML = `<p style="padding:20px">Player not found. <a href="index.html" class="back">Back</a></p>`;
+}
 
-  app.innerHTML = `
-    <div class="hero">
-      <img src="${heroImg}" alt="${p.name}" onerror="this.style.display='none'">
-      <div>
-        <div class="name">${p.name}</div>
-        <div class="sub">Class of ${p.graduatingClass || '—'} • ${team || ''} ${parent?('— '+parent):''}</div>
-        <div class="grid">${statCells.join('')}</div>
-        <a class="back" href="index.html">← Back to gallery</a>
-      </div>
-    </div>
-  `;
-})();
+/* stash players (so profile.html can load without bundler) */
+if(!localStorage.getItem('YAT_PLAYERS')){
+  // NOTE: index.html should set this after render; defensive fallback here does nothing
+}
 </script>
 </body>
 </html>
