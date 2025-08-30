@@ -3,112 +3,78 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Player Profile — WHERE THEY YAT?</title>
+<title>Player Profile — YATSTATS</title>
 <style>
-:root{ --ring:#E3E6EA; --ink:#111827; --muted:#6b7280; --maroon:#7A0019; }
-*{box-sizing:border-box} html,body{margin:0;padding:0}
-body{font:15px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;color:var(--ink);background:#f7f8fa}
-a{text-decoration:none;color:inherit}
-.header{position:sticky;top:0;z-index:5;background:#fff;border-bottom:1px solid var(--ring);display:flex;align-items:center;gap:10px;padding:10px}
-.header .back{width:36px;height:36px;border:0;background:transparent;display:grid;place-items:center;cursor:pointer;border-radius:8px}
-.header .back:hover{background:#f0f2f5}
-.header .title{font-weight:900;letter-spacing:.02em}
-.wrap{max-width:1040px;margin:20px auto;padding:0 14px}
-.hero{display:grid;grid-template-columns: 1.2fr 1fr; gap:14px}
-@media (max-width:900px){ .hero{grid-template-columns:1fr} }
-.cardish{background:#fff;border:1px solid var(--ring);border-radius:12px;overflow:hidden}
-.hero-now{aspect-ratio:16/9;background:#111;position:relative}
-.hero-now img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-.meta{padding:12px}
-.h1{font-size:22px;font-weight:900;letter-spacing:.02em}
-.sub{color:var(--muted);font-size:13px}
-.row{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
-.badge{display:inline-flex;align-items:center;background:#111;color:#fff;border:1px solid #111;border-radius:999px;padding:4px 10px;font-size:11px;font-weight:800;letter-spacing:.06em}
-.badge.maroon{background:var(--maroon);border-color:var(--maroon)}
-.badge.gray{background:#374151;border-color:#374151}
-.kv-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
-@media (max-width:680px){ .kv-grid{grid-template-columns:repeat(2,1fr)} }
-.kv{background:#f3f4f6;border-radius:10px;padding:10px;text-align:center}
-.k{font-size:12px;color:#6b7280}.v{font-weight:900;font-size:16px}
-.hs{display:grid;grid-template-columns:1fr;gap:10px}
-.hs .img{aspect-ratio:3/4;background:#ddd;position:relative}
-.hs .img img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-.actions{display:flex;gap:10px}
-.btn{display:inline-block;background:#111;color:#fff;border:1px solid #111;border-radius:10px;padding:10px 12px;font-weight:800;letter-spacing:.04em}
-.btn.alt{background:#fff;color:#111;border-color:#111}
-.footer{margin:24px 0;color:#6b7280;text-align:center;font-size:12px}
+  body{margin:0;font:15px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;color:#111;background:#f6f7f9}
+  header{display:flex;align-items:center;justify-content:space-between;background:#111;color:#fff;padding:10px 14px}
+  header a{color:#fff;text-decoration:none;font-weight:800}
+  .wrap{max-width:980px;margin:18px auto;padding:0 14px}
+  .hero{display:grid;grid-template-columns:140px 1fr;gap:16px;align-items:center;background:#fff;border-radius:12px;padding:14px}
+  .hero img{width:140px;height:140px;object-fit:cover;border-radius:10px;background:#ddd}
+  .name{font-weight:900;font-size:22px}
+  .sub{color:#444;margin-top:4px}
+  .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:14px}
+  .kv{background:#f1f3f6;border-radius:10px;padding:10px;text-align:center}
+  .k{color:#667085;font-size:12px}.v{font-weight:900}
+  .back{display:inline-block;margin-top:16px;font-weight:800}
 </style>
 </head>
 <body>
-<header class="header">
-  <button class="back" onclick="window.location.href='index.html'">
-    <svg viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M15.41 7.41 14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
-  </button>
-  <div class="title">Player Profile</div>
+<header>
+  <a href="index.html">← Back to gallery</a>
+  <div>YATSTATS — Profile</div>
 </header>
 
-<div class="wrap" id="app"></div>
-<div class="footer">YATSTATS — demo profile (MVP)</div>
+<div class="wrap" id="app">Loading…</div>
 
 <script>
-const players = [
-  { id:"cody-bellinger", name:"CODY BELLINGER", graduatingClass:2013, currentLevel:"MLB", status:"Active",
-    position:"CF/1B", team:"New York Yankees",
-    frontImg:"https://i.postimg.cc/9F19KG5h/new-york-yankees-outfielder-cody-bellinger.jpg",
-    highSchoolImg:"https://i.postimg.cc/Jhq690Lg/01-Bellinger-Front-page-00001.jpg",
-    batting:{avg:".284",obp:".345",slg:".520",ops:".865",hits:"150",runs:"95",hr:"35",rbi:"105"}, tbcId:180827
-  },
-  { id:"dom-hamel", name:"DOM HAMEL", graduatingClass:2017, currentLevel:"Triple-A", status:"Active",
-    position:"P", team:"Syracuse Mets — New York Mets",
-    frontImg:"https://i.postimg.cc/rwYchfnt/20250804-151814.jpg",
-    highSchoolImg:"https://i.postimg.cc/VLC7zDwX/23-Hamel-Front-page-00001.jpg",
-    pitching:{era:"3.89",so:"93",whip:"1.18"}
-  },
-  { id:"drew-swift", name:"DREW SWIFT", graduatingClass:2017, currentLevel:"Triple-A", status:"Active",
-    position:"SS", team:"Las Vegas Aviators — Athletics",
-    frontImg:"https://i.postimg.cc/GmmSKFsV/AISelect-20250826-023939-Instagram.jpg",
-    highSchoolImg:"https://i.postimg.cc/0j6VMCwR/04-Swift-Front-page-00001.jpg",
-    batting:{avg:".271",obp:".335",slg:".414",ops:".749",hits:"114",runs:"68",hr:"10",rbi:"52",doubles:"24",triples:"3",sb:"18",bb:"41"}
+/* minimal dataset mirror — keep in sync with index for demos */
+const players = (()=>{
+  try{ return JSON.parse(localStorage.getItem('playersCache')||'[]'); }catch{ return []; }
+})();
+function setCache(list){ try{ localStorage.setItem('playersCache', JSON.stringify(list)); }catch{} }
+
+(async function boot(){
+  // If no cache, try to fetch from same directory by scraping from opener (best-effort)
+  if(!players.length && window.opener && window.opener.players){
+    setCache(window.opener.players);
   }
-];
-function qs(key){ return new URLSearchParams(location.search).get(key); }
-function teamAndParent(p){ const raw=String(p.team||''); const parts=raw.split('—'); return { team:(parts[0]||raw).trim(), parent:(parts[1]||'').trim() }; }
-function makeKV(k,v){ return `<div class="kv"><div class="k">${k}</div><div class="v">${v??'—'}</div></div>`; }
-function renderProfile(p){
-  const {team,parent}=teamAndParent(p); const hero=p.frontImg||p.highSchoolImg||'';
-  const stats = p.batting ? `
-    ${makeKV('AVG',p.batting.avg)}${makeKV('OBP',p.batting.obp)}${makeKV('SLG',p.batting.slg)}${makeKV('OPS',p.batting.ops)}
-    ${makeKV('H',p.batting.hits)}${makeKV('R',p.batting.runs)}${makeKV('HR',p.batting.hr)}${makeKV('RBI',p.batting.rbi)}
-  ` : `
-    ${makeKV('ERA',p.pitching?.era)}${makeKV('WHIP',p.pitching?.whip)}${makeKV('SO',p.pitching?.so)}${makeKV('IP',p.pitching?.ip||'—')}
-  `;
-  document.getElementById('app').innerHTML = `
+  const id = new URL(location.href).searchParams.get('id');
+  const p = (players||[]).find(x=>x.id===id) || {};
+  const {team,parent} = (()=>{
+    const raw=String(p.team||''); const [t,pr]=raw.split('—'); return {team:(t||raw).trim(), parent:(pr||'').trim()};
+  })();
+
+  const app=document.getElementById('app');
+  if(!p.id){ app.textContent='Player not found.'; return; }
+
+  const heroImg = p.frontImg || p.highSchoolImg || '';
+  const statCells = [];
+  const kv=(k,v)=>`<div class="kv"><div class="k">${k}</div><div class="v">${v??'—'}</div></div>`;
+  if(p.batting){
+    const b=p.batting; statCells.push(
+      kv('AVG',b.avg),kv('OBP',b.obp),kv('SLG',b.slg),kv('OPS',b.ops),
+      kv('H',b.hits),kv('R',b.runs),kv('HR',b.hr),kv('RBI',b.rbi)
+    );
+  }else{
+    const x=p.pitching||{}; statCells.push(
+      kv('ERA',x.era),kv('WHIP',x.whip),kv('OBA',x.oba||'—'),kv('K/BB',x.kbb||'—'),
+      kv('IP',x.ip||'—'),kv('ER',x.er||'—'),kv('K',x.so||x.ko||'—'),kv('W',x.w||'—')
+    );
+  }
+
+  app.innerHTML = `
     <div class="hero">
-      <div class="cardish">
-        <div class="hero-now">${hero?`<img src="${hero}" alt="${p.name}">`:''}</div>
-        <div class="meta">
-          <div class="h1">${p.name} ${p.graduatingClass?`<span class="sub"> (Class of ${p.graduatingClass})</span>`:''}</div>
-          <div class="sub">${team}${parent?` — ${parent}`:''}</div>
-          <div class="row" style="margin-top:10px">
-            ${p.currentLevel?`<span class="badge maroon">${p.currentLevel}</span>`:''}
-            ${p.status?`<span class="badge">${p.status}</span>`:''}
-            ${p.position?`<span class="badge gray">${p.position}</span>`:''}
-          </div>
-          <div class="kv-grid" style="margin-top:12px">${stats}</div>
-        </div>
-      </div>
-      <div class="hs">
-        <div class="cardish img">${p.highSchoolImg?`<img src="${p.highSchoolImg}" alt="${p.name} HS">`:''}</div>
-        <div class="actions">
-          <a class="btn" href="index.html">Back to Gallery</a>
-          ${p.tbcId?`<a class="btn alt" href="https://thebaseballcube.com/content/player/${p.tbcId}/" target="_blank" rel="noopener">View on TBC</a>`:''}
-        </div>
+      <img src="${heroImg}" alt="${p.name}" onerror="this.style.display='none'">
+      <div>
+        <div class="name">${p.name}</div>
+        <div class="sub">Class of ${p.graduatingClass || '—'} • ${team || ''} ${parent?('— '+parent):''}</div>
+        <div class="grid">${statCells.join('')}</div>
+        <a class="back" href="index.html">← Back to gallery</a>
       </div>
     </div>
   `;
-}
-const player = players.find(p=>p.id===qs('id')) || players[0];
-renderProfile(player);
+})();
 </script>
 </body>
 </html>
