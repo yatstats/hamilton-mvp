@@ -4,271 +4,245 @@
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>hamilton.yatstats.com — WHERE THEY YAT? (ham-v4.0.9)</title>
+
 <style>
-  :root{
-    --maroon:#7A0019; --ring:#E3E6EA; --bg:#f3f4f6; --ink:#111827; --muted:#6b7280;
-    --headerH:100px;
-  }
-  *{box-sizing:border-box}
-  html,body{margin:0;padding:0}
-  body{background:var(--bg);font:15px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,"Apple Color Emoji","Segoe UI Emoji";color:var(--ink)}
-  a{text-decoration:none;color:inherit}
-  body.no-scroll{overflow:hidden}
+:root{
+  --maroon:#7A0019; --ring:#E3E6EA; --bg:#f3f4f6; --ink:#111827; --muted:#6b7280;
+  --headerH:100px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:var(--bg);font:15px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,"Apple Color Emoji","Segoe UI Emoji";color:var(--ink)}
+a{text-decoration:none;color:inherit}
+button{font:inherit;color:inherit}
 
-  /* ===== HEADER ===== */
-  .site-header{
-    position:fixed; inset:0 0 auto 0; height:var(--headerH); z-index:60;
-    background:#fff; border-bottom:1px solid var(--ring);
-    display:grid; grid-template-columns:auto 1fr auto; align-items:start; gap:8px; padding:8px 10px 6px;
-  }
-  .h-left{display:flex;align-items:center;gap:8px;min-width:0}
-  .hambtn{width:36px;height:36px;display:grid;place-items:center;border:0;background:transparent;cursor:pointer}
-  .hambtn svg{width:22px;height:22px;color:#111}
-  .ham-logo{height:44px;width:auto;display:block}
+/* HEADER */
+.site-header{
+  position:fixed; inset:0 0 auto 0; height:var(--headerH); z-index:60;
+  background:#fff; border-bottom:1px solid var(--ring);
+  display:grid; grid-template-columns:auto 1fr auto; gap:8px; align-items:start;
+  padding:8px 8px 6px;
+}
+.h-left{display:flex;align-items:center;gap:8px;min-width:0}
+.hambtn{width:36px;height:36px;border:0;background:transparent;display:grid;place-items:center;cursor:pointer}
+.ham-logo{height:42px;width:auto;display:block}
 
-  .nav-desktop{display:flex;gap:14px;align-self:center;justify-self:center}
-  .nav-desktop a{font-size:12px;text-transform:uppercase;color:#1f2937;white-space:nowrap;padding:4px 0;letter-spacing:.06em}
-  /* hide early so it never crashes logos */
-  @media (max-width:1260px){ .nav-desktop{display:none} }
+.nav-desktop{display:flex;gap:14px;align-self:center;justify-self:center}
+.nav-desktop a{font-size:12px;text-transform:uppercase;color:#1f2937;white-space:nowrap;padding:4px 0;letter-spacing:.06em}
+@media (max-width:1260px){ .nav-desktop{display:none} }
 
-  .h-right{display:flex;flex-direction:column;align-items:flex-end;gap:6px;min-width:0}
-  .ystats-logo{height:40px;width:auto;display:block}
-  @media (max-width:420px){ .ystats-logo{height:34px} }
+.h-right{display:flex;flex-direction:column;align-items:flex-end;gap:6px;min-width:0}
+.ystats-logo{height:36px;width:auto;display:block}
+@media (max-width:420px){ .ystats-logo{height:32px} }
 
-  /* Row of 4 header icons under YATSTATS logo */
-  .tiny-ctrls{display:flex;align-items:center;gap:8px; margin-top:2px}
-  .i-btn{
-    width:44px;height:32px; /* invisible tap target >=44 high */
-    border:0;background:transparent;display:grid;place-items:center;cursor:pointer;border-radius:8px;
-  }
-  .i-btn svg{width:18px;height:18px;color:#111}
-  /* Active = reversed in black box */
-  .i-btn.active{background:#000}
-  .i-btn.active svg{color:#fff}
+/* header icon row (right-aligned under YATSTATS logo) */
+.hdr-icons{display:flex;gap:8px;align-items:center;justify-content:flex-end}
+.hdr-icon{width:44px;height:44px;padding:0;border:0;background:transparent;border-radius:8px;display:grid;place-items:center;cursor:pointer}
+.hdr-icon svg{width:20px;height:20px;color:#111}
+.hdr-icon:hover{background:rgba(0,0,0,.06)}
+.hdr-icon:focus-visible{outline:2px solid #111;outline-offset:2px;border-radius:8px}
+.hdr-icon.active{background:#111}
+.hdr-icon.active svg{color:#fff}
 
-  /* Right-align the icon row under the logo; allow row to extend left under logo on phones */
-  .h-right .tiny-ctrls{justify-content:flex-end}
+/* TAGLINE */
+.tagline-wrap{position:sticky;top:var(--headerH);z-index:40;background:#fff;border-bottom:1px solid var(--ring)}
+.tagline{display:flex;align-items:center;justify-content:space-between;padding:8px 10px}
+.tag-text{font-size:14px;line-height:1.1}
+.tag-grey{color:#6b7280;font-weight:700;letter-spacing:-.02em}
+.tag-strong{color:#000;font-weight:900;letter-spacing:-.02em}
+.tag-tight{letter-spacing:-.04em;}
+.tag-grey,.tag-strong{font-stretch:condensed; font-variation-settings:"wdth" 85}
 
-  /* ===== TAGLINE ===== */
-  .tagline-wrap{position:sticky;top:var(--headerH);z-index:40;background:#fff;border-bottom:1px solid var(--ring)}
-  .tagline{display:flex;align-items:center;justify-content:space-between;padding:8px 10px;gap:8px}
-  .tagline .txt{font-size:14px}
-  .tag-grey{color:#6b7280;font-weight:600;letter-spacing:-.01em;font-stretch:condensed;font-variation-settings:"wdth" 90}
-  .tag-strong{color:#000;font-weight:900;letter-spacing:0}
-  .tag-sp{margin-right:2px}
-  .tagline-note{color:#6b7280;font-size:11px;margin-left:8px}
-  @media (max-width:520px){ .tagline-note{display:none} }
+/* GRID (5→4→3→2→1) */
+main{padding:calc(var(--headerH) + 44px) 0 84px}
+.grid{padding:10px;display:grid;grid-template-columns:repeat(1,minmax(0,1fr));gap:12px}
+@media (min-width:560px){ .grid{grid-template-columns:repeat(2,minmax(0,1fr))} }
+@media (min-width:820px){ .grid{grid-template-columns:repeat(3,minmax(0,1fr))} }
+@media (min-width:1100px){ .grid{grid-template-columns:repeat(4,minmax(0,1fr))} }
+@media (min-width:1440px){ .grid{grid-template-columns:repeat(5,minmax(0,1fr))} }
 
-  /* ===== GRID (5→4→3→2→1) ===== */
-  main{padding:calc(var(--headerH) + 44px) 0 84px}
-  .grid{padding:10px;display:grid;grid-template-columns:repeat(1,minmax(0,1fr));gap:12px}
-  @media (min-width:560px){ .grid{grid-template-columns:repeat(2,minmax(0,1fr))} }
-  @media (min-width:820px){ .grid{grid-template-columns:repeat(3,minmax(0,1fr))} }
-  @media (min-width:1100px){ .grid{grid-template-columns:repeat(4,minmax(0,1fr))} }
-  @media (min-width:1440px){ .grid{grid-template-columns:repeat(5,minmax(0,1fr))} }
+/* CARD / FLIP */
+.card{background:#000;border:0;border-radius:10px;overflow:hidden;position:relative;user-select:none;aspect-ratio:5/7;min-height:280px}
+.flip-card{perspective:1200px}
+.flip-inner{position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform .55s cubic-bezier(.2,.7,.2,1)}
+.card.front  .flip-inner{ transform:rotateY(0) }
+.card.back   .flip-inner{ transform:rotateY(180deg) }
+.face{position:absolute; inset:0; backface-visibility:hidden; -webkit-backface-visibility:hidden; overflow:hidden}
 
-  /* ===== CARD ===== */
-  .card{background:#000;border:0;border-radius:10px;overflow:hidden;position:relative;user-select:none;aspect-ratio:5/7;min-height:280px}
-  .flip-card{perspective:1200px}
-  .flip-inner{position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform .55s cubic-bezier(.2,.7,.2,1)}
-  .card.front  .flip-inner{ transform:rotateY(0) }
-  .card.back   .flip-inner{ transform:rotateY(180deg) }
-  .face{position:absolute; inset:0; backface-visibility:hidden; -webkit-backface-visibility:hidden; overflow:hidden}
+/* FRONT */
+.front-face{transform:rotateY(0)}
+.card-img{position:absolute; inset:0; width:100%; height:100%; object-fit:cover; background:#111}
+.bottom-grad{position:absolute; left:0; right:0; bottom:0; height:66%; background:linear-gradient(to top, rgba(0,0,0,.98) 0%, rgba(0,0,0,.92) 30%, rgba(0,0,0,.86) 48%, rgba(0,0,0,0) 76%); pointer-events:none; z-index:1;}
+.front-left, .front-right{position:absolute; z-index:3; color:#fff; text-shadow:0 1px 2px rgba(0,0,0,.45)}
+.front-left{left:12px; bottom:12px; width:46%}
+.front-right{right:12px; bottom:10px; width:72%; text-align:right}
+.name{font-weight:900;text-transform:uppercase;letter-spacing:.02em;font-size:18px;line-height:1.06}
+.team{font-size:13px;opacity:.98}
+.parent{font-size:12px;opacity:.92;margin-top:2px}
+.spacer-6{height:6px}
 
-  /* FRONT */
-  .front-face{transform:rotateY(0)}
-  .card-img{position:absolute; inset:0; width:100%; height:100%; object-fit:cover; background:#111}
-  .bottom-grad{position:absolute; left:0; right:0; bottom:0; height:66%;
-    background:linear-gradient(to top, rgba(0,0,0,.98) 0%, rgba(0,0,0,.92) 30%, rgba(0,0,0,.86) 48%, rgba(0,0,0,0) 76%);
-    pointer-events:none; z-index:1;}
-  .front-left,.front-right{position:absolute; z-index:3; color:#fff; text-shadow:0 1px 2px rgba(0,0,0,.45)}
-  .front-left{left:12px; bottom:12px; width:46%}
-  .front-right{right:12px; bottom:10px; width:72%; text-align:right}
-  .name{font-weight:900;text-transform:uppercase;letter-spacing:.02em;font-size:18px;line-height:1.06}
-  .team{font-size:13px} .parent{font-size:12px;margin-top:2px}
-  .spacer-6{height:6px}
+/* chips */
+.stack{display:flex;flex-direction:column;gap:4px;margin-top:4px;align-items:flex-start}
+.chip{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.14);color:#fff;border:1px solid rgba(255,255,255,.24);border-radius:999px;padding:2px 8px 3px;font-weight:800;font-size:10px;letter-spacing:.06em}
+.chip.level.mlb{background:#7A0019;border-color:#7A0019}
+.chip.level.triple-a{background:#2563eb;border-color:#2563eb}
+.chip.level.double-a{background:#3b82f6;border-color:#3b82f6}
+.chip.level.high-a{background:#4338ca;border-color:#4338ca}
+.chip.level.low-a{background:#3730a3;border-color:#3730a3}
+.chip.level.rookie{background:#0f766e;border-color:#0f766e}
+.chip.level.indy{background:#3f6212;border-color:#3f6212}
+.chip.level.ncaa-d1{background:#166534;border-color:#166534}
+.chip.level.ncaa-d2{background:#047857;border-color:#047857}
+.chip.level.ncaa-d3{background:#065f46;border-color:#065f46}
+.chip.level.naia{background:#9333ea;border-color:#9333ea}
+.chip.level.juco{background:#0d9488;border-color:#0d9488}
+.chip.status{background:#16a34a;border-color:#16a34a}
+.chip.status.retired{background:#6b7280;border-color:#6b7280}
+.chip.class{background:#374151;border-color:#374151}
 
-  /* flat chips */
-  .stack{display:flex;flex-direction:column;gap:4px;margin-top:4px;align-items:flex-start}
-  .chip{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.14);color:#fff;border:1px solid rgba(255,255,255,.24);border-radius:999px;padding:2px 8px 3px;font-weight:800;font-size:10px;letter-spacing:.06em}
-  .chip.level.mlb{background:#7A0019;border-color:#7A0019}
-  .chip.level.triple-a{background:#2563eb;border-color:#2563eb}
-  .chip.level.double-a{background:#3b82f6;border-color:#3b82f6}
-  .chip.level.high-a{background:#4338ca;border-color:#4338ca}
-  .chip.level.low-a{background:#3730a3;border-color:#3730a3}
-  .chip.level.rookie{background:#0f766e;border-color:#0f766e}
-  .chip.level.indy{background:#3f6212;border-color:#3f6212}
-  .chip.level.ncaa-d1{background:#166534;border-color:#166534}
-  .chip.level.ncaa-d2{background:#047857;border-color:#047857}
-  .chip.level.ncaa-d3{background:#065f46;border-color:#065f46}
-  .chip.level.naia{background:#9333ea;border-color:#9333ea}
-  .chip.level.juco{background:#0d9488;border-color:#0d9488}
-  .chip.status{background:#16a34a;border-color:#16a34a}
-  .chip.status.retired{background:#6b7280;border-color:#6b7280}
-  .chip.class{background:#374151;border-color:#374151}
+/* letter dots */
+.letters{display:flex;gap:6px;align-items:center;margin-top:6px}
+.letter-dot{width:20px;height:20px;border-radius:50%;background:#fff;color:var(--maroon);display:grid;place-items:center;font-weight:900;font-size:11px;border:1px solid rgba(0,0,0,.15)}
 
-  /* letters */
-  .letters{display:flex;gap:6px;align-items:center;margin-top:6px}
-  .letter-dot{width:20px;height:20px;border-radius:50%;background:#fff;color:var(--maroon);display:grid;place-items:center;font-weight:900;font-size:11px;border:1px solid rgba(0,0,0,.15)}
+/* right side text */
+.next-chip,.last-chip{display:inline-block;background:rgba(255,255,255,.14);color:#fff;border:1px solid rgba(255,255,255,.24);border-radius:999px;padding:2px 8px 3px;font-size:10px;font-weight:900;letter-spacing:.12em;margin-bottom:3px}
+.right-line{font-size:12px;font-weight:800;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.last3{margin-top:10px;width:100%;margin-left:auto}
+.last3 .item{font-size:12px;color:#e5e7eb;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:right}
 
-  /* right side */
-  .next-chip,.last-chip{display:inline-block;background:rgba(255,255,255,.14);color:#fff;border:1px solid rgba(255,255,255,.24);border-radius:999px;padding:2px 8px 3px;font-size:10px;font-weight:900;letter-spacing:.12em;margin-bottom:3px}
-  .right-line{font-size:12px;font-weight:800;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .last3{margin-top:10px;width:100%;margin-left:auto}
-  .last3 .item{font-size:12px;color:#e5e7eb;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:right}
+/* BACK */
+.back-face{transform:rotateY(180deg);background:#fff;color:#111;display:grid;grid-template-rows:1fr 1fr;height:100%}
+.back-top{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:10px 12px 6px;align-items:end}
+.back-left{min-width:0;display:flex;flex-direction:column}
+.stats-name{font-weight:900;text-transform:uppercase;letter-spacing:.02em;font-size:16px;margin-bottom:2px}
+.team-line{color:#1f2937;font-size:13px;line-height:1.15;margin-top:2px}
+.parent-line{color:#6b7280;font-size:12px;line-height:1.1;margin-top:2px}
 
-  /* ===== BACK ===== */
-  .back-face{transform:rotateY(180deg);background:#fff;color:#111;display:grid;grid-template-rows:1fr 1fr;height:100%}
-  .back-top{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:10px 12px 6px;align-items:start}
-  .back-left{min-width:0;display:flex;flex-direction:column}
-  .stats-name{font-weight:900;text-transform:uppercase;letter-spacing:.02em;font-size:16px;display:inline-block}
-  .stats-name:hover{text-decoration:underline}
-  .team-line{color:#1f2937;font-size:13px;line-height:1.15;margin-top:2px}
-  .parent-line{color:#6b7280;font-size:12px;line-height:1.1;margin-top:2px}
+.tiny-bar{margin-top:auto;width:100%}
+.tiny-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.tabbtn{height:28px;display:grid;place-items:center;border-radius:8px;border:1px solid #e5e7eb;background:#fff;cursor:pointer;transition:background .15s,border-color .15s}
+.tabbtn svg{width:14px;height:14px;color:#111}
+.tabbtn.active{background:#111;border-color:#111}
+.tabbtn.active svg{color:#fff}
 
-  /* tiny 4 icons + stats chip */
-  .tiny-bar{margin-top:auto;width:100%}
-  .tiny-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
-  .tabbtn{height:28px;display:grid;place-items:center;border-radius:8px;border:1px solid #e5e7eb;background:#fff;cursor:pointer;transition:background .15s,border-color .15s}
-  .tabbtn svg{width:14px;height:14px;color:#111}
-  .tabbtn.active{background:#111;border-color:#111}
-  .tabbtn.active svg{color:#fff}
-  .action-chip{margin-top:6px;display:inline-block;width:100%;text-align:center;padding:6px 10px;border-radius:999px;border:1px solid #111;background:#111;color:#fff;font-weight:900;font-size:10px;letter-spacing:.12em;cursor:pointer;user-select:none}
-  .action-chip.flat{background:#0f172a;border-color:#0f172a}
-  .action-chip.active{background:#7A0019;border-color:#7A0019}
+.action-chip{margin-top:6px;display:inline-block;width:100%;text-align:center;padding:6px 10px;border-radius:999px;border:1px solid #111;background:#111;color:#fff;font-weight:900;font-size:10px;letter-spacing:.12em;cursor:pointer;user-select:none}
+.action-chip.flat{background:#0f172a;border-color:#0f172a}
+.action-chip.ghost{background:#fff;color:#111;border-color:#1f2937}
+.action-chip.active{background:#7A0019;border-color:#7A0019}
 
-  /* right column */
-  .back-right{display:flex;flex-direction:column}
-  .hs-box{flex:1 1 auto;width:100%;aspect-ratio:3/4;position:relative;overflow:hidden;border-radius:8px;background:#d1d5db;cursor:pointer}
-  .hs-box img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.back-right{display:flex;flex-direction:column}
+.hs-box{flex:1 1 auto;width:100%;aspect-ratio:3/4;position:relative;overflow:hidden;border-radius:8px;background:#d1d5db}
+.hs-box img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.profile-chip{width:100%}
 
-  /* bottom variable container */
-  .back-bottom{border-top:1px solid var(--ring);padding:10px 12px 12px;min-height:0;overflow:hidden;display:flex;flex-direction:column}
-  .pane{display:none;min-height:0;overflow:auto;flex:1;animation:slide .18s ease}
-  .pane.active{display:block}
-  @keyframes slide{from{opacity:.2;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
-  .kv-wrap12{display:grid;grid-template-columns:repeat(4,1fr);grid-auto-rows:1fr;gap:8px;height:100%}
-  .kv{background:#f3f4f6;border-radius:10px;text-align:center;padding:8px;display:flex;flex-direction:column;justify-content:center}
-  .kv .k{font-size:11px;color:#6b7280}.kv .v{font-weight:800}
+/* panes */
+.back-bottom{border-top:1px solid var(--ring);padding:10px 12px 12px;min-height:0;overflow:hidden;display:flex;flex-direction:column}
+.pane{display:none;min-height:0;overflow:auto;flex:1;animation:slide .18s ease}
+.pane.active{display:block}
+@keyframes slide{from{opacity:.2;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.kv-wrap12{display:grid;grid-template-columns:repeat(4,1fr);grid-auto-rows:1fr;gap:8px;height:100%}
+.kv{background:#f3f4f6;border-radius:10px;text-align:center;padding:8px;display:flex;flex-direction:column;justify-content:center}
+.kv .k{font-size:11px;color:#6b7280}
+.kv .v{font-weight:800}
 
-  /* gallery pane (in-card) */
-  .pane-gallery .gallery-wrap{height:100%;display:flex;flex-direction:column;gap:8px}
-  .pane-gallery .g-stage{position:relative;flex:1 1 auto;min-height:0;display:grid;place-items:center;background:#f8fafc;border:1px solid #e5e7eb;border-radius:10px}
-  .pane-gallery .g-stage img{max-width:100%;max-height:100%;object-fit:contain}
-  .pane-gallery .g-caption{text-align:center;font-size:12px;line-height:1.25;color:#374151}
-  .pane-gallery .g-caption .g-name{font-weight:900;letter-spacing:.04em}
-  .pane-gallery .g-caption .g-meta{opacity:.9;margin-top:2px}
-  .pane-gallery .g-caption .g-count{opacity:.7;margin-top:2px;font-size:11px}
-  .pane-gallery .g-nav{position:absolute;top:50%;transform:translateY(-50%);width:34px;height:34px;border-radius:999px;border:1px solid rgba(0,0,0,.15);background:#fff;display:grid;place-items:center;cursor:pointer;user-select:none}
-  .pane-gallery .g-nav:hover{background:#f3f4f6}
-  .pane-gallery .g-nav.g-prev{left:6px} .pane-gallery .g-nav.g-next{right:6px}
-  .pane-gallery .g-nav span{font-size:20px;line-height:1}
+/* flip zones */
+.hit{position:absolute;top:0;bottom:0;width:22%;z-index:2;background:transparent;border:0}
+@media (max-width:480px){ .hit{width:26%} }
+.hit.left{left:0}.hit.right{right:0}
 
-  /* edge flip zones (narrow so icons don’t trigger) */
-  .hit{position:absolute;top:0;bottom:0;width:22%;z-index:2;background:transparent;border:0}
-  @media (max-width:480px){ .hit{width:26%} }
-  .hit.left{left:0}.hit.right{right:0}
+/* DRAWERS */
+.scrim{position:fixed;left:0;right:0;top:var(--headerH);bottom:0;background:rgba(0,0,0,.35);opacity:0;pointer-events:none;transition:opacity .25s ease;z-index:55}
+.scrim.open{opacity:1;pointer-events:auto}
+body.no-scroll{overflow:hidden}
 
-  /* ===== DRAWERS & SCRIM ===== */
-  .scrim{position:fixed;left:0;right:0;top:var(--headerH);bottom:0;background:rgba(0,0,0,.35);opacity:0;pointer-events:none;transition:opacity .25s ease;z-index:55}
-  .scrim.open{opacity:1;pointer-events:auto}
+/* LEFT drawer (nav + PLAYER PROFILE SEARCH) */
+.drawer-left{position:fixed;top:var(--headerH);bottom:0;left:0;width:360px;max-width:90vw;background:#fff;border-right:1px solid var(--ring);transform:translateX(-100%);transition:transform .25s ease;z-index:56;display:flex;flex-direction:column}
+.drawer-left.open{transform:translateX(0)}
+.drawer-left .drawer-header{height:56px;border-bottom:1px solid var(--ring);display:flex;align-items:center;justify-content:space-between;padding:0 12px}
+.left-title{font-weight:900;letter-spacing:.12em;text-transform:uppercase;font-size:12px;color:#374151}
+.left-content{padding:12px;min-height:0;overflow:auto}
+.nav-left-list{display:flex;flex-direction:column;gap:12px;margin-bottom:10px}
+.nav-left-link{text-decoration:none;color:#2b2b2b;text-transform:uppercase;letter-spacing:.12em;font-weight:400;font-size:13px;line-height:1;padding:10px 6px 8px 4px;border-radius:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nav-left-link:hover{background:#f5f6f8}
+.nav-left-sep{height:1px;background:#eceff3;margin:8px 0}
+.left-search-h{font-weight:900;letter-spacing:.12em;text-transform:uppercase;font-size:12px;color:#374151;margin:2px 0 8px}
+.left-search .ghost{display:block;width:100%;background:#eef1f5;border:1px solid #d7dce2;border-radius:10px;padding:10px 12px;font-size:14px;outline:none}
+.left-results{margin-top:8px;list-style:none;padding:0}
+.left-results li{padding:8px 6px;border-radius:8px;cursor:pointer}
+.left-results li:hover{background:#f5f6f8}
+.global-line{margin-top:12px;font-size:12px;color:#374151;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.global-line .mini-icon{width:14px;height:14px;color:#111}
 
-  /* left drawer */
-  .drawer-left{position:fixed;top:var(--headerH);bottom:0;left:0;width:360px;max-width:92vw;background:#fff;border-right:1px solid var(--ring);transform:translateX(-100%);transition:transform .25s ease;z-index:56;display:flex;flex-direction:column}
-  .drawer-left.open{transform:translateX(0)}
-  .drawer-left .drawer-header{height:56px;border-bottom:1px solid var(--ring);display:flex;align-items:center;justify-content:space-between;padding:0 12px}
-  .drawer-left .drawer-title{font-weight:900;letter-spacing:.12em;font-size:12px}
-  .drawer-left .drawer-body{min-height:0;overflow:auto}
-  .left-content{padding:12px 12px 22px}
-  .nav-left-list{display:flex;flex-direction:column;gap:10px;margin-bottom:12px}
-  .nav-left-link{text-decoration:none;color:#2b2b2b;text-transform:uppercase;letter-spacing:.12em;font-weight:500;font-size:12px;line-height:1;padding:10px 6px 8px 4px;border-radius:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .nav-left-link:hover{background:#f5f6f8}
-  .nav-left-sep{height:1px;background:#eceff3;margin:10px 0}
-  .left-h{font-weight:900;letter-spacing:.12em;text-transform:uppercase;color:#374151;font-size:12px;margin:10px 2px 8px}
-  .left-search{display:block;width:100%;background:#eef1f5;border:1px solid #d7dce2;border-radius:10px;padding:10px 12px;font-size:14px;color:#111;outline:none}
-  .typeahead{margin-top:8px;border:1px solid #e5e7eb;border-radius:10px;overflow:hidden;background:#fff}
-  .type-item{padding:10px 12px;font-size:13px;cursor:pointer}
-  .type-item:hover{background:#f3f4f6}
-  .left-global{display:flex;align-items:center;gap:8px;color:#1f2937;font-size:12px;margin-top:12px}
-  .left-global a{color:#1f2937;text-decoration:underline}
+/* RIGHT drawer (filters) */
+.drawer-right{position:fixed;top:var(--headerH);bottom:0;right:0;width:420px;max-width:92vw;background:#fff;border-left:1px solid var(--ring);transform:translateX(100%);transition:transform .25s ease;z-index:56;display:flex;flex-direction:column}
+.drawer-right.open{transform:translateX(0)}
+.drawer-right .drawer-header{height:56px;border-bottom:1px solid var(--ring);display:flex;align-items:center;justify-content:space-between;padding:0 12px}
+.right-title{font-weight:900;letter-spacing:.12em;text-transform:uppercase;font-size:12px;color:#374151}
+.drawer-body{min-height:0;overflow:auto}
+.drawer-content{display:block;padding:12px 12px 22px}
+.rail{border:1px solid #e5e7eb;border-radius:10px;margin-bottom:10px;overflow:hidden}
+.rail summary{list-style:none;cursor:pointer;padding:9px 12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;font-size:12px;color:#374151;border-bottom:1px solid #e5e7eb}
+.rail summary::-webkit-details-marker{display:none}
+.rail .inner{padding:8px 10px;max-height:40vh;overflow:auto}
+.ghost{display:block;width:100%;background:#eef1f5;border:1px solid #d7dce2;border-radius:8px;padding:10px;font-size:13px;color:#111;outline:none}
+.select-multi{height:110px}
+.hint{color:#9aa1ab;font-size:11px;margin:4px 2px 10px}
+@media (max-width:800px){ .hint{display:none} }
+@media (min-width:1024px){ .drawer-right{width:300px;max-width:24vw} }
 
-  /* right filter drawer */
-  .drawer-right{position:fixed;top:var(--headerH);bottom:0;right:0;width:440px;max-width:92vw;background:#fff;border-left:1px solid var(--ring);transform:translateX(100%);transition:transform .25s ease;z-index:56;display:flex;flex-direction:column}
-  .drawer-right.open{transform:translateX(0)}
-  .drawer-right .drawer-header{height:56px;border-bottom:1px solid var(--ring);display:flex;align-items:center;justify-content:space-between;padding:0 12px}
-  .drawer-right .drawer-title{font-weight:900;letter-spacing:.12em;font-size:12px}
-  .drawer-body{min-height:0;overflow:auto}
-  .drawer-content{display:block;padding:12px 12px 22px}
-  .rail{border:1px solid #e5e7eb;border-radius:10px;margin-bottom:10px;overflow:hidden;background:#fff}
-  .rail summary{list-style:none;cursor:pointer;padding:10px 12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;font-size:12px;color:#374151;border-bottom:1px solid #e5e7eb}
-  .rail summary::-webkit-details-marker{display:none}
-  .rail .inner{padding:10px 12px}
-  .ghost{display:block;width:100%;background:#eef1f5;border:1px solid #d7dce2;border-radius:10px;padding:10px 12px;font-size:13px;color:#111;outline:none}
-  .select-multi{height:152px}
-  .hint{color:#9aa1ab;font-size:11px;margin:4px 2px 10px}
-  @media (max-width:800px){ .hint{display:none} }
+/* AUTH drawer */
+.drawer-auth{position:fixed;top:var(--headerH);bottom:0;right:0;width:420px;max-width:92vw;background:#fff;border-left:1px solid var(--ring);transform:translateX(100%);transition:transform .25s ease;z-index:56;display:flex;flex-direction:column}
+.drawer-auth.open{transform:translateX(0)}
+.drawer-auth .drawer-header{height:56px;border-bottom:1px solid var(--ring);display:flex;align-items:center;justify-content:space-between;padding:0 12px}
+.auth-title{font-weight:900;letter-spacing:.12em;text-transform:uppercase;font-size:12px;color:#374151}
+.auth-body{min-height:0;overflow:auto;padding:12px 12px 22px}
+.input{display:block;width:100%;background:#eef1f5;border:1px solid #d7dce2;border-radius:10px;padding:12px 12px;font-size:14px;color:#111;outline:none}
+.btn-primary{display:inline-block;width:100%;background:#111;color:#fff;border:1px solid #111;border-radius:10px;padding:10px 12px;font-weight:800;letter-spacing:.06em;cursor:pointer;margin-top:10px}
 
-  /* desktop: slimmer right drawer */
-  @media (min-width:1024px){
-    .drawer-right{ width:300px; max-width:24vw; }
-    .drawer-right .drawer-content{ padding:12px 10px 22px; }
-    .drawer-right .rail summary{ white-space:nowrap; padding-right:8px; }
-    .drawer-right .rail .inner{ max-height:36vh; overflow:auto; }
-  }
+/* drawer close buttons */
+.closebtn{width:34px;height:34px;border:0;background:transparent;display:grid;place-items:center;cursor:pointer}
+.closebtn svg{width:18px;height:18px}
 
-  /* auth drawer (account) */
-  .drawer-auth{position:fixed;top:var(--headerH);bottom:0;right:0;width:420px;max-width:92vw;background:#fff;border-left:1px solid var(--ring);transform:translateX(100%);transition:transform .25s ease;z-index:56;display:flex;flex-direction:column}
-  .drawer-auth.open{transform:translateX(0)}
-  .drawer-auth .drawer-header{height:56px;border-bottom:1px solid var(--ring);display:flex;align-items:center;justify-content:space-between;padding:0 12px}
-  .auth-body{min-height:0;overflow:auto;padding:12px 12px 22px}
-  .auth-h{font-weight:900;letter-spacing:.12em;text-transform:uppercase;color:#374151;font-size:12px;margin:12px 2px 8px}
-  .input{display:block;width:100%;background:#eef1f5;border:1px solid #d7dce2;border-radius:10px;padding:12px 12px;font-size:14px;color:#111;outline:none}
-  .btn-primary{display:inline-block;width:100%;background:#111;color:#fff;border:1px solid #111;border-radius:10px;padding:10px 12px;font-weight:800;letter-spacing:.06em;cursor:pointer}
-
-  /* FOOTER */
-  .footer{position:fixed;left:0;right:0;bottom:0;height:72px;background:#000;color:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 12px;z-index:10}
-  .footer img{max-height:60px;width:auto}
-  .build{color:#9ca3af;font-size:12px;font-weight:700;letter-spacing:.03em}
+/* FOOTER */
+.footer{position:fixed;left:0;right:0;bottom:0;height:72px;background:#000;color:#fff;display:flex;align-items:center;justify-content:center;z-index:10}
+.footer img{max-height:60px;width:auto}
+.build-pill{position:absolute;left:10px;bottom:10px;background:rgba(255,255,255,.12);color:#fff;font-size:12px;padding:6px 10px;border-radius:12px}
 </style>
 </head>
 <body>
 
 <header class="site-header">
   <div class="h-left">
-    <button class="hambtn" id="openLeft" aria-label="Open Navigation" title="Menu">
-      <svg viewBox="0 0 24 24"><path fill="currentColor" d="M4 6h16M4 12h16M4 18h16"/></svg>
+    <button class="hambtn" id="openLeft" aria-label="Open Navigation">
+      <svg viewBox="0 0 24 24" width="22" height="22"><path fill="currentColor" d="M3 6h18v2H3zM3 11h18v2H3zM3 16h18v2H3z"/></svg>
     </button>
     <img class="ham-logo" src="https://i.postimg.cc/htV31M3K/hamilton-logo-block-with-3-lines-of-type.png" alt="Hamilton HS"/>
   </div>
 
-  <!-- desktop nav -->
   <nav class="nav-desktop">
     <a href="#">Where They YAT?</a>
     <a href="#">Active Alumni News</a>
     <a href="#">Next-Level All-Time List</a>
-    <a href="#">NIL & YAT-A-BOY Marketplace</a>
+    <a href="#">NIL &amp; YAT-A-BOY Marketplace</a>
     <a href="#">The Current Team</a>
     <a href="#">PCDAction Partner Program</a>
   </nav>
 
   <div class="h-right">
     <img class="ystats-logo" src="https://i.postimg.cc/G2m7rR3p/yatstats-logo-stacked.png" alt="YAT?STATS"/>
-    <div class="tiny-ctrls" id="iconRow">
-      <!-- Reset (left-most) -->
-      <button class="i-btn" id="resetFilters" aria-label="Reset" title="Reset">
-        <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 5V2L8 6l4 4V7a5 5 0 1 1-5 5H5a7 7 0 1 0 7-7z"/></svg>
-      </button>
-      <!-- Filter -->
-      <button class="i-btn" id="openFilters" aria-label="Filters" title="Filters">
-        <svg viewBox="0 0 24 24"><path fill="currentColor" d="M3 5h18l-6.5 7.5V20l-5-2v-5.5L3 5z"/></svg>
-      </button>
-      <!-- Search (opens LEFT drawer) -->
-      <button class="i-btn" id="openLeftViaSearch" aria-label="Search" title="Search">
+    <div class="hdr-icons">
+      <!-- Search → Filter → Reset → Profile -->
+      <button class="hdr-icon" id="iconSearch" aria-label="Search" title="Search">
         <svg viewBox="0 0 24 24"><path fill="currentColor" d="M11 4a7 7 0 1 1 0 14 7 7 0 0 1 0-14zm9.7 15.3-3.4-3.4a9 9 0 1 0-1.4 1.4l3.4 3.4a1 1 0 0 0 1.4-1.4z"/></svg>
       </button>
-      <!-- Profile (right-most) -->
-      <button class="i-btn" id="openAuth" aria-label="Account" title="Account">
-        <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 2a5.5 5.5 0 1 1 0 11 5.5 5.5 0 0 1 0-11zm0 13c4.418 0 8 2.239 8 5v2H4v-2c0-2.761 3.582-5 8-5z"/></svg>
+      <button class="hdr-icon" id="iconFilter" aria-label="Filters" title="Filters">
+        <svg viewBox="0 0 24 24"><path fill="currentColor" d="M3 5h18l-6.5 7.5V20l-5-2v-5.5L3 5z"/></svg>
+      </button>
+      <button class="hdr-icon" id="iconReset" aria-label="Reset" title="Reset">
+        <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 5V2L8 6l4 4V7a5 5 0 1 1-5 5H5a7 7 0 1 0 7-7z"/></svg>
+      </button>
+      <button class="hdr-icon" id="iconProfile" aria-label="Account" title="Account">
+        <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm0 2c-4.2 0-8 2.1-8 5v1h16v-1c0-2.9-3.8-5-8-5z"/></svg>
       </button>
     </div>
   </div>
@@ -277,11 +251,10 @@
 <!-- TAGLINE -->
 <div class="tagline-wrap">
   <div class="tagline">
-    <div class="txt">
-      <span class="tag-grey">WHERE</span> <span class="tag-grey tag-sp">THEY</span><span class="tag-strong">YAT?</span>
+    <div class="tag-text">
+      <span class="tag-grey">WHERE THEY</span><span class="tag-strong tag-tight"> YAT?</span>
       &nbsp;&nbsp;
-      <span class="tag-grey">SWIPE</span> <span class="tag-grey tag-sp">FOR</span><span class="tag-strong">STATS!</span>
-      <span class="tagline-note">(Tap card edge to flip)</span>
+      <span class="tag-grey">SWIPE FOR</span><span class="tag-strong tag-tight"> STATS!</span>
     </div>
   </div>
 </div>
@@ -289,49 +262,44 @@
 <!-- SCRIM -->
 <div class="scrim" id="scrim"></div>
 
-<!-- LEFT DRAWER (Navigation + Player Profile Search + Global links) -->
+<!-- LEFT DRAWER -->
 <aside class="drawer-left" id="drawerLeft" aria-hidden="true" role="navigation">
   <div class="drawer-header">
-    <div class="drawer-title">Navigation</div>
-    <button class="i-btn" id="closeLeft" aria-label="Close">
+    <div class="left-title">Navigation</div>
+    <button class="closebtn" id="closeLeft" aria-label="Close">
       <svg viewBox="0 0 24 24"><path fill="currentColor" d="M6.225 4.811 4.811 6.225 10.586 12l-5.775 5.775 1.414 1.414L12 13.414l5.775 5.775 1.414-1.414L13.414 12l5.775-5.775-1.414-1.414L12 10.586 6.225 4.811z"/></svg>
     </button>
   </div>
-  <div class="drawer-body">
-    <div class="left-content">
-      <!-- A) site nav -->
-      <div class="nav-left-list">
-        <a class="nav-left-link" href="#">WHERE THEY YAT?</a>
-        <a class="nav-left-link" href="#">ACTIVE ALUMNI NEWS</a>
-        <a class="nav-left-link" href="#">NEXT-LEVEL ALL-TIME LIST</a>
-        <a class="nav-left-link" href="#">NIL & YAT-A-BOY MARKETPLACE</a>
-        <a class="nav-left-link" href="#">THE CURRENT TEAM</a>
-        <a class="nav-left-link" href="#">PCDACTION PARTNER PROGRAM</a>
-      </div>
-
+  <div class="left-content">
+    <div class="nav-left-list">
+      <a class="nav-left-link" href="#">WHERE THEY YAT?</a>
+      <a class="nav-left-link" href="#">ACTIVE ALUMNI NEWS</a>
+      <a class="nav-left-link" href="#">NEXT-LEVEL ALL-TIME LIST</a>
+      <a class="nav-left-link" href="#">NIL &amp; YAT-A-BOY MARKETPLACE</a>
+      <a class="nav-left-link" href="#">THE CURRENT TEAM</a>
+      <a class="nav-left-link" href="#">PCDACTION PARTNER PROGRAM</a>
       <div class="nav-left-sep"></div>
+    </div>
 
-      <!-- B) Player Profile Search (site-specific) -->
-      <div class="left-h">PLAYER PROFILE SEARCH</div>
-      <input id="leftSearch" type="text" class="left-search" placeholder="Type a name…" autocomplete="off"/>
-      <div id="leftResults" class="typeahead" style="display:none"></div>
+    <div class="left-search">
+      <div class="left-search-h">PLAYER PROFILE SEARCH</div>
+      <input id="localSearch" type="text" class="ghost" placeholder="Type a player name…" autocomplete="off"/>
+      <ul id="localResults" class="left-results"></ul>
 
-      <!-- C) Global links -->
-      <div class="left-global">
-        <svg viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M11 4a7 7 0 1 1 0 14 7 7 0 0 1 0-14zm9.7 15.3-3.4-3.4a9 9 0 1 0-1.4 1.4l3.4 3.4a1 1 0 0 0 1.4-1.4z"/></svg>
-        <a href="https://www.yatstats.com" target="_blank" rel="noopener">GLOBAL PLAYER SEARCH</a>
-        &nbsp;|&nbsp;
+      <div class="global-line">
+        <svg class="mini-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M11 4a7 7 0 1 1 0 14 7 7 0 0 1 0-14zm9.7 15.3-3.4-3.4a9 9 0 1 0-1.4 1.4l3.4 3.4a1 1 0 0 0 1.4-1.4z"/></svg>
+        <a href="https://www.yatstats.com" target="_blank" rel="noopener">GLOBAL PLAYER SEARCH</a> |
         <a href="https://www.yatstats.com" target="_blank" rel="noopener">GLOBAL SCHOOL SEARCH</a>
       </div>
     </div>
   </div>
 </aside>
 
-<!-- RIGHT DRAWER (Filters only) -->
+<!-- RIGHT DRAWER (Filters) -->
 <aside class="drawer-right" id="drawerRight" aria-hidden="true" role="dialog" aria-modal="true">
   <div class="drawer-header">
-    <div class="drawer-title">Filters</div>
-    <button class="i-btn" id="closeRight" aria-label="Close">
+    <div class="right-title">Filters</div>
+    <button class="closebtn" id="closeRight" aria-label="Close">
       <svg viewBox="0 0 24 24"><path fill="currentColor" d="M6.225 4.811 4.811 6.225 10.586 12l-5.775 5.775 1.414 1.414L12 13.414l5.775 5.775 1.414-1.414L13.414 12l5.775-5.775-1.414-1.414L12 10.586 6.225 4.811z"/></svg>
     </button>
   </div>
@@ -340,8 +308,8 @@
       <details class="rail" open>
         <summary>By Player</summary>
         <div class="inner">
-          <input id="fByName" type="text" class="ghost" placeholder="Filter by player name…" autocomplete="off"/>
-          <div class="hint">Press <b>Enter</b> to apply & close this drawer.</div>
+          <input id="filterName" type="text" class="ghost" placeholder="Type name & press Enter"/>
+          <div class="hint">Press <b>Enter</b> to apply and close.</div>
         </div>
       </details>
 
@@ -378,23 +346,17 @@
 <!-- AUTH DRAWER -->
 <aside class="drawer-auth" id="drawerAuth" aria-hidden="true" role="dialog" aria-modal="true">
   <div class="drawer-header">
-    <div class="drawer-title">Account</div>
-    <button class="i-btn" id="closeAuth" aria-label="Close">
+    <div class="auth-title">Sign Up | Login</div>
+    <button class="closebtn" id="closeAuth" aria-label="Close">
       <svg viewBox="0 0 24 24"><path fill="currentColor" d="M6.225 4.811 4.811 6.225 10.586 12l-5.775 5.775 1.414 1.414L12 13.414l5.775 5.775 1.414-1.414L13.414 12l5.775-5.775-1.414-1.414L12 10.586 6.225 4.811z"/></svg>
     </button>
   </div>
   <div class="auth-body">
-    <div class="auth-h">Sign Up</div>
-    <input class="input" placeholder="Email"/>
-    <input class="input" placeholder="Password" type="password" style="margin-top:8px"/>
-    <button class="btn-primary" style="margin-top:10px">Create Account</button>
-
-    <div class="nav-left-sep"></div>
-
-    <div class="auth-h">Login</div>
-    <input class="input" placeholder="Email"/>
-    <input class="input" placeholder="Password" type="password" style="margin-top:8px"/>
-    <button class="btn-primary" style="margin-top:10px">Login</button>
+    <label>Email</label>
+    <input class="input" type="email" placeholder="you@example.com"/>
+    <label style="margin-top:10px">Password</label>
+    <input class="input" type="password" placeholder="••••••••"/>
+    <button class="btn-primary">Continue</button>
   </div>
 </aside>
 
@@ -403,24 +365,19 @@
 </main>
 
 <footer class="footer">
-  <div class="build">BUILD: ham-v4.0.9</div>
   <img src="https://i.postimg.cc/v8LxKy54/no-errors-sample-banner.png" alt="Sponsor banner">
+  <div class="build-pill">BUILD: ham-v4.0.9</div>
 </footer>
 
 <script>
-/* ===== helpers ===== */
+/* helpers */
 const byId = id => document.getElementById(id);
 function lvlClass(l){return String(l||'').toLowerCase().replace(/\s+/g,'-').replace('aaa','triple-a').replace('aa','double-a')}
-function teamAndParent(p){
-  const raw=String(p.team||''); const parts = raw.split('—'); // em dash
-  const team = (parts[0]||raw).trim(); let parent=(parts[1]||'').trim();
-  if((p.currentLevel||'').toUpperCase()==='MLB') parent='';
-  return {team,parent};
-}
+function teamAndParent(p){ const raw=String(p.team||''); const parts=raw.split('—'); const team=(parts[0]||raw).trim(); let parent=(parts[1]||'').trim(); if((p.currentLevel||'').toUpperCase()==='MLB') parent=''; return {team,parent}; }
 function fmtLast3(g){ return `${g.date||'—'} • ${g.opp||'—'} — ${g.line||'—'}`; }
-function formatNextTwoLines(ng){ if(!ng) return ['—','—']; const ds=String(ng.date||''); const mmdd=(ds.match(/\b(\d{1,2}\/\d{1,2})\b/)||[, '—'])[1]; let time=(ds.match(/(\d{1,2}:\d{2}\s*[AP]M)/i)||[, '—'])[1].toUpperCase(); const tz=(ds.match(/\b(ET|CT|MT|PT|AZ)\b/i)||[, ''])[1].toUpperCase(); if(tz && !time.includes(tz)) time=`${time} ${tz}`; return [`${mmdd} - ${time}`.trim(), String(ng.opponent||'—').trim()||'—']; }
+function formatNextTwoLines(ng){ if(!ng) return ['—','—']; const ds=String(ng.date||'').trim(); const mmdd=(ds.match(/\b(\d{1,2}\/\d{1,2})\b/)||[, '—'])[1]; let time=(ds.match(/(\d{1,2}:\d{2}\s*[AP]M)/i)||[, '—'])[1].toUpperCase(); const tz=(ds.match(/\b(ET|CT|MT|PT|AZ)\b/i)||[, ''])[1].toUpperCase(); if(tz && !time.includes(tz)) time=`${time} ${tz}`; return [`${mmdd} - ${time}`.trim(), String(ng.opponent||'—').trim()||'—']; }
 
-/* ===== data (sample + your list) ===== */
+/* data */
 const playersRaw = [
   { id:"cody-bellinger", name:"CODY BELLINGER", graduatingClass:2013, currentLevel:"MLB", status:"Active",
     position:"CF/1B", team:"New York Yankees",
@@ -429,7 +386,8 @@ const playersRaw = [
     batting:{avg:".284",obp:".345",slg:".520",ops:".865",hits:"150",runs:"95",hr:"35",rbi:"105"},
     nextGame:{opponent:"@ BOSTON RED SOX", date:"7/15 5:10 PM AZ"},
     last3:[{date:"7/12",opp:"@ BOS",line:"2-4, HR, 2 RBI"},{date:"7/11",opp:"@ BOS",line:"1-3, BB"},{date:"7/10",opp:"vs TOR",line:"0-4"}],
-    letterWinnerYears:[2012,2013]
+    letterWinnerYears:[2012,2013],
+    tbcId:180827
   },
   { id:"patrick-murphy", name:"PATRICK MURPHY", graduatingClass:2013, currentLevel:"KBO", status:"Active",
     position:"P", team:"KT Wiz Suwon — KBO",
@@ -499,11 +457,11 @@ const playersRaw = [
     frontImg:"https://i.postimg.cc/rp0T753Z/IMG-7630.jpg",
     highSchoolImg:"https://i.postimg.cc/v8xHxwmx/AISelect-20250729-224953-System-UI.jpg",
     pitching:{era:"3.89",so:"93",whip:"1.18"},
-    nextGame:{date:"8/28 - 3:35 PM AZ",opponent:"@ SCRANTON/ WILKES BARRE"},
+    nextGame:{date:"8/28 - 3:35 PM AZ", opponent:"@ SCRANTON/ WILKES BARRE"},
     last3:[{date:"8/26",opp:"@ SWB",line:"1.0 IP, 1 ER, 1 K"},{date:"8/21",opp:"vs IND",line:"1.0 IP, 7 ER"},{date:"8/15",opp:"@ ROC",line:"1.0 IP, 1 ER"}],
     letterWinnerYears:[2016,2017]
   },
-  /* lightweight rows to fill out */
+  /* minimal extras */
   {id:"cooper-brass",name:"COOPER BRASS",position:"IF",currentLevel:"NCAA",graduatingClass:2023,status:"Active"},
   {id:"caden-burghardt",name:"CADEN BURGHARDT",position:"UT",currentLevel:"NCAA",graduatingClass:2024,status:"Active"},
   {id:"carson-johnson",name:"CARSON JOHNSON",position:"P",currentLevel:"NCAA",graduatingClass:2024,status:"Active"},
@@ -520,53 +478,45 @@ const playersRaw = [
   {id:"jeremy-jones",name:"JEREMY JONES",position:"P",currentLevel:"NCAA",graduatingClass:2022,status:"Active"},
   {id:"kole-klecker",name:"KOLE KLECKER",position:"P",currentLevel:"NCAA",graduatingClass:2022,status:"Active"},
   {id:"logan-saloman",name:"LOGAN SALOMAN",position:"P",currentLevel:"NCAA",graduatingClass:2022,status:"Active"},
+  {id:"luke-thiele-dup",name:"LUKE THIELE",position:"IF",currentLevel:"NCAA",graduatingClass:2021,status:"Active"},
   {id:"josh-tiedemann",name:"JOSH TIEDEMANN",position:"H-P",currentLevel:"A",graduatingClass:2023,status:"Active"},
   {id:"gavin-turley",name:"GAVIN TURLEY",position:"OF",currentLevel:"A",graduatingClass:2022,status:"Active"},
   {id:"braden-watkins",name:"BRADEN WATKINS",position:"OF",currentLevel:"NCAA",graduatingClass:2022,status:"Active"},
-  {id:"alex-hernandez",name:"ALEX HERNANDEZ",position:"C",currentLevel:"NCAA",graduatingClass:2021,status:"Active"},
+  {id:"alex-hernandez",name:"ALEX HERNANDEZ",position:"C",currentLevel:"NCAA",graduatingClass:2021,status:"Active"}
 ];
-
 const players = [...playersRaw].sort((a,b)=>(+a.graduatingClass||0)-(+b.graduatingClass||0));
 
-/* ===== render ===== */
-function letterDots(years){
-  if(!years||!years.length) return '';
-  const sorted=[...years].sort((a,b)=>b-a);
-  return `<div class="letters">${sorted.slice(0,4).map(y=>`<span class="letter-dot" title="${y}">${String(y).slice(-2)}</span>`).join('')}</div>`;
-}
+/* render */
+function letterDots(years){ if(!years||!years.length) return ''; const sorted=[...years].sort((a,b)=>b-a); return `<div class="letters">${sorted.slice(0,4).map(y=>`<span class="letter-dot" title="${y}">${String(y).slice(-2)}</span>`).join('')}</div>`;}
 function makeKV(k,v){ return `<div class="kv"><div class="k">${k}</div><div class="v">${v??'—'}</div></div>`; }
 function makeStats12(p){
   if(p.batting){
     const b=p.batting;
-    return `${makeKV('AVG',b.avg)}${makeKV('OBP',b.obp)}${makeKV('SLG',b.slg)}${makeKV('OPS',b.ops)}
-            ${makeKV('H',b.hits)}${makeKV('R',b.runs)}${makeKV('HR',b.hr)}${makeKV('RBI',b.rbi)}
-            ${makeKV('2B',b.doubles||'—')}${makeKV('3B',b.triples||'—')}${makeKV('SB',b.sb||'—')}${makeKV('BB',b.bb||'—')}`;
+    return `${makeKV('AVG',b.avg)} ${makeKV('OBP',b.obp)} ${makeKV('SLG',b.slg)} ${makeKV('OPS',b.ops)}
+            ${makeKV('H',b.hits)} ${makeKV('R',b.runs)} ${makeKV('HR',b.hr)} ${makeKV('RBI',b.rbi)}
+            ${makeKV('2B',b.doubles||'—')} ${makeKV('3B',b.triples||'—')} ${makeKV('SB',b.sb||'—')} ${makeKV('BB',b.bb||'—')}`;
   }
   const x=p.pitching||{};
-  return `${makeKV('ERA',x.era)}${makeKV('WHIP',x.whip)}${makeKV('OBA',x.oba||'—')}${makeKV('K/BB',x.kbb||'—')}
-          ${makeKV('FIP',x.fip||'—')}${makeKV('IP',x.ip||'—')}${makeKV('ER',x.er||'—')}${makeKV('K',x.so||x.ko||'—')}
-          ${makeKV('QS',x.qs||'—')}${makeKV('HR',x.hr||'—')}${makeKV('W',x.w||'—')}${makeKV('SV',x.sv||'—')}`;
+  return `${makeKV('ERA',x.era)} ${makeKV('WHIP',x.whip)} ${makeKV('OBA',x.oba||'—')} ${makeKV('K/BB',x.kbb||'—')}
+          ${makeKV('FIP',x.fip||'—')} ${makeKV('IP',x.ip||'—')} ${makeKV('ER',x.er||'—')} ${makeKV('K',x.so||x.ko||'—')}
+          ${makeKV('QS',x.qs||'—')} ${makeKV('HR',x.hr||'—')} ${makeKV('W',x.w||'—')} ${makeKV('SV',x.sv||'—')}`;
 }
 function makeCard(p){
   const lvl = lvlClass(p.currentLevel);
   const {team,parent} = teamAndParent(p);
   const [ng1,ng2] = formatNextTwoLines(p.nextGame||{});
-  const profileHref = `profile.html?id=${encodeURIComponent(p.id)}`;
-
+  const profUrl = `profile.html?id=${encodeURIComponent(p.id)}`;
   return `
-<article class="card flip-card front" tabindex="0" aria-label="${p.name} card">
-  <button class="hit left"  data-toggle="prev" aria-label="Flip"></button>
-  <button class="hit right" data-toggle="next" aria-label="Flip"></button>
+<article class="card flip-card front" tabindex="0" aria-label="${(p.name||'').toUpperCase()}">
+  <button class="hit left"  data-toggle="prev" aria-label="Flip previous"></button>
+  <button class="hit right" data-toggle="next" aria-label="Flip next"></button>
   <div class="flip-inner">
-
-    <!-- FRONT -->
     <section class="face front-face">
       <img class="card-img" src="${(p.frontImg||p.highSchoolImg||'')}" alt="${p.name}" onerror="this.onerror=null;this.style.display='none'">
       <div class="bottom-grad"></div>
-
       <div class="front-left">
-        <div class="name">${p.name}</div>
-        <div class="team">${team||''}</div>
+        <div class="name">${(p.name||'').toUpperCase()}</div>
+        <div class="team">${team}</div>
         ${parent?`<div class="parent">${parent}</div>`:`<div class="parent">&nbsp;</div>`}
         <div class="spacer-6"></div>
         <div class="stack">
@@ -576,12 +526,10 @@ function makeCard(p){
         </div>
         ${letterDots(p.letterWinnerYears)}
       </div>
-
       <div class="front-right">
         <span class="next-chip">NEXT GAME</span>
         <div class="right-line">${ng1}</div>
         <div class="right-line">${ng2}</div>
-
         <div class="last3">
           <span class="last-chip">LAST 3 GAMES</span>
           <div class="item">${p.last3?.[0]?fmtLast3(p.last3[0]):'—'}</div>
@@ -591,17 +539,17 @@ function makeCard(p){
       </div>
     </section>
 
-    <!-- BACK -->
     <section class="face back-face">
       <div class="back-top">
         <div class="back-left">
-          <!-- name links to profile -->
-          <a href="${profileHref}" class="stats-name" data-noflip>${p.name}</a>
+          <div class="stats-name">${(p.name||'').toUpperCase()}</div>
           <div class="team-line">${team||''}</div>
           <div class="parent-line">${parent||''}</div>
-
-          <div class="tiny-bar">
+          <div class="tiny-bar" data-noflip>
             <div class="tiny-grid" role="tablist" aria-label="Content tabs" data-noflip>
+              <button class="tabbtn active" data-tab="stats" title="Stats (default)" aria-pressed="true" data-noflip>
+                <svg viewBox="0 0 24 24"><path fill="currentColor" d="M5 3h2v18H5zM11 10h2v11h-2zM17 6h2v15h-2z"/></svg>
+              </button>
               <button class="tabbtn" data-tab="news" title="News" aria-pressed="false" data-noflip>
                 <svg viewBox="0 0 24 24"><path fill="currentColor" d="M4 5h16v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5zm2 2v12h12V7H6zm1 1h10v3H7V8z"/></svg>
               </button>
@@ -611,316 +559,150 @@ function makeCard(p){
               <button class="tabbtn" data-tab="ig" title="Instagram" aria-pressed="false" data-noflip>
                 <svg viewBox="0 0 24 24"><path fill="currentColor" d="M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5zm5 5a5 5 0 1 0 .001 10.001A5 5 0 0 0 12 7zm6-2.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z"/></svg>
               </button>
-              <button class="tabbtn" data-tab="gift" title="YAT-A-BOY / NIL" aria-pressed="false" data-noflip>
-                <svg viewBox="0 0 24 24"><path fill="currentColor" d="M20 12v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-8h16zm-7 0H4V8h9V6a3 3 0 1 1 3 3h3v3h-6zm-2 0v10h2V12h-2zM9 6a1 1 0 1 0 0 2h3.5A1.5 1.5 0 1 0 11 6H9z"/></svg>
-              </button>
             </div>
-            <button class="action-chip flat tab-stats active" data-tab="stats" data-noflip>
-              ${(String(p.status||'').toLowerCase()==='retired') ? 'CAREER STATS' : '2025 SEASON STATS'}
-            </button>
+            <button class="action-chip flat tab-stats active" data-tab="stats" data-noflip>2025 SEASON STATS</button>
           </div>
         </div>
-
         <div class="back-right">
-          <!-- HS photo opens in-card gallery -->
-          <div class="hs-box" data-pid="${p.id}" data-noflip title="Tap to view photo timeline">
-            <img src="${(p.highSchoolImg||p.frontImg||'')}" alt="${p.name} HS" onerror="this.onerror=null;this.style.display='none'">
+          <div class="hs-box" aria-hidden="true">
+            <img src="${(p.highSchoolImg||p.frontImg||'')}" alt="${(p.name||'HS')}" onerror="this.onerror=null;this.style.display='none'">
           </div>
+          <a class="action-chip ghost profile-chip" href="${profUrl}" data-noflip>PLAYER PROFILE</a>
         </div>
       </div>
-
       <div class="back-bottom" data-noflip>
         <div class="pane pane-stats active" data-pane="stats"><div class="kv-wrap12">${makeStats12(p)}</div></div>
         <div class="pane pane-news" data-pane="news"><div style="color:#6b7280">Latest headlines placeholder.</div></div>
         <div class="pane pane-x" data-pane="x"><div style="color:#6b7280">X/Twitter posts placeholder.</div></div>
         <div class="pane pane-ig" data-pane="ig"><div style="color:#6b7280">Instagram posts placeholder.</div></div>
-        <div class="pane pane-gift" data-pane="gift"><div><b>YAT-A-BOY Marketplace</b> • NIL Points: <b>${Number(p.nilPoints||0).toLocaleString()}</b></div></div>
-        <!-- Gallery (in variable area) -->
-        <div class="pane pane-gallery" data-pane="gallery">
-          <div class="gallery-wrap" data-noflip>
-            <div class="g-stage" data-noflip>
-              <button class="g-nav g-prev" data-noflip aria-label="Previous"><span>‹</span></button>
-              <img class="g-img" alt="">
-              <button class="g-nav g-next" data-noflip aria-label="Next"><span>›</span></button>
-            </div>
-            <div class="g-caption"><div class="g-name"></div><div class="g-meta"></div><div class="g-count"></div></div>
-          </div>
-        </div>
       </div>
     </section>
-
   </div>
 </article>`;
 }
+function render(list){ byId('grid').innerHTML = list.map(makeCard).join(''); attachInteractions(); }
 
-function render(list){
-  byId('grid').innerHTML = list.map(makeCard).join('');
-  attachInteractions();
-}
-
-/* ===== filters ===== */
+/* filters */
 const LEVEL_ORDER = ["MLB","TRIPLE-A","DOUBLE-A","HIGH-A","LOW-A","ROOKIE","INDY","NCAA","NCAA-D1","NCAA-D2","NCAA-D3","NAIA","JUCO"];
-function yearsRangeDesc(){ return Array.from({length:26},(_,i)=>2025-i); }
-function uniqueSortedGradYears(){ const s=new Set(players.map(p=>p.graduatingClass).filter(Boolean)); const base=[...s].map(Number); return [...new Set([...yearsRangeDesc(),...base])].filter(y=>y>=2000&&y<=2025); }
-function uniqueRosterYears(){ const s=new Set(); players.forEach(p=>(p.letterWinnerYears||[]).forEach(y=>s.add(Number(y)))); const base=[...s]; return [...new Set([...yearsRangeDesc(),...base])].filter(y=>y>=2000&&y<=2025); }
+function yearsRange(start,end){const arr=[]; for(let y=start;y>=end;y--) arr.push(y); return arr;}
+function uniqueSortedGradYears(){ const set=new Set(players.map(p=>p.graduatingClass).filter(Boolean)); const have=[...set].map(Number); const want=yearsRange(2025,2000); return [...new Set([...want,...have])]; }
+function uniqueRosterYears(){ const set=new Set(); players.forEach(p=>(p.letterWinnerYears||[]).forEach(y=>set.add(Number(y)))); const have=[...set]; const want=yearsRange(2025,2000); return [...new Set([...want,...have])]; }
 function populateFilters(){
   const lSel=byId('lvl'); lSel.innerHTML=''; LEVEL_ORDER.forEach(L=>{const o=document.createElement('option');o.value=L;o.textContent=L;lSel.appendChild(o);});
   const gSel=byId('grad'); gSel.innerHTML=''; uniqueSortedGradYears().forEach(y=>{const o=document.createElement('option');o.value=String(y);o.textContent=y;gSel.appendChild(o);});
   const rSel=byId('roster'); rSel.innerHTML=''; uniqueRosterYears().forEach(y=>{const o=document.createElement('option');o.value=String(y);o.textContent=y;rSel.appendChild(o);});
 }
 function getMultiValues(id){const sel=byId(id);return sel?[...sel.options].filter(o=>o.selected).map(o=>o.value):[]}
-
 function applyFilters(){
-  // left drawer site search (name only)
-  const qLeft=(byId('leftSearch')?.value||'').toLowerCase().trim();
-  // right drawer "By Player" filter
-  const qRight=(byId('fByName')?.value||'').toLowerCase().trim();
-  const nameNeedle = (qLeft||qRight);
-
+  const qLeft=(byId('localSearch')?.value||'').toLowerCase().trim();
+  const qRight=(byId('filterName')?.value||'').toLowerCase().trim();
+  const q=qRight||qLeft;
   const levels=getMultiValues('lvl').map(s=>s.toUpperCase());
   const grads=getMultiValues('grad');
   const years=getMultiValues('roster').map(Number);
   const stats=getMultiValues('status').map(s=>s.toLowerCase());
-
   const out=players.filter(p=>{
-    if(nameNeedle && !(p.name||'').toLowerCase().includes(nameNeedle)) return false;
-    if(levels.length){
-      const L=String(p.currentLevel||'').toUpperCase().replace('AAA','TRIPLE-A').replace('AA','DOUBLE-A');
-      if(!levels.includes(L) && !levels.includes(String(p.currentLevel||'').toUpperCase())) return false;
-    }
+    const name=(p.name||'').toLowerCase();
+    if(q && !name.includes(q)) return false;
+    if(levels.length){ const L=String(p.currentLevel||'').toUpperCase().replace('AAA','TRIPLE-A').replace('AA','DOUBLE-A'); if(!levels.includes(L)) return false; }
     if(grads.length && !grads.includes(String(p.graduatingClass))) return false;
-    if(years.length){const lw=p.letterWinnerYears||[]; if(!lw.some(y=>years.includes(y))) return false;}
+    if(years.length){ const lw=(p.letterWinnerYears||[]).map(Number); if(!lw.some(y=>years.includes(y))) return false; }
     if(stats.length){ if(!stats.includes(String(p.status||'').toLowerCase())) return false; }
     return true;
   }).sort((a,b)=>(+a.graduatingClass||0)-(+b.graduatingClass||0));
-
   render(out);
 }
-function resetFilters(){
+function resetAll(){
+  const ls=byId('localSearch'); if(ls) ls.value='';
+  const fn=byId('filterName'); if(fn) fn.value='';
   ['lvl','grad','roster','status'].forEach(id=>{const sel=byId(id); if(sel) [...sel.options].forEach(o=>o.selected=false);});
-  if(byId('fByName')) byId('fByName').value='';
-  if(byId('leftSearch')) byId('leftSearch').value='';
   render(players);
 }
 
-/* ===== gallery helpers ===== */
-function findPlayerById(pid){ return players.find(p=>p.id===pid); }
-function galleryItemsFor(p){
-  const out = (p.gallery && p.gallery.length ? p.gallery.slice() : []).filter(it=>it && it.src);
-  if(!out.length){
-    if(p.highSchoolImg) out.push({src:p.highSchoolImg, year:String(p.graduatingClass||''), label:'High School'});
-    if(p.frontImg)      out.push({src:p.frontImg, year:'', label:''});
-  }
-  return out;
-}
-function activatePane(card, name){
-  card.querySelectorAll('.pane').forEach(p=>p.classList.toggle('active', p.dataset.pane===name));
-  const statsChip = card.querySelector('.action-chip.flat.tab-stats');
-  if(statsChip) statsChip.classList.toggle('active', name==='stats');
-  card.querySelectorAll('.tabbtn').forEach(b=>{
-    const on = (b.dataset.tab === name);
-    b.classList.toggle('active', on);
-    b.setAttribute('aria-pressed', on ? 'true' : 'false');
-  });
-}
-function renderCardGallery(card){
-  const wrap = card.querySelector('.pane-gallery .gallery-wrap');
-  if(!wrap || !wrap._items || !wrap._items.length) return;
-  const idx  = wrap._idx || 0;
-  const it   = wrap._items[idx] || {};
-  const img  = card.querySelector('.pane-gallery .g-img');
-  const nm   = card.querySelector('.pane-gallery .g-name');
-  const meta = card.querySelector('.pane-gallery .g-meta');
-  const cnt  = card.querySelector('.pane-gallery .g-count');
-  img.src = it.src || ''; img.alt = `${wrap._name||'Player'} — ${it.label||it.year||'Photo'}`;
-  nm.textContent = wrap._name || '';
-  const pieces=[]; if(it.year) pieces.push(it.year); if(it.label) pieces.push(it.label);
-  meta.textContent = pieces.join(' • ');
-  cnt.textContent  = `${idx+1} / ${wrap._items.length}`;
-}
-function openCardGallery(card, pid){
-  const p = findPlayerById(pid);
-  const wrap = card.querySelector('.pane-gallery .gallery-wrap');
-  if(!p || !wrap) return;
-  wrap._items = galleryItemsFor(p);
-  wrap._name  = p.name || '';
-  wrap._idx   = 0;
-  activatePane(card, 'gallery');
-  renderCardGallery(card);
-}
-function attachGalleryInCard(card){
-  const stage = card.querySelector('.pane-gallery .g-stage');
-  const wrap  = card.querySelector('.pane-gallery .gallery-wrap');
-  if(!stage || !wrap) return;
-  if(stage._wired) return; stage._wired = true;
-
-  card.querySelector('.pane-gallery .g-prev')?.addEventListener('click', (e)=>{
-    e.stopPropagation();
-    if(!wrap._items || !wrap._items.length) return;
-    wrap._idx = (wrap._idx-1+wrap._items.length)%wrap._items.length;
-    renderCardGallery(card);
-  });
-  card.querySelector('.pane-gallery .g-next')?.addEventListener('click', (e)=>{
-    e.stopPropagation();
-    if(!wrap._items || !wrap._items.length) return;
-    wrap._idx = (wrap._idx+1)%wrap._items.length;
-    renderCardGallery(card);
-  });
-
-  // swipe
-  let sx=0, sy=0;
-  stage.addEventListener('touchstart', ev=>{
-    const t=ev.touches[0]; sx=t.clientX; sy=t.clientY;
-  }, {passive:true});
-  stage.addEventListener('touchend', ev=>{
-    const t=ev.changedTouches[0]; const dx=t.clientX-sx, dy=t.clientY-sy;
-    if(Math.abs(dx)>40 && Math.abs(dx)>Math.abs(dy)){
-      if(dx<0){ wrap._idx=(wrap._idx+1)%wrap._items.length; } else { wrap._idx=(wrap._idx-1+wrap._items.length)%wrap._items.length; }
-      renderCardGallery(card);
-    }
-  }, {passive:true});
-}
-
-/* ===== interactions ===== */
-const INTERACTIVE_SEL = '[data-noflip], .tabbtn, .action-chip, .hs-box, a,button,input,select,textarea';
-function toggle(card){ if(!card) return; card.classList.contains('front') ? card.classList.replace('front','back') : card.classList.replace('back','front'); }
+/* interactions */
+const INTERACTIVE_SEL='[data-noflip], .tabbtn, .action-chip, a,button,input,select,textarea';
+function toggle(card){ if(!card) return; card.classList.contains('front') ? (card.classList.remove('front'),card.classList.add('back')) : (card.classList.remove('back'),card.classList.add('front')); }
 function attachInteractions(){
-  document.querySelectorAll('.card').forEach(c=>{ if(!c.classList.contains('front') && !c.classList.contains('back')) c.classList.add('front'); });
-
-  // Edge clicks (avoid flipping when hitting interactive areas)
+  document.querySelectorAll('.card').forEach(c=>{ if(!c.classList.contains('front')&& !c.classList.contains('back')) c.classList.add('front'); });
   document.querySelectorAll('.card .hit').forEach(hit=>{
     hit.addEventListener('click', e=>{ if(e.target.closest(INTERACTIVE_SEL)) return; toggle(hit.closest('.card')); });
   });
-
-  // Swipe to flip (ignore if started in interactive)
   let sx=0, swc=null;
   document.querySelectorAll('.card').forEach(card=>{
-    card.addEventListener('touchstart', e=>{
-      if(e.target.closest(INTERACTIVE_SEL)) { swc=null; return; }
-      swc=card; sx=e.touches[0].clientX;
-    },{passive:true});
-    card.addEventListener('touchend', e=>{
-      if(!swc) return; const dx=e.changedTouches[0].clientX-sx; if(Math.abs(dx)>40) toggle(swc); swc=null;
-    });
+    card.addEventListener('touchstart', e=>{ if(e.target.closest(INTERACTIVE_SEL)) { swc=null; return; } swc=card; sx=e.touches[0].clientX; },{passive:true});
+    card.addEventListener('touchend', e=>{ if(!swc) return; const dx=e.changedTouches[0].clientX-sx; if(Math.abs(dx)>40) toggle(swc); swc=null; });
   });
-
-  // Back: icon tab switching + stats chip
-  document.addEventListener('click', (e)=>{
-    const btn = e.target.closest('.tabbtn, .action-chip.flat');
-    if(!btn) return;
-    e.stopPropagation();
-    const card = btn.closest('.card');
-    const pane = btn.dataset.tab || 'stats';
-    card.querySelectorAll('.tabbtn').forEach(b=>b.classList.toggle('active', b.dataset.tab===pane));
-    const statsChip = card.querySelector('.action-chip.flat.tab-stats');
-    statsChip?.classList.toggle('active', pane==='stats');
-    card.querySelectorAll('.pane').forEach(p=>p.classList.toggle('active', p.dataset.pane===pane));
-  }, true);
-
-  // HS click → in-card gallery
-  document.querySelectorAll('.card .hs-box[data-pid]').forEach(box=>{
-    if(box._wired) return; box._wired = true;
-    box.addEventListener('click', (e)=>{
+  document.querySelectorAll('.tiny-grid, .tab-stats').forEach(container=>{
+    container.addEventListener('click', (e)=>{
+      const btn=e.target.closest('.tabbtn, .action-chip.flat'); if(!btn) return;
       e.stopPropagation();
-      const card = box.closest('.card');
-      const pid  = box.getAttribute('data-pid');
-      openCardGallery(card, pid);
-      attachGalleryInCard(card);
-    });
+      const card=btn.closest('.card'); const pane=btn.dataset.tab||'stats';
+      card.querySelectorAll('.tabbtn').forEach(b=>b.classList.toggle('active', b.dataset.tab===pane || (pane==='stats'&&b.dataset.tab==='stats')));
+      const statsChip=card.querySelector('.action-chip.flat.tab-stats'); if(statsChip) statsChip.classList.toggle('active', pane==='stats');
+      card.querySelectorAll('.pane').forEach(p=>p.classList.toggle('active', p.dataset.pane===pane));
+    },true);
   });
-
-  // ensure each card's gallery nav is wired
-  document.querySelectorAll('.card').forEach(attachGalleryInCard);
 }
 
-/* ===== drawers ===== */
-const scrim = byId('scrim');
-const drawerLeft  = byId('drawerLeft');
-const drawerRight = byId('drawerRight');
-const drawerAuth  = byId('drawerAuth');
+/* drawers & header icons */
+const scrim=byId('scrim');
+const drawerLeft=byId('drawerLeft'); const drawerRight=byId('drawerRight'); const drawerAuth=byId('drawerAuth');
+const iconSearch=byId('iconSearch'); const iconFilter=byId('iconFilter'); const iconReset=byId('iconReset'); const iconProfile=byId('iconProfile');
 let lastFocus=null;
+function setActiveIcon(btn,a){ btn?.classList.toggle('active',!!a); }
 
-function setIconActive(id, on){
-  const b = byId(id);
-  if(!b) return;
-  b.classList.toggle('active', !!on);
-}
+function openLeft(){ closeRight(false); closeAuth(false); lastFocus=document.activeElement; drawerLeft.classList.add('open'); scrim.classList.add('open'); document.body.classList.add('no-scroll'); setActiveIcon(iconSearch,true); setActiveIcon(iconFilter,false); setActiveIcon(iconProfile,false); }
+function closeLeft(focus=true){ drawerLeft.classList.remove('open'); if(!drawerRight.classList.contains('open')&&!drawerAuth.classList.contains('open')){ scrim.classList.remove('open'); document.body.classList.remove('no-scroll'); } setActiveIcon(iconSearch,false); if(focus) lastFocus?.focus?.(); }
 
-function openLeft(){ closeRight(false); closeAuth(false); lastFocus=document.activeElement; drawerLeft.classList.add('open'); scrim.classList.add('open'); document.body.classList.add('no-scroll'); setIconActive('openLeftViaSearch', true); }
-function closeLeft(focus=true){ drawerLeft.classList.remove('open'); setIconActive('openLeftViaSearch', false); maybeUnscrim(); if(focus) lastFocus?.focus?.(); }
+function openRight(){ closeLeft(false); closeAuth(false); lastFocus=document.activeElement; drawerRight.classList.add('open'); scrim.classList.add('open'); document.body.classList.add('no-scroll'); setActiveIcon(iconFilter,true); setActiveIcon(iconSearch,false); setActiveIcon(iconProfile,false); }
+function closeRight(focus=true){ drawerRight.classList.remove('open'); if(!drawerLeft.classList.contains('open')&&!drawerAuth.classList.contains('open')){ scrim.classList.remove('open'); document.body.classList.remove('no-scroll'); } setActiveIcon(iconFilter,false); if(focus) lastFocus?.focus?.(); }
 
-function openRight(){ closeLeft(false); closeAuth(false); lastFocus=document.activeElement; drawerRight.classList.add('open'); scrim.classList.add('open'); document.body.classList.add('no-scroll'); setIconActive('openFilters', true); }
-function closeRight(focus=true){ drawerRight.classList.remove('open'); setIconActive('openFilters', false); maybeUnscrim(); if(focus) lastFocus?.focus?.(); }
+function openAuth(){ closeLeft(false); closeRight(false); lastFocus=document.activeElement; drawerAuth.classList.add('open'); scrim.classList.add('open'); document.body.classList.add('no-scroll'); setActiveIcon(iconProfile,true); setActiveIcon(iconSearch,false); setActiveIcon(iconFilter,false); }
+function closeAuth(focus=true){ drawerAuth.classList.remove('open'); if(!drawerLeft.classList.contains('open')&&!drawerRight.classList.contains('open')){ scrim.classList.remove('open'); document.body.classList.remove('no-scroll'); } setActiveIcon(iconProfile,false); if(focus) lastFocus?.focus?.(); }
 
-function openAuth(){ closeLeft(false); closeRight(false); lastFocus=document.activeElement; drawerAuth.classList.add('open'); scrim.classList.add('open'); document.body.classList.add('no-scroll'); setIconActive('openAuth', true); }
-function closeAuth(focus=true){ drawerAuth.classList.remove('open'); setIconActive('openAuth', false); maybeUnscrim(); if(focus) lastFocus?.focus?.(); }
-
-function maybeUnscrim(){ if(!drawerLeft.classList.contains('open') && !drawerRight.classList.contains('open') && !drawerAuth.classList.contains('open')){ scrim.classList.remove('open'); document.body.classList.remove('no-scroll'); } }
 function closeDrawers(){ closeLeft(false); closeRight(false); closeAuth(); }
 
+/* binds */
 byId('openLeft').addEventListener('click', openLeft);
-byId('openLeftViaSearch').addEventListener('click', openLeft);
-byId('openFilters').addEventListener('click', openRight);
-byId('openAuth').addEventListener('click', openAuth);
 byId('closeLeft').addEventListener('click', ()=>closeLeft());
 byId('closeRight').addEventListener('click', ()=>closeRight());
 byId('closeAuth').addEventListener('click', ()=>closeAuth());
+iconSearch.addEventListener('click', openLeft);
+iconFilter.addEventListener('click', openRight);
+iconProfile.addEventListener('click', openAuth);
+iconReset.addEventListener('click', resetAll);
 scrim.addEventListener('click', closeDrawers);
 
-// swipe to close drawers
-function wireSwipeClose(el, dir){ // dir: 'left' or 'right' indicates swipe direction to close
-  let sx=0, sy=0;
-  el.addEventListener('touchstart', ev=>{ const t=ev.touches[0]; sx=t.clientX; sy=t.clientY; }, {passive:true});
-  el.addEventListener('touchend', ev=>{
-    const t=ev.changedTouches[0]; const dx=t.clientX-sx; const dy=t.clientY-sy;
-    if(Math.abs(dx)>50 && Math.abs(dx)>Math.abs(dy)){
-      if(dir==='left' && dx<0) closeLeft();
-      if(dir==='right'&& dx>0) { if(el===drawerRight) closeRight(); if(el===drawerAuth) closeAuth(); }
-    }
-  }, {passive:true});
+/* ESC */
+document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') closeDrawers(); });
+
+/* swipe-close drawers */
+function addSwipeClose(el,dir){ let sx=null,sy=null;
+  el.addEventListener('touchstart', e=>{ sx=e.touches[0].clientX; sy=e.touches[0].clientY; },{passive:true});
+  el.addEventListener('touchend', e=>{ if(sx==null) return; const dx=e.changedTouches[0].clientX-sx; const dy=e.changedTouches[0].clientY-sy;
+    if(Math.abs(dx)>40 && Math.abs(dx)>Math.abs(dy)){ if(dir==='left'&&dx<0) closeLeft(); if(dir==='right'&&dx>0){ el===drawerAuth?closeAuth():closeRight(); } }
+    sx=sy=null;
+  });
 }
-wireSwipeClose(drawerLeft,'left');
-wireSwipeClose(drawerRight,'right');
-wireSwipeClose(drawerAuth,'right');
+addSwipeClose(drawerLeft,'left'); addSwipeClose(drawerRight,'right'); addSwipeClose(drawerAuth,'right');
 
-/* ===== left drawer: type-ahead site search ===== */
-const leftInput = byId('leftSearch');
-const leftResults = byId('leftResults');
-function renderLeftResults(list){
-  if(!list.length){ leftResults.style.display='none'; leftResults.innerHTML=''; return; }
-  leftResults.style.display='block';
-  leftResults.innerHTML = list.slice(0,30).map(p=>(
-    `<div class="type-item" data-id="${p.id}">
-       ${p.name} ${p.graduatingClass?`<span style="color:#6b7280"> (Class of ${p.graduatingClass})</span>`:''}
-     </div>`
-  )).join('');
+/* left drawer type-ahead */
+const localSearch=byId('localSearch'); const localResults=byId('localResults');
+function renderLocalResults(q){
+  localResults.innerHTML=''; if(!q) return;
+  players.filter(p=>(p.name||'').toLowerCase().includes(q.toLowerCase())).slice(0,50).forEach(p=>{
+    const li=document.createElement('li'); const yr=p.graduatingClass?` (Class of ${p.graduatingClass})`:''; li.textContent=`${p.name}${yr}`;
+    li.addEventListener('click', ()=>{ window.location.href=`profile.html?id=${encodeURIComponent(p.id)}`; closeLeft(); });
+    localResults.appendChild(li);
+  });
 }
-leftResults.addEventListener('click', e=>{
-  const it = e.target.closest('.type-item'); if(!it) return;
-  const pid = it.getAttribute('data-id');
-  window.location.href = `profile.html?id=${encodeURIComponent(pid)}`;
-  closeLeft();
-});
-leftInput.addEventListener('input', ()=>{
-  const q = (leftInput.value||'').toLowerCase().trim();
-  if(!q){ renderLeftResults([]); return; }
-  const matches = players.filter(p=> (p.name||'').toLowerCase().includes(q));
-  renderLeftResults(matches);
-});
+localSearch.addEventListener('input', (e)=>renderLocalResults(e.target.value));
 
-/* ===== right drawer: By Player enter closes drawer ===== */
-byId('fByName').addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ applyFilters(); closeRight(); } });
+/* right drawer: By Player filter (auto-close on Enter) */
+byId('filterName').addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ e.preventDefault(); applyFilters(); closeRight(); } });
 
-/* ===== grid filters wiring ===== */
-['lvl','grad','roster','status'].forEach(id=> byId(id)?.addEventListener('change', applyFilters));
-byId('fByName').addEventListener('input', applyFilters);
-byId('resetFilters').addEventListener('click', resetFilters);
-
-/* ===== boot ===== */
-document.addEventListener('DOMContentLoaded', ()=>{
-  populateFilters();
-  render(players);
-});
+/* boot */
+document.addEventListener('DOMContentLoaded', ()=>{ populateFilters(); render(players); });
 </script>
 </body>
 </html>
