@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>hamilton.yatstats.com — WHERE THEY YAT? (v4.2.4)</title>
+<title>hamilton.yatstats.com — WHERE THEY YAT? (v4.2.5)</title>
 
 <style>
 /* Import Google Font */
@@ -62,7 +62,7 @@ button{font:inherit;color:inherit}
 .tag-strong, .name, .stats-name, .kv .v, .right-line, .next-chip, .last-chip, .stats-tab { font-family: var(--font-display); }
 
 /* GRID & CARDS */
-main{padding:var(--headerH) 0 84px}
+main{padding-top:var(--headerH)}
 .grid{padding:10px;display:grid;grid-template-columns:repeat(1,minmax(0,1fr));gap:12px}
 @media (min-width:560px){ .grid{grid-template-columns:repeat(2,minmax(0,1fr))} }
 @media (min-width:820px){ .grid{grid-template-columns:repeat(3,minmax(0,1fr))} }
@@ -80,10 +80,8 @@ main{padding:var(--headerH) 0 84px}
 .front-face{transform:rotateY(0); background-color: #111;}
 .card-img{position:absolute; inset:0; width:100%; height:100%; object-fit:cover;}
 .bottom-grad{position:absolute; left:0; right:0; bottom:0; height:66%; background:linear-gradient(to top, rgba(0,0,0,.98) 0%, rgba(0,0,0,.92) 30%, rgba(0,0,0,.86) 48%, rgba(0,0,0,0) 76%); pointer-events:none; z-index:1;}
-.front-left, .front-right{position:absolute; z-index:3; color:#fff; text-shadow:0 1px 2px rgba(0,0,0,.45)}
 .front-left{left:12px; bottom:12px; width:46%}
-.front-right{right:12px; bottom:10px; width:72%; text-align:right}
-.name{font-weight:900;text-transform:uppercase;letter-spacing:.02em;font-size:18px;line-height:1.06}
+.name{font-weight:900;text-transform:uppercase;letter-spacing:.02em;font-size:18px;line-height:1.06; color:#fff; text-shadow:0 1px 2px rgba(0,0,0,.45)}
 .chip{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.14);color:#fff;border:1px solid rgba(255,255,255,.24);border-radius:999px;padding:2px 8px 3px;font-weight:800;font-size:10px;letter-spacing:.06em}
 
 /* BACK OF CARD */
@@ -196,7 +194,7 @@ body.no-scroll{overflow:hidden}
 </header>
 
 <main>
-  <div id="tagline" class="tagline-wrap" style="padding-top: var(--headerH);">
+  <div class="tagline-wrap">
     <div class="tagline">
       <div class="tag-text">
         <span class="tag-grey">WHERE THEY</span><span class="tag-strong tag-tight"> YAT?</span>
@@ -223,7 +221,7 @@ body.no-scroll{overflow:hidden}
 
 <footer class="footer">
   <img src="https://i.postimg.cc/v8LxKy54/no-errors-sample-banner.png" alt="Sponsor banner">
-  <div class="build-pill">BUILD: ham-v4.2.4</div>
+  <div class="build-pill">BUILD: ham-v4.2.5</div>
 </footer>
 
 <script>
@@ -243,7 +241,6 @@ document.addEventListener('DOMContentLoaded', () => {
     {"name":"Shane Anderson","frontImg":"https://i.postimg.cc/J4j5XP4M/IMG-20250826-030341.jpg","highSchoolImg":"https://i.postimg.cc/SNj7TkrQ/AISelect-20250826-031127-Gallery-1.jpg"},
     {"name":"Chaz DeLuca","frontImg":"https://i.postimg.cc/rp0T753Z/IMG-7630.jpg","highSchoolImg":"https://i.postimg.cc/v8xHxwmx/AISelect-20250729-224953-System-UI.jpg"}
   ];
-
   const hamiltonPlayersData = [
     {"name":"Shane Anderson","label":"ACTIVE 2025","type":"pitcher"},{"name":"DJ Barrett","label":"ACTIVE 2025","type":"pitcher"},{"name":"Cody Bellinger","label":"ACTIVE 2025","type":"batter"},
     {"name":"Logan Boyer","label":"ACTIVE 2025","type":"pitcher"},{"name":"Cooper Brass","label":"ACTIVE 2025","type":"batter"},{"name":"Michael Brueser","label":"ACTIVE 2024","type":"batter"},
@@ -262,13 +259,11 @@ document.addEventListener('DOMContentLoaded', () => {
     {"name":"Braden Watkins","label":"ACTIVE 2025","type":"batter"},{"name":"Liam Wilson","label":"ACTIVE 2025","type":"batter"},{"name":"Tyler Wilson","label":"ACTIVE 2025","type":"batter"},
     {"name":"Jake Wong","label":"ACTIVE 2024","type":"pitcher"}
   ];
-
   const players = hamiltonPlayersData.map(p => {
     const originalPlayer = initialPlayers.find(op => op.name.toLowerCase() === p.name.toLowerCase());
     const id = p.name.toLowerCase().replace(/\s+/g, '-');
     return { ...p, id, frontImg: originalPlayer?.frontImg, highSchoolImg: originalPlayer?.highSchoolImg };
   }).sort((a, b) => b.label.localeCompare(a.label) || a.name.localeCompare(b.name));
-
   const sampleData = {
     'cody-bellinger': {
       stats2025: { type: 'batter', ab: '450', h: '128', r: '80', sb: '15', '2b': '30', '3b': '3', hr: '28', rbi: '95', avg: '.284', obp: '.350', slg: '.540', ops: '.890' },
@@ -411,6 +406,10 @@ document.addEventListener('DOMContentLoaded', () => {
     [iconSearch, iconFilter, iconProfile].forEach(icon => setActiveIcon(icon, false));
     if (focus) lastFocus?.focus();
   }
+  function resetAll() {
+    // Basic reset logic, can be expanded
+    render(players);
+  }
   byId('openLeft').addEventListener('click', openLeft);
   byId('iconProfile').addEventListener('click', openAuth);
   byId('iconSearch').addEventListener('click', openLeft);
@@ -418,7 +417,7 @@ document.addEventListener('DOMContentLoaded', () => {
   byId('closeLeft').addEventListener('click', () => closeAllDrawers());
   byId('closeRight').addEventListener('click', () => closeAllDrawers());
   byId('closeAuth').addEventListener('click', () => closeAllDrawers());
-  byId('iconReset').addEventListener('click', () => { /* Logic for reset */ });
+  byId('iconReset').addEventListener('click', resetAll);
   scrim.addEventListener('click', () => closeAllDrawers());
   document.addEventListener('keydown', e => { if (e.key === 'Escape') closeAllDrawers(); });
   
