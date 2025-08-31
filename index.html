@@ -173,7 +173,6 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelectorAll('.card').forEach(c => {
             if (!c.classList.contains('front') && !c.classList.contains('back')) c.classList.add('front');
             
-            // Your brilliant fix is here:
             const backFace = c.querySelector('.back-face');
             backFace.addEventListener('click', (e) => {
                 if(e.target.closest('a, button')) {
@@ -205,7 +204,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         document.querySelectorAll('.card .hit').forEach(hit => {
             hit.addEventListener('click', e => {
-                // Simplified listener as per your suggestion
                 toggle(hit.closest('.card'));
             });
         });
@@ -236,14 +234,16 @@ document.addEventListener('DOMContentLoaded', () => {
     scrim.addEventListener('click', () => closeAllDrawers());
     document.addEventListener('keydown', e => { if (e.key === 'Escape') closeAllDrawers(); });
     const localSearch = byId('localSearch'); const localResults = byId('localResults');
-    function renderLocalResults(q) { localResults.innerHTML = ''; if (!q) return; players.filter(p=>(p.name||'').toLowerCase().includes(q.toLowerCase())).slice(0,50).forEach(p=>{ const li=document.createElement('li'); li.textContent=`${p.name}`; li.addEventListener('click', ()=>{ window.location.href=`profile.html?id=${p.id}`; closeAllDrawers(); }); localResults.appendChild(li); }); }
+    function renderLocalResults(q) { localResults.innerHTML = ''; if (!q) return; players.filter(p=>(p.name||'').toLowerCase().includes(q.toLowerCase())).slice(0,50).forEach(p=>{ const li=document.createElement('li'); li.textContent=`${p.name}`; li.addEventListener('click', ()=>{ window.location.href=`profile.html?id=${p.id}`; closeAllDraws(); }); localResults.appendChild(li); }); }
     localSearch.addEventListener('input', e=>renderLocalResults(e.target.value));
 
     // --- INITIALIZE APP ---
     const splash = byId('splashScreen');
     render(players);
-    setTimeout(() => { splash.classList.remove('open'); }, 500);
-    setTimeout(() => { splash.style.display = 'none'; }, 1000);
+    splash.classList.remove('open'); 
+    splash.addEventListener('transitionend', () => {
+        splash.style.display = 'none';
+    }, { once: true });
 });
 </script>
 
