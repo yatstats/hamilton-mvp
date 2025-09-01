@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>hamilton.yatstats.com — WHERE THEY YAT? (ham-v4.0.9)</title>
+<title>hamilton.yatstats.com — WHERE THEY YAT? (ham-v4.1.0)</title>
 
 <style>
 :root{
@@ -27,8 +27,12 @@ button{font:inherit;color:inherit}
 .hambtn{width:36px;height:36px;border:0;background:transparent;display:grid;place-items:center;cursor:pointer}
 .ham-logo{height:42px;width:auto;display:block}
 
-.nav-desktop{display:flex;gap:14px;align-self:center;justify-self:center}
-.nav-desktop a{font-size:12px;text-transform:uppercase;color:#1f2937;white-space:nowrap;padding:4px 0;letter-spacing:.06em}
+/* Desktop nav: allow horizontal scroll before collapsing */
+.nav-desktop{
+  display:flex; gap:14px; align-self:center; justify-self:center;
+  max-width:100%; overflow-x:auto; scrollbar-width:thin; padding:2px 4px;
+}
+.nav-desktop a{font-size:12px;text-transform:uppercase;color:#1f2937;white-space:nowrap;padding:4px 0;letter-spacing:.06em;flex:0 0 auto}
 @media (max-width:1260px){ .nav-desktop{display:none} }
 
 .h-right{display:flex;flex-direction:column;align-items:flex-end;gap:6px;min-width:0}
@@ -85,12 +89,14 @@ main{padding:calc(var(--headerH) + 44px) 0 84px}
 .stack{display:flex;flex-direction:column;gap:4px;margin-top:4px;align-items:flex-start}
 .chip{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.14);color:#fff;border:1px solid rgba(255,255,255,.24);border-radius:999px;padding:2px 8px 3px;font-weight:800;font-size:10px;letter-spacing:.06em}
 .chip.level.mlb{background:#7A0019;border-color:#7A0019}
+.chip.level.kbo{background:#b45309;border-color:#b45309}
 .chip.level.triple-a{background:#2563eb;border-color:#2563eb}
 .chip.level.double-a{background:#3b82f6;border-color:#3b82f6}
 .chip.level.high-a{background:#4338ca;border-color:#4338ca}
 .chip.level.low-a{background:#3730a3;border-color:#3730a3}
 .chip.level.rookie{background:#0f766e;border-color:#0f766e}
 .chip.level.indy{background:#3f6212;border-color:#3f6212}
+.chip.level.ncaa{background:#166534;border-color:#166534}
 .chip.level.ncaa-d1{background:#166534;border-color:#166534}
 .chip.level.ncaa-d2{background:#047857;border-color:#047857}
 .chip.level.ncaa-d3{background:#065f46;border-color:#065f46}
@@ -98,6 +104,7 @@ main{padding:calc(var(--headerH) + 44px) 0 84px}
 .chip.level.juco{background:#0d9488;border-color:#0d9488}
 .chip.status{background:#16a34a;border-color:#16a34a}
 .chip.status.retired{background:#6b7280;border-color:#6b7280}
+.chip.status.coach{background:#0f172a;border-color:#0f172a}
 .chip.class{background:#374151;border-color:#374151}
 
 /* letter dots */
@@ -336,6 +343,7 @@ body.no-scroll{overflow:hidden}
             <option value="Free Agent">FREE AGENT</option>
             <option value="Injured">INJURED</option>
             <option value="Retired">RETIRED</option>
+            <option value="Coach">COACH</option>
           </select>
         </div>
       </details>
@@ -366,18 +374,58 @@ body.no-scroll{overflow:hidden}
 
 <footer class="footer">
   <img src="https://i.postimg.cc/v8LxKy54/no-errors-sample-banner.png" alt="Sponsor banner">
-  <div class="build-pill">BUILD: ham-v4.0.9</div>
+  <div class="build-pill">BUILD: ham-v4.1.0</div>
 </footer>
 
 <script>
-/* helpers */
+/* ========= Helpers & Constants (with Level Normalization) ========= */
 const byId = id => document.getElementById(id);
-function lvlClass(l){return String(l||'').toLowerCase().replace(/\s+/g,'-').replace('aaa','triple-a').replace('aa','double-a')}
-function teamAndParent(p){ const raw=String(p.team||''); const parts=raw.split('—'); const team=(parts[0]||raw).trim(); let parent=(parts[1]||'').trim(); if((p.currentLevel||'').toUpperCase()==='MLB') parent=''; return {team,parent}; }
-function fmtLast3(g){ return `${g.date||'—'} • ${g.opp||'—'} — ${g.line||'—'}`; }
-function formatNextTwoLines(ng){ if(!ng) return ['—','—']; const ds=String(ng.date||'').trim(); const mmdd=(ds.match(/\b(\d{1,2}\/\d{1,2})\b/)||[, '—'])[1]; let time=(ds.match(/(\d{1,2}:\d{2}\s*[AP]M)/i)||[, '—'])[1].toUpperCase(); const tz=(ds.match(/\b(ET|CT|MT|PT|AZ)\b/i)||[, ''])[1].toUpperCase(); if(tz && !time.includes(tz)) time=`${time} ${tz}`; return [`${mmdd} - ${time}`.trim(), String(ng.opponent||'—').trim()||'—']; }
 
-/* data */
+// Normalize level labels to canonical forms used everywhere
+function normalizeLevel(raw) {
+  if (!raw) return '';
+  let t = String(raw).trim().toUpperCase();
+  t = t.replace('AAA','TRIPLE-A')
+       .replace(/\bAA\b/,'DOUBLE-A')
+       .replace(/\bA\+\b/,'HIGH-A')
+       .replace(/SINGLE-A|^A$/,'LOW-A');
+  // known values (leave as-is): MLB, KBO, ROOKIE, INDY, NCAA, NCAA-D1/2/3, NAIA, JUCO
+  return t;
+}
+
+function lvlClass(l){
+  const L = normalizeLevel(l);
+  return L.toLowerCase().replace(/\s+/g,'-');
+}
+
+function teamAndParent(p){
+  const raw = String(p.team || '');
+  // split on em dash, en dash, or hyphen with spaces
+  const parts = raw.split(/\s*[—–-]\s*/);
+  const team = (parts[0] || raw).trim();
+  let parent = (parts[1] || '').trim();
+  if (normalizeLevel(p.currentLevel) === 'MLB') parent = '';
+  return { team, parent };
+}
+
+function fmtLast3(g){ return `${g.date||'—'} • ${g.opp||'—'} — ${g.line||'—'}`; }
+
+function formatNextTwoLines(ng){
+  if(!ng) return ['—','—'];
+  const ds = String(ng.date||'').trim();
+  const mmdd = (ds.match(/\b(\d{1,2}\/\d{1,2})\b/)||[, '—'])[1];
+  let time  = (ds.match(/(\d{1,2}:\d{2}\s*[AP]M)/i)||[, '—'])[1].toUpperCase();
+  const tz  = (ds.match(/\b(ET|CT|MT|PT|AZ)\b/i)||[, ''])[1]?.toUpperCase() || '';
+  if (tz && !time.includes(tz)) time = `${time} ${tz}`;
+  return [`${mmdd} - ${time}`.trim(), String(ng.opponent||'—').trim()||'—'];
+}
+
+const LEVEL_ORDER = [
+  "MLB","KBO","TRIPLE-A","DOUBLE-A","HIGH-A","LOW-A","ROOKIE","INDY",
+  "NCAA","NCAA-D1","NCAA-D2","NCAA-D3","NAIA","JUCO"
+];
+
+/* ===================== Demo Data ===================== */
 const playersRaw = [
   { id:"cody-bellinger", name:"CODY BELLINGER", graduatingClass:2013, currentLevel:"MLB", status:"Active",
     position:"CF/1B", team:"New York Yankees",
@@ -452,7 +500,7 @@ const playersRaw = [
     highSchoolImg:"https://i.postimg.cc/SNj7TkrQ/AISelect-20250826-031127-Gallery-1.jpg",
     letterWinnerYears:[2020]
   },
-  { id:"chaz-deluca", name:"CHAZ DELUCA", graduatingClass:2017, currentLevel:"High-A", status:"COACH",
+  { id:"chaz-deluca", name:"CHAZ DELUCA", graduatingClass:2017, currentLevel:"High-A", status:"Coach",
     position:"Player Development", team:"Aberdeen IronBirds — Baltimore Orioles",
     frontImg:"https://i.postimg.cc/rp0T753Z/IMG-7630.jpg",
     highSchoolImg:"https://i.postimg.cc/v8xHxwmx/AISelect-20250729-224953-System-UI.jpg",
@@ -479,15 +527,21 @@ const playersRaw = [
   {id:"kole-klecker",name:"KOLE KLECKER",position:"P",currentLevel:"NCAA",graduatingClass:2022,status:"Active"},
   {id:"logan-saloman",name:"LOGAN SALOMAN",position:"P",currentLevel:"NCAA",graduatingClass:2022,status:"Active"},
   {id:"luke-thiele-dup",name:"LUKE THIELE",position:"IF",currentLevel:"NCAA",graduatingClass:2021,status:"Active"},
-  {id:"josh-tiedemann",name:"JOSH TIEDEMANN",position:"H-P",currentLevel:"A",graduatingClass:2023,status:"Active"},
-  {id:"gavin-turley",name:"GAVIN TURLEY",position:"OF",currentLevel:"A",graduatingClass:2022,status:"Active"},
+  {id:"josh-tiedemann",name:"JOSH TIEDEMANN",position:"H-P",currentLevel:"A",graduatingClass:2023,status:"Active"}, /* will normalize to LOW-A */
+  {id:"gavin-turley",name:"GAVIN TURLEY",position:"OF",currentLevel:"A",graduatingClass:2022,status:"Active"},       /* will normalize to LOW-A */
   {id:"braden-watkins",name:"BRADEN WATKINS",position:"OF",currentLevel:"NCAA",graduatingClass:2022,status:"Active"},
   {id:"alex-hernandez",name:"ALEX HERNANDEZ",position:"C",currentLevel:"NCAA",graduatingClass:2021,status:"Active"}
 ];
-const players = [...playersRaw].sort((a,b)=>(+a.graduatingClass||0)-(+b.graduatingClass||0));
 
-/* render */
-function letterDots(years){ if(!years||!years.length) return ''; const sorted=[...years].sort((a,b)=>b-a); return `<div class="letters">${sorted.slice(0,4).map(y=>`<span class="letter-dot" title="${y}">${String(y).slice(-2)}</span>`).join('')}</div>`;}
+const players = [...playersRaw].map(p=>({...p, currentLevel: normalizeLevel(p.currentLevel)}))
+                               .sort((a,b)=>(+a.graduatingClass||0)-(+b.graduatingClass||0));
+
+/* ===================== Render ===================== */
+function letterDots(years){
+  if(!years||!years.length) return '';
+  const sorted=[...years].sort((a,b)=>b-a);
+  return `<div class="letters">${sorted.slice(0,4).map(y=>`<span class="letter-dot" title="${y}">${String(y).slice(-2)}</span>`).join('')}</div>`;
+}
 function makeKV(k,v){ return `<div class="kv"><div class="k">${k}</div><div class="v">${v??'—'}</div></div>`; }
 function makeStats12(p){
   if(p.batting){
@@ -506,13 +560,19 @@ function makeCard(p){
   const {team,parent} = teamAndParent(p);
   const [ng1,ng2] = formatNextTwoLines(p.nextGame||{});
   const profUrl = `profile.html?id=${encodeURIComponent(p.id)}`;
+  const statusClass = String(p.status||'').toLowerCase()==='retired' ? 'retired'
+                      : String(p.status||'').toLowerCase()==='coach' ? 'coach' : '';
   return `
 <article class="card flip-card front" tabindex="0" aria-label="${(p.name||'').toUpperCase()}">
   <button class="hit left"  data-toggle="prev" aria-label="Flip previous"></button>
   <button class="hit right" data-toggle="next" aria-label="Flip next"></button>
   <div class="flip-inner">
     <section class="face front-face">
-      <img class="card-img" src="${(p.frontImg||p.highSchoolImg||'')}" alt="${p.name}" onerror="this.onerror=null;this.style.display='none'">
+      <img class="card-img"
+           src="${(p.frontImg||p.highSchoolImg||'')}"
+           alt="${p.name}"
+           loading="lazy" decoding="async"
+           onerror="this.onerror=null;this.style.display='none'">
       <div class="bottom-grad"></div>
       <div class="front-left">
         <div class="name">${(p.name||'').toUpperCase()}</div>
@@ -521,7 +581,7 @@ function makeCard(p){
         <div class="spacer-6"></div>
         <div class="stack">
           ${p.currentLevel?`<span class="chip level ${lvl}">${String(p.currentLevel).toUpperCase()}</span>`:''}
-          ${p.status?`<span class="chip status ${String(p.status).toLowerCase()==='retired'?'retired':''}">${String(p.status).toUpperCase()}</span>`:''}
+          ${p.status?`<span class="chip status ${statusClass}">${String(p.status).toUpperCase()}</span>`:''}
           ${p.graduatingClass?`<span class="chip class">CLASS OF ${p.graduatingClass}</span>`:''}
         </div>
         ${letterDots(p.letterWinnerYears)}
@@ -565,7 +625,10 @@ function makeCard(p){
         </div>
         <div class="back-right">
           <div class="hs-box" aria-hidden="true">
-            <img src="${(p.highSchoolImg||p.frontImg||'')}" alt="${(p.name||'HS')}" onerror="this.onerror=null;this.style.display='none'">
+            <img src="${(p.highSchoolImg||p.frontImg||'')}"
+                 alt="${(p.name||'HS')}"
+                 loading="lazy" decoding="async"
+                 onerror="this.onerror=null;this.style.display='none'">
           </div>
           <a class="action-chip ghost profile-chip" href="${profUrl}" data-noflip>PLAYER PROFILE</a>
         </div>
@@ -582,36 +645,54 @@ function makeCard(p){
 }
 function render(list){ byId('grid').innerHTML = list.map(makeCard).join(''); attachInteractions(); }
 
-/* filters */
-const LEVEL_ORDER = ["MLB","TRIPLE-A","DOUBLE-A","HIGH-A","LOW-A","ROOKIE","INDY","NCAA","NCAA-D1","NCAA-D2","NCAA-D3","NAIA","JUCO"];
+/* ===================== Filters ===================== */
 function yearsRange(start,end){const arr=[]; for(let y=start;y>=end;y--) arr.push(y); return arr;}
 function uniqueSortedGradYears(){ const set=new Set(players.map(p=>p.graduatingClass).filter(Boolean)); const have=[...set].map(Number); const want=yearsRange(2025,2000); return [...new Set([...want,...have])]; }
 function uniqueRosterYears(){ const set=new Set(); players.forEach(p=>(p.letterWinnerYears||[]).forEach(y=>set.add(Number(y)))); const have=[...set]; const want=yearsRange(2025,2000); return [...new Set([...want,...have])]; }
+
 function populateFilters(){
-  const lSel=byId('lvl'); lSel.innerHTML=''; LEVEL_ORDER.forEach(L=>{const o=document.createElement('option');o.value=L;o.textContent=L;lSel.appendChild(o);});
-  const gSel=byId('grad'); gSel.innerHTML=''; uniqueSortedGradYears().forEach(y=>{const o=document.createElement('option');o.value=String(y);o.textContent=y;gSel.appendChild(o);});
-  const rSel=byId('roster'); rSel.innerHTML=''; uniqueRosterYears().forEach(y=>{const o=document.createElement('option');o.value=String(y);o.textContent=y;rSel.appendChild(o);});
+  const lSel=byId('lvl'); lSel.innerHTML='';
+  LEVEL_ORDER.forEach(L=>{const o=document.createElement('option');o.value=L;o.textContent=L;lSel.appendChild(o);});
+
+  const gSel=byId('grad'); gSel.innerHTML='';
+  uniqueSortedGradYears().forEach(y=>{const o=document.createElement('option');o.value=String(y);o.textContent=y;gSel.appendChild(o);});
+
+  const rSel=byId('roster'); rSel.innerHTML='';
+  uniqueRosterYears().forEach(y=>{const o=document.createElement('option');o.value=String(y);o.textContent=y;rSel.appendChild(o);});
 }
+
 function getMultiValues(id){const sel=byId(id);return sel?[...sel.options].filter(o=>o.selected).map(o=>o.value):[]}
+
 function applyFilters(){
   const qLeft=(byId('localSearch')?.value||'').toLowerCase().trim();
   const qRight=(byId('filterName')?.value||'').toLowerCase().trim();
   const q=qRight||qLeft;
-  const levels=getMultiValues('lvl').map(s=>s.toUpperCase());
+  const levels=getMultiValues('lvl'); // already normalized labels
   const grads=getMultiValues('grad');
   const years=getMultiValues('roster').map(Number);
   const stats=getMultiValues('status').map(s=>s.toLowerCase());
+
   const out=players.filter(p=>{
     const name=(p.name||'').toLowerCase();
     if(q && !name.includes(q)) return false;
-    if(levels.length){ const L=String(p.currentLevel||'').toUpperCase().replace('AAA','TRIPLE-A').replace('AA','DOUBLE-A'); if(!levels.includes(L)) return false; }
+    if(levels.length){
+      const L = normalizeLevel(p.currentLevel);
+      if(!levels.includes(L)) return false;
+    }
     if(grads.length && !grads.includes(String(p.graduatingClass))) return false;
-    if(years.length){ const lw=(p.letterWinnerYears||[]).map(Number); if(!lw.some(y=>years.includes(y))) return false; }
-    if(stats.length){ if(!stats.includes(String(p.status||'').toLowerCase())) return false; }
+    if(years.length){
+      const lw=(p.letterWinnerYears||[]).map(Number);
+      if(!lw.some(y=>years.includes(y))) return false;
+    }
+    if(stats.length){
+      if(!stats.includes(String(p.status||'').toLowerCase())) return false;
+    }
     return true;
   }).sort((a,b)=>(+a.graduatingClass||0)-(+b.graduatingClass||0));
+
   render(out);
 }
+
 function resetAll(){
   const ls=byId('localSearch'); if(ls) ls.value='';
   const fn=byId('filterName'); if(fn) fn.value='';
@@ -619,9 +700,10 @@ function resetAll(){
   render(players);
 }
 
-/* interactions */
+/* ===================== Interactions ===================== */
 const INTERACTIVE_SEL='[data-noflip], .tabbtn, .action-chip, a,button,input,select,textarea';
 function toggle(card){ if(!card) return; card.classList.contains('front') ? (card.classList.remove('front'),card.classList.add('back')) : (card.classList.remove('back'),card.classList.add('front')); }
+
 function attachInteractions(){
   document.querySelectorAll('.card').forEach(c=>{ if(!c.classList.contains('front')&& !c.classList.contains('back')) c.classList.add('front'); });
   document.querySelectorAll('.card .hit').forEach(hit=>{
@@ -644,7 +726,7 @@ function attachInteractions(){
   });
 }
 
-/* drawers & header icons */
+/* ===================== Drawers & Header Icons ===================== */
 const scrim=byId('scrim');
 const drawerLeft=byId('drawerLeft'); const drawerRight=byId('drawerRight'); const drawerAuth=byId('drawerAuth');
 const iconSearch=byId('iconSearch'); const iconFilter=byId('iconFilter'); const iconReset=byId('iconReset'); const iconProfile=byId('iconProfile');
@@ -673,8 +755,17 @@ iconProfile.addEventListener('click', openAuth);
 iconReset.addEventListener('click', resetAll);
 scrim.addEventListener('click', closeDrawers);
 
-/* ESC */
-document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') closeDrawers(); });
+/* ESC + Arrow flip (keyboard) */
+document.addEventListener('keydown', (e)=>{
+  if (e.key==='Escape') { closeDrawers(); return; }
+  const card = document.activeElement?.closest?.('.card');
+  if (!card) return;
+  if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+    if (document.activeElement.matches('input,select,textarea')) return;
+    e.preventDefault();
+    toggle(card);
+  }
+});
 
 /* swipe-close drawers */
 function addSwipeClose(el,dir){ let sx=null,sy=null;
