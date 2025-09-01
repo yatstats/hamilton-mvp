@@ -3,74 +3,74 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>hamilton.yatstats.com — WHERE THEY YAT?</title>
+<title>hamilton.yatstats.com — WHERE THEY YAT? (ham-v4.6.0)</title>
+
+<!-- Fonts for “skinny gray” + “bold black” nav/tagline -->
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Roboto+Condensed:wght@300;400;700&display=swap" rel="stylesheet">
 
 <style>
 :root{
-  --maroon:#7A0019; --ring:#2b2f36; --bg:#0b0d12; --panel:#10141b; --ink:#f8fafc; --muted:#9aa1ab;
-  --ink2:#d6d8dd; --accent:#ffffff; --headerH:112px;
+  --maroon:#7A0019; --ring:#E3E6EA; --bg:#0b0c0f; --ink:#111827; --muted:#6b7280;
+  --headerH:100px;
+
+  /* drawers */
+  --drawer-min:280px;
+  --drawer-max:520px;
+  --drawer-mob:75vw;
 }
 *{box-sizing:border-box}
 html,body{margin:0;padding:0}
-body{background:var(--bg);font:15px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,"Apple Color Emoji","Segoe UI Emoji";color:var(--ink)}
+body{background:var(--bg);font:15px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,"Apple Color Emoji","Segoe UI Emoji";color:#e5e7eb}
 a{text-decoration:none;color:inherit}
 button{font:inherit;color:inherit}
 
 /* HEADER */
 .site-header{
   position:fixed; inset:0 0 auto 0; height:var(--headerH); z-index:60;
-  background:#0e1117; border-bottom:1px solid var(--ring);
-  display:grid; grid-template-rows:auto auto; gap:6px; padding:8px 10px 6px;
+  background:#000; border-bottom:1px solid #1f2836;
+  display:grid; grid-template-columns:auto 1fr auto; gap:8px; align-items:start;
+  padding:8px 8px 6px;
 }
+.h-left{display:flex;align-items:center;gap:8px;min-width:0}
+.hambtn{width:36px;height:36px;border:0;background:transparent;display:grid;place-items:center;cursor:pointer;color:#fff}
+.ham-logo{height:42px;width:auto;display:block}
 
-/* Top icon row */
-.h-top{display:flex; align-items:center; gap:10px}
-.hambtn{width:36px;height:36px;border:0;background:transparent;display:grid;place-items:center;cursor:pointer}
-.hdr-icons{display:flex;gap:8px;align-items:center}
-.hdr-icon{width:40px;height:40px;padding:0;border:0;background:transparent;border-radius:8px;display:grid;place-items:center;cursor:pointer}
-.hdr-icon svg{width:20px;height:20px;color:var(--ink)}
-.hdr-icon:hover{background:rgba(255,255,255,.06)}
+/* top row icons now left of logos */
+.h-right{display:flex;flex-direction:column;align-items:flex-end;gap:6px;min-width:0}
+.ystats-logo{height:36px;width:auto;display:block}
+@media (max-width:420px){ .ystats-logo{height:32px} }
+
+/* header icon row (right-aligned under YATSTATS logo) */
+.hdr-icons{display:flex;gap:8px;align-items:center;justify-content:flex-start}
+.hdr-icon{width:44px;height:44px;padding:0;border:0;background:transparent;border-radius:8px;display:grid;place-items:center;cursor:pointer}
+.hdr-icon svg{width:20px;height:20px;color:#fff}
+.hdr-icon:hover{background:rgba(255,255,255,.08)}
 .hdr-icon:focus-visible{outline:2px solid #fff;outline-offset:2px;border-radius:8px}
 .hdr-icon.active{background:#fff}
 .hdr-icon.active svg{color:#000}
 
-/* Second row: logos line */
-.h-bot{display:grid; grid-template-columns:auto 1fr auto; align-items:center}
-.brand-left{display:flex; align-items:flex-end; gap:10px; min-width:0}
-
-/* school block (icon + three lines) */
-.school-block{display:flex; align-items:flex-end; gap:10px; min-width:0}
-.school-icon{height:42px;width:auto;display:block; filter:drop-shadow(0 0 10px rgba(255,255,255,.06))}
-.school-type{display:flex; flex-direction:column; line-height:1}
-.school-line1{font-size:10px; letter-spacing:.06em; color:#cbd5e1; font-weight:600; margin-bottom:0; font-stretch:condensed; font-variation-settings:"wdth" 80}
-.school-line2{font-size:12px; font-weight:900; letter-spacing:.02em}
-.school-line3{font-size:14px; font-weight:900; letter-spacing:.02em}
-
-/* right logo (YAT?STATS) */
-.ystats-wrap{justify-self:end}
-.ystats-logo{height:36px; width:auto; max-width:min(40vw, 260px); display:block}
-
-/* Nav bar */
-.nav-desktop{
-  display:flex; gap:16px; align-items:center; justify-content:center;
-  padding:6px 0 0; grid-column:1 / -1;
-}
-@media (max-width:1160px){ .nav-desktop{display:none} }
-
-/* two-tone link */
-.nav-link{display:inline-flex; align-items:baseline; white-space:nowrap}
-.nav-grey{color:#9aa1ab; font-weight:700; letter-spacing:.02em; font-stretch:condensed; font-variation-settings:"wdth" 80}
-.nav-black{color:#fff; font-weight:900; letter-spacing:.01em; margin-left:-1px}
-.nav-link:hover .nav-black{text-decoration:underline}
+/* NAV (top) with 2-font styling */
+.nav-desktop{display:flex;gap:14px;align-self:center;justify-self:center}
+@media (max-width:1260px){ .nav-desktop{display:none} }
+.nav-desktop a{padding:4px 0}
+.nav-desktop a, .nav-left-link{display:inline-flex;gap:0;align-items:baseline}
+.font-slim{font-family:"Roboto Condensed",system-ui,-apple-system,Segoi UI,Roboto,Helvetica,Arial,sans-serif;font-weight:300;letter-spacing:.04em}
+.font-strong{font-family:"Anton",system-ui,-apple-system,Segoi UI,Roboto,Helvetica,Arial,sans-serif;font-weight:400;letter-spacing:.01em}
+.nav-slim{color:#9aa1ab;text-transform:uppercase}
+.nav-strong{color:#fff;text-transform:uppercase}
 
 /* TAGLINE */
-.tagline-wrap{position:sticky;top:var(--headerH);z-index:40;background:#0e1117;border-bottom:1px solid var(--ring)}
-.tagline{display:flex;align-items:center;justify-content:center;padding:8px 10px}
-.tag-grey{color:#9aa1ab;font-weight:800;letter-spacing:.02em; font-stretch:condensed; font-variation-settings:"wdth" 75}
-.tag-strong{color:#fff;font-weight:900;letter-spacing:-.01em;margin-left:-1px}
+.tagline-wrap{position:sticky;top:var(--headerH);z-index:40;background:#000;border-bottom:1px solid #1f2836}
+.tagline{display:flex;align-items:center;justify-content:space-between;padding:8px 10px}
+.tag-text{font-size:14px;line-height:1.1}
+.tag-grey{color:#9aa1ab}
+.tag-strong{color:#fff}
+.tag-tight{letter-spacing:-.02em}
+.tagline .tag-grey{font-family:"Roboto Condensed";font-weight:300}
+.tagline .tag-strong{font-family:"Anton"}
 
 /* GRID */
-main{padding:calc(var(--headerH) + 44px) 0 88px}
+main{padding:calc(var(--headerH) + 44px) 0 84px}
 .grid{padding:10px;display:grid;grid-template-columns:repeat(1,minmax(0,1fr));gap:12px}
 @media (min-width:560px){ .grid{grid-template-columns:repeat(2,minmax(0,1fr))} }
 @media (min-width:820px){ .grid{grid-template-columns:repeat(3,minmax(0,1fr))} }
@@ -78,16 +78,14 @@ main{padding:calc(var(--headerH) + 44px) 0 88px}
 @media (min-width:1440px){ .grid{grid-template-columns:repeat(5,minmax(0,1fr))} }
 
 /* CARD / FLIP */
-.card{background:#000;border:0;border-radius:16px;overflow:hidden;position:relative;user-select:none;aspect-ratio:5/7;min-height:280px; touch-action:pan-y;}
+.card{background:#000;border:0;border-radius:10px;overflow:hidden;position:relative;user-select:none;aspect-ratio:5/7;min-height:280px;transform:translateZ(0);transition:transform .18s ease, box-shadow .18s ease}
+.card:hover{ transform:translateY(-6px); box-shadow:0 14px 28px rgba(0,0,0,.45) } /* hover lift requested */
+
 .flip-card{perspective:1200px}
 .flip-inner{position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform .55s cubic-bezier(.2,.7,.2,1)}
 .card.front  .flip-inner{ transform:rotateY(0) }
 .card.back   .flip-inner{ transform:rotateY(180deg) }
 .face{position:absolute; inset:0; backface-visibility:hidden; -webkit-backface-visibility:hidden; overflow:hidden}
-
-/* Prevent hidden face bleed-through (mobile GPUs) */
-.card.front .back-face{ visibility:hidden }
-.card.back  .front-face{ visibility:hidden }
 
 /* FRONT */
 .front-face{transform:rotateY(0)}
@@ -111,7 +109,9 @@ main{padding:calc(var(--headerH) + 44px) 0 88px}
 .chip.level.low-a{background:#3730a3;border-color:#3730a3}
 .chip.level.rookie{background:#0f766e;border-color:#0f766e}
 .chip.level.indy{background:#3f6212;border-color:#3f6212}
-.chip.level.ncaa{background:#166534;border-color:#166534}
+.chip.level.ncaa-d1{background:#166534;border-color:#166534}
+.chip.level.ncaa-d2{background:#047857;border-color:#047857}
+.chip.level.ncaa-d3{background:#065f46;border-color:#065f46}
 .chip.level.naia{background:#9333ea;border-color:#9333ea}
 .chip.level.juco{background:#0d9488;border-color:#0d9488}
 .chip.status{background:#16a34a;border-color:#16a34a}
@@ -129,136 +129,121 @@ main{padding:calc(var(--headerH) + 44px) 0 88px}
 .last3 .item{font-size:12px;color:#e5e7eb;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:right}
 
 /* BACK */
-.back-face{transform:rotateY(180deg);background:#0f131a;color:#e5e7eb;display:grid;grid-template-rows:auto 1fr auto;height:100%}
-.back-top{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:10px 12px 6px;align-items:start}
+.back-face{transform:rotateY(180deg);background:#fff;color:#111;display:grid;grid-template-rows:1fr 1fr;height:100%}
+.back-top{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:10px 12px 6px;align-items:end}
 .back-left{min-width:0;display:flex;flex-direction:column}
-.stats-name{font-weight:900;text-transform:uppercase;letter-spacing:.02em;font-size:16px;margin:0 0 2px}
-.team-line{color:#cbd5e1;font-size:13px;line-height:1.15;margin-top:2px}
-.parent-line{color:#94a3b8;font-size:12px;line-height:1.1;margin-top:0}
+.stats-name{font-weight:900;text-transform:uppercase;letter-spacing:.02em;font-size:16px;margin-bottom:2px}
+.team-line{color:#1f2937;font-size:13px;line-height:1.15;margin-top:2px}
+.parent-line{color:#6b7280;font-size:12px;line-height:1.1;margin-top:2px}
 
-/* small inline profile link block */
-.profile-mini{
-  margin-top:6px; background:#0b0f15; border:1px solid #273041; color:#e5e7eb;
-  border-radius:10px; padding:8px 10px; line-height:1.05; font-weight:800;
-  display:inline-block; max-width:100%; text-align:left;
-}
-.profile-mini .l1{font-size:13px}
-.profile-mini .l2{font-size:11px; color:#cbd5e1}
-.profile-mini .l3{font-size:11px; color:#94a3b8; margin-top:0}
+.tiny-bar{margin-top:auto;width:100%}
+.tiny-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px} /* 5 icons incl. video */
+.tabbtn{height:28px;display:grid;place-items:center;border-radius:8px;border:1px solid #e5e7eb;background:#fff;cursor:pointer;transition:background .15s,border-color .15s}
+.tabbtn svg{width:14px;height:14px;color:#111}
+.tabbtn.active{background:#000;border-color:#000}
+.tabbtn.active svg{color:#fff}
 
-/* HS image */
-.back-right{display:flex;flex-direction:column;align-items:flex-end}
-.hs-box{flex:1 1 auto;width:100%;aspect-ratio:3/4;position:relative;overflow:hidden;border-radius:12px;background:#0b0f15;border:1px solid #273041}
+.action-chip{margin-top:6px;display:inline-block;width:100%;text-align:center;padding:6px 10px;border-radius:999px;border:1px solid #111;background:#111;color:#fff;font-weight:900;font-size:10px;letter-spacing:.12em;cursor:pointer;user-select:none}
+.action-chip.flat{background:#0f172a;border-color:#0f172a}
+.action-chip.ghost{background:#fff;color:#111;border-color:#1f2937}
+.action-chip.active{background:#7A0019;border-color:#7A0019}
+
+.back-right{display:flex;flex-direction:column}
+.hs-box{flex:1 1 auto;width:100%;aspect-ratio:3/4;position:relative;overflow:hidden;border-radius:8px;background:#d1d5db}
 .hs-box img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.profile-chip{width:100%}
 
-/* Fun Zone */
-.back-bottom{border-top:1px solid #202735;padding:8px 10px 12px;min-height:0;overflow:hidden;display:flex;flex-direction:column}
-.funzone{flex:1 1 auto; min-height:0; overflow:auto; border-radius:12px; background:#0b0f15; border:1px solid #1f2937; padding:10px}
-.pane{display:none; min-height:0; overflow:auto; animation:fade .18s ease}
+/* panes */
+.back-bottom{border-top:1px solid var(--ring);padding:10px 12px 8px;min-height:0;overflow:hidden;display:flex;flex-direction:column}
+.pane{display:none;min-height:0;overflow:auto;flex:1;animation:slide .18s ease}
 .pane.active{display:block}
-@keyframes fade{from{opacity:.3; transform:translateY(4px)} to{opacity:1; transform:none}}
-
-/* 8-icon bar (active = black bg + white icon) */
-.tab-icons{display:grid; grid-template-columns:repeat(8,1fr); gap:8px; margin-top:8px}
-.tabbtn{
-  height:36px; display:grid; place-items:center; border-radius:10px;
-  border:1px solid #2a3446; background:#0b0f15; cursor:pointer;
-}
-.tabbtn svg{width:16px; height:16px; color:#e5e7eb}
-.tabbtn.active{background:#000000;border-color:#000000}
-.tabbtn.active svg{color:#ffffff}
-
-/* 12 stat tiles grid */
+@keyframes slide{from{opacity:.2;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
 .kv-wrap12{display:grid;grid-template-columns:repeat(4,1fr);grid-auto-rows:1fr;gap:8px;height:100%}
-.kv{background:#0b0f15;border:1px solid #273041;border-radius:12px;text-align:center;padding:8px;display:flex;flex-direction:column;justify-content:center}
-.kv .k{font-size:11px;color:#9aa1ab}
-.kv .v{font-weight:900; color:#fff}
+.kv{background:#f3f4f6;border-radius:10px;text-align:center;padding:8px;display:flex;flex-direction:column;justify-content:center}
+.kv .k{font-size:11px;color:#6b7280}
+.kv .v{font-weight:800}
 
-/* flip zones (top only; never overlap icon row) */
-.hit{
-  position:absolute; top:0; height:68%; width:22%; z-index:2;
-  background:transparent; border:none; outline:none; box-shadow:none;
-  -webkit-tap-highlight-color: transparent; appearance:none;
-}
+/* flip zones */
+.hit{position:absolute;top:0;bottom:0;width:22%;z-index:1;background:transparent;border:0;outline:none}
 .hit.left{left:0}.hit.right{right:0}
-@media (max-width:480px){ .hit{height:65%; width:26%} }
+@media (max-width:480px){ .hit{width:26%} }
+/* keep flip areas invisible; only show outline when keyboard focusing */
+.hit:focus-visible{outline:2px solid #111}
 
 /* DRAWERS */
-.scrim{position:fixed;left:0;right:0;top:var(--headerH);bottom:0;background:rgba(0,0,0,.5);opacity:0;pointer-events:none;transition:opacity .25s ease;z-index:55}
+.scrim{position:fixed;left:0;right:0;top:var(--headerH);bottom:0;background:rgba(0,0,0,.35);opacity:0;pointer-events:none;transition:opacity .25s ease;z-index:55}
 .scrim.open{opacity:1;pointer-events:auto}
 body.no-scroll{overflow:hidden}
 
-/* LEFT drawer */
-.drawer-left{position:fixed;top:var(--headerH);bottom:0;left:0;width:360px;max-width:90vw;background:#0f131a;border-right:1px solid #202735;transform:translateX(-100%);transition:transform .25s ease;z-index:56;display:flex;flex-direction:column;color:#e5e7eb}
+/* LEFT drawer (nav + PLAYER PROFILE SEARCH) */
+.drawer-left{position:fixed;top:var(--headerH);bottom:0;left:0;width:clamp(var(--drawer-min),var(--drawer-mob),var(--drawer-max));max-width:92vw;background:#0b0c10;border-right:1px solid #1f2836;transform:translateX(-100%);transition:transform .25s ease;z-index:56;display:flex;flex-direction:column}
 .drawer-left.open{transform:translateX(0)}
-.drawer-left .drawer-header{height:56px;border-bottom:1px solid #202735;display:flex;align-items:center;justify-content:space-between;padding:0 12px}
-.left-title{font-weight:900;letter-spacing:.12em;text-transform:uppercase;font-size:12px;color:#cbd5e1}
+.drawer-left .drawer-header{height:56px;border-bottom:1px solid #1f2836;display:flex;align-items:center;justify-content:space-between;padding:0 12px;color:#fff}
+.left-title{font-weight:900;letter-spacing:.12em;text-transform:uppercase;font-size:12px;color:#e5e7eb}
 .left-content{padding:12px;min-height:0;overflow:auto}
-.nav-left-list{display:flex;flex-direction:column;gap:8px;margin-bottom:10px}
-.nav-left-link{color:#e5e7eb;text-transform:uppercase;letter-spacing:.12em;font-weight:700;font-size:12px;line-height:1;padding:10px 6px 8px 4px;border-radius:6px}
-.nav-left-link:hover{background:#121826}
-.nav-left-sep{height:1px;background:#202735;margin:8px 0}
-.left-search-h{font-weight:900;letter-spacing:.12em;text-transform:uppercase;font-size:12px;color:#cbd5e1;margin:2px 0 8px}
-.left-search .ghost{display:block;width:100%;background:#0b0f15;border:1px solid #273041;border-radius:10px;padding:10px 12px;font-size:14px;color:#e5e7eb;outline:none}
+.nav-left-list{display:flex;flex-direction:column;gap:10px;margin-bottom:10px}
+.nav-left-link{padding:10px 6px 8px 4px;border-radius:6px}
+.nav-left-link:hover{background:#111}
+
+.nav-left-sep{height:1px;background:#1f2836;margin:8px 0}
+
+.left-search-h{font-weight:900;letter-spacing:.12em;text-transform:uppercase;font-size:12px;color:#e5e7eb;margin:2px 0 8px}
+.left-search .ghost{display:block;width:100%;background:#11151b;border:1px solid #202838;border-radius:10px;padding:10px 12px;font-size:14px;color:#e5e7eb;outline:none}
 .left-results{margin-top:8px;list-style:none;padding:0}
 .left-results li{padding:8px 6px;border-radius:8px;cursor:pointer}
-.left-results li:hover{background:#121826}
+.left-results li:hover{background:#111}
 
-/* RIGHT drawer */
-.drawer-right{position:fixed;top:var(--headerH);bottom:0;right:0;width:420px;max-width:92vw;background:#0f131a;border-left:1px solid #202735;transform:translateX(100%);transition:transform .25s ease;z-index:56;display:flex;flex-direction:column;color:#e5e7eb}
+/* GLOBAL links under search */
+.global-line{margin-top:14px;font-size:12px;color:#c7cbd2;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.global-line .mini-icon{width:14px;height:14px;color:#fff}
+
+/* RIGHT drawer (filters) */
+.drawer-right{position:fixed;top:var(--headerH);bottom:0;right:0;width:clamp(var(--drawer-min),var(--drawer-mob),var(--drawer-max));max-width:92vw;background:#0b0c10;border-left:1px solid #1f2836;transform:translateX(100%);transition:transform .25s ease;z-index:56;display:flex;flex-direction:column}
 .drawer-right.open{transform:translateX(0)}
-.drawer-right .drawer-header{height:56px;border-bottom:1px solid #202735;display:flex;align-items:center;justify-content:space-between;padding:0 12px}
-.right-title{font-weight:900;letter-spacing:.12em;text-transform:uppercase;font-size:12px;color:#cbd5e1}
+.drawer-right .drawer-header{height:56px;border-bottom:1px solid #1f2836;display:flex;align-items:center;justify-content:space-between;padding:0 12px;color:#fff}
+.right-title{font-weight:900;letter-spacing:.12em;text-transform:uppercase;font-size:12px;color:#e5e7eb}
 .drawer-body{min-height:0;overflow:auto}
 .drawer-content{display:block;padding:12px 12px 22px}
-.rail{border:1px solid #202735;border-radius:12px;margin-bottom:10px;overflow:hidden;background:#0b0f15}
-.rail summary{list-style:none;cursor:pointer;padding:9px 12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;font-size:12px;color:#cbd5e1;border-bottom:1px solid #202735}
+.rail{border:1px solid #1f2836;border-radius:10px;margin-bottom:10px;overflow:hidden;background:#0f1217}
+.rail summary{list-style:none;cursor:pointer;padding:9px 12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;font-size:12px;color:#cfd4dd;border-bottom:1px solid #1f2836}
 .rail summary::-webkit-details-marker{display:none}
 .rail .inner{padding:8px 10px;max-height:40vh;overflow:auto}
-.ghost{display:block;width:100%;background:#0b0f15;border:1px solid #273041;border-radius:10px;padding:10px;font-size:13px;color:#e5e7eb;outline:none}
+.ghost{display:block;width:100%;background:#11151b;border:1px solid #202838;border-radius:8px;padding:10px;font-size:13px;color:#e5e7eb;outline:none}
 .select-multi{height:110px}
-.hint{color:#64748b;font-size:11px;margin:4px 2px 10px}
-@media (min-width:1024px){ .drawer-right{width:300px;max-width:24vw} }
+.hint{color:#9aa1ab;font-size:11px;margin:4px 2px 10px}
+@media (min-width:1024px){ .drawer-right{width:420px;max-width:24vw} }
 
-/* AUTH drawer (starts hidden) */
-.drawer-auth{position:fixed;top:var(--headerH);bottom:0;right:0;width:420px;max-width:92vw;background:#0f131a;border-left:1px solid #202735;transform:translateX(100%);transition:transform .25s ease;z-index:56;display:flex;flex-direction:column;color:#e5e7eb}
+/* AUTH drawer */
+.drawer-auth{position:fixed;top:var(--headerH);bottom:0;right:0;width:clamp(var(--drawer-min),var(--drawer-mob),var(--drawer-max));max-width:92vw;background:#0b0c10;border-left:1px solid #1f2836;transform:translateX(100%);transition:transform .25s ease;z-index:56;display:flex;flex-direction:column}
 .drawer-auth.open{transform:translateX(0)}
-.drawer-auth .drawer-header{height:56px;border-bottom:1px solid #202735;display:flex;align-items:center;justify-content:space-between;padding:0 12px}
-.auth-title{font-weight:900;letter-spacing:.12em;text-transform:uppercase;font-size:12px;color:#cbd5e1}
+.drawer-auth .drawer-header{height:56px;border-bottom:1px solid #1f2836;display:flex;align-items:center;justify-content:space-between;padding:0 12px;color:#fff}
+.auth-title{font-weight:900;letter-spacing:.12em;text-transform:uppercase;font-size:12px;color:#e5e7eb}
 .auth-body{min-height:0;overflow:auto;padding:12px 12px 22px}
-.input{display:block;width:100%;background:#0b0f15;border:1px solid #273041;border-radius:10px;padding:12px 12px;font-size:14px;color:#e5e7eb;outline:none}
-.btn-primary{display:inline-block;width:100%;background:#fff;color:#000;border:1px solid #fff;border-radius:10px;padding:10px 12px;font-weight:900;letter-spacing:.06em;cursor:pointer;margin-top:10px}
+.input{display:block;width:100%;background:#11151b;border:1px solid #202838;border-radius:10px;padding:12px 12px;font-size:14px;color:#e5e7eb;outline:none}
+.btn-primary{display:inline-block;width:100%;background:#fff;color:#111;border:1px solid #fff;border-radius:10px;padding:10px 12px;font-weight:800;letter-spacing:.06em;cursor:pointer;margin-top:10px}
 
-/* drawer close button */
-.closebtn{width:34px;height:34px;border:0;background:transparent;display:grid;place-items:center;cursor:pointer}
-.closebtn svg{width:18px;height:18px;color:#e5e7eb}
+/* drawer close buttons */
+.closebtn{width:34px;height:34px;border:0;background:transparent;display:grid;place-items:center;cursor:pointer;color:#fff}
+.closebtn svg{width:18px;height:18px}
 
 /* FOOTER */
-.footer{position:fixed;left:0;right:0;bottom:0;height:76px;background:#0e1117;color:#fff;display:flex;align-items:center;justify-content:center;z-index:10}
+.footer{position:fixed;left:0;right:0;bottom:0;height:72px;background:#000;color:#fff;display:flex;align-items:center;justify-content:center;z-index:10}
 .footer img{max-height:60px;width:auto}
-.build-pill{position:absolute;left:10px;bottom:10px;background:rgba(255,255,255,.08);color:#fff;font-size:12px;padding:6px 10px;border-radius:12px;border:1px solid rgba(255,255,255,.12)}
+.build-pill{position:absolute;left:10px;bottom:10px;background:rgba(255,255,255,.12);color:#fff;font-size:12px;padding:6px 10px;border-radius:12px}
 
-/* --- Splash (mobile/tablet only) --- MLB-style feel */
-.splash{
-  position:fixed; inset:0; z-index:1000; display:none; opacity:1; transition:opacity .45s ease;
-  background: radial-gradient(1200px 600px at 50% -200px, #1b1f2a 0%, #0b0d12 60%, #000 100%);
-}
-.splash.show{ display:block; }
+/* --- Splash (mobile/tablet only) --- */
+.splash{position:fixed; inset:0; z-index:1000; background:#000; color:#fff; display:none; opacity:1; transition:opacity .5s ease}
+.splash.show{ display:block }
 .splash.hide{ opacity:0; pointer-events:none }
-.splash-inner{
-  position:absolute; inset:0; display:flex; align-items:center; justify-content:center; flex-direction:column;
-}
-.splash-logo{ width:120px; height:auto; animation:logoZoom .65s ease-out forwards; }
-.splash-logo img{ width:100%; height:auto; display:block; filter: drop-shadow(0 2px 12px rgba(255,255,255,.12)); }
-
-/* subtle pulse ring */
-.splash-ring{
-  margin-top:18px; width:28px; height:28px; border-radius:50%;
-  border:2px solid rgba(255,255,255,.28);
-  animation:pulse 1.2s ease-in-out infinite;
-}
-@keyframes pulse{ 0%{transform:scale(.9); opacity:.6} 50%{transform:scale(1.08); opacity:1} 100%{transform:scale(.9); opacity:.6} }
-@keyframes logoZoom{0%{transform:scale(.9);opacity:.0}60%{transform:scale(1.02);opacity:1}100%{transform:scale(1)}}
+.splash-inner{position:absolute; inset:0; display:grid; grid-template-rows:33% 34% 33%; place-items:center}
+.splash-top{ align-self:end }
+.splash-bot{ align-self:start }
+.splash-logo-top{ width:120px; height:auto; animation:logoZoom .8s ease-out forwards, logoGlow 2.2s ease-in-out 1.2s infinite; filter:drop-shadow(0 2px 12px rgba(255,255,255,.18)); position:relative }
+.splash-logo-top::after{ content:""; position:absolute; inset:0; background:linear-gradient(105deg, rgba(255,255,255,0) 10%, rgba(255,255,255,.22) 20%, rgba(255,255,255,0) 32%); transform:translateX(-140%); pointer-events:none; mix-blend-mode:screen; animation:logoShimmer 1.6s ease-out .6s 1 forwards }
+.splash-logo-bot{ width:120px; height:auto; filter:drop-shadow(0 2px 10px rgba(255,255,255,.12)); animation:logoZoom .8s ease-out .08s both }
+@keyframes logoZoom{ 0%{ transform:scale(.85); opacity:0 } 60%{ transform:scale(1.03); opacity:1 } 100%{ transform:scale(1) } }
+@keyframes logoGlow{ 0%,100%{ filter: drop-shadow(0 2px 10px rgba(255,255,255,.18)) } 50%{ filter: drop-shadow(0 2px 18px rgba(255,255,255,.28)) } }
+@keyframes logoShimmer{ 0%{ transform: translateX(-140%) } 100%{ transform: translateX(140%) } }
 @media (min-width:1025px){ .splash{ display:none !important } }
 </style>
 </head>
@@ -267,21 +252,28 @@ body.no-scroll{overflow:hidden}
 <!-- Splash -->
 <div id="splash" class="splash" aria-hidden="true">
   <div class="splash-inner">
-    <div class="splash-logo" aria-label="YATSTATS">
-      <img id="splashLogo"
-        src="https://i.postimg.cc/C5mwXpQy/35878-20250830-222027-0000.png"
-        alt="YAT?STATS" width="120" height="32" decoding="async" loading="eager" />
+    <div></div>
+    <div class="splash-top">
+      <img class="splash-logo-top"
+           src="https://i.postimg.cc/C5mwXpQy/35878-20250830-222027-0000.png"
+           alt="YAT?STATS">
     </div>
-    <div class="splash-ring" aria-hidden="true"></div>
+    <div class="splash-bot">
+      <img class="splash-logo-bot"
+           src="https://i.postimg.cc/2jwjVn8H/32900-20250830-222044-0000.png"
+           alt="Hamilton H">
+    </div>
   </div>
+  <audio id="splashSfx" preload="auto"></audio>
 </div>
 
 <header class="site-header">
-  <!-- top icons row -->
-  <div class="h-top">
+  <div class="h-left">
     <button class="hambtn" id="openLeft" aria-label="Open Navigation">
       <svg viewBox="0 0 24 24" width="22" height="22"><path fill="currentColor" d="M3 6h18v2H3zM3 11h18v2H3zM3 16h18v2H3z"/></svg>
     </button>
+
+    <!-- Header icons (L→R): Account, Search, Filter, Reset -->
     <div class="hdr-icons">
       <button class="hdr-icon" id="iconProfile" aria-label="Account" title="Account">
         <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm0 2c-4.2 0-8 2.1-8 5v1h16v-1c0-2.9-3.8-5-8-5z"/></svg>
@@ -298,39 +290,28 @@ body.no-scroll{overflow:hidden}
     </div>
   </div>
 
-  <!-- logos row -->
-  <div class="h-bot">
-    <div class="brand-left">
-      <div class="school-block">
-        <img class="school-icon" src="https://i.postimg.cc/2jwjVn8H/32900-20250830-222044-0000.png" alt="Hamilton HS"/>
-        <div class="school-type">
-          <div class="school-line1">CHANDLER, AZ</div>
-          <div class="school-line2">HAMILTON HIGH SCHOOL</div>
-          <div class="school-line3">ACTIVE ALUMNI</div>
-        </div>
-      </div>
-    </div>
-    <nav class="nav-desktop">
-      <a href="#" class="nav-link"><span class="nav-grey">where&nbsp;they</span><span class="nav-black">YAT?</span></a>
-      <a href="#" class="nav-link"><span class="nav-grey">active&nbsp;alumni</span><span class="nav-black">News</span></a>
-      <a href="#" class="nav-link"><span class="nav-grey">next&nbsp;level&nbsp;</span><span class="nav-black">All-Time&nbsp;List</span></a>
-      <a href="#" class="nav-link"><span class="nav-grey">NIL&nbsp;&nbsp;YAT-A-BOY</span><span class="nav-black">Marketplace</span></a>
-      <a href="#" class="nav-link"><span class="nav-grey">the&nbsp;</span><span class="nav-black">Current&nbsp;Team</span></a>
-      <a href="#" class="nav-link"><span class="nav-grey">PCD&nbsp;Action&nbsp;</span><span class="nav-black">Partner&nbsp;Program</span></a>
-    </nav>
-    <div class="ystats-wrap">
-      <img class="ystats-logo" src="https://i.postimg.cc/C5mwXpQy/35878-20250830-222027-0000.png" alt="YAT?STATS"/>
-    </div>
+  <!-- School + YAT?STATS logos row -->
+  <nav class="nav-desktop">
+    <a href="#where"><span class="nav-slim font-slim">Where They</span><span class="nav-strong font-strong">&nbsp;YAT?</span></a>
+    <a href="#news"><span class="nav-slim font-slim">Active Alumni</span><span class="nav-strong font-strong">&nbsp;News</span></a>
+    <a href="#alltime"><span class="nav-slim font-slim">Next-Level</span><span class="nav-strong font-strong">&nbsp;All-Time List</span></a>
+    <a href="#market"><span class="nav-slim font-slim">NIL &amp; YAT-A-BOY</span><span class="nav-strong font-strong">&nbsp;Marketplace</span></a>
+    <a href="#current"><span class="nav-slim font-slim">The</span><span class="nav-strong font-strong">&nbsp;Current Team</span></a>
+    <a href="#partners"><span class="nav-slim font-slim">PCDAction</span><span class="nav-strong font-strong">&nbsp;Partner Program</span></a>
+  </nav>
+
+  <div class="h-right">
+    <img class="ystats-logo" src="https://i.postimg.cc/C5mwXpQy/35878-20250830-222027-0000.png" alt="YAT?STATS"/>
   </div>
 </header>
 
 <!-- TAGLINE -->
 <div class="tagline-wrap">
   <div class="tagline">
-    <div>
-      <span class="tag-grey">WHERE&nbsp;THEY</span><span class="tag-strong">YAT?</span>
+    <div class="tag-text">
+      <span class="tag-grey font-slim">WHERE THEY</span><span class="tag-strong font-strong tag-tight">&nbsp;YAT?</span>
       &nbsp;&nbsp;
-      <span class="tag-grey">SWIPE&nbsp;FOR</span><span class="tag-strong">STATS!</span>
+      <span class="tag-grey font-slim">SWIPE FOR</span><span class="tag-strong font-strong tag-tight">&nbsp;STATS!</span>
     </div>
   </div>
 </div>
@@ -348,12 +329,12 @@ body.no-scroll{overflow:hidden}
   </div>
   <div class="left-content">
     <div class="nav-left-list">
-      <a class="nav-left-link" href="#">WHERE THEY YAT?</a>
-      <a class="nav-left-link" href="#">ACTIVE ALUMNI NEWS</a>
-      <a class="nav-left-link" href="#">NEXT-LEVEL ALL-TIME LIST</a>
-      <a class="nav-left-link" href="#">NIL &amp; YAT-A-BOY MARKETPLACE</a>
-      <a class="nav-left-link" href="#">THE CURRENT TEAM</a>
-      <a class="nav-left-link" href="#">PCDACTION PARTNER PROGRAM</a>
+      <a class="nav-left-link" href="#where"><span class="nav-slim font-slim">Where They</span><span class="nav-strong font-strong">&nbsp;YAT?</span></a>
+      <a class="nav-left-link" href="#news"><span class="nav-slim font-slim">Active Alumni</span><span class="nav-strong font-strong">&nbsp;News</span></a>
+      <a class="nav-left-link" href="#alltime"><span class="nav-slim font-slim">Next-Level</span><span class="nav-strong font-strong">&nbsp;All-Time List</span></a>
+      <a class="nav-left-link" href="#market"><span class="nav-slim font-slim">NIL &amp; YAT-A-BOY</span><span class="nav-strong font-strong">&nbsp;Marketplace</span></a>
+      <a class="nav-left-link" href="#current"><span class="nav-slim font-slim">The</span><span class="nav-strong font-strong">&nbsp;Current Team</span></a>
+      <a class="nav-left-link" href="#partners"><span class="nav-slim font-slim">PCDAction</span><span class="nav-strong font-strong">&nbsp;Partner Program</span></a>
       <div class="nav-left-sep"></div>
     </div>
 
@@ -361,11 +342,20 @@ body.no-scroll{overflow:hidden}
       <div class="left-search-h">PLAYER PROFILE SEARCH</div>
       <input id="localSearch" type="text" class="ghost" placeholder="Type a player name…" autocomplete="off"/>
       <ul id="localResults" class="left-results"></ul>
+
+      <div class="global-line">
+        <svg class="mini-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M11 4a7 7 0 1 1 0 14 7 7 0 0 1 0-14zm9.7 15.3-3.4-3.4a9 9 0 1 0-1.4 1.4l3.4 3.4a1 1 0 0 0 1.4-1.4z"/></svg>
+        <span>GLOBAL YATSTATS PLATFORM SEARCHES</span>
+        <div style="display:flex;flex-direction:column;gap:6px;margin-top:6px">
+          <a href="https://www.yatstats.com" target="_blank" rel="noopener">🌎🔍 by PLAYER</a>
+          <a href="https://www.yatstats.com" target="_blank" rel="noopener">🌎🔍 by TEAM</a>
+        </div>
+      </div>
     </div>
   </div>
 </aside>
 
-<!-- RIGHT DRAWER (Filters only) -->
+<!-- RIGHT DRAWER (Filters) -->
 <aside class="drawer-right" id="drawerRight" aria-hidden="true" role="dialog" aria-modal="true">
   <div class="drawer-header">
     <div class="right-title">Filters</div>
@@ -383,26 +373,27 @@ body.no-scroll{overflow:hidden}
         </div>
       </details>
 
-      <details class="rail" open>
+      <details class="rail">
         <summary>By Level</summary>
         <div class="inner"><select id="lvl" class="ghost select-multi" multiple></select></div>
       </details>
 
-      <details class="rail" open>
+      <details class="rail">
         <summary>By Grad Class</summary>
         <div class="inner"><select id="grad" class="ghost select-multi" multiple></select></div>
       </details>
 
-      <details class="rail" open>
+      <details class="rail">
         <summary>By Roster Year</summary>
         <div class="inner"><select id="roster" class="ghost select-multi" multiple></select></div>
       </details>
 
-      <details class="rail" open>
+      <details class="rail">
         <summary>By Status</summary>
         <div class="inner">
           <select id="status" class="ghost select-multi" multiple>
-            <option value="Active">ACTIVE</option>
+            <option value="Active 2025">ACTIVE 2025</option>
+            <option value="Active 2024">ACTIVE 2024</option>
             <option value="Free Agent">FREE AGENT</option>
             <option value="Injured">INJURED</option>
             <option value="Retired">RETIRED</option>
@@ -413,7 +404,7 @@ body.no-scroll{overflow:hidden}
   </div>
 </aside>
 
-<!-- AUTH DRAWER (starts closed) -->
+<!-- AUTH DRAWER (closed by default) -->
 <aside class="drawer-auth" id="drawerAuth" aria-hidden="true" role="dialog" aria-modal="true">
   <div class="drawer-header">
     <div class="auth-title">Sign Up | Login</div>
@@ -440,171 +431,127 @@ body.no-scroll{overflow:hidden}
 </footer>
 
 <script>
-/* ===== Splash (mobile/tablet only) ===== */
+/* Splash on mobile/tablet only */
 function runSplash(){
   const isSmall = window.matchMedia('(max-width: 1024px)').matches;
   const splash = document.getElementById('splash');
   if(!splash) return;
   if(!isSmall){ splash.remove(); return; }
   splash.classList.add('show');
-  setTimeout(() => {
-    splash.classList.add('hide');
-    setTimeout(() => splash.remove(), 450);
-  }, 1000);
+  setTimeout(()=>{ splash.classList.add('hide'); setTimeout(()=>splash.remove(),520); }, 1200);
 }
+document.addEventListener('DOMContentLoaded', runSplash);
 
-/* ===== GLOBAL FALLBACK IMAGE ===== */
-const FALLBACK_IMG = "https://i.postimg.cc/2jwjVn8H/32900-20250830-222044-0000.png"; // Hamilton H
-function imgOnError(el, who){
-  try{ console.warn("Image failed:", who, el?.src); }catch(_){}
-  if(el){ el.onerror=null; el.src = FALLBACK_IMG; }
-}
-
-/* ===== HELPERS ===== */
+/* helpers */
 const byId = id => document.getElementById(id);
 function lvlClass(l){return String(l||'').toLowerCase().replace(/\s+/g,'-').replace('aaa','triple-a').replace('aa','double-a')}
-function mapLevel(hilvl){
-  const s=String(hilvl||'').toUpperCase();
-  if(s==='MLB') return 'MLB';
-  if(s==='AAA') return 'Triple-A';
-  if(s==='AA') return 'Double-A';
-  if(s==='A+'||s==='HIGH-A') return 'High-A';
-  if(s==='A'||s==='A-') return 'Low-A';
-  if(s==='JR COLLEGE'||s==='JR COLLEGE '||s==='JR COLLEGE' || s==='JRCOLLEGE' || s==='JR COLLEGE' || s==='JRCOLLEGE' || s==='JRCOLLEGE') return 'JUCO';
-  if(s==='JRCOLLEGE'||s==='JR COLLEGE'||s==='JR') return 'JUCO';
-  if(s==='NCAA') return 'NCAA';
-  if(s==='NAIA') return 'NAIA';
-  if(s==='AA '||s==='A A') return 'Double-A';
-  return hilvl || '';
-}
 function teamAndParent(p){ const raw=String(p.team||''); const parts=raw.split('—'); const team=(parts[0]||raw).trim(); let parent=(parts[1]||'').trim(); if((p.currentLevel||'').toUpperCase()==='MLB') parent=''; return {team,parent}; }
 function fmtLast3(g){ return `${g.date||'—'} • ${g.opp||'—'} — ${g.line||'—'}`; }
-function formatNextTwoLines(ng){ if(!ng) return ['—','—']; const ds=String(ng.date||'').trim(); const mmdd=(ds.match(/\b(\d{1,2}\/\d{1,2})\b/)||[, '—'])[1]; let time=(ds.match(/(\d{1,2}:\d{2}\s*[AP]M)/i)||[, '—'])[1]?.toUpperCase()||'—'; const tz=(ds.match(/\b(ET|CT|MT|PT|AZ)\b/i)||[, ''])[1]?.toUpperCase()||''; if(tz && !time.includes(tz)) time=`${time} ${tz}`; return [`${mmdd} - ${time}`.trim(), String(ng.opponent||'—').trim()||'—']; }
-function toId(name){ return String(name||'').trim().toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,''); }
+function formatNextTwoLines(ng){ if(!ng) return ['—','—']; const ds=String(ng.date||'').trim(); const mmdd=(ds.match(/\b(\d{1,2}\/\d{1,2})\b/)||[, '—'])[1]; let time=(ds.match(/(\d{1,2}:\d{2}\s*[AP]M)/i)||[, '—'])[1].toUpperCase(); const tz=(ds.match(/\b(ET|CT|MT|PT|AZ)\b/i)||[, ''])[1]?.toUpperCase?.()||''; if(tz && !time.includes(tz)) time=`${time} ${tz}`; return [`${mmdd} - ${time}`.trim(), String(ng.opponent||'—').trim()||'—']; }
 
-/* ===== CSV (31 players) ===== */
-const CSV = `player,pos,ht,wt,ba,th,born,place,hilvl,mlb years,stat years
-Shane Anderson,ut,5-11,195,R,R, ,"Chandler,AZ",NCAA, ,2021-2025
-DJ Barrett,p-of,6-1,190,R,R, ,"Gilbert,AZ",JrCollege, ,2024-2025
-Cody Bellinger,cf-1b,6-4,203,L,L,1995-07-13,"Scottsdale,AZ",MLB,2017-2025,2013-2025
-Dustin Bermudez,ut-p,5-10,160,R,R,2001-06-05,"Chandler,AZ",NCAA, ,2020-2024
-Logan Boyer,p,6-3,215,R,R,1998-01-24,"Chandler,AZ",AAA, ,2017-2025
-Cooper Brass,if,5-10,180,R,R,2005-02-14,"Chandler,AZ",NCAA, ,2025-2025
-Michael Brueser,of,6-1,190,R,R,2001-11-08,"Chandler,AZ",NCAA, ,2021-2024
-Caden Burghardt,ut,6-3,0,R,R, ,"Chandler,AZ",NCAA, ,2025-2025
-Roch Cholowsky,if,6-2,195,R,R,2005-04-05,"Chandler,AZ",NCAA, ,2024-2025
-Prince DeBoskie,of,6-0,180,R,R,2003-09-23,"Chandler,AZ",JrCollege, ,2023-2024
-AJ Diaz,ss, ,0,R,R, , ,JrCollege, ,2025-2025
-Ryan Figueroa,p,6-3,192,R,R, ,"Chandler,AZ",NCAA, ,2021-2024
-Jorge Flores,ss,5-5,160,R,R,1991-11-25,"Ensenada,MX",AAA, ,2012-2024
-Dom Hamel,p,6-2,206,R,R,1999-03-02,"Chandler,AZ",AAA, ,2018-2025
-Kent Hasler,p,5-10,205,R,R,1995-10-15,"Chandler,AZ",AAA, ,2015-2024
-Alex Hernandez,c,6-1,195,R,R, ,"Chandler,AZ",NCAA, ,2022-2025
-Tanner Holland,of,6-0,185,R,R,2003-06-07,"Chandler,AZ",JrCollege, ,2024-2024
-Carson Johnson,p,6-4,206,R,R,2005-02-02,"Torrance,CA",NCAA, ,2025-2025
-Zachary Johnston,of,6-3,0, , , ,"Chandler,AZ",NAIA, ,2024-2025
-Jeremy Jones,p,6-1,202,R,R,2004-05-31,"Chandler,AZ",NCAA, ,2023-2025
-Kole Klecker,p,6-2,205,R,R,2004-08-25,"Mesa,AZ",NCAA, ,2023-2025
-Logan Krei,of,5-11,165,R,R, ,"Defiance,MO",JrCollege, ,2024-2024
-Ryan Kucherak,if,6-1,195,R,R,2004-08-24,"Salt Lake City,UT",NCAA, ,2024-2025
-Rohan Lettow,p,6-2,180,R,R,2005-07-24,"Chandler,AZ",NCAA, ,2024-2025
-Jeter Mauzey,of,6-5,200,R,R, ,"Chandler,AZ",JrCollege, ,2024-2025
-J.D. McLaughlin,lf-cf,6-2,195,R,R,2000-12-28,"Mesa,AZ",AAA, ,2020-2024
-Patrick Murphy,p,6-5,211,R,R,1995-06-10,"Chandler,AZ",MLB,2020-2022,2014-2025
-Shane Murphy,p,6-5,210,L,L,2001-01-19,"Chandler,AZ",AAA, ,2020-2025
-Sean Rackoski,p,6-7,225,R,R,1995-05-12,"Mesa,AZ",AAA, ,2014-2024
-Drew Rogers,c-if,6-0,220,R,R,2005-07-15,"Minneapolis,MN",NCAA, ,2025-2025
-Logan Saloman,p,6-5,230,R,R,2004-05-10,"Chandler,AZ",NCAA, ,2023-2025
-Brock Selvidge,p,6-3,205,R,L,2002-08-28,"Carrolton,TX",AA, ,2021-2025
-Will Shelor,p,5-11,190,R,R, ,"Chandler,AZ",JrCollege, ,2024-2025
-Jackson Smith,p,6-1,235,L,L,2004-04-04,"Chandler,AZ",JrCollege, ,2023-2024
-Drew Swift,ss-2b,6-0,165,R,R,1999-02-15,"Chandler,AZ",AAA, ,2018-2025
-Luke Thiele,if,6-0,195,R,R,2002-12-19,"Chandler,AZ",NCAA, ,2023-2025
-Josh Tiedemann,h-p,6-0,165,R,R,2004-06-09,"Phoenix,AZ",A, ,2023-2025
-Gavin Turley,of,6-1,196,R,R,2003-11-12,"American Fork,UT",A, ,2023-2025
-Zach Wadas,ut,6-4,205,L,L,2004-08-25,"Chandler,AZ",NCAA, ,2024-2025
-Braden Watkins,of,6-0,160,L,R, ,"Chandler,AZ",NCAA, ,2023-2025
-Liam Wilson,c-1b,6-0,205,R,R, ,"Chandler,AZ",NCAA, ,2025-2025
-Tyler Wilson,lf-rf,6-2,210,B,R,2002-07-10,"Tainan,TW",A+, ,2021-2025
-Jake Wong,p,6-2,218,R,R,1996-09-03,"Chandler,AZ",MLB,2023-2023,2016-2024
-Justin Wylie,if-of,5-10,180,R,R,1996-08-26,"Lancaster,PA",Indy, ,2015-2024`;
-
-/* ===== Parse CSV → player objects (31) ===== */
-function parseCSV(csv){
-  const lines = csv.trim().split(/\r?\n/);
-  const hdr = lines.shift().split(',');
-  return lines.map(row=>{
-    // split respecting quotes
-    const cells = [];
-    let cur = '', inQ=false;
-    for(let i=0;i<row.length;i++){
-      const ch=row[i];
-      if(ch==='\"'){ inQ = !inQ; continue; }
-      if(ch===',' && !inQ){ cells.push(cur); cur=''; continue; }
-      cur+=ch;
-    }
-    cells.push(cur);
-    const m = new Map();
-    hdr.forEach((h,idx)=>m.set(h.trim(), (cells[idx]||'').trim()));
-    const name = m.get('player');
-    const hilvl = mapLevel(m.get('hilvl'));
-    const gradGuess = m.get('stat years')?.split('-')?.[1] || ''; // fallback when class missing
-    return {
-      id: toId(name),
-      name: (name||'').toUpperCase(),
-      graduatingClass: gradGuess ? Number(gradGuess) : undefined,
-      currentLevel: hilvl,
-      status: 'Active',
-      position: m.get('pos') || '',
-      team: '', // can be enriched later
-      frontImg: '', highSchoolImg: '',
-      letterWinnerYears: [], // unknown from CSV; can ingest later
-      // simple stubs so UI renders consistently
-      batting: undefined, pitching: undefined,
-      nextGame: undefined, last3: []
-    };
-  });
-}
-
-const csvPlayers = parseCSV(CSV);
-
-/* ===== Demo overlays for a few players that we DO have images/teams for ===== */
-const enrich = {
-  "cody-bellinger": {
-    team:"New York Yankees",
-    frontImg:"https://i.postimg.cc/9F19KG5h/new-york-yankees-outfielder-cody-bellinger.jpg",
+/* data (31 players from your CSV; add/update images as you upload) */
+const playersRaw = [
+  {id:"shane-anderson",name:"SHANE ANDERSON",position:"UT",currentLevel:"NCAA",graduatingClass:2021,status:"Active"},
+  {id:"dj-barrett",name:"DJ BARRETT",position:"P-OF",currentLevel:"JUCO",graduatingClass:2023,status:"Active"},
+  {id:"cody-bellinger",name:"CODY BELLINGER",position:"CF/1B",currentLevel:"MLB",graduatingClass:2013,status:"Active",
+    team:"New York Yankees", frontImg:"https://i.postimg.cc/9F19KG5h/new-york-yankees-outfielder-cody-bellinger.jpg",
     highSchoolImg:"https://i.postimg.cc/Jhq690Lg/01-Bellinger-Front-page-00001.jpg",
     batting:{avg:".284",obp:".345",slg:".520",ops:".865",hits:"150",runs:"95",hr:"35",rbi:"105"},
+    nextGame:{opponent:"@ BOSTON RED SOX", date:"7/15 5:10 PM AZ"},
+    last3:[{date:"7/12",opp:"@ BOS",line:"2-4, HR, 2 RBI"},{date:"7/11",opp:"@ BOS",line:"1-3, BB"},{date:"7/10",opp:"vs TOR",line:"0-4"}],
     letterWinnerYears:[2012,2013]
   },
-  "dom-hamel":{
-    team:"Syracuse Mets — New York Mets",
-    frontImg:"https://i.postimg.cc/rwYchfnt/20250804-151814.jpg",
-    highSchoolImg:"https://i.postimg.cc/VLC7zDwX/23-Hamel-Front-page-00001.jpg",
+  {id:"dustin-bermudez",name:"DUSTIN BERMUDEZ",position:"UT-P",currentLevel:"NCAA",graduatingClass:2020,status:"Active"},
+  {id:"logan-boyer",name:"LOGAN BOYER",position:"P",currentLevel:"AAA",graduatingClass:2017,status:"Active",
+    frontImg:"https://i.postimg.cc/c1Kq8Dkv/Logan-Boyer.jpg", highSchoolImg:"https://i.postimg.cc/gJtM27rH/11-Boyer-Front-page-00001.jpg"},
+  {id:"cooper-brass",name:"COOPER BRASS",position:"IF",currentLevel:"NCAA",graduatingClass:2025,status:"Active"},
+  {id:"michael-brueser",name:"MICHAEL BRUESER",position:"OF",currentLevel:"NCAA",graduatingClass:2021,status:"Active"},
+  {id:"caden-burghardt",name:"CADEN BURGHARDT",position:"UT",currentLevel:"NCAA",graduatingClass:2025,status:"Active"},
+  {id:"roch-cholowsky",name:"ROCH CHOLOWSKY",position:"IF",currentLevel:"NCAA",graduatingClass:2024,status:"Active"},
+  {id:"prince-deboskie",name:"PRINCE DEBOSKIE",position:"OF",currentLevel:"JUCO",graduatingClass:2024,status:"Active"},
+  {id:"aj-diaz",name:"AJ DIAZ",position:"SS",currentLevel:"JUCO",graduatingClass:2025,status:"Active"},
+  {id:"ryan-figueroa",name:"RYAN FIGUEROA",position:"P",currentLevel:"NCAA",graduatingClass:2021,status:"Active"},
+  {id:"jorge-flores",name:"JORGE FLORES",position:"SS",currentLevel:"AAA",graduatingClass:2012,status:"Active"},
+  {id:"dom-hamel",name:"DOM HAMEL",position:"P",currentLevel:"AAA",graduatingClass:2018,status:"Active",
+    frontImg:"https://i.postimg.cc/rwYchfnt/20250804-151814.jpg", highSchoolImg:"https://i.postimg.cc/VLC7zDwX/23-Hamel-Front-page-00001.jpg",
     pitching:{era:"3.89",so:"93",whip:"1.18"},
+    nextGame:{date:"8/28 - 3:35 PM AZ", opponent:"@ SCRANTON/ WILKES BARRE"},
+    last3:[{date:"8/26",opp:"@ SWB",line:"1.0 IP, 1 ER, 1 K"},{date:"8/21",opp:"vs IND",line:"1.0 IP, 7 ER"},{date:"8/15",opp:"@ ROC",line:"1.0 IP, 1 ER"}],
     letterWinnerYears:[2016,2017]
   },
-  "drew-swift":{
-    team:"Las Vegas Aviators — Athletics",
-    frontImg:"https://i.postimg.cc/GmmSKFsV/AISelect-20250826-023939-Instagram.jpg",
-    highSchoolImg:"https://i.postimg.cc/0j6VMCwR/04-Swift-Front-page-00001.jpg",
+  {id:"kent-hasler",name:"KENT HASLER",position:"P",currentLevel:"AAA",graduatingClass:2015,status:"Active"},
+  {id:"alex-hernandez",name:"ALEX HERNANDEZ",position:"C",currentLevel:"NCAA",graduatingClass:2022,status:"Active"},
+  {id:"tanner-holland",name:"TANNER HOLLAND",position:"OF",currentLevel:"JUCO",graduatingClass:2024,status:"Active"},
+  {id:"carson-johnson",name:"CARSON JOHNSON",position:"P",currentLevel:"NCAA",graduatingClass:2025,status:"Active"},
+  {id:"zachary-johnston",name:"ZACHARY JOHNSTON",position:"OF",currentLevel:"NAIA",graduatingClass:2024,status:"Active"},
+  {id:"jeremy-jones",name:"JEREMY JONES",position:"P",currentLevel:"NCAA",graduatingClass:2023,status:"Active"},
+  {id:"kole-klecker",name:"KOLE KLECKER",position:"P",currentLevel:"NCAA",graduatingClass:2023,status:"Active"},
+  {id:"logan-krei",name:"LOGAN KREI",position:"OF",currentLevel:"JUCO",graduatingClass:2024,status:"Active"},
+  {id:"ryan-kucherak",name:"RYAN KUCHERAK",position:"IF",currentLevel:"NCAA",graduatingClass:2024,status:"Active"},
+  {id:"rohan-lettow",name:"ROHAN LETTOW",position:"P",currentLevel:"NCAA",graduatingClass:2024,status:"Active"},
+  {id:"jeter-mauzey",name:"JETER MAUZEY",position:"OF",currentLevel:"JUCO",graduatingClass:2024,status:"Active"},
+  {id:"jd-mclaughlin",name:"J.D. MCLAUGHLIN",position:"LF-CF",currentLevel:"AAA",graduatingClass:2020,status:"Active"},
+  {id:"patrick-murphy",name:"PATRICK MURPHY",position:"P",currentLevel:"MLB",graduatingClass:2014,status:"Active",
+    team:"KT Wiz Suwon — KBO", frontImg:"https://i.postimg.cc/JnCXccvC/MURPH.avif", highSchoolImg:"https://i.postimg.cc/pdxcG8gz/02-Murphy-Front-page-00001.jpg",
+    pitching:{era:"3.22",so:"71",whip:"1.09"}, nextGame:{opponent:"vs KIA TIGERS", date:"8/29 2:30AM AZ"},
+    last3:[{date:"8/27",opp:"vs KIA",line:"6.0 IP, 1 ER, 7 K"},{date:"8/23",opp:"@ KIA",line:"5.2 IP, 2 ER, 5 K"},{date:"8/20",opp:"vs SSG",line:"7.0 IP, 0 ER, 8 K"}],
+    letterWinnerYears:[2012,2013]
+  },
+  {id:"shane-murphy",name:"SHANE MURPHY",position:"P",currentLevel:"AAA",graduatingClass:2019,status:"Active",
+    frontImg:"https://i.postimg.cc/HL7zvBWZ/Shane-Murphy-Birmingham-Barons-Chicago-White-Sox.jpg", highSchoolImg:"https://i.postimg.cc/bYMCX47z/26-Murphy-Front-page-00001.jpg"},
+  {id:"sean-rackoski",name:"SEAN RACKOSKI",position:"P",currentLevel:"AAA",graduatingClass:2014,status:"Active"},
+  {id:"drew-rogers",name:"DREW ROGERS",position:"C-IF",currentLevel:"NCAA",graduatingClass:2025,status:"Active"},
+  {id:"logan-saloman",name:"LOGAN SALOMAN",position:"P",currentLevel:"NCAA",graduatingClass:2023,status:"Active"},
+  {id:"brock-selvidge",name:"BROCK SELVIDGE",position:"P",currentLevel:"AA",graduatingClass:2021,status:"Active",
+    frontImg:"https://i.postimg.cc/kgSyd4xs/AISelect-20250826-020305-Instagram.jpg", highSchoolImg:"https://i.postimg.cc/vTp3W6r1/22-Selvidge-Front-page-00001.jpg"},
+  {id:"will-shelor",name:"WILL SHELOR",position:"P",currentLevel:"JUCO",graduatingClass:2024,status:"Active"},
+  {id:"jackson-smith",name:"JACKSON SMITH",position:"P",currentLevel:"JUCO",graduatingClass:2023,status:"Active"},
+  {id:"drew-swift",name:"DREW SWIFT",position:"SS-2B",currentLevel:"AAA",graduatingClass:2018,status:"Active",
+    frontImg:"https://i.postimg.cc/GmmSKFsV/AISelect-20250826-023939-Instagram.jpg", highSchoolImg:"https://i.postimg.cc/0j6VMCwR/04-Swift-Front-page-00001.jpg",
     batting:{avg:".271",obp:".335",slg:".414",ops:".749",hits:"114",runs:"68",hr:"10",rbi:"52",doubles:"24",triples:"3",sb:"18",bb:"41"},
+    nextGame:{ date:"8/28 - 5:05 PM AZ", opponent:"vs. IOWA" },
+    last3:[{date:"08/25",opp:"@ ABQ",line:"2-5, 2B, R"},{date:"08/24",opp:"@ ABQ",line:"1-3, BB, SB"},{date:"08/23",opp:"@ ABQ",line:"0-4"}],
     letterWinnerYears:[2014,2015,2016,2017]
   },
-  "patrick-murphy":{
-    team:"KT Wiz Suwon — KBO",
-    frontImg:"https://i.postimg.cc/JnCXccvC/MURPH.avif",
-    highSchoolImg:"https://i.postimg.cc/pdxcG8gz/02-Murphy-Front-page-00001.jpg",
-    pitching:{era:"3.22",so:"71",whip:"1.09"},
-    letterWinnerYears:[2012,2013]
-  }
+  {id:"luke-thiele",name:"LUKE THIELE",position:"IF",currentLevel:"NCAA",graduatingClass:2023,status:"Active",
+    frontImg:"https://i.postimg.cc/593zLzmD/luke-theil.jpg", highSchoolImg:"https://i.postimg.cc/LXYrnvvj/45-Thiele-Front-page-00001.jpg"},
+  {id:"josh-tiedemann",name:"JOSH TIEDEMANN",position:"H-P",currentLevel:"A",graduatingClass:2023,status:"Active"},
+  {id:"gavin-turley",name:"GAVIN TURLEY",position:"OF",currentLevel:"A",graduatingClass:2023,status:"Active"},
+  {id:"zach-wadas",name:"ZACH WADAS",position:"UT",currentLevel:"NCAA",graduatingClass:2024,status:"Active"},
+  {id:"braden-watkins",name:"BRADEN WATKINS",position:"OF",currentLevel:"NCAA",graduatingClass:2023,status:"Active"},
+  {id:"liam-wilson",name:"LIAM WILSON",position:"C-1B",currentLevel:"NCAA",graduatingClass:2025,status:"Active"},
+  {id:"tyler-wilson",name:"TYLER WILSON",position:"LF-RF",currentLevel:"A+",graduatingClass:2021,status:"Active"},
+  {id:"jake-wong",name:"JAKE WONG",position:"P",currentLevel:"MLB",graduatingClass:2016,status:"Active"},
+  {id:"justin-wylie",name:"JUSTIN WYLIE",position:"IF-OF",currentLevel:"Indy",graduatingClass:2015,status:"Active"}
+];
+
+/* --- Normalize statuses to Active 2025 / Active 2024 per your callout --- */
+const STATUS_FIX = {
+  // ACTIVE 2025
+  "shane-anderson":"Active 2025","dj-barrett":"Active 2025","cody-bellinger":"Active 2025","logan-boyer":"Active 2025",
+  "cooper-brass":"Active 2025","caden-burghardt":"Active 2025","roch-cholowsky":"Active 2025","aj-diaz":"Active 2025",
+  "dom-hamel":"Active 2025","alex-hernandez":"Active 2025","carson-johnson":"Active 2025","zachary-johnston":"Active 2025",
+  "jeremy-jones":"Active 2025","kole-klecker":"Active 2025","ryan-kucherak":"Active 2025","rohan-lettow":"Active 2025",
+  "jeter-mauzey":"Active 2025","patrick-murphy":"Active 2025","shane-murphy":"Active 2025","drew-rogers":"Active 2025",
+  "logan-saloman":"Active 2025","brock-selvidge":"Active 2025","will-shelor":"Active 2025","drew-swift":"Active 2025",
+  "luke-thiele":"Active 2025","josh-tiedemann":"Active 2025","gavin-turley":"Active 2025","zach-wadas":"Active 2025",
+  "braden-watkins":"Active 2025","liam-wilson":"Active 2025","tyler-wilson":"Active 2025",
+  // ACTIVE 2024
+  "dustin-bermudez":"Active 2024","michael-brueser":"Active 2024","prince-deboskie":"Active 2024","ryan-figueroa":"Active 2024",
+  "jorge-flores":"Active 2024","kent-hasler":"Active 2024","tanner-holland":"Active 2024","logan-krei":"Active 2024",
+  "jd-mclaughlin":"Active 2024","sean-rackoski":"Active 2024","jackson-smith":"Active 2024","jake-wong":"Active 2024",
+  "justin-wylie":"Active 2024"
 };
-const playersRaw = csvPlayers.map(p=> ({...p, ...(enrich[p.id]||{})}));
+playersRaw.forEach(p=>{
+  const key = (p.id||'').toLowerCase();
+  const fixed = STATUS_FIX[key] || STATUS_FIX[(p.name||'').toLowerCase().replace(/\s+/g,'-')];
+  if (fixed) p.status = fixed;
+});
 
-/* ===== Default sort: Grad Class oldest → newest (explicit) ===== */
-const players = [...playersRaw].sort((a,b)=>(+a.graduatingClass||0)-(+b.graduatingClass||0));
+/* working array sorted oldest→newest by default */
+const players = [...playersRaw];
 
-/* ===== Render Helpers ===== */
+/* render */
 function letterDots(years){ if(!years||!years.length) return ''; const sorted=[...years].sort((a,b)=>b-a); return `<div class="letters">${sorted.slice(0,4).map(y=>`<span class="letter-dot" title="${y}">${String(y).slice(-2)}</span>`).join('')}</div>`;}
 function makeKV(k,v){ return `<div class="kv"><div class="k">${k}</div><div class="v">${v??'—'}</div></div>`; }
 function makeStats12(p){
@@ -619,27 +566,12 @@ function makeStats12(p){
           ${makeKV('FIP',x.fip||'—')} ${makeKV('IP',x.ip||'—')} ${makeKV('ER',x.er||'—')} ${makeKV('K',x.so||x.ko||'—')}
           ${makeKV('QS',x.qs||'—')} ${makeKV('HR',x.hr||'—')} ${makeKV('W',x.w||'—')} ${makeKV('SV',x.sv||'—')}`;
 }
-
-function makeIcon(id, title, d, viewBox="0 0 24 24"){
-  return `<button class="tabbtn" data-tab="${id}" title="${title}" aria-pressed="false" data-noflip>
-    <svg viewBox="${viewBox}"><path fill="currentColor" d="${d}"/></svg>
-  </button>`;
-}
-
-/* Google News / ESPN helper links */
-function urlNews(name){ return `https://news.google.com/search?q=${encodeURIComponent(name)}&hl=en-US&gl=US&ceid=US:en`; }
-function urlEspn(name){ return `https://www.espn.com/search/results?q=${encodeURIComponent(name)}`; }
-function urlMlb(name){ return `https://www.mlb.com/search?q=${encodeURIComponent(name)}&type=news`; }
-function urlMilb(name){ return `https://www.milb.com/search?q=${encodeURIComponent(name)}&type=news`; }
-
 function makeCard(p){
   const lvl = lvlClass(p.currentLevel);
   const {team,parent} = teamAndParent(p);
   const [ng1,ng2] = formatNextTwoLines(p.nextGame||{});
   const profUrl = `profile.html?id=${encodeURIComponent(p.id)}`;
-
-  const xPath = "M18.244 2H21l-6.5 7.43L22 22h-7.31l-5.13-6.73L3.6 22H1l7-8.0L2 2h7.31l4.67 6.14L18.244 2z"; /* clean X */
-  const igPath = "M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5zm5 5a5 5 0 1 0 .001 10.001A5 5 0 0 0 12 7zm6-2.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z";
+  const vidId = 'z0anHDZ8rz8'; // your YouTube video ID
 
   return `
 <article class="card flip-card front" tabindex="0" aria-label="${(p.name||'').toUpperCase()}">
@@ -647,12 +579,7 @@ function makeCard(p){
   <button class="hit right" data-toggle="next" aria-label="Flip next"></button>
   <div class="flip-inner">
     <section class="face front-face">
-      <img
-        class="card-img"
-        src="${p.frontImg || p.highSchoolImg || FALLBACK_IMG}"
-        alt="${p.name}"
-        onerror="imgOnError(this,'${(p.name||'').toUpperCase()} front')"
-      >
+      <img class="card-img" src="${(p.frontImg||p.highSchoolImg||'')}" alt="${p.name}" onerror="this.onerror=null;this.style.display='none'">
       <div class="bottom-grad"></div>
       <div class="front-left">
         <div class="name">${(p.name||'').toUpperCase()}</div>
@@ -661,7 +588,7 @@ function makeCard(p){
         <div class="spacer-6"></div>
         <div class="stack">
           ${p.currentLevel?`<span class="chip level ${lvl}">${String(p.currentLevel).toUpperCase()}</span>`:''}
-          ${p.status?`<span class="chip status ${String(p.status).toLowerCase()==='retired'?'retired':''}">${String(p.status).toUpperCase()}</span>`:''}
+          ${p.status?`<span class="chip status ${String(p.status).toLowerCase().includes('retired')?'retired':''}">${String(p.status).toUpperCase()}</span>`:''}
           ${p.graduatingClass?`<span class="chip class">CLASS OF ${p.graduatingClass}</span>`:''}
         </div>
         ${letterDots(p.letterWinnerYears)}
@@ -682,71 +609,69 @@ function makeCard(p){
     <section class="face back-face">
       <div class="back-top">
         <div class="back-left">
-          <div class="stats-name">${(p.name||'').toUpperCase()}</div>
-          <div class="team-line">${team||''}</div>
-          <div class="parent-line">${parent||''}</div>
-          <a class="profile-mini" href="${profUrl}" data-noflip>
-            <div class="l1">${(p.name||'').toUpperCase()}</div>
-            <div class="l2">${team||'—'}</div>
-            <div class="l3">${parent||'—'}</div>
+          <!-- Consolidated profile button with 3-line info (top-left quadrant) -->
+          <a class="action-chip ghost profile-chip" href="${profUrl}" data-noflip>
+            <div style="display:flex;flex-direction:column;line-height:1.1;text-align:center">
+              <div style="font-weight:900">${(p.name||'').toUpperCase()}</div>
+              <div style="font-size:12px;opacity:.9">${team||''}</div>
+              <div style="font-size:12px;opacity:.75">${parent||''}</div>
+            </div>
           </a>
+
+          <div class="tiny-bar" data-noflip>
+            <div class="tiny-grid" role="tablist" aria-label="Content tabs" data-noflip>
+              <button class="tabbtn active" data-tab="stats" title="Stats" aria-pressed="true" data-noflip>
+                <svg viewBox="0 0 24 24"><path fill="currentColor" d="M5 3h2v18H5zM11 10h2v11h-2zM17 6h2v15h-2z"/></svg>
+              </button>
+              <button class="tabbtn" data-tab="news" title="News" aria-pressed="false" data-noflip>
+                <svg viewBox="0 0 24 24"><path fill="currentColor" d="M4 5h16v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5zm2 2v12h12V7H6zm1 1h10v3H7V8z"/></svg>
+              </button>
+              <button class="tabbtn" data-tab="x" title="X" aria-pressed="false" data-noflip>
+                <svg viewBox="0 0 1200 1227"><path fill="currentColor" d="M714 511 1160 0H996L689 356 420 0H0l463 607L0 1227h164l329-379 286 379h420zM327 120h154l646 873H973z"/></svg>
+              </button>
+              <button class="tabbtn" data-tab="ig" title="Instagram" aria-pressed="false" data-noflip>
+                <svg viewBox="0 0 24 24"><path fill="currentColor" d="M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5zm5 5a5 5 0 1 0 .001 10.001A5 5 0 0 0 12 7zm6-2.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z"/></svg>
+              </button>
+              <button class="tabbtn" data-tab="video" title="Video" aria-pressed="false" data-noflip>
+                <svg viewBox="0 0 24 24"><path fill="currentColor" d="M8 5v14l11-7zM3 5h2v14H3z"/></svg>
+              </button>
+            </div>
+            <button class="action-chip flat tab-stats active" data-tab="stats" data-noflip>2025 SEASON STATS</button>
+          </div>
         </div>
+
         <div class="back-right">
           <div class="hs-box" aria-hidden="true">
-            <img
-              src="${p.highSchoolImg || p.frontImg || FALLBACK_IMG}"
-              alt="${(p.name||'HS')}"
-              onerror="imgOnError(this,'${(p.name||'').toUpperCase()} back')"
-            >
+            <img src="${(p.highSchoolImg||p.frontImg||'')}" alt="${(p.name||'HS')}" onerror="this.onerror=null;this.style.display='none'">
           </div>
         </div>
       </div>
 
       <div class="back-bottom" data-noflip>
-        <div class="funzone">
-          <div class="pane pane-stats active" data-pane="stats"><div class="kv-wrap12">${makeStats12(p)}</div></div>
-          <div class="pane pane-news"  data-pane="news">
-            <div class="kv">
-              <div class="k">Latest News Links</div>
-              <div class="v" style="display:flex; gap:10px; flex-wrap:wrap; justify-content:center; padding-top:6px">
-                <a class="chip" href="${urlNews(p.name)}" target="_blank" rel="noopener">Google News</a>
-                <a class="chip" href="${urlEspn(p.name)}" target="_blank" rel="noopener">ESPN</a>
-                <a class="chip" href="${urlMlb(p.name)}" target="_blank" rel="noopener">MLB</a>
-                <a class="chip" href="${urlMilb(p.name)}" target="_blank" rel="noopener">MiLB</a>
-              </div>
-            </div>
+        <!-- FUN ZONE panes -->
+        <div class="pane pane-stats active" data-pane="stats"><div class="kv-wrap12">${makeStats12(p)}</div></div>
+        <div class="pane pane-news" data-pane="news"><div style="color:#6b7280">Latest headlines placeholder.</div></div>
+        <div class="pane pane-x" data-pane="x"><div style="color:#6b7280">X/Twitter posts placeholder.</div></div>
+        <div class="pane pane-ig" data-pane="ig"><div style="color:#6b7280">Instagram posts placeholder.</div></div>
+        <div class="pane pane-video" data-pane="video">
+          <div style="position:relative;padding-top:56.25%;border-radius:10px;overflow:hidden;background:#000">
+            <iframe data-ytembed
+              src=""
+              title="YATSTATS Video"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              allowfullscreen
+              style="position:absolute;inset:0;width:100%;height:100%;border:0"></iframe>
           </div>
-          <div class="pane pane-yat"   data-pane="yat"><div class="kv"><div class="k">YAT-A-BOY!</div><div class="v">Gifting CTA coming soon</div></div></div>
-          <div class="pane pane-nil"   data-pane="nil"><div class="kv"><div class="k">NIL Points</div><div class="v">Totals coming soon</div></div></div>
-          <div class="pane pane-x"     data-pane="x"><div class="kv"><div class="k">X Feed</div><div class="v">Connect handle via CMS</div></div></div>
-          <div class="pane pane-ig"    data-pane="ig"><div class="kv"><div class="k">Instagram</div><div class="v">Connect handle via CMS</div></div></div>
-          <div class="pane pane-vid"   data-pane="vid"><div class="kv"><div class="k">Video</div><div class="v">Clips coming soon</div></div></div>
-          <div class="pane pane-gal"   data-pane="gal"><div class="kv"><div class="k">Gallery</div><div class="v">Photos coming soon</div></div></div>
-        </div>
-
-        <div class="tab-icons" data-noflip>
-          ${makeIcon('stats','Season/Career Stats','M5 3h2v18H5zM11 10h2v11h-2zM17 6h2v15h-2z')}
-          ${makeIcon('news','News','M4 5h16v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5zm2 2v12h12V7H6zm1 1h10v3H7V8z')}
-          ${makeIcon('yat','YAT-A-BOY','M12 21 3 12h5V3h6v9h5z')}
-          ${makeIcon('nil','NIL Points','M12 2l9 4-9 4-9-4 9-4zm0 18l-9-4 3-1.3V11l6 2.7 6-2.7v3.7l3 1.3-9 4z')}
-          ${makeIcon('x','X Feed', xPath, "0 0 24 24")}
-          ${makeIcon('ig','Instagram', igPath)}
-          ${makeIcon('vid','Video','M4 6h10v12H4zM16 8l6 4-6 4z')}
-          ${makeIcon('gal','Gallery','M3 6h18v12H3zM6 16l4-5 3 4 2-3 3 4H6z')}
         </div>
       </div>
     </section>
   </div>
 </article>`;
 }
+function render(list){ byId('grid').innerHTML = list.map(makeCard).join(''); attachInteractions(); }
 
-function render(list){
-  byId('grid').innerHTML = list.map(makeCard).join('');
-  attachInteractions();
-}
-
-/* ===== Filters ===== */
-const LEVEL_ORDER = ["MLB","TRIPLE-A","DOUBLE-A","HIGH-A","LOW-A","ROOKIE","INDY","NCAA","NAIA","JUCO"];
+/* filters + defaults */
+const LEVEL_ORDER = ["MLB","TRIPLE-A","DOUBLE-A","HIGH-A","LOW-A","ROOKIE","INDY","NCAA","NCAA-D1","NCAA-D2","NCAA-D3","NAIA","JUCO"];
 function yearsRange(start,end){const arr=[]; for(let y=start;y>=end;y--) arr.push(y); return arr;}
 function uniqueSortedGradYears(){ const set=new Set(players.map(p=>p.graduatingClass).filter(Boolean)); const have=[...set].map(Number); const want=yearsRange(2025,2000); return [...new Set([...want,...have])]; }
 function uniqueRosterYears(){ const set=new Set(); players.forEach(p=>(p.letterWinnerYears||[]).forEach(y=>set.add(Number(y)))); const have=[...set]; const want=yearsRange(2025,2000); return [...new Set([...want,...have])]; }
@@ -755,75 +680,103 @@ function populateFilters(){
   const gSel=byId('grad'); if(gSel){ gSel.innerHTML=''; uniqueSortedGradYears().forEach(y=>{const o=document.createElement('option');o.value=String(y);o.textContent=y;gSel.appendChild(o);}); }
   const rSel=byId('roster'); if(rSel){ rSel.innerHTML=''; uniqueRosterYears().forEach(y=>{const o=document.createElement('option');o.value=String(y);o.textContent=y;rSel.appendChild(o);}); }
 }
-function getMultiValues(id){const sel=byId(id);return sel?[...sel.options].filter(o=>o.selected).map(o=>o.value):[]}
+function getMultiValues(id){const sel=byId(id);return sel?[...sel.options].filter(o=>o.selected && o.value!=="__ALL__").map(o=>o.value):[]}
+function sortByGradAsc(list){
+  return [...list].sort((a,b)=>{
+    const ga=Number(a.graduatingClass)||9999, gb=Number(b.graduatingClass)||9999;
+    if(ga!==gb) return ga-gb;
+    return (a.name||'').localeCompare(b.name||'');
+  });
+}
+function isActive(p){ return /\bactive\b/i.test(String(p.status||'')); }
+const ACTIVE_BASE = players.filter(isActive);
+
 function applyFilters(){
   const qLeft=(byId('localSearch')?.value||'').toLowerCase().trim();
   const qRight=(byId('filterName')?.value||'').toLowerCase().trim();
   const q=qRight||qLeft;
+
   const levels=getMultiValues('lvl').map(s=>s.toUpperCase());
   const grads=getMultiValues('grad');
   const years=getMultiValues('roster').map(Number);
   const stats=getMultiValues('status').map(s=>s.toLowerCase());
-  const out=players.filter(p=>{
+
+  const usingAnyFilter = q || levels.length || grads.length || years.length || stats.length;
+  const base = usingAnyFilter ? players : ACTIVE_BASE;
+
+  const out=base.filter(p=>{
     const name=(p.name||'').toLowerCase();
     if(q && !name.includes(q)) return false;
-    if(levels.length){ const L=String(p.currentLevel||'').toUpperCase().replace('AAA','TRIPLE-A').replace('AA','DOUBLE-A'); if(!levels.includes(L)) return false; }
-    if(grads.length && !grads.includes(String(p.graduatingClass))) return false;
-    if(years.length){ const lw=(p.letterWinnerYears||[]).map(Number); if(!lw.some(y=>years.includes(y))) return false; }
+    if(levels.length){
+      const L=String(p.currentLevel||'').toUpperCase().replace('AAA','TRIPLE-A').replace('AA','DOUBLE-A');
+      if(!levels.includes(L)) return false;
+    }
+    if(grads.length && !grads.includes(String(p.graduatingClass||''))) return false;
+    if(years.length){
+      const lw=(p.letterWinnerYears||[]).map(Number);
+      if(!lw.some(y=>years.includes(y))) return false;
+    }
     if(stats.length){ if(!stats.includes(String(p.status||'').toLowerCase())) return false; }
     return true;
-  }).sort((a,b)=>(+a.graduatingClass||0)-(+b.graduatingClass||0));
-  render(out);
+  });
+
+  render(sortByGradAsc(out));
 }
 function resetAll(){
   const ls=byId('localSearch'); if(ls) ls.value='';
   const fn=byId('filterName'); if(fn) fn.value='';
   ['lvl','grad','roster','status'].forEach(id=>{const sel=byId(id); if(sel) [...sel.options].forEach(o=>o.selected=false);});
-  render(players); // restores all 31
+  render(sortByGradAsc(ACTIVE_BASE));
 }
 
-/* ===== Interactions ===== */
-const INTERACTIVE_SEL='[data-noflip], .tabbtn, .action-chip, a,button,input,select,textarea, .tab-icons *';
+/* interactions */
+const INTERACTIVE_SEL='[data-noflip], .tabbtn, .action-chip, a,button,input,select,textarea';
 function toggle(card){ if(!card) return; card.classList.contains('front') ? (card.classList.remove('front'),card.classList.add('back')) : (card.classList.remove('back'),card.classList.add('front')); }
-
 function attachInteractions(){
-  // Tabs: switch panes + active state
-  document.querySelectorAll('.tab-icons').forEach(bar=>{
-    bar.addEventListener('click', (e)=>{
-      const btn=e.target.closest('.tabbtn'); if(!btn) return;
-      const pane=btn.dataset.tab||'stats';
-      const card=btn.closest('.card');
-      card.querySelectorAll('.tabbtn').forEach(b=>b.classList.toggle('active', b===btn));
-      card.querySelectorAll('.pane').forEach(p=>p.classList.toggle('active', p.dataset.pane===pane));
-    }, true);
-  });
-
-  // Flip by edge hits
+  // ensure side state class
+  document.querySelectorAll('.card').forEach(c=>{ if(!c.classList.contains('front')&& !c.classList.contains('back')) c.classList.add('front'); });
+  // flip click zones (don’t flip when interacting with controls)
   document.querySelectorAll('.card .hit').forEach(hit=>{
     hit.addEventListener('click', e=>{ if(e.target.closest(INTERACTIVE_SEL)) return; toggle(hit.closest('.card')); });
   });
-
-  // Swipe anywhere not interactive
+  // swipe to flip (mobile)
+  let sx=0, swc=null, sy=0;
   document.querySelectorAll('.card').forEach(card=>{
-    let sx=null, sy=null, tracking=false;
-    const MIN=40;
-    card.addEventListener('pointerdown', e=>{
-      if(e.target.closest(INTERACTIVE_SEL)) return;
-      sx=e.clientX; sy=e.clientY; tracking=true;
-    }, {passive:true});
-    card.addEventListener('pointerup', e=>{
-      if(!tracking) return;
-      const dx=e.clientX-sx, dy=e.clientY-sy;
-      if(Math.abs(dx)>MIN && Math.abs(dx)>Math.abs(dy)) toggle(card);
-      tracking=false; sx=sy=null;
-    }, {passive:true});
-    card.addEventListener('keydown', e=>{
-      if(e.key==='Enter' || e.key===' '){ e.preventDefault(); toggle(card); }
+    card.addEventListener('touchstart', e=>{
+      if(e.target.closest(INTERACTIVE_SEL)) { swc=null; return; }
+      swc=card; sx=e.touches[0].clientX; sy=e.touches[0].clientY;
+    },{passive:true});
+    card.addEventListener('touchend', e=>{
+      if(!swc) return;
+      const dx=e.changedTouches[0].clientX-sx; const dy=e.changedTouches[0].clientY-sy;
+      if(Math.abs(dx)>40 && Math.abs(dx)>Math.abs(dy)) toggle(swc);
+      swc=null;
     });
+  });
+  // tab switching (including Video pane w/ YouTube embed)
+  document.querySelectorAll('.tiny-grid, .tab-stats').forEach(container=>{
+    container.addEventListener('click', (e)=>{
+      const btn=e.target.closest('.tabbtn, .action-chip.flat'); if(!btn) return;
+      e.stopPropagation();
+      const card=btn.closest('.card'); const pane=btn.dataset.tab||'stats';
+      card.querySelectorAll('.tabbtn').forEach(b=>b.classList.toggle('active', b.dataset.tab===pane || (pane==='stats'&&b.dataset.tab==='stats')));
+      const statsChip=card.querySelector('.action-chip.flat.tab-stats'); if(statsChip) statsChip.classList.toggle('active', pane==='stats');
+      card.querySelectorAll('.pane').forEach(p=>p.classList.toggle('active', p.dataset.pane===pane));
+
+      // handle YouTube lazy load + stop on leave
+      const ifr = card.querySelector('.pane-video iframe[data-ytembed]');
+      if (ifr){
+        if (pane==='video'){
+          if (!ifr.src) ifr.src = 'https://www.youtube.com/embed/z0anHDZ8rz8?rel=0&playsinline=1';
+        } else {
+          if (ifr.src) { const s=ifr.src; ifr.src=''; setTimeout(()=>{ifr.src=s; ifr.src='';},0); } // stop playback
+        }
+      }
+    },true);
   });
 }
 
-/* ===== Drawers & header icons ===== */
+/* drawers & header icons */
 const scrim=byId('scrim');
 const drawerLeft=byId('drawerLeft'); const drawerRight=byId('drawerRight'); const drawerAuth=byId('drawerAuth');
 const iconSearch=byId('iconSearch'); const iconFilter=byId('iconFilter'); const iconReset=byId('iconReset'); const iconProfile=byId('iconProfile');
@@ -841,7 +794,7 @@ function closeAuth(focus=true){ drawerAuth.classList.remove('open'); if(!drawerL
 
 function closeDrawers(){ closeLeft(false); closeRight(false); closeAuth(); }
 
-/* ===== Binds ===== */
+/* binds */
 byId('openLeft').addEventListener('click', openLeft);
 byId('closeLeft').addEventListener('click', ()=>closeLeft());
 byId('closeRight').addEventListener('click', ()=>closeRight());
@@ -852,27 +805,30 @@ iconProfile.addEventListener('click', openAuth);
 iconReset.addEventListener('click', resetAll);
 scrim.addEventListener('click', closeDrawers);
 
-/* Left drawer type-ahead */
+/* ESC */
+document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') closeDrawers(); });
+
+/* left drawer live-search (debounced) */
 const localSearch=byId('localSearch'); const localResults=byId('localResults');
 function renderLocalResults(q){
   localResults.innerHTML=''; if(!q) return;
-  players.filter(p=>(p.name||'').toLowerCase().includes(q.toLowerCase())).slice(0,50).forEach(p=>{
+  const ql=q.toLowerCase();
+  players.filter(p=>(p.name||'').toLowerCase().includes(ql)).slice(0,50).forEach(p=>{
     const li=document.createElement('li'); const yr=p.graduatingClass?` (Class of ${p.graduatingClass})`:''; li.textContent=`${p.name}${yr}`;
     li.addEventListener('click', ()=>{ window.location.href=`profile.html?id=${encodeURIComponent(p.id)}`; closeLeft(); });
     localResults.appendChild(li);
   });
 }
-localSearch.addEventListener('input', (e)=>renderLocalResults(e.target.value));
+if(localSearch){ localSearch.addEventListener('input', (e)=>{ clearTimeout(localSearch._t); localSearch._t=setTimeout(()=>renderLocalResults(e.target.value),90); }); }
 
-/* Right drawer: By Player filter (auto-close on Enter) */
+/* right drawer: By Player Enter = apply & close */
 byId('filterName').addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ e.preventDefault(); applyFilters(); closeRight(); } });
 
-/* ===== Boot ===== */
-document.addEventListener('DOMContentLoaded', ()=>{
-  runSplash();
-  populateFilters();
-  render(players); // <-- ALL 31 loaded; default sorted oldest → newest by class
-});
+/* filters instant-apply */
+['lvl','grad','roster','status'].forEach(id=>{ const el=byId(id); if(el) el.addEventListener('change', applyFilters); });
+
+/* boot: populate filters; default = Active only, oldest→newest */
+document.addEventListener('DOMContentLoaded', ()=>{ populateFilters(); render(sortByGradAsc(ACTIVE_BASE)); });
 </script>
 </body>
 </html>
