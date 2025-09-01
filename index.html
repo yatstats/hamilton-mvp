@@ -3,12 +3,12 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>hamilton.yatstats.com — WHERE THEY YAT? (ham-v4.1.0)</title>
+<title>hamilton.yatstats.com — WHERE THEY YAT? (ham-v4.1.1)</title>
 
 <style>
 :root{
   --maroon:#7A0019; --ring:#E3E6EA; --bg:#f3f4f6; --ink:#111827; --muted:#6b7280;
-  --headerH:100px;
+  --headerH:100px; /* will be measured & updated by JS */
 }
 *{box-sizing:border-box}
 html,body{margin:0;padding:0}
@@ -16,37 +16,39 @@ body{background:var(--bg);font:15px/1.45 system-ui,-apple-system,Segoe UI,Roboto
 a{text-decoration:none;color:inherit}
 button{font:inherit;color:inherit}
 
-/* HEADER */
+/* HEADER (2 rows: icons top, logos bottom) */
 .site-header{
-  position:fixed; inset:0 0 auto 0; height:var(--headerH); z-index:60;
-  background:#fff; border-bottom:1px solid var(--ring);
-  display:grid; grid-template-columns:auto 1fr auto; gap:8px; align-items:start;
-  padding:8px 8px 6px;
+  position:fixed; inset:0 0 auto 0; z-index:60; background:#fff; border-bottom:1px solid var(--ring);
+  display:grid; grid-template-rows:auto auto; gap:6px; padding:8px 8px 6px;
 }
-.h-left{display:flex;align-items:center;gap:8px;min-width:0}
+.header-top{display:flex; align-items:center; gap:8px}
+.header-bottom{
+  display:grid; grid-template-columns:auto 1fr auto; align-items:center;
+  gap:8px; min-width:0;
+}
+
+/* Top-row icons (left of header) */
+.h-left-icons{display:flex;align-items:center;gap:8px;min-width:0}
 .hambtn{width:36px;height:36px;border:0;background:transparent;display:grid;place-items:center;cursor:pointer}
-.ham-logo{height:42px;width:auto;display:block}
-
-/* Desktop nav: allow horizontal scroll before collapsing */
-.nav-desktop{
-  display:flex; gap:14px; align-self:center; justify-self:center;
-  max-width:100%; overflow-x:auto; scrollbar-width:thin; padding:2px 4px;
-}
-.nav-desktop a{font-size:12px;text-transform:uppercase;color:#1f2937;white-space:nowrap;padding:4px 0;letter-spacing:.06em;flex:0 0 auto}
-@media (max-width:1260px){ .nav-desktop{display:none} }
-
-.h-right{display:flex;flex-direction:column;align-items:flex-end;gap:6px;min-width:0}
-.ystats-logo{height:36px;width:auto;display:block}
-@media (max-width:420px){ .ystats-logo{height:32px} }
-
-/* header icon row (right-aligned under YATSTATS logo) */
-.hdr-icons{display:flex;gap:8px;align-items:center;justify-content:flex-end}
+.hdr-icons{display:flex;gap:8px;align-items:center}
 .hdr-icon{width:44px;height:44px;padding:0;border:0;background:transparent;border-radius:8px;display:grid;place-items:center;cursor:pointer}
 .hdr-icon svg{width:20px;height:20px;color:#111}
 .hdr-icon:hover{background:rgba(0,0,0,.06)}
 .hdr-icon:focus-visible{outline:2px solid #111;outline-offset:2px;border-radius:8px}
 .hdr-icon.active{background:#111}
 .hdr-icon.active svg{color:#fff}
+
+/* Bottom-row logos */
+.ham-logo{height:42px;width:auto;display:block}
+.ystats-logo{
+  height:36px; width:auto; display:block; justify-self:end;
+  max-width:min(38vw, 260px); /* shrink before overflow */
+  object-fit:contain;
+}
+@media (max-width:420px){ .ystats-logo{height:32px; max-width:min(44vw, 220px)} }
+
+/* (Optional) hide the old center nav for this layout */
+.nav-desktop{display:none}
 
 /* TAGLINE */
 .tagline-wrap{position:sticky;top:var(--headerH);z-index:40;background:#fff;border-bottom:1px solid var(--ring)}
@@ -219,39 +221,34 @@ body.no-scroll{overflow:hidden}
 <body>
 
 <header class="site-header">
-  <div class="h-left">
-    <button class="hambtn" id="openLeft" aria-label="Open Navigation">
-      <svg viewBox="0 0 24 24" width="22" height="22"><path fill="currentColor" d="M3 6h18v2H3zM3 11h18v2H3zM3 16h18v2H3z"/></svg>
-    </button>
-    <img class="ham-logo" src="https://i.postimg.cc/htV31M3K/hamilton-logo-block-with-3-lines-of-type.png" alt="Hamilton HS"/>
+  <!-- TOP ROW: Icons (L→R: Hamburger, Account, Search, Filter, Reset) -->
+  <div class="header-top">
+    <div class="h-left-icons">
+      <button class="hambtn" id="openLeft" aria-label="Open Navigation">
+        <svg viewBox="0 0 24 24" width="22" height="22"><path fill="currentColor" d="M3 6h18v2H3zM3 11h18v2H3zM3 16h18v2H3z"/></svg>
+      </button>
+      <div class="hdr-icons">
+        <button class="hdr-icon" id="iconProfile" aria-label="Account" title="Account">
+          <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm0 2c-4.2 0-8 2.1-8 5v1h16v-1c0-2.9-3.8-5-8-5z"/></svg>
+        </button>
+        <button class="hdr-icon" id="iconSearch" aria-label="Search" title="Search">
+          <svg viewBox="0 0 24 24"><path fill="currentColor" d="M11 4a7 7 0 1 1 0 14 7 7 0 0 1 0-14zm9.7 15.3-3.4-3.4a9 9 0 1 0-1.4 1.4l3.4 3.4a1 1 0 0 0 1.4-1.4z"/></svg>
+        </button>
+        <button class="hdr-icon" id="iconFilter" aria-label="Filters" title="Filters">
+          <svg viewBox="0 0 24 24"><path fill="currentColor" d="M3 5h18l-6.5 7.5V20l-5-2v-5.5L3 5z"/></svg>
+        </button>
+        <button class="hdr-icon" id="iconReset" aria-label="Reset" title="Reset">
+          <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 5V2L8 6l4 4V7a5 5 0 1 1-5 5H5a7 7 0 1 0 7-7z"/></svg>
+        </button>
+      </div>
+    </div>
   </div>
 
-  <nav class="nav-desktop">
-    <a href="#">Where They YAT?</a>
-    <a href="#">Active Alumni News</a>
-    <a href="#">Next-Level All-Time List</a>
-    <a href="#">NIL &amp; YAT-A-BOY Marketplace</a>
-    <a href="#">The Current Team</a>
-    <a href="#">PCDAction Partner Program</a>
-  </nav>
-
-  <div class="h-right">
+  <!-- BOTTOM ROW: Logos (left school, right YATSTATS) -->
+  <div class="header-bottom">
+    <img class="ham-logo" src="https://i.postimg.cc/htV31M3K/hamilton-logo-block-with-3-lines-of-type.png" alt="Hamilton HS"/>
+    <div></div> <!-- flexible spacer -->
     <img class="ystats-logo" src="https://i.postimg.cc/G2m7rR3p/yatstats-logo-stacked.png" alt="YAT?STATS"/>
-    <div class="hdr-icons">
-      <!-- Search → Filter → Reset → Profile -->
-      <button class="hdr-icon" id="iconSearch" aria-label="Search" title="Search">
-        <svg viewBox="0 0 24 24"><path fill="currentColor" d="M11 4a7 7 0 1 1 0 14 7 7 0 0 1 0-14zm9.7 15.3-3.4-3.4a9 9 0 1 0-1.4 1.4l3.4 3.4a1 1 0 0 0 1.4-1.4z"/></svg>
-      </button>
-      <button class="hdr-icon" id="iconFilter" aria-label="Filters" title="Filters">
-        <svg viewBox="0 0 24 24"><path fill="currentColor" d="M3 5h18l-6.5 7.5V20l-5-2v-5.5L3 5z"/></svg>
-      </button>
-      <button class="hdr-icon" id="iconReset" aria-label="Reset" title="Reset">
-        <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 5V2L8 6l4 4V7a5 5 0 1 1-5 5H5a7 7 0 1 0 7-7z"/></svg>
-      </button>
-      <button class="hdr-icon" id="iconProfile" aria-label="Account" title="Account">
-        <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm0 2c-4.2 0-8 2.1-8 5v1h16v-1c0-2.9-3.8-5-8-5z"/></svg>
-      </button>
-    </div>
   </div>
 </header>
 
@@ -374,10 +371,19 @@ body.no-scroll{overflow:hidden}
 
 <footer class="footer">
   <img src="https://i.postimg.cc/v8LxKy54/no-errors-sample-banner.png" alt="Sponsor banner">
-  <div class="build-pill">BUILD: ham-v4.1.0</div>
+  <div class="build-pill">BUILD: ham-v4.1.1</div>
 </footer>
 
 <script>
+/* ========= Dynamic header height: keep sticky offsets perfect ========= */
+function setHeaderHeight(){
+  const h=document.querySelector('.site-header');
+  if(!h) return;
+  const px = Math.round(h.getBoundingClientRect().height);
+  document.documentElement.style.setProperty('--headerH', px+'px');
+}
+window.addEventListener('resize', ()=>{ clearTimeout(window.__hh_t); window.__hh_t=setTimeout(setHeaderHeight, 80); });
+
 /* ========= Helpers & Constants (with Level Normalization) ========= */
 const byId = id => document.getElementById(id);
 
@@ -527,8 +533,8 @@ const playersRaw = [
   {id:"kole-klecker",name:"KOLE KLECKER",position:"P",currentLevel:"NCAA",graduatingClass:2022,status:"Active"},
   {id:"logan-saloman",name:"LOGAN SALOMAN",position:"P",currentLevel:"NCAA",graduatingClass:2022,status:"Active"},
   {id:"luke-thiele-dup",name:"LUKE THIELE",position:"IF",currentLevel:"NCAA",graduatingClass:2021,status:"Active"},
-  {id:"josh-tiedemann",name:"JOSH TIEDEMANN",position:"H-P",currentLevel:"A",graduatingClass:2023,status:"Active"}, /* will normalize to LOW-A */
-  {id:"gavin-turley",name:"GAVIN TURLEY",position:"OF",currentLevel:"A",graduatingClass:2022,status:"Active"},       /* will normalize to LOW-A */
+  {id:"josh-tiedemann",name:"JOSH TIEDEMANN",position:"H-P",currentLevel:"A",graduatingClass:2023,status:"Active"},
+  {id:"gavin-turley",name:"GAVIN TURLEY",position:"OF",currentLevel:"A",graduatingClass:2022,status:"Active"},
   {id:"braden-watkins",name:"BRADEN WATKINS",position:"OF",currentLevel:"NCAA",graduatingClass:2022,status:"Active"},
   {id:"alex-hernandez",name:"ALEX HERNANDEZ",position:"C",currentLevel:"NCAA",graduatingClass:2021,status:"Active"}
 ];
@@ -733,8 +739,8 @@ const iconSearch=byId('iconSearch'); const iconFilter=byId('iconFilter'); const 
 let lastFocus=null;
 function setActiveIcon(btn,a){ btn?.classList.toggle('active',!!a); }
 
-function openLeft(){ closeRight(false); closeAuth(false); lastFocus=document.activeElement; drawerLeft.classList.add('open'); scrim.classList.add('open'); document.body.classList.add('no-scroll'); setActiveIcon(iconSearch,true); setActiveIcon(iconFilter,false); setActiveIcon(iconProfile,false); }
-function closeLeft(focus=true){ drawerLeft.classList.remove('open'); if(!drawerRight.classList.contains('open')&&!drawerAuth.classList.contains('open')){ scrim.classList.remove('open'); document.body.classList.remove('no-scroll'); } setActiveIcon(iconSearch,false); if(focus) lastFocus?.focus?.(); }
+function openLeft(){ closeRight(false); closeAuth(false); lastFocus=document.activeElement; drawerLeft.classList.add('open'); scrim.classList.add('open'); document.body.classList.add('no-scroll'); setActiveIcon(iconSearch,false); setActiveIcon(iconFilter,false); setActiveIcon(iconProfile,false); }
+function closeLeft(focus=true){ drawerLeft.classList.remove('open'); if(!drawerRight.classList.contains('open')&&!drawerAuth.classList.contains('open')){ scrim.classList.remove('open'); document.body.classList.remove('no-scroll'); } if(focus) lastFocus?.focus?.(); }
 
 function openRight(){ closeLeft(false); closeAuth(false); lastFocus=document.activeElement; drawerRight.classList.add('open'); scrim.classList.add('open'); document.body.classList.add('no-scroll'); setActiveIcon(iconFilter,true); setActiveIcon(iconSearch,false); setActiveIcon(iconProfile,false); }
 function closeRight(focus=true){ drawerRight.classList.remove('open'); if(!drawerLeft.classList.contains('open')&&!drawerAuth.classList.contains('open')){ scrim.classList.remove('open'); document.body.classList.remove('no-scroll'); } setActiveIcon(iconFilter,false); if(focus) lastFocus?.focus?.(); }
@@ -754,6 +760,12 @@ iconFilter.addEventListener('click', openRight);
 iconProfile.addEventListener('click', openAuth);
 iconReset.addEventListener('click', resetAll);
 scrim.addEventListener('click', closeDrawers);
+
+/* Make filter selects apply immediately */
+['lvl','grad','roster','status'].forEach(id=>{
+  const el = byId(id);
+  if (el) el.addEventListener('change', applyFilters);
+});
 
 /* ESC + Arrow flip (keyboard) */
 document.addEventListener('keydown', (e)=>{
@@ -777,7 +789,7 @@ function addSwipeClose(el,dir){ let sx=null,sy=null;
 }
 addSwipeClose(drawerLeft,'left'); addSwipeClose(drawerRight,'right'); addSwipeClose(drawerAuth,'right');
 
-/* left drawer type-ahead */
+/* left drawer type-ahead (also live-filter grid) */
 const localSearch=byId('localSearch'); const localResults=byId('localResults');
 function renderLocalResults(q){
   localResults.innerHTML=''; if(!q) return;
@@ -787,13 +799,18 @@ function renderLocalResults(q){
     localResults.appendChild(li);
   });
 }
-localSearch.addEventListener('input', (e)=>renderLocalResults(e.target.value));
+localSearch?.addEventListener('input', (e)=>{
+  const val = e.target.value;
+  renderLocalResults(val);
+  applyFilters();
+});
 
-/* right drawer: By Player filter (auto-close on Enter) */
+/* right drawer: By Player filter (live + Enter closes) */
+byId('filterName').addEventListener('input', ()=>applyFilters());
 byId('filterName').addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ e.preventDefault(); applyFilters(); closeRight(); } });
 
 /* boot */
-document.addEventListener('DOMContentLoaded', ()=>{ populateFilters(); render(players); });
+document.addEventListener('DOMContentLoaded', ()=>{ setHeaderHeight(); populateFilters(); render(players); });
 </script>
 </body>
 </html>
