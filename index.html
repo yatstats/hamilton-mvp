@@ -10,7 +10,7 @@
 <style>
 :root{
   --bg:#0b0d12; --ink:#f3f4f6; --muted:#9aa1ab; --ring:#1f2530; --ring2:#232a36;
-  --headerH:118px;
+  --headerH:135px;
   --drawer-min:300px; --drawer-max:520px; --drawer-mob:75vw;
   --accent:#ffffff; --chip:#0e1016;
   --touchEdge:18%;
@@ -26,6 +26,7 @@ img{max-width:100%;display:block}
 .site-header{
   position:fixed;inset:0 0 auto 0;height:var(--headerH);z-index:60;background:#000;border-bottom:1px solid var(--ring);
   display:grid;grid-template-columns:auto 1fr auto;gap:8px;padding:8px 10px 6px;
+  align-items:start;
 }
 .h-left{display:flex;flex-direction:column;gap:8px;min-width:0}
 .top-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
@@ -36,12 +37,12 @@ img{max-width:100%;display:block}
 
 /* Hamilton block */
 .h-logos{display:flex;align-items:flex-end;gap:8px}
-.ham-brand{display:flex;gap:10px;align-items:flex-end}
-.ham-logo{height:40px;width:auto}
-.ham-type{line-height:1;display:flex;flex-direction:column;gap:0}
+.ham-brand{display:flex;gap:6px;align-items:flex-end}
+.ham-logo{height:80px;width:auto}
+.ham-type{line-height:1;display:flex;flex-direction:column;gap:2px;justify-content:flex-end;padding-bottom:4px;}
 .ham-line1{font-family:"Roboto Condensed",sans-serif;font-weight:300;font-size:12px;letter-spacing:.02em}
-.ham-line2{font-family:"Anton",sans-serif;font-size:17px;letter-spacing:.01em;margin-top:-1px}
-.ham-line3{font-family:"Anton",sans-serif;font-size:19px;letter-spacing:.01em;margin-top:-3px}
+.ham-line2{font-family:"Anton",sans-serif;font-size:17px;letter-spacing:.01em;margin-top:0;}
+.ham-line3{font-family:"Anton",sans-serif;font-size:19px;letter-spacing:.01em;margin-top:0;}
 
 /* center nav (desktop) */
 .nav-desktop{display:flex;gap:16px;align-self:center;justify-self:center;flex-wrap:wrap}
@@ -49,11 +50,11 @@ img{max-width:100%;display:block}
 .font-slim{font-family:"Roboto Condensed",sans-serif;font-weight:300}
 .font-strong{font-family:"Anton",sans-serif}
 .nav-desktop a{font-size:12px;text-transform:uppercase;white-space:nowrap}
-.nav-slim{color:#9aa1ab;letter-spacing:-.01em;margin-right:-1px} /* tight, touches strong */
+.nav-slim{color:#9aa1ab;letter-spacing:-.01em;margin-right:-1px}
 .nav-strong{color:#fff;letter-spacing:.01em}
 
 /* right logo */
-.h-right{display:flex;flex-direction:column;align-items:flex-end;gap:6px;min-width:0}
+.h-right{display:flex;align-items:flex-end;min-width:0}
 .ystats-logo{height:36px;width:auto;object-fit:contain;max-width:40vw}
 @media (max-width:520px){ .ystats-logo{height:28px;max-width:54vw} }
 
@@ -197,25 +198,20 @@ body.no-scroll{overflow:hidden}
 
 /* ---------- HEADER RESPONSIVENESS (ADDED) ---------- */
 @media (max-width: 640px) {
-  .site-header {
-    padding: 8px;
-    gap: 6px;
+  :root {
+    --headerH: 100px;
   }
-  /* Hide the longer lines of text, but keep the school name */
-  .ham-line1, .ham-line3 {
-      display: none;
+  .ham-logo {
+    height: 50px;
   }
-  .ham-line2 {
-      font-size: 15px; /* Adjust font size */
+  .ham-type {
+    display: none;
+  }
+  .top-row {
+    gap: 4px;
   }
   .ystats-logo {
     height: 30px;
-  }
-  .ham-logo {
-      height: 36px;
-  }
-  .h-logos {
-      gap: 6px;
   }
 }
 </style>
@@ -373,7 +369,7 @@ body.no-scroll{overflow:hidden}
 </main>
 
 <footer class="footer">
-  <div class="build-pill">BUILD: ham-v4.6.3</div>
+  <div class="build-pill">BUILD: ham-v4.6.4</div>
 </footer>
 
 <div id="splash" class="splash" aria-hidden="true">
@@ -505,7 +501,7 @@ function makeCard(p){
   const [ng1,ng2] = formatNextTwoLines(p.nextGame||{});
   const profUrl = `profile.html?id=${encodeURIComponent(p.id)}`;
   const statsTitle = dynamicStatsTitle(p);
-  const cardId = p.id || `player-${Math.random()}`; // Fallback ID for safety
+  const cardId = p.id || `player-${Math.random()}`;
 
   return `
 <article class="card flip-card front" aria-label="${(p.name||'').toUpperCase()}">
@@ -616,7 +612,6 @@ function yearsRange(start,end){const arr=[]; for(let y=start;y>=end;y--) arr.pus
 function uniqueSortedGradYears(players){ const set=new Set(players.map(p=>p.graduatingClass).filter(Boolean)); const have=[...set].map(Number); const want=yearsRange(2025,2000); return [...new Set([...want,...have])]; }
 function uniqueRosterYears(players){ const set=new Set(); players.forEach(p=>(p.letterWinnerYears||[]).forEach(y=>set.add(Number(y)))); const have=[...set]; const want=yearsRange(2025,2000); return [...new Set([...want,...have])]; }
 
-// UPDATED: This function is now simpler
 function addSelectAll(sel){
   const opt=document.createElement('option');
   opt.value="__ALL__";
@@ -748,7 +743,6 @@ function runSplash(){
 document.addEventListener('DOMContentLoaded', ()=>{
   populateFilters(players);
 
-  // --- REVISED FIX: A single, smarter listener for all select filters --- //
   const filterControls = ['lvl', 'grad', 'roster', 'status'];
   filterControls.forEach(id => {
     const el = byId(id);
@@ -756,22 +750,19 @@ document.addEventListener('DOMContentLoaded', ()=>{
       el.addEventListener('change', (event) => {
         const selectElement = event.currentTarget;
         const chosen = [...selectElement.selectedOptions].map(o => o.value);
-        
-        // First, handle the "SELECT ALL" logic if it was clicked
+
         if (chosen.includes("__ALL__")) {
           [...selectElement.options].forEach(o => {
             o.selected = (o.value !== "__ALL__");
           });
         }
         
-        // NOW, apply the filters with the correct selections
         applyFilters();
       });
     }
   });
-  // Listener for the name filter remains the same
+  
   byId('filterName').addEventListener('input', applyFilters);
-  // --- END REVISED FIX --- //
 
   render(playersDefaultView());
   runSplash();
