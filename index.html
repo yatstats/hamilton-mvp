@@ -11,11 +11,12 @@
 :root{
   --bg:#0b0d12; --ink:#f3f4f6; --muted:#A6ADB7;
   --ring:#1f2530; --ring2:#232a36;
-  --headerH:135px;  /* desktop */
-  --headerH-sm:100px; /* mobile */
+  --headerH:135px;      /* desktop */
+  --headerH-sm:100px;   /* mobile */
   --drawer-min:300px; --drawer-max:520px; --drawer-mob:75vw;
   --accent:#ffffff; --chip:#0e1016;
   --touchEdge:18%;
+  --gutter:14px;        /* shared left/right padding to align hamburger, lovebirds, tagline */
 }
 *{box-sizing:border-box}
 html,body{margin:0;padding:0}
@@ -25,11 +26,11 @@ button{font:inherit;color:inherit}
 img{max-width:100%;display:block}
 :focus-visible{outline:2px solid #fff; outline-offset:2px}
 
-/* ---------- HEADER (two rows, sticky) ---------- */
+/* ---------- HEADER (two rows, sticky, aligned by gutter) ---------- */
 .site-header{
   position:sticky; top:0; z-index:60;
   background:#000; border-bottom:1px solid var(--ring);
-  display:flex; flex-direction:column; gap:8px; padding:8px 10px 6px;
+  display:flex; flex-direction:column; gap:8px; padding:8px var(--gutter) 6px var(--gutter);
 }
 .header-top, .header-bottom { display:flex; width:100%; align-items:center; }
 .header-top { justify-content:space-between; flex-wrap:nowrap; gap:8px; min-width:0; }
@@ -42,18 +43,18 @@ img{max-width:100%;display:block}
 /* right logo pinned, scales but never wraps */
 .ystats-logo{flex:0 0 auto;height:clamp(24px,4.5vw,36px);width:auto;object-fit:contain}
 
-/* Row 2: Hamilton "lovebirds" — acts as one unit */
-.header-bottom{justify-content:flex-start}
+/* Row 2: Hamilton "lovebirds" — nudge inward by same gutter as hamburger */
+.header-bottom{justify-content:flex-start; padding:0 0 0 0; } /* header already padded with --gutter */
 .ham-brand{
   display:grid;
   grid-template-columns:auto 1fr;
   align-items:center;
-  column-gap:6px;
+  column-gap:8px;
 }
 .ham-logo{
   --hamH:80px;
   height:var(--hamH); width:auto;
-  margin-left:clamp(-12px,-1.5vw,-2px); /* eat transparent padding if any */
+  margin-left:2px; /* slight breathing room beyond gutter */
 }
 .ham-type{
   display:flex; flex-direction:column; justify-content:space-between; align-items:flex-start;
@@ -75,9 +76,9 @@ img{max-width:100%;display:block}
 .nav-slim{color:#9aa1ab;letter-spacing:-.01em;margin-right:-1px}
 .nav-strong{color:#fff;letter-spacing:.01em}
 
-/* ---------- TAGLINE ---------- */
+/* ---------- TAGLINE (aligned with gutter) ---------- */
 .tagline-wrap{position:sticky; top:var(--headerH); z-index:40; background:#000; border-bottom:1px solid var(--ring)}
-.tagline{display:flex;align-items:center;justify-content:space-between;padding:8px 10px}
+.tagline{display:flex;align-items:center;justify-content:space-between;padding:8px var(--gutter)}
 .tag-grey{color:#9aa1ab;font-family:"Roboto Condensed",sans-serif;font-weight:300;letter-spacing:-.01em;margin-right:-1px}
 .tag-strong{color:#fff;font-family:"Anton",sans-serif;letter-spacing:.01em}
 
@@ -133,7 +134,7 @@ main{padding:10px 0 86px}
 .right-line{font-size:12px;font-weight:800;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .last3 .item{font-size:12px;color:#e5e7eb;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:right;margin-top:2px}
 
-/* BACK (layout locked to card; no inner scroll; icons under funzone) */
+/* BACK (title → funzone → icons; locked layout, no overlap) */
 .back-face{
   transform:rotateY(180deg);
   background:#fff;color:#111;display:grid;
@@ -143,28 +144,33 @@ main{padding:10px 0 86px}
 /* top half: two equal columns (left meta, right HS image) */
 .back-top{
   display:grid; grid-template-columns:1fr 1fr; gap:12px;
-  padding:10px 12px 6px; align-items:start;
+  padding:10px var(--gutter) 6px var(--gutter); align-items:start;
 }
 .profile-block{display:flex;flex-direction:column;gap:10px}
 .profile-link{display:block;border:1px solid #111;border-radius:10px;padding:10px 12px;background:#111;color:#fff}
 .profile-link .pn{font-weight:900;font-size:16px;letter-spacing:.02em}
 .profile-link .pt{font-size:12px;opacity:.95;margin-top:2px;line-height:1.15}
-.fun-title{font-family:"Anton",sans-serif;font-size:13px;letter-spacing:.12em;margin:6px 0 0 2px}
+.fun-title{font-family:"Anton",sans-serif;font-size:13px;letter-spacing:.12em;margin:0 0 0 2px}
 
+/* HS image (exactly quarter area) */
 .hs-box{width:100%;height:100%;border-radius:10px;overflow:hidden;background:#d2d6db}
 .hs-box img{width:100%;height:100%;object-fit:cover;}
 
-/* bottom half: panes (fill) then iconbar (auto height) */
+/* bottom half: TITLE (auto) + PANE (1fr) + ICONBAR (auto) */
 .back-bottom{
   border-top:1px solid #e5e7eb;
-  display:grid; grid-template-rows: 1fr auto;
-  min-height:0; padding:8px 10px 10px;
+  display:grid; grid-template-rows: auto minmax(0,1fr) auto;
+  min-height:0; padding:8px var(--gutter) 10px var(--gutter);
 }
-.pane{display:none;min-height:0;height:100%;overflow:hidden}
+.zone-title{
+  font-family:"Anton",sans-serif; letter-spacing:.12em; font-size:13px; color:#111;
+  margin:0 0 6px 0; /* sits right above funzone */
+}
+.pane{display:none;min-height:0;overflow:hidden}
 .pane.active{display:block}
 
-/* stats grid fixed 12 cells */
-.kv-wrap12{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;height:100%}
+/* stats grid — flexible; will not push under icon bar */
+.kv-wrap12{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
 .kv{background:#f3f4f6;border-radius:10px;text-align:center;padding:8px;display:flex;flex-direction:column;justify-content:center}
 .kv .k{font-size:11px;color:#374151}
 .kv .v{font-weight:800}
@@ -194,11 +200,24 @@ body.no-scroll{overflow:hidden}
 .drawer-left.open{transform:translateX(0)}
 .drawer-right.open,.drawer-auth.open{transform:translateX(0)}
 
-.drawer-header{height:56px;border-bottom:1px solid var(--ring2);display:flex;align-items:center;justify-content:space-between;padding:0 12px}
+.drawer-header{height:56px;border-bottom:1px solid var(--ring2);display:flex;align-items:center;justify-content:space-between;padding:0 var(--gutter)}
 .right-title,.auth-title{font-weight:900;letter-spacing:.12em;text-transform:uppercase;font-size:12px;color:#d5d9df}
 .drawer-body{min-height:0;overflow:auto}
-.drawer-content{display:block;padding:12px 12px 18px}
-.rail{border:1px solid #1e2533;border-radius:10px;margin-bottom:10px;overflow:hidden;background:#0e141f}
+.drawer-content{display:block;padding:12px var(--gutter) 18px var(--gutter)}
+
+/* LEFT NAV LIST — spaced, with grey slim + bold black pairing */
+.nav-left-list{
+  display:flex; flex-direction:column; gap:14px; margin:2px 0 16px 0;
+}
+.nav-left-link{
+  display:block; line-height:1; padding:10px 6px 8px 4px; border-radius:6px;
+}
+.nav-left-link:hover{background:#0e1420}
+.nav-left-link .nav-slim{color:#9aa1ab;font-family:"Roboto Condensed",sans-serif;font-weight:300;letter-spacing:-.01em;margin-right:-1px}
+.nav-left-link .nav-strong{color:#fff;font-family:"Anton",sans-serif;letter-spacing:.01em}
+
+/* rails */
+.rail{border:1px solid #1e2533;border-radius:10px;margin-bottom:12px;overflow:hidden;background:#0e141f}
 .rail summary{list-style:none;cursor:pointer;padding:10px 12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;font-size:12px;color:#d2d8e1;border-bottom:1px solid #1e2533}
 .rail summary::-webkit-details-marker{display:none}
 .rail .inner{padding:8px 10px;max-height:42vh;overflow:auto}
@@ -206,7 +225,7 @@ body.no-scroll{overflow:hidden}
 .select-multi{height:118px}
 
 /* auth */
-.auth-body{min-height:0;overflow:auto;padding:12px 12px 22px}
+.auth-body{min-height:0;overflow:auto;padding:12px var(--gutter) 22px var(--gutter)}
 .input{display:block;width:100%;background:#0e141f;border:1px solid #1b2330;border-radius:10px;padding:12px 12px;font-size:14px;color:#fff;outline:none}
 .btn-primary{display:inline-block;width:100%;background:#fff;color:#000;border:1px solid #fff;border-radius:10px;padding:10px 12px;font-weight:800;letter-spacing:.06em;cursor:pointer;margin-top:10px}
 
@@ -235,14 +254,13 @@ body.no-scroll{overflow:hidden}
   .flip-inner,.card,.splash,.splash-logo::after{transition:none !important;animation:none !important}
 }
 
-/* Header height adjustments on small screens */
+/* Small screens */
 @media (max-width: 640px) {
-  :root { --headerH: var(--headerH-sm); }
-  .ham-logo { --hamH: 50px; height: var(--hamH); }
-  .ham-type { height: var(--hamH); }
+  :root { --headerH: var(--headerH-sm); --gutter:12px; }
+  .ham-logo { --hamH: 54px; }
   .hambtn,.hdr-icon{width:34px;height:34px}
   .hambtn svg,.hdr-icon svg{width:19px;height:19px}
-  .ham-brand{column-gap:4px}
+  .ham-brand{column-gap:6px}
 }
 </style>
 </head>
@@ -315,26 +333,29 @@ body.no-scroll{overflow:hidden}
       <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M6.225 4.811 4.811 6.225 10.586 12l-5.775 5.775 1.414 1.414L12 13.414l5.775 5.775 1.414-1.414L13.414 12l5.775-5.775-1.414-1.414L12 10.586 6.225 4.811z"/></svg>
     </button>
   </div>
-  <div class="left-content" id="drawerLeftContent">
-    <div class="nav-left-list">
-      <a class="nav-left-link" href="#"><span class="font-slim nav-slim">WHERE THEY</span><span class="font-strong nav-strong">YAT?</span></a>
-      <a class="nav-left-link" href="#"><span class="font-slim nav-slim">ACTIVE ALUMNI</span><span class="font-strong nav-strong">NEWS</span></a>
-      <a class="nav-left-link" href="#"><span class="font-slim nav-slim">NEXT LEVEL</span><span class="font-strong nav-strong">ALL-TIME LIST</span></a>
-      <a class="nav-left-link" href="#"><span class="font-slim nav-slim">NIL & YAT-A-BOY</span><span class="font-strong nav-strong">MARKETPLACE</span></a>
-      <a class="nav-left-link" href="#"><span class="font-slim nav-slim">THE</span><span class="font-strong nav-strong">CURRENT TEAM</span></a>
-      <a class="nav-left-link" href="#"><span class="font-slim nav-slim">PCDACTION</span><span class="font-strong nav-strong">PARTNER PROGRAM</span></a>
-    </div>
+  <div class="drawer-body">
+    <div class="drawer-content" id="drawerLeftContent">
+      <nav class="nav-left-list" aria-label="Drawer pages">
+        <a class="nav-left-link" href="#"><span class="nav-slim">WHERE THEY</span> <span class="nav-strong">YAT?</span></a>
+        <a class="nav-left-link" href="#"><span class="nav-slim">ACTIVE ALUMNI</span> <span class="nav-strong">NEWS</span></a>
+        <a class="nav-left-link" href="#"><span class="nav-slim">NEXT LEVEL</span> <span class="nav-strong">ALL-TIME LIST</span></a>
+        <a class="nav-left-link" href="#"><span class="nav-slim">NIL & YAT-A-BOY</span> <span class="nav-strong">MARKETPLACE</span></a>
+        <a class="nav-left-link" href="#"><span class="nav-slim">THE</span> <span class="nav-strong">CURRENT TEAM</span></a>
+        <a class="nav-left-link" href="#"><span class="nav-slim">PCDACTION</span> <span class="nav-strong">PARTNER PROGRAM</span></a>
+      </nav>
 
-    <div class="left-search">
-      <div class="left-search-h" style="font-weight:900;letter-spacing:.12em;text-transform:uppercase;font-size:12px;color:#d5d9df;margin:2px 0 8px">PLAYER PROFILE SEARCH</div>
-      <input id="localSearch" type="text" class="ghost" placeholder="Type a player name…" autocomplete="off"/>
-      <ul id="localResults" class="left-results" role="listbox" aria-label="Search results" style="list-style:none;padding:0;margin:8px 0 0"></ul>
-
-      <div class="global-line" style="margin-top:14px;font-size:12px;color:#c4c9d1;display:flex;gap:10px;align-items:center;flex-wrap:wrap">
-        <span>GLOBAL YATSTATS PLATFORM SEARCHES</span>
-        <a href="https://www.yatstats.com" target="_blank" rel="noopener">🌎🔍 by PLAYER</a> •
-        <a href="https://www.yatstats.com" target="_blank" rel="noopener">🌎🔍 by TEAM</a>
-      </div>
+      <details class="rail" open>
+        <summary>Player Profile Search</summary>
+        <div class="inner">
+          <input id="localSearch" type="text" class="ghost" placeholder="Type a player name…" autocomplete="off"/>
+          <ul id="localResults" class="left-results" role="listbox" aria-label="Search results" style="list-style:none;padding:0;margin:8px 0 0"></ul>
+          <div class="global-line" style="margin-top:12px;font-size:12px;color:#c4c9d1;display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+            <span>GLOBAL YATSTATS PLATFORM SEARCHES</span>
+            <a href="https://www.yatstats.com" target="_blank" rel="noopener">🌎🔍 by PLAYER</a> •
+            <a href="https://www.yatstats.com" target="_blank" rel="noopener">🌎🔍 by TEAM</a>
+          </div>
+        </div>
+      </details>
     </div>
   </div>
 </aside>
@@ -403,7 +424,7 @@ body.no-scroll{overflow:hidden}
 </main>
 
 <footer class="footer">
-  <div class="build-pill">BUILD: ham-v4.6.13</div>
+  <div class="build-pill">BUILD: ham-v4.7.1</div>
 </footer>
 
 <!-- Splash -->
@@ -543,11 +564,12 @@ function blankPitching(){
 }
 function dynamicStatsTitle(p){
   const s=String(p.status||'').toUpperCase();
-  if(s.includes('2025')) return '2025 SEASON STATS';
-  if(s.includes('2024')) return '2024 SEASON STATS';
+  if(s.includes('ACTIVE 2025') || s.includes('INJURED')) return '2025 SEASON STATS';
+  if(s.includes('ACTIVE 2024') || s.includes('FREE AGENT')) return '2024 SEASON STATS';
   if(s.includes('RETIRE')) return 'CAREER STATS';
   return 'SEASON STATS';
 }
+
 function makeStats12(p){
   if(p.batting && Object.keys(p.batting).length){
     const b={...blankBatting(),...p.batting};
@@ -574,10 +596,21 @@ function makeStats12(p){
   }
 }
 
+function paneTitleFor(key, p){
+  if(key==='stats')   return dynamicStatsTitle(p);
+  if(key==='news')    return 'LATEST PLAYER NEWS';
+  if(key==='yat')     return 'YAT-A-BOY! VIRTUAL GIFTS';
+  if(key==='nil')     return 'NIL POWER POINT SCORE';
+  if(key==='x')       return `X @${(p.xHandle||p.name||'PLAYER')}`;
+  if(key==='ig')      return `IG @${(p.igHandle||p.name||'player').toLowerCase().replace(/\s+/g,'')}`;
+  if(key==='video')   return 'VIDEO HIGHLIGHTS';
+  if(key==='gallery') return 'FAN-TASTIC PICS!';
+  return '';
+}
+
 function makeCard(p){
   const {team,parent} = teamAndParent(p);
   const [ng1,ng2] = formatNextTwoLines(p.nextGame||{});
-  const statsTitle = dynamicStatsTitle(p);
   const cardId = p.id || `player-${Math.random().toString(36).slice(2)}`;
   const paneIds = {
     stats: `${cardId}-pane-stats`,
@@ -589,7 +622,6 @@ function makeCard(p){
     video: `${cardId}-pane-video`,
     gallery: `${cardId}-pane-gallery`,
   };
-
   const icons = {
     stats:'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M5 3h2v18H5zM11 10h2v11h-2zM17 6h2v15h-2z"/></svg>',
     news:'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M4 5h16v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5zm2 2v12h12V7H6zm1 1h10v3H7V8z"/></svg>',
@@ -641,7 +673,7 @@ function makeCard(p){
             <div class="pn">${(p.name||'').toUpperCase()}</div>
             <div class="pt">${team||'&nbsp;'}<br>${parent||'&nbsp;'}</div>
           </a>
-          <div class="fun-title" data-title>${statsTitle}</div>
+          <div class="fun-title" data-title>${dynamicStatsTitle(p)}</div>
         </div>
         <div class="hs-box" aria-hidden="true">
           <img src="${(p.highSchoolImg||p.frontImg||'')}" alt="" loading="lazy" onerror="this.onerror=null;this.style.display='none'">
@@ -649,17 +681,30 @@ function makeCard(p){
       </div>
 
       <div class="back-bottom" data-noflip>
+        <!-- Title above funzone -->
+        <div class="zone-title" data-zone-title>${dynamicStatsTitle(p)}</div>
+
         <!-- FUNZONE (panes) -->
-        <div role="tabpanel" class="pane pane-stats active" id="${paneIds.stats}" data-pane="stats" aria-labelledby="tab-${cardId}-stats" aria-hidden="false"><div class="kv-wrap12">${makeStats12(p)}</div></div>
-        <div role="tabpanel" class="pane pane-news" id="${paneIds.news}" data-pane="news" aria-labelledby="tab-${cardId}-news" aria-hidden="true"><div style="color:#374151;font-size:14px;height:100%;display:flex;align-items:center;justify-content:center">
-          <div><strong>Latest:</strong> ${p.name} makes headlines — on-platform story rendering here.</div>
-        </div></div>
-        <div role="tabpanel" class="pane pane-yat" id="${paneIds.yat}" data-pane="yat" aria-labelledby="tab-${cardId}-yat" aria-hidden="true"><div style="color:#111;display:flex;align-items:center;justify-content:center;height:100%">YAT-A-BOY! virtual gifting — CTA placeholder.</div></div>
+        <div role="tabpanel" class="pane pane-stats active" id="${paneIds.stats}" data-pane="stats" aria-labelledby="tab-${cardId}-stats" aria-hidden="false">
+          <div class="kv-wrap12">${makeStats12(p)}</div>
+        </div>
+        <div role="tabpanel" class="pane pane-news" id="${paneIds.news}" data-pane="news" aria-labelledby="tab-${cardId}-news" aria-hidden="true">
+          <div style="color:#374151;font-size:14px;display:flex;align-items:center;justify-content:center;height:100%">
+            <div><strong>Latest:</strong> ${p.name} makes headlines — on-platform story rendering here.</div>
+          </div>
+        </div>
+        <div role="tabpanel" class="pane pane-yat" id="${paneIds.yat}" data-pane="yat" aria-labelledby="tab-${cardId}-yat" aria-hidden="true">
+          <div style="color:#111;display:flex;align-items:center;justify-content:center;height:100%">YAT-A-BOY! virtual gifting — CTA placeholder.</div>
+        </div>
         <div role="tabpanel" class="pane pane-nil" id="${paneIds.nil}" data-pane="nil" aria-labelledby="tab-${cardId}-nil" aria-hidden="true">
           ${p.nilImg?`<img src="${p.nilImg}" alt="NIL score" style="width:100%;height:100%;object-fit:cover;border-radius:10px">`:`<div style="color:#111;display:flex;align-items:center;justify-content:center;height:100%">NIL points will appear here.</div>`}
         </div>
-        <div role="tabpanel" class="pane pane-x" id="${paneIds.x}" data-pane="x" aria-labelledby="tab-${cardId}-x" aria-hidden="true"><div style="color:#111;display:flex;align-items:center;justify-content:center;height:100%">X/Twitter posts placeholder.</div></div>
-        <div role="tabpanel" class="pane pane-ig" id="${paneIds.ig}" data-pane="ig" aria-labelledby="tab-${cardId}-ig" aria-hidden="true"><div style="color:#111;display:flex;align-items:center;justify-content:center;height:100%">Instagram posts placeholder.</div></div>
+        <div role="tabpanel" class="pane pane-x" id="${paneIds.x}" data-pane="x" aria-labelledby="tab-${cardId}-x" aria-hidden="true">
+          <div style="color:#111;display:flex;align-items:center;justify-content:center;height:100%">X/Twitter posts placeholder.</div>
+        </div>
+        <div role="tabpanel" class="pane pane-ig" id="${paneIds.ig}" data-pane="ig" aria-labelledby="tab-${cardId}-ig" aria-hidden="true">
+          <div style="color:#111;display:flex;align-items:center;justify-content:center;height:100%">Instagram posts placeholder.</div>
+        </div>
         <div role="tabpanel" class="pane pane-video" id="${paneIds.video}" data-pane="video" aria-labelledby="tab-${cardId}-video" aria-hidden="true">
           <iframe width="100%" height="100%" src="${p.video||COMMON_VIDEO}" title="Video" frameborder="0" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
         </div>
@@ -704,7 +749,6 @@ function populateFilters(players){
   const gSel=byId('grad'); gSel.innerHTML=''; uniqueSortedGradYears(players).forEach(y=>{const o=document.createElement('option');o.value=String(y);o.textContent=y;gSel.appendChild(o);}); addSelectAll(gSel);
   const rSel=byId('roster'); rSel.innerHTML=''; uniqueRosterYears(players).forEach(y=>{const o=document.createElement('option');o.value=String(y);o.textContent=y;rSel.appendChild(o);}); addSelectAll(rSel);
 
-  /* include all known statuses, including Injured + Free Agent */
   const sSel=byId('status'); sSel.innerHTML='';
   ["Active 2025","Injured","Active 2024","Free Agent","Retired"].forEach(s=>{
     const o=document.createElement('option');o.value=s;o.textContent=s.toUpperCase();sSel.appendChild(o);
@@ -777,12 +821,15 @@ function attachInteractions(){
         b.setAttribute('aria-selected', String(isSel));
       });
 
-      // Swap panes within this card
-      const pane = btn.dataset.tab || 'stats';
+      // Swap panes within this card & update title
+      const paneKey = btn.dataset.tab || 'stats';
       const back = card.querySelector('.back-face');
       if (!back) return;
+      const zoneTitle = back.querySelector('[data-zone-title]');
+      if (zoneTitle) zoneTitle.textContent = paneTitleFor(paneKey, currentPlayerForCard(card));
+
       back.querySelectorAll('.pane').forEach(p=>{
-        const active = p.dataset.pane === pane;
+        const active = p.dataset.pane === paneKey;
         p.classList.toggle('active', active);
         p.setAttribute('aria-hidden', String(!active));
       });
@@ -799,6 +846,11 @@ function attachInteractions(){
     card.addEventListener('touchstart', e=>{ if(e.target.closest(INTERACTIVE_SEL)) return; active=true; sx=e.touches[0].clientX; sy=e.touches[0].clientY; },{passive:true});
     card.addEventListener('touchend', e=>{ if(!active) return; const dx=e.changedTouches[0].clientX-sx; const dy=e.changedTouches[0].clientY-sy; if(Math.abs(dx)>40 && Math.abs(dx)>Math.abs(dy)) toggle(card); active=false; },{passive:true});
   });
+}
+
+function currentPlayerForCard(card){
+  const pn = card.querySelector('.profile-link')?.dataset?.profile;
+  return players.find(p=>p.id===pn) || {};
 }
 
 /* drawers & header icons */
@@ -839,7 +891,7 @@ function renderLocalResults(q){
     localResults.appendChild(li);
   });
 }
-localSearch.addEventListener('input', (e)=>renderLocalResults(e.target.value));
+localSearch?.addEventListener('input', (e)=>renderLocalResults(e.target.value));
 
 /* ------------------- default view: ACTIVE ONLY with custom order ------------------- */
 const players = [...playersSeed];
@@ -883,7 +935,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
     }
   });
   
-  byId('filterName').addEventListener('input', applyFilters);
+  byId('filterName')?.addEventListener('input', applyFilters);
 
   render(playersDefaultView());
   runSplash();
