@@ -373,7 +373,7 @@ body.no-scroll{overflow:hidden}
 </main>
 
 <footer class="footer">
-  <div class="build-pill">BUILD: ham-v4.6.2</div>
+  <div class="build-pill">BUILD: ham-v4.6.3</div>
 </footer>
 
 <div id="splash" class="splash" aria-hidden="true">
@@ -507,7 +507,6 @@ function makeCard(p){
   const statsTitle = dynamicStatsTitle(p);
   const cardId = p.id || `player-${Math.random()}`; // Fallback ID for safety
 
-  // ACCESSIBILITY FIX: Removed tabindex="0" from article
   return `
 <article class="card flip-card front" aria-label="${(p.name||'').toUpperCase()}">
   <button class="hit left"  data-toggle="prev" aria-label="Flip previous"></button>
@@ -617,16 +616,12 @@ function yearsRange(start,end){const arr=[]; for(let y=start;y>=end;y--) arr.pus
 function uniqueSortedGradYears(players){ const set=new Set(players.map(p=>p.graduatingClass).filter(Boolean)); const have=[...set].map(Number); const want=yearsRange(2025,2000); return [...new Set([...want,...have])]; }
 function uniqueRosterYears(players){ const set=new Set(); players.forEach(p=>(p.letterWinnerYears||[]).forEach(y=>set.add(Number(y)))); const have=[...set]; const want=yearsRange(2025,2000); return [...new Set([...want,...have])]; }
 
+// UPDATED: This function is now simpler
 function addSelectAll(sel){
   const opt=document.createElement('option');
-  opt.value="__ALL__"; opt.textContent="— SELECT ALL —";
+  opt.value="__ALL__";
+  opt.textContent="— SELECT ALL —";
   sel.prepend(opt);
-  sel.addEventListener('change', ()=>{
-    const chosen=[...sel.selectedOptions].map(o=>o.value);
-    if(chosen.includes("__ALL__")){
-      [...sel.options].forEach(o=>{o.selected = (o.value!=="__ALL__")});
-    }
-  });
 }
 
 function populateFilters(players){
@@ -646,7 +641,7 @@ function applyFilters(){
   const levels=getMultiValues('lvl').map(s=>s.toUpperCase());
   const grads=getMultiValues('grad');
   const years=getMultiValues('roster').map(Number);
-  const statsSel=getMultiValues('status'); // explicit user picks
+  const statsSel=getMultiValues('status');
 
   const out=players.filter(p=>{
     const name=(p.name||'').toLowerCase();
@@ -671,12 +666,10 @@ function resetAll(){
 const INTERACTIVE_SEL='[data-noflip], .tabbtn, .action-chip, .iconbar, .ibtn, a,button,input,select,textarea';
 function toggle(card){ if(!card) return; card.classList.contains('front') ? (card.classList.remove('front'),card.classList.add('back')) : (card.classList.remove('back'),card.classList.add('front')); }
 function attachInteractions(){
-  // set pane switching & dynamic title
   $$('.iconbar').forEach(bar=>{
     bar.addEventListener('click', (e)=>{
       const btn=e.target.closest('.ibtn'); if(!btn) return;
       const card=btn.closest('.card'); const pane=btn.dataset.tab||'stats';
-      // ACCESSIBILITY FIX: Update aria-selected for tab roles
       card.querySelectorAll('.ibtn[role="tab"]').forEach(b => {
           const isSelected = (b === btn);
           b.classList.toggle('active', isSelected);
@@ -686,17 +679,11 @@ function attachInteractions(){
     },true);
   });
 
-  // flip edges (front only) & swipe on whole card
   $$('.card').forEach(card=>{
-    // ensure state
     if(!card.classList.contains('front')&& !card.classList.contains('back')) card.classList.add('front');
-
-    // click edges
     $$('.hit',card).forEach(hit=>{
       hit.addEventListener('click', e=>{ if(e.target.closest(INTERACTIVE_SEL)) return; toggle(card); });
     });
-
-    // swipe
     let sx=0,sy=0, active=false;
     card.addEventListener('touchstart', e=>{ if(e.target.closest(INTERACTIVE_SEL)) return; active=true; sx=e.touches[0].clientX; sy=e.touches[0].clientY; },{passive:true});
     card.addEventListener('touchend', e=>{ if(!active) return; const dx=e.changedTouches[0].clientX-sx; const dy=e.changedTouches[0].clientY-sy; if(Math.abs(dx)>40 && Math.abs(dx)>Math.abs(dy)) toggle(card); active=false; },{passive:true});
@@ -727,10 +714,8 @@ iconProfile.addEventListener('click', openAuth);
 iconReset.addEventListener('click', resetAll);
 scrim.addEventListener('click', closeDrawers);
 
-/* right drawer: By Player auto-close on Enter */
 byId('filterName').addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ e.preventDefault(); applyFilters(); closeRight(); } });
 
-/* left drawer: live search */
 const localSearch=byId('localSearch'); const localResults=byId('localResults');
 function renderLocalResults(q){
   localResults.innerHTML=''; if(!q) return;
@@ -763,18 +748,30 @@ function runSplash(){
 document.addEventListener('DOMContentLoaded', ()=>{
   populateFilters(players);
 
-  // --- FIX: Add event listeners to trigger filtering --- //
+  // --- REVISED FIX: A single, smarter listener for all select filters --- //
   const filterControls = ['lvl', 'grad', 'roster', 'status'];
   filterControls.forEach(id => {
     const el = byId(id);
     if (el) {
-        // When a dropdown value changes, apply the filters
-        el.addEventListener('change', applyFilters);
+      el.addEventListener('change', (event) => {
+        const selectElement = event.currentTarget;
+        const chosen = [...selectElement.selectedOptions].map(o => o.value);
+        
+        // First, handle the "SELECT ALL" logic if it was clicked
+        if (chosen.includes("__ALL__")) {
+          [...selectElement.options].forEach(o => {
+            o.selected = (o.value !== "__ALL__");
+          });
+        }
+        
+        // NOW, apply the filters with the correct selections
+        applyFilters();
+      });
     }
   });
-  // Also apply filters instantly as the user types a name
+  // Listener for the name filter remains the same
   byId('filterName').addEventListener('input', applyFilters);
-  // --- END FIX --- //
+  // --- END REVISED FIX --- //
 
   render(playersDefaultView());
   runSplash();
