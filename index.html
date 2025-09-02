@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>hamilton.yatstats.com — WHERE THEY YAT?</title>
 
-<!-- Fonts -->
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Roboto+Condensed:wght@300;400;700&display=swap" rel="stylesheet">
 
 <style>
@@ -195,11 +194,34 @@ body.no-scroll{overflow:hidden}
 
 /* utility */
 .hidden{display:none !important}
+
+/* ---------- HEADER RESPONSIVENESS (ADDED) ---------- */
+@media (max-width: 640px) {
+  .site-header {
+    padding: 8px;
+    gap: 6px;
+  }
+  /* Hide the longer lines of text, but keep the school name */
+  .ham-line1, .ham-line3 {
+      display: none;
+  }
+  .ham-line2 {
+      font-size: 15px; /* Adjust font size */
+  }
+  .ystats-logo {
+    height: 30px;
+  }
+  .ham-logo {
+      height: 36px;
+  }
+  .h-logos {
+      gap: 6px;
+  }
+}
 </style>
 </head>
 <body>
 
-<!-- HEADER -->
 <header class="site-header">
   <div class="h-left">
     <div class="top-row">
@@ -232,7 +254,6 @@ body.no-scroll{overflow:hidden}
     </div>
   </div>
 
-  <!-- Center nav (desktop) -->
   <nav class="nav-desktop" aria-label="Primary">
     <a href="#" class="font-slim nav-slim">WHERE THEY</a><a href="#" class="font-strong nav-strong">YAT?</a>
     <a href="#" class="font-slim nav-slim">ACTIVE ALUMNI</a><a href="#" class="font-strong nav-strong">NEWS</a>
@@ -247,7 +268,6 @@ body.no-scroll{overflow:hidden}
   </div>
 </header>
 
-<!-- TAGLINE -->
 <div class="tagline-wrap">
   <div class="tagline">
     <div>
@@ -258,10 +278,8 @@ body.no-scroll{overflow:hidden}
   </div>
 </div>
 
-<!-- SCRIM -->
 <div class="scrim" id="scrim"></div>
 
-<!-- LEFT DRAWER -->
 <aside class="drawer-left" id="drawerLeft" aria-hidden="true" role="navigation">
   <div class="drawer-header">
     <div class="right-title">Navigation</div>
@@ -293,7 +311,6 @@ body.no-scroll{overflow:hidden}
   </div>
 </aside>
 
-<!-- RIGHT DRAWER (Filters) -->
 <aside class="drawer-right" id="drawerRight" aria-hidden="true" role="dialog" aria-modal="true">
   <div class="drawer-header">
     <div class="right-title">Filters</div>
@@ -306,7 +323,7 @@ body.no-scroll{overflow:hidden}
       <details class="rail" open>
         <summary>By Player</summary>
         <div class="inner">
-          <input id="filterName" type="text" class="ghost" placeholder="Type name & press Enter"/>
+          <input id="filterName" type="text" class="ghost" placeholder="Type name to filter..."/>
         </div>
       </details>
 
@@ -335,7 +352,6 @@ body.no-scroll{overflow:hidden}
   </div>
 </aside>
 
-<!-- AUTH DRAWER -->
 <aside class="drawer-auth" id="drawerAuth" aria-hidden="true" role="dialog" aria-modal="true">
   <div class="drawer-header">
     <div class="auth-title">Sign Up | Login</div>
@@ -357,10 +373,9 @@ body.no-scroll{overflow:hidden}
 </main>
 
 <footer class="footer">
-  <div class="build-pill">BUILD: ham-v4.6.1</div>
+  <div class="build-pill">BUILD: ham-v4.6.2</div>
 </footer>
 
-<!-- SPLASH -->
 <div id="splash" class="splash" aria-hidden="true">
   <div class="splash-inner" id="splashInner">
     <div class="splash-top">
@@ -374,9 +389,7 @@ body.no-scroll{overflow:hidden}
       </div>
       <div class="sponsor" id="sponsorBlock">
         presented by <strong>Primary Source</strong>
-        <!-- add your sponsor logo URL if/when you have it -->
-        <!-- <img src="SPONSOR_LOGO_URL.png" alt="Primary Source"> -->
-      </div>
+        </div>
     </div>
   </div>
 </div>
@@ -394,7 +407,6 @@ function letterDots(years){ if(!years||!years.length) return ''; const sorted=[.
 function makeKV(k,v){ return `<div class="kv"><div class="k">${k}</div><div class="v">${v??'—'}</div></div>`; }
 
 /* ------------------- data ------------------- */
-/* Minimal seed players with richer cards; rest can be appended later */
 const playersSeed = [
   { id:"cody-bellinger", name:"CODY BELLINGER", graduatingClass:2013, currentLevel:"MLB", status:"Active 2025",
     position:"CF/1B", team:"New York Yankees",
@@ -483,8 +495,8 @@ function makeStats12(p){
   }
   const x=p.pitching||{};
   return `${makeKV('ERA',x.era)} ${makeKV('WHIP',x.whip)} ${makeKV('OBA',x.oba||'—')} ${makeKV('K/BB',x.kbb||'—')}
-          ${makeKV('FIP',x.fip||'—')} ${makeKV('IP',x.ip||'—')} ${makeKV('ER',x.er||'—')} ${makeKV('K',x.so||x.ko||'—')}
-          ${makeKV('QS',x.qs||'—')} ${makeKV('HR',x.hr||'—')} ${makeKV('W',x.w||'—')} ${makeKV('SV',x.sv||'—')}`;
+            ${makeKV('FIP',x.fip||'—')} ${makeKV('IP',x.ip||'—')} ${makeKV('ER',x.er||'—')} ${makeKV('K',x.so||x.ko||'—')}
+            ${makeKV('QS',x.qs||'—')} ${makeKV('HR',x.hr||'—')} ${makeKV('W',x.w||'—')} ${makeKV('SV',x.sv||'—')}`;
 }
 
 function makeCard(p){
@@ -493,14 +505,15 @@ function makeCard(p){
   const [ng1,ng2] = formatNextTwoLines(p.nextGame||{});
   const profUrl = `profile.html?id=${encodeURIComponent(p.id)}`;
   const statsTitle = dynamicStatsTitle(p);
+  const cardId = p.id || `player-${Math.random()}`; // Fallback ID for safety
 
+  // ACCESSIBILITY FIX: Removed tabindex="0" from article
   return `
-<article class="card flip-card front" tabindex="0" aria-label="${(p.name||'').toUpperCase()}">
+<article class="card flip-card front" aria-label="${(p.name||'').toUpperCase()}">
   <button class="hit left"  data-toggle="prev" aria-label="Flip previous"></button>
   <button class="hit right" data-toggle="next" aria-label="Flip next"></button>
 
   <div class="flip-inner">
-    <!-- FRONT -->
     <section class="face front-face">
       <img class="card-img" src="${(p.frontImg||p.highSchoolImg||'')}" alt="${p.name}" onerror="this.onerror=null;this.style.display='none'">
       <div class="bottom-grad"></div>
@@ -528,7 +541,6 @@ function makeCard(p){
       </div>
     </section>
 
-    <!-- BACK -->
     <section class="face back-face">
       <div class="back-top">
         <div class="profile-block">
@@ -544,50 +556,50 @@ function makeCard(p){
       </div>
 
       <div class="back-bottom" data-noflip>
-        <div class="pane pane-stats active" data-pane="stats"><div class="kv-wrap12">${makeStats12(p)}</div></div>
-        <div class="pane pane-news" data-pane="news"><div style="color:#374151;font-size:14px">
+        <div role="tabpanel" class="pane pane-stats active" data-pane="stats" aria-labelledby="tab-${cardId}-stats"><div class="kv-wrap12">${makeStats12(p)}</div></div>
+        <div role="tabpanel" class="pane pane-news" data-pane="news" aria-labelledby="tab-${cardId}-news"><div style="color:#374151;font-size:14px">
           <div><strong>Latest:</strong> ${p.name} makes headlines — on-platform story rendering here.</div>
           <p style="margin:.4em 0 0">Short summary lives here. We’ll wire real feeds to this pane.</p>
         </div></div>
-        <div class="pane pane-yat" data-pane="yat"><div style="color:#111">YAT-A-BOY! virtual gifting — CTA placeholder.</div></div>
-        <div class="pane pane-nil" data-pane="nil">
+        <div role="tabpanel" class="pane pane-yat" data-pane="yat" aria-labelledby="tab-${cardId}-yat"><div style="color:#111">YAT-A-BOY! virtual gifting — CTA placeholder.</div></div>
+        <div role="tabpanel" class="pane pane-nil" data-pane="nil" aria-labelledby="tab-${cardId}-nil">
           ${p.nilImg?`<img src="${p.nilImg}" alt="NIL score" style="width:100%;height:auto;border-radius:10px">`:`<div style="color:#111">NIL points will appear here.</div>`}
         </div>
-        <div class="pane pane-x" data-pane="x"><div style="color:#111">X/Twitter posts placeholder.</div></div>
-        <div class="pane pane-ig" data-pane="ig"><div style="color:#111">Instagram posts placeholder.</div></div>
-        <div class="pane pane-video" data-pane="video">
+        <div role="tabpanel" class="pane pane-x" data-pane="x" aria-labelledby="tab-${cardId}-x"><div style="color:#111">X/Twitter posts placeholder.</div></div>
+        <div role="tabpanel" class="pane pane-ig" data-pane="ig" aria-labelledby="tab-${cardId}-ig"><div style="color:#111">Instagram posts placeholder.</div></div>
+        <div role="tabpanel" class="pane pane-video" data-pane="video" aria-labelledby="tab-${cardId}-video">
           ${p.video?`<iframe width="100%" height="220" src="${p.video}" title="Video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>`:`<div style="color:#111">Video will play here.</div>`}
         </div>
-        <div class="pane pane-gallery" data-pane="gallery">
+        <div role="tabpanel" class="pane pane-gallery" data-pane="gallery" aria-labelledby="tab-${cardId}-gallery">
           ${p.gallery&&p.gallery.length?`
             <div style="overflow:auto;white-space:nowrap">
               ${p.gallery.map(src=>`<img src="${src}" style="display:inline-block;height:220px;object-fit:cover;border-radius:10px;margin-right:8px">`).join('')}
             </div>`:`<div style="color:#111">Gallery coming soon.</div>`}
         </div>
 
-        <div class="iconbar" role="tablist" aria-label="Card actions" data-noflip>
-          <button class="ibtn active" data-tab="stats" title="Season/Career Stats" aria-pressed="true">
+        <div class="iconbar" role="tablist" aria-label="Card details" data-noflip>
+          <button role="tab" class="ibtn active" data-tab="stats" title="Season/Career Stats" aria-selected="true" id="tab-${cardId}-stats">
             <svg viewBox="0 0 24 24"><path fill="currentColor" d="M5 3h2v18H5zM11 10h2v11h-2zM17 6h2v15h-2z"/></svg>
           </button>
-          <button class="ibtn" data-tab="news" title="News" aria-pressed="false">
+          <button role="tab" class="ibtn" data-tab="news" title="News" aria-selected="false" id="tab-${cardId}-news">
             <svg viewBox="0 0 24 24"><path fill="currentColor" d="M4 5h16v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5zm2 2v12h12V7H6zm1 1h10v3H7V8z"/></svg>
           </button>
-          <button class="ibtn" data-tab="yat" title="YAT-A-BOY!" aria-pressed="false">
+          <button role="tab" class="ibtn" data-tab="yat" title="YAT-A-BOY!" aria-selected="false" id="tab-${cardId}-yat">
             <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 21.35 10.55 20.03C5.4 15.36 2 12.28 2 8.5A5.5 5.5 0 0 1 7.5 3C9.24 3 10.91 3.81 12 5.08 13.09 3.81 14.76 3 16.5 3 21 3 24 6.5 24 10.5c0 3.78-3.4 6.86-8.55 11.53L12 21.35z"/></svg>
           </button>
-          <button class="ibtn" data-tab="nil" title="NIL Score" aria-pressed="false">
+          <button role="tab" class="ibtn" data-tab="nil" title="NIL Score" aria-selected="false" id="tab-${cardId}-nil">
             <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 1 3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 2.2L19 6v5c0 4.52-3.01 8.77-7 10-3.99-1.23-7-5.48-7-10V6l7-2.8zM11 7h2v6h3l-4 4-4-4h3z"/></svg>
           </button>
-          <button class="ibtn" data-tab="x" title="X Feed" aria-pressed="false">
+          <button role="tab" class="ibtn" data-tab="x" title="X Feed" aria-selected="false" id="tab-${cardId}-x">
             <svg viewBox="0 0 1200 1227"><path fill="currentColor" d="M714 511 1160 0H996L689 356 420 0H0l463 607L0 1227h164l329-379 286 379h420zM327 120h154l646 873H973z"/></svg>
           </button>
-          <button class="ibtn" data-tab="ig" title="Instagram" aria-pressed="false">
+          <button role="tab" class="ibtn" data-tab="ig" title="Instagram" aria-selected="false" id="tab-${cardId}-ig">
             <svg viewBox="0 0 24 24"><path fill="currentColor" d="M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5zm5 5a5 5 0 1 0 .001 10.001A5 5 0 0 0 12 7zm6-2.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z"/></svg>
           </button>
-          <button class="ibtn" data-tab="video" title="Video" aria-pressed="false">
+          <button role="tab" class="ibtn" data-tab="video" title="Video" aria-selected="false" id="tab-${cardId}-video">
             <svg viewBox="0 0 24 24"><path fill="currentColor" d="M8 5v14l11-7zM5 5h2v14H5z"/></svg>
           </button>
-          <button class="ibtn" data-tab="gallery" title="Photo Gallery" aria-pressed="false">
+          <button role="tab" class="ibtn" data-tab="gallery" title="Photo Gallery" aria-selected="false" id="tab-${cardId}-gallery">
             <svg viewBox="0 0 24 24"><path fill="currentColor" d="M21 19V5a2 2 0 0 0-2-2H5C3.9 3 3 3.9 3 5v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5zM8 8a2 2 0 1 1 4 0 2 2 0 0 1-4 0z"/></svg>
           </button>
         </div>
@@ -664,7 +676,12 @@ function attachInteractions(){
     bar.addEventListener('click', (e)=>{
       const btn=e.target.closest('.ibtn'); if(!btn) return;
       const card=btn.closest('.card'); const pane=btn.dataset.tab||'stats';
-      card.querySelectorAll('.ibtn').forEach(b=>b.classList.toggle('active', b===btn));
+      // ACCESSIBILITY FIX: Update aria-selected for tab roles
+      card.querySelectorAll('.ibtn[role="tab"]').forEach(b => {
+          const isSelected = (b === btn);
+          b.classList.toggle('active', isSelected);
+          b.setAttribute('aria-selected', isSelected);
+      });
       card.querySelectorAll('.pane').forEach(p=>p.classList.toggle('active', p.dataset.pane===pane));
     },true);
   });
@@ -745,6 +762,20 @@ function runSplash(){
 /* ------------------- boot ------------------- */
 document.addEventListener('DOMContentLoaded', ()=>{
   populateFilters(players);
+
+  // --- FIX: Add event listeners to trigger filtering --- //
+  const filterControls = ['lvl', 'grad', 'roster', 'status'];
+  filterControls.forEach(id => {
+    const el = byId(id);
+    if (el) {
+        // When a dropdown value changes, apply the filters
+        el.addEventListener('change', applyFilters);
+    }
+  });
+  // Also apply filters instantly as the user types a name
+  byId('filterName').addEventListener('input', applyFilters);
+  // --- END FIX --- //
+
   render(playersDefaultView());
   runSplash();
 });
