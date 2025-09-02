@@ -5,84 +5,71 @@
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>hamilton.yatstats.com — WHERE THEY YAT?</title>
 
-<!-- Two-font system (skinny condensed gray + bold black) -->
-<link href="https://fonts.googleapis.com/css2?family=Anton&family=Roboto+Condensed:wght@300;400;700&display=swap" rel="stylesheet"/>
-
 <style>
 :root{
-  --maroon:#7A0019; --ring:#E3E6EA; --bg:#0b0d10; --ink:#111827; --muted:#9aa1ab;
-  --headerH:100px;
+  --maroon:#7A0019;
+  --ring:#2b2f36;
+  --bg:#0b0d12;
+  --ink:#e5e7eb;
+  --ink-strong:#fff;
+  --muted:#9aa1ab;
+  --chip:#111827;
 
-  /* Drawer sizing */
-  --drawer-min:280px; --drawer-max:520px; --drawer-mob:75vw;
+  --headerH-mobile:124px;
+  --headerH-desktop:126px;
+  --taglineH:40px;
+
+  --cardRadius:12px;
 }
-
-/* Base */
 *{box-sizing:border-box}
-html,body{margin:0;padding:0}
-body{background:var(--bg);font:15px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,"Apple Color Emoji","Segoe UI Emoji";color:#e5e7eb}
-a{text-decoration:none;color:inherit}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font:15px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial}
+a{color:inherit;text-decoration:none}
 button{font:inherit;color:inherit}
 
-/* Font helpers */
-.font-slim{font-family:"Roboto Condensed",system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;font-weight:300;letter-spacing:.04em}
-.font-strong{font-family:"Anton",system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;font-weight:400;letter-spacing:.01em}
-
-/* HEADER */
+/* ===== HEADER ===== */
 .site-header{
-  position:fixed; inset:0 0 auto 0; height:var(--headerH); z-index:60;
-  background:#000; border-bottom:1px solid #1f2937;
-  display:grid; grid-template-columns:auto 1fr auto; gap:8px; align-items:start;
-  padding:8px 8px 6px;
+  position:fixed; inset:0 0 auto 0; z-index:60;
+  background:#0e1117; border-bottom:1px solid var(--ring);
+  display:grid; grid-template-rows:auto auto;
+  padding:8px 10px 6px;
 }
-.h-left{display:flex;align-items:center;gap:8px;min-width:0}
-.hambtn{width:36px;height:36px;border:0;background:transparent;display:grid;place-items:center;cursor:pointer}
-.ham-logo{height:42px;width:auto;display:block; filter:invert(1) contrast(1.1)}
-.nav-desktop{display:flex;gap:14px;align-self:center;justify-self:center}
-.nav-desktop a{font-size:12px;text-transform:uppercase;color:#e5e7eb;white-space:nowrap;padding:4px 0;letter-spacing:.06em}
-.nav-desktop a .nav-slim{color:#9aa1ab}
-.nav-desktop a .nav-strong{color:#fff}
-@media (max-width:1260px){ .nav-desktop{display:none} }
+.h-top{display:flex; align-items:center; gap:10px}
+.hambtn,.hdr-icon{
+  width:40px;height:40px;border:0;background:transparent;border-radius:8px;
+  display:grid;place-items:center;cursor:pointer;outline:none
+}
+.hdr-icon:hover,.hambtn:hover{background:rgba(255,255,255,.07)}
+.hdr-icon svg,.hambtn svg{width:20px;height:20px;color:var(--ink-strong)}
+.hdr-icon.active{background:#fff}.hdr-icon.active svg{color:#000}
 
-.h-right{display:flex;flex-direction:column;align-items:flex-end;gap:6px;min-width:0}
-.ystats-logo{height:36px;width:auto;display:block; filter:invert(1) contrast(1.1)}
-@media (max-width:420px){ .ystats-logo{height:32px} }
+.h-bot{display:grid; grid-template-columns:1fr auto; align-items:end; gap:10px}
+.school-wrap{display:flex; align-items:flex-end; gap:10px; min-width:0}
+.school-icon{height:42px;width:auto;flex:0 0 auto}
+.school-type{display:flex;flex-direction:column;line-height:1;min-width:0;max-width:clamp(160px,52vw,320px)}
+.school-line1{font-size:10px; letter-spacing:.06em; color:#cbd5e1; font-weight:600; font-stretch:condensed; font-variation-settings:"wdth" 80}
+.school-line2{font-size:13px; font-weight:900; letter-spacing:.02em; color:#fff}
+.school-line3{font-size:15px; font-weight:900; letter-spacing:.02em; color:#fff}
+.ystats-logo{height:36px;width:auto;max-width:min(42vw,260px);display:block;justify-self:end}
 
-/* header icon row (now top-left next to hamburger) */
-.hdr-icons{display:flex;gap:8px;align-items:center;justify-content:flex-start}
-.hdr-icon{width:44px;height:44px;padding:0;border:0;background:transparent;border-radius:8px;display:grid;place-items:center;cursor:pointer}
-.hdr-icon svg{width:20px;height:20px;color:#fff}
-.hdr-icon:hover{background:rgba(255,255,255,.08)}
-.hdr-icon:focus-visible{outline:2px solid #fff;outline-offset:2px;border-radius:8px}
-.hdr-icon.active{background:#fff}
-.hdr-icon.active svg{color:#000}
+.tagline-wrap{
+  position:sticky; top:calc(max(var(--headerH-mobile),var(--headerH-desktop)));
+  z-index:40; background:#0e1117; border-bottom:1px solid var(--ring); height:var(--taglineH); display:flex; align-items:center
+}
+.tagline{width:100%; display:flex; justify-content:center; gap:8px; padding:6px 10px}
+.tag-grey{color:#9aa1ab; font-weight:700; font-stretch:condensed; font-variation-settings:"wdth" 80}
+.tag-strong{color:#fff; font-weight:900}
+.tag-tight{letter-spacing:-.04em}
 
-/* TAGLINE */
-.tagline-wrap{position:sticky;top:var(--headerH);z-index:40;background:#000;border-bottom:1px solid #1f2937}
-.tagline{display:flex;align-items:center;justify-content:space-between;padding:8px 10px}
-.tag-text{font-size:14px;line-height:1.1}
-.tag-grey{color:#9aa1ab;font-weight:300;letter-spacing:.02em}
-.tag-strong{color:#fff;font-weight:400;letter-spacing:0}
-.tag-tight{letter-spacing:-.02em}
-.tagline .tag-grey{font-family:"Roboto Condensed"}
-.tagline .tag-strong{font-family:"Anton"}
-
-/* GRID (5→4→3→2→1) */
-main{padding:calc(var(--headerH) + 44px) 0 84px}
+/* MAIN */
+main{padding-top:calc(max(var(--headerH-mobile),var(--headerH-desktop))+var(--taglineH)+8px); padding-bottom:84px}
 .grid{padding:10px;display:grid;grid-template-columns:repeat(1,minmax(0,1fr));gap:12px}
 @media (min-width:560px){ .grid{grid-template-columns:repeat(2,minmax(0,1fr))} }
 @media (min-width:820px){ .grid{grid-template-columns:repeat(3,minmax(0,1fr))} }
 @media (min-width:1100px){ .grid{grid-template-columns:repeat(4,minmax(0,1fr))} }
 @media (min-width:1440px){ .grid{grid-template-columns:repeat(5,minmax(0,1fr))} }
 
-/* CARD / FLIP */
-.card{background:#000;border:0;border-radius:10px;overflow:hidden;position:relative;user-select:none;aspect-ratio:5/7;min-height:280px}
-/* hover lift (only on hover-capable devices) */
-@media (hover:hover){
-  .card{transition:transform .18s ease, box-shadow .18s ease}
-  .card:hover{transform:translateY(-6px); box-shadow:0 12px 26px rgba(0,0,0,.5)}
-}
-
+/* CARD */
+.card{background:#0f1116;border-radius:var(--cardRadius);overflow:hidden;position:relative;user-select:none;aspect-ratio:5/7;min-height:300px;border:1px solid #1e2430}
 .flip-card{perspective:1200px}
 .flip-inner{position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform .55s cubic-bezier(.2,.7,.2,1)}
 .card.front  .flip-inner{ transform:rotateY(0) }
@@ -92,7 +79,7 @@ main{padding:calc(var(--headerH) + 44px) 0 84px}
 /* FRONT */
 .front-face{transform:rotateY(0)}
 .card-img{position:absolute; inset:0; width:100%; height:100%; object-fit:cover; background:#111}
-.bottom-grad{position:absolute; left:0; right:0; bottom:0; height:66%; background:linear-gradient(to top, rgba(0,0,0,.98) 0%, rgba(0,0,0,.92) 30%, rgba(0,0,0,.86) 48%, rgba(0,0,0,0) 76%); pointer-events:none; z-index:1;}
+.bottom-grad{position:absolute; left:0; right:0; bottom:0; height:66%; background:linear-gradient(to top, rgba(0,0,0,.98) 0%, rgba(0,0,0,.92) 30%, rgba(0,0,0,.0) 76%); pointer-events:none; z-index:1;}
 .front-left, .front-right{position:absolute; z-index:3; color:#fff; text-shadow:0 1px 2px rgba(0,0,0,.45)}
 .front-left{left:12px; bottom:12px; width:46%}
 .front-right{right:12px; bottom:10px; width:72%; text-align:right}
@@ -100,10 +87,8 @@ main{padding:calc(var(--headerH) + 44px) 0 84px}
 .team{font-size:13px;opacity:.98}
 .parent{font-size:12px;opacity:.92;margin-top:2px}
 .spacer-6{height:6px}
-
-/* chips */
 .stack{display:flex;flex-direction:column;gap:4px;margin-top:4px;align-items:flex-start}
-.chip{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.14);color:#fff;border:1px solid rgba(255,255,255,.24);border-radius:999px;padding:2px 8px 3px;font-weight:800;font-size:10px;letter-spacing:.06em}
+.chip{display:inline-flex;align-items:center;gap:6px;background:#0e1726;color:#fff;border:1px solid #334155;border-radius:999px;padding:2px 8px 3px;font-weight:800;font-size:10px;letter-spacing:.06em}
 .chip.level.mlb{background:#7A0019;border-color:#7A0019}
 .chip.level.triple-a{background:#2563eb;border-color:#2563eb}
 .chip.level.double-a{background:#3b82f6;border-color:#3b82f6}
@@ -119,368 +104,284 @@ main{padding:calc(var(--headerH) + 44px) 0 84px}
 .chip.status{background:#16a34a;border-color:#16a34a}
 .chip.status.retired{background:#6b7280;border-color:#6b7280}
 .chip.class{background:#374151;border-color:#374151}
-
-/* letter dots */
 .letters{display:flex;gap:6px;align-items:center;margin-top:6px}
 .letter-dot{width:20px;height:20px;border-radius:50%;background:#fff;color:var(--maroon);display:grid;place-items:center;font-weight:900;font-size:11px;border:1px solid rgba(0,0,0,.15)}
-
-/* right side text */
 .next-chip,.last-chip{display:inline-block;background:rgba(255,255,255,.14);color:#fff;border:1px solid rgba(255,255,255,.24);border-radius:999px;padding:2px 8px 3px;font-size:10px;font-weight:900;letter-spacing:.12em;margin-bottom:3px}
 .right-line{font-size:12px;font-weight:800;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .last3{margin-top:10px;width:100%;margin-left:auto}
 .last3 .item{font-size:12px;color:#e5e7eb;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:right}
 
 /* BACK */
-.back-face{transform:rotateY(180deg);background:#fff;color:#111;display:grid;grid-template-rows:1fr 1fr;height:100%}
-.back-top{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:10px 12px 6px;align-items:end}
-.back-left{min-width:0;display:flex;flex-direction:column}
-.stats-name{font-weight:900;text-transform:uppercase;letter-spacing:.02em;font-size:16px;margin-bottom:2px}
-.team-line{color:#1f2937;font-size:13px;line-height:1.15;margin-top:2px}
-.parent-line{color:#6b7280;font-size:12px;line-height:1.1;margin-top:2px}
+.back-face{transform:rotateY(180deg);background:#0e1117;color:#e5e7eb;display:grid;grid-template-rows:auto 1fr;gap:8px;padding:10px}
+.back-top{display:grid;grid-template-columns:1fr 1fr;gap:10px;align-items:start}
+.back-left{min-width:0;display:flex;flex-direction:column;gap:6px}
+.stats-name{font-weight:900;text-transform:uppercase;letter-spacing:.02em;font-size:16px;margin:0;color:#fff}
+.team-line{color:#cbd5e1;font-size:13px;line-height:1.15;margin-top:0}
+.parent-line{color:#9aa1ab;font-size:12px;line-height:1.1;margin:0}
 
-.tiny-bar{margin-top:auto;width:100%}
-.tiny-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
-.tabbtn{height:28px;display:grid;place-items:center;border-radius:8px;border:1px solid #e5e7eb;background:#fff;cursor:pointer;transition:background .15s,border-color .15s}
-.tabbtn svg{width:14px;height:14px;color:#111}
-.tabbtn.active{background:#111;border-color:#111}
-.tabbtn.active svg{color:#fff}
-
-.action-chip{margin-top:6px;display:inline-block;width:100%;text-align:center;padding:6px 10px;border-radius:999px;border:1px solid #111;background:#111;color:#fff;font-weight:900;font-size:10px;letter-spacing:.12em;cursor:pointer;user-select:none}
-.action-chip.flat{background:#0f172a;border-color:#0f172a}
-.action-chip.ghost{background:#fff;color:#111;border-color:#1f2937}
-.action-chip.active{background:#7A0019;border-color:#7A0019}
-
-.back-right{display:flex;flex-direction:column}
-.hs-box{flex:1 1 auto;width:100%;aspect-ratio:3/4;position:relative;overflow:hidden;border-radius:8px;background:#d1d5db}
+.hs-box{width:100%;aspect-ratio:3/4;position:relative;overflow:hidden;border-radius:10px;background:#1f2937}
 .hs-box img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-.profile-chip{width:100%}
 
-/* panes */
-.back-bottom{border-top:1px solid var(--ring);padding:10px 12px 12px;min-height:0;overflow:hidden;display:flex;flex-direction:column}
-.pane{display:none;min-height:0;overflow:auto;flex:1;animation:slide .18s ease}
+.profile-info{
+  position:absolute; top:10px; left:10px; right:auto; z-index:3;
+  text-align:left; background:rgba(0,0,0,.35); backdrop-filter:blur(2px);
+  border:1px solid #334155; border-radius:10px; padding:6px 8px;
+}
+.profile-link{color:#fff; text-decoration:none}
+.p-line1{font-size:13px; font-weight:800}
+.p-line2,.p-line3{font-size:11px; color:#d1d5db; line-height:1.15; margin-top:1px}
+
+/* Fun Zone */
+.back-bottom{border-top:1px solid var(--ring);min-height:0;overflow:hidden;display:flex;flex-direction:column}
+.pane{display:none;min-height:0;overflow:auto;flex:1;animation:fade .18s ease;padding:8px}
 .pane.active{display:block}
-@keyframes slide{from{opacity:.2;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
-.kv-wrap12{display:grid;grid-template-columns:repeat(4,1fr);grid-auto-rows:1fr;gap:8px;height:100%}
-.kv{background:#f3f4f6;border-radius:10px;text-align:center;padding:8px;display:flex;flex-direction:column;justify-content:center}
-.kv .k{font-size:11px;color:#6b7280}
-.kv .v{font-weight:800}
+@keyframes fade{from{opacity:.2;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+.kv-wrap12{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.kv{background:#111827;border:1px solid #1f2937;border-radius:10px;text-align:center;padding:10px;display:flex;flex-direction:column;justify-content:center}
+.kv .k{font-size:11px;color:#9aa1ab}
+.kv .v{font-weight:800;color:#fff}
 
-/* flip zones */
-.hit{position:absolute;top:0;bottom:0;width:22%;z-index:1;background:transparent;border:0}
-@media (max-width:480px){ .hit{width:26%} }
+/* Fun bar with 8 icons (bottom) */
+.funbar{
+  display:grid; grid-template-columns:repeat(8,1fr); gap:6px; padding:8px 8px 10px; border-top:1px solid #1f2430;
+}
+.funbtn{
+  height:34px; display:grid; place-items:center; border-radius:8px;
+  border:1px solid #334155; background:#0f1624; cursor:pointer; outline:none
+}
+.funbtn svg{width:16px;height:16px;color:#e5e7eb}
+.funbtn.active{background:#fff;border-color:#fff}
+.funbtn.active svg{color:#000}
+
+/* Flip hit areas – invisible & never outlined */
+.hit{position:absolute;top:0;bottom:0;width:18%;z-index:2;background:transparent;border:0;outline:none}
+.hit:focus{outline:none}
 .hit.left{left:0}.hit.right{right:0}
+@media (max-width:480px){ .hit{width:22%} }
 
-/* Make FunZone tabs NOT flip when clicking */
-[data-noflip]{pointer-events:auto}
-
-/* DRAWERS */
-.scrim{position:fixed;left:0;right:0;top:var(--headerH);bottom:0;background:rgba(0,0,0,.35);opacity:0;pointer-events:none;transition:opacity .25s ease;z-index:55}
+/* Drawers (hidden by default) */
+.drawer-left,.drawer-right,.drawer-auth{
+  position:fixed; top:calc(max(var(--headerH-mobile),var(--headerH-desktop))); bottom:0;
+  width:360px; max-width:92vw; background:#0e1117; border:1px solid var(--ring);
+  transform:translateX(-100%); transition:transform .25s ease; z-index:56; color:#e5e7eb
+}
+.drawer-right,.drawer-auth{ right:0; left:auto; transform:translateX(100%) }
+.drawer-left.open{ transform:translateX(0) }
+.drawer-right.open,.drawer-auth.open{ transform:translateX(0) }
+.scrim{position:fixed;left:0;right:0;top:calc(max(var(--headerH-mobile),var(--headerH-desktop)));bottom:0;background:rgba(0,0,0,.4);opacity:0;pointer-events:none;transition:opacity .25s ease;z-index:55}
 .scrim.open{opacity:1;pointer-events:auto}
-body.no-scroll{overflow:hidden}
-
-/* LEFT drawer (nav + PLAYER PROFILE SEARCH) */
-.drawer-left{position:fixed;top:var(--headerH);bottom:0;left:0;width:clamp(var(--drawer-min),var(--drawer-mob),var(--drawer-max));max-width:92vw;background:#0f1115;border-right:1px solid #1f2937;transform:translateX(-100%);transition:transform .25s ease;z-index:56;display:flex;flex-direction:column}
-.drawer-left.open{transform:translateX(0)}
-.drawer-left .drawer-header{height:56px;border-bottom:1px solid #1f2937;display:flex;align-items:center;justify-content:space-between;padding:0 12px;color:#e5e7eb}
-.left-title{font-weight:900;letter-spacing:.12em;text-transform:uppercase;font-size:12px;color:#e5e7eb}
-.left-content{padding:12px;min-height:0;overflow:auto}
-.nav-left-list{display:flex;flex-direction:column;gap:12px;margin-bottom:10px}
-.nav-left-link{text-decoration:none;color:#e5e7eb;text-transform:uppercase;letter-spacing:.12em;font-weight:400;font-size:13px;line-height:1;padding:10px 6px 8px 4px;border-radius:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.nav-left-link:hover{background:#131722}
-.nav-left-sep{height:1px;background:#1f2937;margin:8px 0}
-.left-search-h{font-weight:900;letter-spacing:.12em;text-transform:uppercase;font-size:12px;color:#e5e7eb;margin:2px 0 8px}
-.left-search .ghost{display:block;width:100%;background:#0d1220;border:1px solid #1f2937;border-radius:10px;padding:10px 12px;font-size:14px;outline:none;color:#e5e7eb}
-.left-results{margin-top:8px;list-style:none;padding:0}
-.left-results li{padding:8px 6px;border-radius:8px;cursor:pointer}
-.left-results li:hover{background:#131722}
-.global-line{margin-top:14px;font-size:12px;color:#e5e7eb;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-.global-line a{color:#93c5fd;text-decoration:underline}
-
-/* RIGHT drawer (filters) */
-.drawer-right{position:fixed;top:var(--headerH);bottom:0;right:0;width:clamp(var(--drawer-min),var(--drawer-mob),var(--drawer-max));max-width:92vw;background:#0f1115;border-left:1px solid #1f2937;transform:translateX(100%);transition:transform .25s ease;z-index:56;display:flex;flex-direction:column}
-.drawer-right.open{transform:translateX(0)}
-.drawer-right .drawer-header{height:56px;border-bottom:1px solid #1f2937;display:flex;align-items:center;justify-content:space-between;padding:0 12px;color:#e5e7eb}
-.right-title{font-weight:900;letter-spacing:.12em;text-transform:uppercase;font-size:12px;color:#e5e7eb}
-.drawer-body{min-height:0;overflow:auto}
-.drawer-content{display:block;padding:12px 12px 22px}
-.rail{border:1px solid #1f2937;border-radius:10px;margin-bottom:10px;overflow:hidden;background:#0b0d16}
-.rail summary{list-style:none;cursor:pointer;padding:9px 12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;font-size:12px;color:#e5e7eb;border-bottom:1px solid #1f2937}
+.drawer-header{height:56px;border-bottom:1px solid var(--ring);display:flex;align-items:center;justify-content:space-between;padding:0 12px}
+.closebtn{width:34px;height:34px;border:0;background:transparent;display:grid;place-items:center;cursor:pointer}
+.closebtn svg{width:18px;height:18px}
+.drawer-content{padding:12px 12px 22px}
+.rail{border:1px solid #293042;border-radius:10px;margin-bottom:10px;overflow:hidden}
+.rail summary{list-style:none;cursor:pointer;padding:9px 12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;font-size:12px;color:#cbd5e1;border-bottom:1px solid #293042}
 .rail summary::-webkit-details-marker{display:none}
 .rail .inner{padding:8px 10px;max-height:40vh;overflow:auto}
-.ghost{display:block;width:100%;background:#0d1220;border:1px solid #1f2937;border-radius:8px;padding:10px;font-size:13px;color:#e5e7eb;outline:none}
+.ghost{display:block;width:100%;background:#0f1624;border:1px solid #293042;border-radius:10px;padding:10px;font-size:13px;color:#e5e7eb;outline:none}
 .select-multi{height:110px}
-.hint{color:#9aa1ab;font-size:11px;margin:4px 2px 10px}
-@media (max-width:800px){ .hint{display:none} }
-@media (min-width:1024px){ .drawer-right{width:420px;max-width:24vw} }
-
-/* AUTH drawer */
-.drawer-auth{position:fixed;top:var(--headerH);bottom:0;right:0;width:clamp(var(--drawer-min),var(--drawer-mob),var(--drawer-max));max-width:92vw;background:#0f1115;border-left:1px solid #1f2937;transform:translateX(100%);transition:transform .25s ease;z-index:56;display:flex;flex-direction:column}
-.drawer-auth.open{transform:translateX(0)}
-.drawer-auth .drawer-header{height:56px;border-bottom:1px solid #1f2937;display:flex;align-items:center;justify-content:space-between;padding:0 12px;color:#e5e7eb}
-.auth-title{font-weight:900;letter-spacing:.12em;text-transform:uppercase;font-size:12px;color:#e5e7eb}
-.auth-body{min-height:0;overflow:auto;padding:12px 12px 22px}
-.input{display:block;width:100%;background:#0d1220;border:1px solid #1f2937;border-radius:10px;padding:12px 12px;font-size:14px;color:#e5e7eb;outline:none}
-.btn-primary{display:inline-block;width:100%;background:#111827;color:#fff;border:1px solid #1f2937;border-radius:10px;padding:10px 12px;font-weight:800;letter-spacing:.06em;cursor:pointer;margin-top:10px}
-
-/* drawer close buttons */
-.closebtn{width:34px;height:34px;border:0;background:transparent;display:grid;place-items:center;cursor:pointer}
-.closebtn svg{width:18px;height:18px;color:#e5e7eb}
 
 /* FOOTER */
 .footer{position:fixed;left:0;right:0;bottom:0;height:72px;background:#000;color:#fff;display:flex;align-items:center;justify-content:center;z-index:10}
 .footer img{max-height:60px;width:auto}
 .build-pill{position:absolute;left:10px;bottom:10px;background:rgba(255,255,255,.12);color:#fff;font-size:12px;padding:6px 10px;border-radius:12px}
 
-/* --- Splash (mobile/tablet only) --- */
+/* ======== Splash (mobile/tablet only) ======== */
 .splash{
-  position:fixed; inset:0; z-index:1000;
-  background:#000; color:#fff; display:none;
-  opacity:1; transition:opacity .5s ease;
+  position:fixed; inset:0; background:#000; color:#fff; z-index:1000;
+  opacity:1; transition:opacity .5s ease; display:none;
 }
-.splash.show{ display:block; }
-.splash.hide{ opacity:0; pointer-events:none; }
+.splash.show{display:block}
+.splash.hide{opacity:0; pointer-events:none }
 
-/* MLB-style layout: top & bottom thirds */
-.splash-inner{
-  position:absolute; inset:0; display:grid;
-  grid-template-rows:33% 34% 33%; place-items:center;
+.splash-inner{position:absolute; inset:0;}
+
+/* top third: YAT?STATS */
+.splash-top{
+  position:absolute; left:50%; top:33vh; transform:translateX(-50%);
 }
-.splash-top{ align-self:end }
-.splash-bot{ align-self:start }
-.splash-logo-top{
-  width:120px; height:auto;
+.splash-logo{
+  position:relative; width:100px; height:auto;
   animation:logoZoom .8s ease-out forwards, logoGlow 2.2s ease-in-out 1.2s infinite;
-  filter: drop-shadow(0 2px 12px rgba(255,255,255,.18));
-  position:relative;
 }
-.splash-logo-top::after{
+.splash-logo img{display:block; width:100%; height:auto; filter: drop-shadow(0 2px 12px rgba(255,255,255,.18));}
+.splash-logo::after{
   content:""; position:absolute; inset:0;
   background:linear-gradient(105deg, rgba(255,255,255,0) 10%, rgba(255,255,255,.22) 20%, rgba(255,255,255,0) 32%);
-  transform: translateX(-140%); pointer-events:none; mix-blend-mode:screen;
-  animation:logoShimmer 1.6s ease-out .6s 1 forwards;
-}
-.splash-logo-bot{
-  width:120px; height:auto;
-  filter: drop-shadow(0 2px 10px rgba(255,255,255,.12));
-  animation:logoZoom .8s ease-out .08s both;
+  transform:translateX(-140%); animation:logoShimmer 1.6s ease-out .6s 1 forwards; mix-blend-mode:screen; pointer-events:none;
 }
 
-@keyframes logoZoom{0%{transform:scale(.85);opacity:0}60%{transform:scale(1.03);opacity:1}100%{transform:scale(1)}}
+/* bottom third: Hamilton H icon */
+.splash-bottom{
+  position:absolute; left:50%; bottom:33vh; transform:translateX(-50%);
+  animation:fadeUp .8s ease .2s both;
+}
+.splash-school{width:120px; height:auto; display:block}
+
+@keyframes logoZoom{0%{transform:scale(.85);opacity:0}60%{transform:scale(1.02);opacity:1}100%{transform:scale(1)}}
 @keyframes logoGlow{0%,100%{filter:drop-shadow(0 2px 10px rgba(255,255,255,.18))}50%{filter:drop-shadow(0 2px 18px rgba(255,255,255,.28))}}
 @keyframes logoShimmer{0%{transform:translateX(-140%)}100%{transform:translateX(140%)}}
-@media (min-width:1025px){ .splash{ display:none!important } }
+@keyframes fadeUp{from{opacity:.0; transform:translate(-50%, 12px)} to{opacity:1; transform:translate(-50%, 0)}}
+
+@media (min-width:1025px){ .splash{display:none !important} .school-icon{height:48px} .school-line2{font-size:14px} .school-line3{font-size:16px} .ystats-logo{height:40px} }
+@media (max-width:420px){ .school-type{max-width:64vw} .school-line3{font-size:14px} }
 </style>
 </head>
 <body>
 
-<!-- Splash -->
+<!-- ====== Splash ====== -->
 <div id="splash" class="splash" aria-hidden="true">
   <div class="splash-inner">
-    <div></div>
     <div class="splash-top">
-      <img class="splash-logo-top"
-           src="https://i.postimg.cc/C5mwXpQy/35878-20250830-222027-0000.png"
-           alt="YAT?STATS"/>
+      <div class="splash-logo" aria-label="YAT?STATS">
+        <img src="https://i.postimg.cc/C5mwXpQy/35878-20250830-222027-0000.png" alt="YAT?STATS" width="100" height="28" decoding="async" loading="eager"/>
+      </div>
     </div>
-    <div class="splash-bot">
-      <img class="splash-logo-bot"
-           src="https://i.postimg.cc/2jwjVn8H/32900-20250830-222044-0000.png"
-           alt="Hamilton H"/>
+    <div class="splash-bottom">
+      <img class="splash-school" src="https://i.postimg.cc/2jwjVn8H/32900-20250830-222044-0000.png" alt="Hamilton H"/>
     </div>
   </div>
-  <audio id="splashSfx" preload="auto"><!-- <source src="splash.mp3" type="audio/mpeg"> --></audio>
+  <audio id="splashSfx" preload="auto"></audio>
 </div>
 
-<header class="site-header">
-  <div class="h-left">
+<!-- ====== Header ====== -->
+<header class="site-header" role="banner">
+  <div class="h-top">
     <button class="hambtn" id="openLeft" aria-label="Open Navigation">
-      <svg viewBox="0 0 24 24" width="22" height="22"><path fill="currentColor" d="M3 6h18v2H3zM3 11h18v2H3zM3 16h18v2H3z"/></svg>
+      <svg viewBox="0 0 24 24"><path fill="currentColor" d="M3 6h18v2H3zM3 11h18v2H3zM3 16h18v2H3z"/></svg>
     </button>
-
-    <!-- Icon row (L→R): Account, Search, Filter, Reset -->
-    <div class="hdr-icons">
-      <button class="hdr-icon" id="iconProfile" aria-label="Account" title="Account">
-        <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm0 2c-4.2 0-8 2.1-8 5v1h16v-1c0-2.9-3.8-5-8-5z"/></svg>
-      </button>
-      <button class="hdr-icon" id="iconSearch" aria-label="Search" title="Search">
-        <svg viewBox="0 0 24 24"><path fill="currentColor" d="M11 4a7 7 0 1 1 0 14 7 7 0 0 1 0-14zm9.7 15.3-3.4-3.4a9 9 0 1 0-1.4 1.4l3.4 3.4a1 1 0 0 0 1.4-1.4z"/></svg>
-      </button>
-      <button class="hdr-icon" id="iconFilter" aria-label="Filters" title="Filters">
-        <svg viewBox="0 0 24 24"><path fill="currentColor" d="M3 5h18l-6.5 7.5V20l-5-2v-5.5L3 5z"/></svg>
-      </button>
-      <button class="hdr-icon" id="iconReset" aria-label="Reset" title="Reset">
-        <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 5V2L8 6l4 4V7a5 5 0 1 1-5 5H5a7 7 0 1 0 7-7z"/></svg>
-      </button>
-    </div>
+    <button class="hdr-icon" id="iconProfile" aria-label="Account" title="Account">
+      <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm0 2c-4.2 0-8 2.1-8 5v1h16v-1c0-2.9-3.8-5-8-5z"/></svg>
+    </button>
+    <button class="hdr-icon" id="iconSearch" aria-label="Search" title="Search">
+      <svg viewBox="0 0 24 24"><path fill="currentColor" d="M11 4a7 7 0 1 1 0 14 7 7 0 0 1 0-14zm9.7 15.3-3.4-3.4a9 9 0 1 0-1.4 1.4l3.4 3.4a1 1 0 0 0 1.4-1.4z"/></svg>
+    </button>
+    <button class="hdr-icon" id="iconFilter" aria-label="Filters" title="Filters">
+      <svg viewBox="0 0 24 24"><path fill="currentColor" d="M3 5h18l-6.5 7.5V20l-5-2v-5.5L3 5z"/></svg>
+    </button>
+    <button class="hdr-icon" id="iconReset" aria-label="Reset" title="Reset">
+      <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 5V2L8 6l4 4V7a5 5 0 1 1-5 5H5a7 7 0 1 0 7-7z"/></svg>
+    </button>
   </div>
 
-  <nav class="nav-desktop">
-    <a href="#where">
-      <span class="nav-slim font-slim">Where They</span><span class="nav-strong font-strong">&nbsp;YAT?</span>
-    </a>
-    <a href="#news">
-      <span class="nav-slim font-slim">Active Alumni</span><span class="nav-strong font-strong">&nbsp;News</span>
-    </a>
-    <a href="#alltime">
-      <span class="nav-slim font-slim">Next-Level</span><span class="nav-strong font-strong">&nbsp;All-Time List</span>
-    </a>
-    <a href="#market">
-      <span class="nav-slim font-slim">NIL &amp; YAT-A-BOY</span><span class="nav-strong font-strong">&nbsp;Marketplace</span>
-    </a>
-    <a href="#current">
-      <span class="nav-slim font-slim">The</span><span class="nav-strong font-strong">&nbsp;Current Team</span>
-    </a>
-    <a href="#partners">
-      <span class="nav-slim font-slim">PCDAction</span><span class="nav-strong font-strong">&nbsp;Partner Program</span>
-    </a>
-  </nav>
-
-  <div class="h-right">
-    <img class="ham-logo" src="https://i.postimg.cc/2jwjVn8H/32900-20250830-222044-0000.png" alt="Hamilton HS"/>
+  <div class="h-bot">
+    <div class="school-wrap">
+      <img class="school-icon" src="https://i.postimg.cc/2jwjVn8H/32900-20250830-222044-0000.png" alt="Hamilton HS"/>
+      <div class="school-type" aria-label="School Identity">
+        <div class="school-line1">CHANDLER, AZ</div>
+        <div class="school-line2">HAMILTON HIGH SCHOOL</div>
+        <div class="school-line3">ACTIVE ALUMNI</div>
+      </div>
+    </div>
     <img class="ystats-logo" src="https://i.postimg.cc/C5mwXpQy/35878-20250830-222027-0000.png" alt="YAT?STATS"/>
   </div>
 </header>
 
-<!-- TAGLINE -->
+<!-- Tagline -->
 <div class="tagline-wrap">
   <div class="tagline">
-    <div class="tag-text">
-      <span class="tag-grey font-slim">WHERE THEY</span><span class="tag-strong font-strong tag-tight">&nbsp;YAT?</span>
-      &nbsp;&nbsp;
-      <span class="tag-grey font-slim">SWIPE FOR</span><span class="tag-strong font-strong tag-tight">&nbsp;STATS!</span>
-    </div>
+    <span class="tag-grey">WHERE&nbsp;THEY</span><span class="tag-strong tag-tight">YAT?</span>
+    <span class="tag-grey">&nbsp;&nbsp;SWIPE&nbsp;FOR</span><span class="tag-strong tag-tight">STATS!</span>
   </div>
 </div>
 
 <!-- SCRIM -->
 <div class="scrim" id="scrim"></div>
 
-<!-- LEFT DRAWER -->
+<!-- LEFT NAV -->
 <aside class="drawer-left" id="drawerLeft" aria-hidden="true" role="navigation">
   <div class="drawer-header">
-    <div class="left-title">Navigation</div>
+    <div style="font-weight:900;letter-spacing:.12em;text-transform:uppercase;font-size:12px;color:#cbd5e1">Navigation</div>
     <button class="closebtn" id="closeLeft" aria-label="Close">
       <svg viewBox="0 0 24 24"><path fill="currentColor" d="M6.225 4.811 4.811 6.225 10.586 12l-5.775 5.775 1.414 1.414L12 13.414l5.775 5.775 1.414-1.414L13.414 12l5.775-5.775-1.414-1.414L12 10.586 6.225 4.811z"/></svg>
     </button>
   </div>
-  <div class="left-content">
-    <div class="nav-left-list">
-      <a class="nav-left-link" href="#where">
-        <span class="nav-slim font-slim">Where They</span><span class="nav-strong font-strong">&nbsp;YAT?</span>
-      </a>
-      <a class="nav-left-link" href="#news">
-        <span class="nav-slim font-slim">Active Alumni</span><span class="nav-strong font-strong">&nbsp;News</span>
-      </a>
-      <a class="nav-left-link" href="#alltime">
-        <span class="nav-slim font-slim">Next-Level</span><span class="nav-strong font-strong">&nbsp;All-Time List</span>
-      </a>
-      <a class="nav-left-link" href="#market">
-        <span class="nav-slim font-slim">NIL &amp; YAT-A-BOY</span><span class="nav-strong font-strong">&nbsp;Marketplace</span>
-      </a>
-      <a class="nav-left-link" href="#current">
-        <span class="nav-slim font-slim">The</span><span class="nav-strong font-strong">&nbsp;Current Team</span>
-      </a>
-      <a class="nav-left-link" href="#partners">
-        <span class="nav-slim font-slim">PCDAction</span><span class="nav-strong font-strong">&nbsp;Partner Program</span>
-      </a>
-      <div class="nav-left-sep"></div>
-    </div>
+  <div class="drawer-content">
+    <nav class="nav-left-list" style="display:flex;flex-direction:column;gap:12px;margin-bottom:10px">
+      <a class="nav-left-link" href="#">WHERE THEY <b>YAT?</b></a>
+      <a class="nav-left-link" href="#">ACTIVE ALUMNI <b>NEWS</b></a>
+      <a class="nav-left-link" href="#">NEXT-LEVEL <b>ALL-TIME LIST</b></a>
+      <a class="nav-left-link" href="#">NIL &amp; YAT-A-BOY <b>MARKETPLACE</b></a>
+      <a class="nav-left-link" href="#">THE <b>CURRENT TEAM</b></a>
+      <a class="nav-left-link" href="#">PCD ACTION <b>PARTNER PROGRAM</b></a>
+      <div style="height:1px;background:#1f2633;margin:8px 0"></div>
+    </nav>
 
     <div class="left-search">
-      <div class="left-search-h">PLAYER PROFILE SEARCH</div>
+      <div style="font-weight:900;letter-spacing:.12em;text-transform:uppercase;font-size:12px;color:#cbd5e1;margin:2px 0 8px">PLAYER PROFILE SEARCH</div>
       <input id="localSearch" type="text" class="ghost" placeholder="Type a player name…" autocomplete="off"/>
-      <ul id="localResults" class="left-results"></ul>
+      <ul id="localResults" class="left-results" style="margin-top:8px;list-style:none;padding:0"></ul>
 
-      <!-- Global platform links (no local search here; just links) -->
-      <div class="global-line">
-        <strong>GLOBAL YATSTATS PLATFORM SEARCHES</strong>
-      </div>
-      <div class="global-line">
-        <span>🌎🔍</span>
-        <a href="https://www.yatstats.com" target="_blank" rel="noopener">by PLAYER</a>
-      </div>
-      <div class="global-line">
-        <span>🌎🔍</span>
-        <a href="https://www.yatstats.com" target="_blank" rel="noopener">by TEAM</a>
+      <div class="global-line" style="margin-top:12px;font-size:12px;color:#cbd5e1;display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+        <svg class="mini-icon" viewBox="0 0 24 24" style="width:14px;height:14px;color:#fff"><path fill="currentColor" d="M11 4a7 7 0 1 1 0 14 7 7 0 0 1 0-14zm9.7 15.3-3.4-3.4a9 9 0 1 0-1.4 1.4l3.4 3.4a1 1 0 0 0 1.4-1.4z"/></svg>
+        <a href="https://www.yatstats.com" target="_blank" rel="noopener">GLOBAL PLAYER SEARCH</a> |
+        <a href="https://www.yatstats.com" target="_blank" rel="noopener">GLOBAL SCHOOL SEARCH</a>
       </div>
     </div>
   </div>
 </aside>
 
-<!-- RIGHT DRAWER (Filters) -->
+<!-- RIGHT FILTERS -->
 <aside class="drawer-right" id="drawerRight" aria-hidden="true" role="dialog" aria-modal="true">
   <div class="drawer-header">
-    <div class="right-title">Filters</div>
+    <div style="font-weight:900;letter-spacing:.12em;text-transform:uppercase;font-size:12px;color:#cbd5e1">Filters</div>
     <button class="closebtn" id="closeRight" aria-label="Close">
       <svg viewBox="0 0 24 24"><path fill="currentColor" d="M6.225 4.811 4.811 6.225 10.586 12l-5.775 5.775 1.414 1.414L12 13.414l5.775 5.775 1.414-1.414L13.414 12l5.775-5.775-1.414-1.414L12 10.586 6.225 4.811z"/></svg>
     </button>
   </div>
-  <div class="drawer-body">
-    <div class="drawer-content">
-      <!-- By Player (kept open) -->
-      <details class="rail" open>
-        <summary>By Player</summary>
-        <div class="inner">
-          <input id="filterName" type="text" class="ghost" placeholder="Type name & press Enter"/>
-          <div class="hint">Press <b>Enter</b> to apply and close.</div>
-        </div>
-      </details>
+  <div class="drawer-content">
+    <details class="rail" open>
+      <summary>By Player</summary>
+      <div class="inner">
+        <input id="filterName" type="text" class="ghost" placeholder="Type name & press Enter"/>
+        <div style="color:#9aa1ab;font-size:11px;margin:4px 2px 10px">Press <b>Enter</b> to apply and close.</div>
+      </div>
+    </details>
 
-      <!-- By Level (collapsed on load) -->
-      <details class="rail">
-        <summary>By Level</summary>
-        <div class="inner">
-          <select id="lvl" class="ghost select-multi" multiple></select>
-        </div>
-      </details>
+    <details class="rail" open>
+      <summary>By Level</summary>
+      <div class="inner"><select id="lvl" class="ghost select-multi" multiple></select></div>
+    </details>
 
-      <!-- By Grad Class (collapsed on load) -->
-      <details class="rail">
-        <summary>By Grad Class</summary>
-        <div class="inner">
-          <select id="grad" class="ghost select-multi" multiple></select>
-        </div>
-      </details>
+    <details class="rail" open>
+      <summary>By Grad Class</summary>
+      <div class="inner"><select id="grad" class="ghost select-multi" multiple></select></div>
+    </details>
 
-      <!-- By Roster Year (collapsed on load) -->
-      <details class="rail">
-        <summary>By Roster Year</summary>
-        <div class="inner">
-          <select id="roster" class="ghost select-multi" multiple></select>
-        </div>
-      </details>
+    <details class="rail" open>
+      <summary>By Roster Year</summary>
+      <div class="inner"><select id="roster" class="ghost select-multi" multiple></select></div>
+    </details>
 
-      <!-- By Status (last, collapsed on load) -->
-      <details class="rail">
-        <summary>By Status</summary>
-        <div class="inner">
-          <select id="status" class="ghost select-multi" multiple>
-            <option value="Active 2025">ACTIVE 2025</option>
-            <option value="Active 2024">ACTIVE 2024</option>
-            <option value="Free Agent">FREE AGENT</option>
-            <option value="Injured">INJURED</option>
-            <option value="Retired">RETIRED</option>
-          </select>
-        </div>
-      </details>
-    </div>
+    <details class="rail" open>
+      <summary>By Status</summary>
+      <div class="inner">
+        <select id="status" class="ghost select-multi" multiple>
+          <option value="Active">ACTIVE</option>
+          <option value="Free Agent">FREE AGENT</option>
+          <option value="Injured">INJURED</option>
+          <option value="Retired">RETIRED</option>
+          <option value="Coach">COACH</option>
+        </select>
+      </div>
+    </details>
   </div>
 </aside>
 
-<!-- AUTH DRAWER -->
+<!-- AUTH -->
 <aside class="drawer-auth" id="drawerAuth" aria-hidden="true" role="dialog" aria-modal="true">
   <div class="drawer-header">
-    <div class="auth-title">Sign Up | Login</div>
+    <div style="font-weight:900;letter-spacing:.12em;text-transform:uppercase;font-size:12px;color:#cbd5e1">Sign Up | Login</div>
     <button class="closebtn" id="closeAuth" aria-label="Close">
       <svg viewBox="0 0 24 24"><path fill="currentColor" d="M6.225 4.811 4.811 6.225 10.586 12l-5.775 5.775 1.414 1.414L12 13.414l5.775 5.775 1.414-1.414L13.414 12l5.775-5.775-1.414-1.414L12 10.586 6.225 4.811z"/></svg>
     </button>
   </div>
-  <div class="auth-body">
+  <div style="padding:12px 12px 22px">
     <label>Email</label>
-    <input class="input" type="email" placeholder="you@example.com"/>
+    <input class="ghost" type="email" placeholder="you@example.com"/>
     <label style="margin-top:10px">Password</label>
-    <input class="input" type="password" placeholder="••••••••"/>
-    <button class="btn-primary">Continue</button>
+    <input class="ghost" type="password" placeholder="••••••••"/>
+    <button class="ghost" style="margin-top:10px;background:#fff;color:#000;font-weight:800;cursor:pointer">Continue</button>
   </div>
 </aside>
 
@@ -490,30 +391,38 @@ body.no-scroll{overflow:hidden}
 
 <footer class="footer">
   <img src="https://i.postimg.cc/v8LxKy54/no-errors-sample-banner.png" alt="Sponsor banner">
-  <div class="build-pill">BUILD: ham-v4.6.0</div>
+  <div class="build-pill">BUILD: ham-v4.6.1</div>
 </footer>
 
 <script>
-/* helpers */
+/* ------- utilities ------- */
 const byId = id => document.getElementById(id);
 function lvlClass(l){return String(l||'').toLowerCase().replace(/\s+/g,'-').replace('aaa','triple-a').replace('aa','double-a')}
 function teamAndParent(p){ const raw=String(p.team||''); const parts=raw.split('—'); const team=(parts[0]||raw).trim(); let parent=(parts[1]||'').trim(); if((p.currentLevel||'').toUpperCase()==='MLB') parent=''; return {team,parent}; }
 function fmtLast3(g){ return `${g.date||'—'} • ${g.opp||'—'} — ${g.line||'—'}`; }
-function formatNextTwoLines(ng){ if(!ng) return ['—','—']; const ds=String(ng.date||'').trim(); const mmdd=(ds.match(/\b(\d{1,2}\/\d{1,2})\b/)||[, '—'])[1]; let time=(ds.match(/(\d{1,2}:\d{2}\s*[AP]M)/i)||[, '—'])[1].toUpperCase(); const tz=(ds.match(/\b(ET|CT|MT|PT|AZ)\b/i)||[, ''])[1]?.toUpperCase()||''; if(tz && !time.includes(tz)) time=`${time} ${tz}`; return [`${mmdd} - ${time}`.trim(), String(ng.opponent||'—').trim()||'—']; }
+function formatNextTwoLines(ng){ if(!ng) return ['—','—']; const ds=String(ng.date||'').trim(); const mmdd=(ds.match(/\b(\d{1,2}\/\d{1,2})\b/)||[, '—'])[1]; let time=(ds.match(/(\d{1,2}:\d{2}\s*[AP]M)/i)||[, '—'])[1]; if(time) time=time.toUpperCase(); const tz=(ds.match(/\b(ET|CT|MT|PT|AZ)\b/i)||[, ''])[1]; const tzU=tz?tz.toUpperCase():''; if(tzU && !time.includes(tzU)) time=`${time} ${tzU}`; return [`${mmdd} - ${time}`.trim(), String(ng.opponent||'—').trim()||'—']; }
 
-/* =================================================================== */
-/* Your roster data: keep your existing playersRaw here                 */
-/* =================================================================== */
-window.playersRaw = window.playersRaw || [
-  /* Fallback sample — replace with your full playersRaw (31 players) */
+/* ------- data (short sample – plug your full 31 here) ------- */
+const playersRaw = [
   { id:"cody-bellinger", name:"CODY BELLINGER", graduatingClass:2013, currentLevel:"MLB", status:"Active",
     position:"CF/1B", team:"New York Yankees",
     frontImg:"https://i.postimg.cc/9F19KG5h/new-york-yankees-outfielder-cody-bellinger.jpg",
     highSchoolImg:"https://i.postimg.cc/Jhq690Lg/01-Bellinger-Front-page-00001.jpg",
     batting:{avg:".284",obp:".345",slg:".520",ops:".865",hits:"150",runs:"95",hr:"35",rbi:"105"},
     nextGame:{opponent:"@ BOSTON RED SOX", date:"7/15 5:10 PM AZ"},
-    last3:[{date:"7/12",opp:"@ BOS",line:"2-4, HR, 2 RBI"}],
-    letterWinnerYears:[2012,2013]
+    last3:[{date:"7/12",opp:"@ BOS",line:"2-4, HR, 2 RBI"},{date:"7/11",opp:"@ BOS",line:"1-3, BB"},{date:"7/10",opp:"vs TOR",line:"0-4"}],
+    letterWinnerYears:[2012,2013],
+    teamName:"New York Yankees", orgOrConf:"MLB"
+  },
+  { id:"patrick-murphy", name:"PATRICK MURPHY", graduatingClass:2013, currentLevel:"KBO", status:"Active",
+    position:"P", team:"KT Wiz Suwon — KBO",
+    frontImg:"https://i.postimg.cc/JnCXccvC/MURPH.avif",
+    highSchoolImg:"https://i.postimg.cc/pdxcG8gz/02-Murphy-Front-page-00001.jpg",
+    pitching:{era:"3.22",so:"71",whip:"1.09",oba:".224",kbb:"3.6",fip:"3.45",ip:"112.0",er:"40",hr:"8",qs:"10",w:"8",sv:"0"},
+    nextGame:{opponent:"vs KIA TIGERS", date:"8/29 2:30AM AZ"},
+    last3:[{date:"8/27",opp:"vs KIA",line:"6.0 IP, 1 ER, 7 K"},{date:"8/23",opp:"@ KIA",line:"5.2 IP, 2 ER, 5 K"},{date:"8/20",opp:"vs SSG",line:"7.0 IP, 0 ER, 8 K"}],
+    letterWinnerYears:[2012,2013],
+    teamName:"KT Wiz Suwon", orgOrConf:"KBO"
   },
   { id:"dom-hamel", name:"DOM HAMEL", graduatingClass:2017, currentLevel:"Triple-A", status:"Active",
     position:"P", team:"Syracuse Mets — New York Mets",
@@ -521,109 +430,71 @@ window.playersRaw = window.playersRaw || [
     highSchoolImg:"https://i.postimg.cc/VLC7zDwX/23-Hamel-Front-page-00001.jpg",
     pitching:{era:"3.89",so:"93",whip:"1.18"},
     nextGame:{date:"8/28 - 3:35 PM AZ", opponent:"@ SCRANTON/ WILKES BARRE"},
-    last3:[{date:"8/26",opp:"@ SWB",line:"1.0 IP, 1 ER, 1 K"}],
-    letterWinnerYears:[2016,2017]
+    last3:[{date:"8/26",opp:"@ SWB",line:"1.0 IP, 1 ER, 1 K"},{date:"8/21",opp:"vs IND",line:"1.0 IP, 7 ER"},{date:"8/15",opp:"@ ROC",line:"1.0 IP, 1 ER"}],
+    letterWinnerYears:[2016,2017],
+    teamName:"Syracuse Mets", orgOrConf:"New York Mets"
+  },
+  { id:"drew-swift", name:"DREW SWIFT", graduatingClass:2017, currentLevel:"Triple-A", status:"Active",
+    position:"SS", team:"Las Vegas Aviators — Athletics",
+    frontImg:"https://i.postimg.cc/GmmSKFsV/AISelect-20250826-023939-Instagram.jpg",
+    highSchoolImg:"https://i.postimg.cc/0j6VMCwR/04-Swift-Front-page-00001.jpg",
+    batting:{avg:".271",obp:".335",slg:".414",ops:".749",hits:"114",runs:"68",hr:"10",rbi:"52",doubles:"24",triples:"3",sb:"18",bb:"41"},
+    nextGame:{ date:"8/28 - 5:05 PM AZ", opponent:"vs. IOWA" },
+    last3:[{date:"08/25",opp:"@ ABQ",line:"2-5, 2B, R"},{date:"08/24",opp:"@ ABQ",line:"1-3, BB, SB"},{date:"08/23",opp:"@ ABQ",line:"0-4"}],
+    letterWinnerYears:[2014,2015,2016,2017],
+    teamName:"Las Vegas Aviators", orgOrConf:"Athletics"
+  },
+  { id:"brock-selvidge", name:"BROCK SELVIDGE", graduatingClass:2021, currentLevel:"Double-A", status:"Active",
+    position:"P", team:"Somerset Patriots — New York Yankees",
+    frontImg:"https://i.postimg.cc/kgSyd4xs/AISelect-20250826-020305-Instagram.jpg",
+    highSchoolImg:"https://i.postimg.cc/vTp3W6r1/22-Selvidge-Front-page-00001.jpg",
+    letterWinnerYears:[2018,2019,2020,2021],
+    teamName:"Somerset Patriots", orgOrConf:"New York Yankees"
+  },
+  { id:"luke-thiele", name:"LUKE THIELE", graduatingClass:2021, currentLevel:"NCAA-D1", status:"Active",
+    position:"IF", team:"Washington State — Pac-12",
+    frontImg:"https://i.postimg.cc/593zLzmD/luke-theil.jpg",
+    highSchoolImg:"https://i.postimg.cc/LXYrnvvj/45-Thiele-Front-page-00001.jpg",
+    letterWinnerYears:[2020,2021],
+    teamName:"Washington State", orgOrConf:"Pac-12"
+  },
+  { id:"tyler-wilson", name:"TYLER WILSON", graduatingClass:2021, currentLevel:"High-A", status:"Active",
+    position:"LF/RF", team:"Hudson Valley Renegades — New York Yankees",
+    frontImg:"https://i.postimg.cc/pXpZqkrg/1756201702161-1.jpg",
+    highSchoolImg:"https://i.postimg.cc/PxXbZQ0V/34-Wilson-Front-page-00001.jpg",
+    letterWinnerYears:[2018,2019,2020],
+    teamName:"Hudson Valley Renegades", orgOrConf:"New York Yankees"
   }
+  // 👉 Continue your remaining 31 here with teamName / orgOrConf if you want the 3-line block populated.
 ];
 
-/* Normalize statuses into Active 2025 / Active 2024 using your map */
-const STATUS_FIX = {
-  "shane-anderson":"Active 2025","dj-barrett":"Active 2025","cody-bellinger":"Active 2025","logan-boyer":"Active 2025",
-  "cooper-brass":"Active 2025","caden-burghardt":"Active 2025","roch-cholowsky":"Active 2025","aj-diaz":"Active 2025",
-  "dom-hamel":"Active 2025","alex-hernandez":"Active 2025","carson-johnson":"Active 2025","zachary-johnston":"Active 2025",
-  "jeremy-jones":"Active 2025","kole-klecker":"Active 2025","ryan-kucherak":"Active 2025","rohan-lettow":"Active 2025",
-  "jeter-mauzey":"Active 2025","patrick-murphy":"Active 2025","shane-murphy":"Active 2025","drew-rogers":"Active 2025",
-  "logan-saloman":"Active 2025","brock-selvidge":"Active 2025","will-shelor":"Active 2025","drew-swift":"Active 2025",
-  "luke-thiele":"Active 2025","josh-tiedemann":"Active 2025","gavin-turley":"Active 2025","zach-wadas":"Active 2025",
-  "braden-watkins":"Active 2025","liam-wilson":"Active 2025","tyler-wilson":"Active 2025",
+const players = [...playersRaw];
 
-  "dustin-bermudez":"Active 2024","michael-brueser":"Active 2024","prince-deboskie":"Active 2024","ryan-figueroa":"Active 2024",
-  "jorge-flores":"Active 2024","kent-hasler":"Active 2024","tanner-holland":"Active 2024","logan-krei":"Active 2024",
-  "jd-mclaughlin":"Active 2024","sean-rackoski":"Active 2024","jackson-smith":"Active 2024","jake-wong":"Active 2024",
-  "justin-wylie":"Active 2024"
-};
-playersRaw.forEach(p=>{
-  const key = (p.id||'').toLowerCase();
-  const fixed = STATUS_FIX[key] || (/^active$/i.test(p.status||'') ? "Active 2025" : null);
-  if (fixed) p.status = fixed;
-});
-
-/* Build working list, default sort oldest→newest */
-const players = [...playersRaw].sort((a,b)=>{
-  const ga = Number(a.graduatingClass)||9999;
-  const gb = Number(b.graduatingClass)||9999;
-  if(ga!==gb) return ga-gb;
-  return (a.name||'').localeCompare(b.name||'');
-});
-
-/* render */
+/* ------- render helpers ------- */
 function letterDots(years){ if(!years||!years.length) return ''; const sorted=[...years].sort((a,b)=>b-a); return `<div class="letters">${sorted.slice(0,4).map(y=>`<span class="letter-dot" title="${y}">${String(y).slice(-2)}</span>`).join('')}</div>`;}
 function makeKV(k,v){ return `<div class="kv"><div class="k">${k}</div><div class="v">${v??'—'}</div></div>`; }
 function makeStats12(p){
   if(p.batting){
     const b=p.batting;
-    return `${makeKV('AVG',b.avg)} ${makeKV('OBP',b.obp)} ${makeKV('SLG',b.slg)} ${makeKV('OPS',b.ops)}
-            ${makeKV('H',b.hits)} ${makeKV('R',b.runs)} ${makeKV('HR',b.hr)} ${makeKV('RBI',b.rbi)}
-            ${makeKV('2B',b.doubles||'—')} ${makeKV('3B',b.triples||'—')} ${makeKV('SB',b.sb||'—')} ${makeKV('BB',b.bb||'—')}`;
+    return `${makeKV('AVG',b.avg)}${makeKV('OBP',b.obp)}${makeKV('SLG',b.slg)}${makeKV('OPS',b.ops)}
+            ${makeKV('H',b.hits)}${makeKV('R',b.runs)}${makeKV('HR',b.hr)}${makeKV('RBI',b.rbi)}
+            ${makeKV('2B',b.doubles||'—')}${makeKV('3B',b.triples||'—')}${makeKV('SB',b.sb||'—')}${makeKV('BB',b.bb||'—')}`;
   }
   const x=p.pitching||{};
-  return `${makeKV('ERA',x.era)} ${makeKV('WHIP',x.whip)} ${makeKV('OBA',x.oba||'—')} ${makeKV('K/BB',x.kbb||'—')}
-          ${makeKV('FIP',x.fip||'—')} ${makeKV('IP',x.ip||'—')} ${makeKV('ER',x.er||'—')} ${makeKV('K',x.so||x.ko||'—')}
-          ${makeKV('QS',x.qs||'—')} ${makeKV('HR',x.hr||'—')} ${makeKV('W',x.w||'—')} ${makeKV('SV',x.sv||'—')}`;
+  return `${makeKV('ERA',x.era)}${makeKV('WHIP',x.whip)}${makeKV('OBA',x.oba||'—')}${makeKV('K/BB',x.kbb||'—')}
+          ${makeKV('FIP',x.fip||'—')}${makeKV('IP',x.ip||'—')}${makeKV('ER',x.er||'—')}${makeKV('K',x.so||x.ko||'—')}
+          ${makeKV('QS',x.qs||'—')}${makeKV('HR',x.hr||'—')}${makeKV('W',x.w||'—')}${makeKV('SV',x.sv||'—')}`;
 }
-
-/* FunZone icon set (8 icons), and Video loads your YouTube */
-const VIDEO_URL = "https://www.youtube.com/embed/z0anHDZ8rz8?rel=0&modestbranding=1&playsinline=1";
-
-/* Tiny SVGs (monotone so active state inverts) */
-const ICONS = {
-  stats:'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M5 3h2v18H5zM11 10h2v11h-2zM17 6h2v15h-2z"/></svg>',
-  news:'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M4 5h16v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5zm2 2v12h12V7H6zm1 1h10v3H7V8z"/></svg>',
-  yat:'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 2 2 7l10 5 10-5-10-5zm0 7-10 5 10 5 10-5-10-5z"/></svg>',
-  nil:'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M3 12a9 9 0 1 0 18 0A9 9 0 0 0 3 12zm8-5h2v10h-2V7z"/></svg>',
-  x:'<svg viewBox="0 0 1200 1227"><path fill="currentColor" d="M714 511 1160 0H996L689 356 420 0H0l463 607L0 1227h164l329-379 286 379h420zM327 120h154l646 873H973z"/></svg>',
-  ig:'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5zm5 5a5 5 0 1 0 .001 10.001A5 5 0 0 0 12 7zm6-2.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z"/></svg>',
-  video:'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M4 6h12a2 2 0 0 1 2 2v1l4-2v10l-4-2v1a2 2 0 0 1-2 2H4zM10 9v6l5-3z"/></svg>',
-  gallery:'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M21 19V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14zM8 13l2.5 3.01L13 13l3 4H5zM8 8a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"/></svg>'
-};
-
-function funzoneToolbar(){
-  // 8 icons, now moved to bottom
-  const keys=['stats','news','yat','nil','x','ig','video','gallery'];
-  return `
-    <div class="tiny-grid" role="tablist" aria-label="Content tabs" data-noflip>
-      ${keys.map((k,i)=>`
-        <button class="tabbtn ${i===0?'active':''}" data-tab="${k}" title="${k.toUpperCase()}" aria-pressed="${i===0?'true':'false'}" data-noflip>
-          ${ICONS[k]}
-        </button>`).join('')}
-    </div>
-    <button class="action-chip flat tab-stats active" data-tab="stats" data-noflip>2025 SEASON STATS</button>
-  `;
-}
-
-function profileBadge(p){
-  const {team,parent}=teamAndParent(p);
-  return `
-  <a class="action-chip ghost profile-chip" href="profile.html?id=${encodeURIComponent(p.id)}" data-noflip
-     style="text-align:left; display:block; white-space:normal;">
-    <div style="font-weight:900; font-size:12px; letter-spacing:.04em;">${(p.name||'').toUpperCase()}</div>
-    <div style="font-size:11px; color:#1f2937; margin-top:2px;">${team||''}</div>
-    <div style="font-size:11px; color:#6b7280; margin-top:0;">${parent||''}</div>
-  </a>`;
-}
-
 function makeCard(p){
   const lvl = lvlClass(p.currentLevel);
   const {team,parent} = teamAndParent(p);
   const [ng1,ng2] = formatNextTwoLines(p.nextGame||{});
+  const profUrl = `profile.html?id=${encodeURIComponent(p.id)}`;
   return `
 <article class="card flip-card front" tabindex="0" aria-label="${(p.name||'').toUpperCase()}">
-  <!-- flip hit areas -->
   <button class="hit left"  data-toggle="prev" aria-label="Flip previous"></button>
   <button class="hit right" data-toggle="next" aria-label="Flip next"></button>
-
   <div class="flip-inner">
-    <!-- FRONT -->
     <section class="face front-face">
       <img class="card-img" src="${(p.frontImg||p.highSchoolImg||'')}" alt="${p.name}" onerror="this.onerror=null;this.style.display='none'">
       <div class="bottom-grad"></div>
@@ -634,7 +505,7 @@ function makeCard(p){
         <div class="spacer-6"></div>
         <div class="stack">
           ${p.currentLevel?`<span class="chip level ${lvl}">${String(p.currentLevel).toUpperCase()}</span>`:''}
-          ${p.status?`<span class="chip status ${String(p.status).toLowerCase().includes('retired')?'retired':''}">${String(p.status).toUpperCase()}</span>`:''}
+          ${p.status?`<span class="chip status ${String(p.status).toLowerCase()==='retired'?'retired':''}">${String(p.status).toUpperCase()}</span>`:''}
           ${p.graduatingClass?`<span class="chip class">CLASS OF ${p.graduatingClass}</span>`:''}
         </div>
         ${letterDots(p.letterWinnerYears)}
@@ -652,39 +523,64 @@ function makeCard(p){
       </div>
     </section>
 
-    <!-- BACK -->
     <section class="face back-face">
       <div class="back-top">
         <div class="back-left">
-          <!-- Name appears here ONLY once now via profile badge -->
-          <div class="tiny-bar" data-noflip>
-            ${funzoneToolbar()}
-          </div>
+          <h3 class="stats-name">${(p.name||'').toUpperCase()}</h3>
+          <div class="team-line">${team||''}</div>
+          <div class="parent-line">${parent||''}</div>
         </div>
-        <div class="back-right">
+        <div class="back-right" style="position:relative">
           <div class="hs-box" aria-hidden="true">
             <img src="${(p.highSchoolImg||p.frontImg||'')}" alt="${(p.name||'HS')}" onerror="this.onerror=null;this.style.display='none'">
           </div>
-          ${profileBadge(p)}
-        </div>
-      </div>
-      <div class="back-bottom" data-noflip>
-        <div class="pane pane-stats active" data-pane="stats"><div class="kv-wrap12">${makeStats12(p)}</div></div>
-        <div class="pane pane-news" data-pane="news"><div style="color:#6b7280">Latest headlines placeholder.</div></div>
-        <div class="pane pane-yat" data-pane="yat"><div style="color:#6b7280">YAT-A-BOY! virtual gifting CTA.</div></div>
-        <div class="pane pane-nil" data-pane="nil"><div style="color:#6b7280">NIL point totals placeholder.</div></div>
-        <div class="pane pane-x" data-pane="x"><div style="color:#6b7280">X/Twitter posts placeholder.</div></div>
-        <div class="pane pane-ig" data-pane="ig"><div style="color:#6b7280">Instagram posts placeholder.</div></div>
-        <div class="pane pane-video" data-pane="video">
-          <div style="position:relative;padding-top:56.25%;background:#000;border-radius:8px;overflow:hidden">
-            <iframe src="${VIDEO_URL}"
-              title="YATSTATS Video"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-              allowfullscreen
-              style="position:absolute;inset:0;width:100%;height:100%;border:0"></iframe>
+          <!-- 3-line profile link (no duplicate name elsewhere) -->
+          <div class="profile-info" data-noflip>
+            <a class="profile-link" href="${profUrl}">
+              <div class="p-line1">${p.name||''}</div>
+              <div class="p-line2">${p.teamName||team||''}</div>
+              <div class="p-line3">${p.orgOrConf||parent||''}</div>
+            </a>
           </div>
         </div>
-        <div class="pane pane-gallery" data-pane="gallery"><div style="color:#6b7280">Photo gallery placeholder.</div></div>
+      </div>
+
+      <div class="back-bottom" data-noflip>
+        <div class="pane pane-stats active" data-pane="stats"><div class="kv-wrap12">${makeStats12(p)}</div></div>
+        <div class="pane pane-news" data-pane="news"><div style="color:#9aa1ab">Latest headlines placeholder.</div></div>
+        <div class="pane pane-x" data-pane="x"><div style="color:#9aa1ab">X feed placeholder.</div></div>
+        <div class="pane pane-ig" data-pane="ig"><div style="color:#9aa1ab">Instagram feed placeholder.</div></div>
+        <div class="pane pane-gifts" data-pane="gifts"><div style="color:#9aa1ab">YAT-A-BOY! gifting / NIL points placeholder.</div></div>
+        <div class="pane pane-video" data-pane="video"><div style="color:#9aa1ab">Video placeholder.</div></div>
+        <div class="pane pane-gallery" data-pane="gallery"><div style="color:#9aa1ab">Photo gallery placeholder.</div></div>
+
+        <!-- 8-icon bar -->
+        <div class="funbar" data-noflip>
+          <button class="funbtn active" data-tab="stats" title="Season/Career Stats" aria-label="Stats">
+            <svg viewBox="0 0 24 24"><path fill="currentColor" d="M5 3h2v18H5zM11 10h2v11h-2zM17 6h2v15h-2z"/></svg>
+          </button>
+          <button class="funbtn" data-tab="news" title="News" aria-label="News">
+            <svg viewBox="0 0 24 24"><path fill="currentColor" d="M3 5h18v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5zm2 2v12h14V7H5z"/></svg>
+          </button>
+          <button class="funbtn" data-tab="gifts" title="YAT-A-BOY!" aria-label="YAT-A-BOY!">
+            <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 21s8-4.5 8-10a5 5 0 0 0-9-3A5 5 0 0 0 4 11c0 5.5 8 10 8 10z"/></svg>
+          </button>
+          <button class="funbtn" data-tab="x" title="X Feed" aria-label="X Feed">
+            <svg viewBox="0 0 1200 1227"><path fill="currentColor" d="M714 511 1160 0H996L689 356 420 0H0l463 607L0 1227h164l329-379 286 379h420zM327 120h154l646 873H973z"/></svg>
+          </button>
+          <button class="funbtn" data-tab="ig" title="Instagram" aria-label="Instagram">
+            <svg viewBox="0 0 24 24"><path fill="currentColor" d="M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5zm5 5a5 5 0 1 0 .001 10.001A5 5 0 0 0 12 7zm6-2.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z"/></svg>
+          </button>
+          <button class="funbtn" data-tab="video" title="Video" aria-label="Video">
+            <svg viewBox="0 0 24 24"><path fill="currentColor" d="M4 5h12a2 2 0 0 1 2 2v2l4-2v10l-4-2v2a2 2 0 0 1-2 2H4z"/></svg>
+          </button>
+          <button class="funbtn" data-tab="gallery" title="Gallery" aria-label="Gallery">
+            <svg viewBox="0 0 24 24"><path fill="currentColor" d="M21 19V5a2 2 0 0 0-2-2H5C3.9 3 3 3.9 3 5v14a2 2 0 0 0 2 2h14c1.1 0 2-.9 2-2zM8 13l2.5 3 3.5-4.5 4.5 6H6l2-4.5zM8 8.5A1.5 1.5 0 1 0 8 11a1.5 1.5 0 0 0 0-2.5z"/></svg>
+          </button>
+          <button class="funbtn" data-tab="stats" title="Back to Stats" aria-label="Back to Stats">
+            <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 8l-6 6h12z"/></svg>
+          </button>
+        </div>
       </div>
     </section>
   </div>
@@ -692,63 +588,67 @@ function makeCard(p){
 }
 function render(list){ byId('grid').innerHTML = list.map(makeCard).join(''); attachInteractions(); }
 
-/* filters */
+/* ------- filters & defaults ------- */
 const LEVEL_ORDER = ["MLB","TRIPLE-A","DOUBLE-A","HIGH-A","LOW-A","ROOKIE","INDY","NCAA","NCAA-D1","NCAA-D2","NCAA-D3","NAIA","JUCO"];
 function yearsRange(start,end){const arr=[]; for(let y=start;y>=end;y--) arr.push(y); return arr;}
 function uniqueSortedGradYears(){ const set=new Set(players.map(p=>p.graduatingClass).filter(Boolean)); const have=[...set].map(Number); const want=yearsRange(2025,2000); return [...new Set([...want,...have])]; }
 function uniqueRosterYears(){ const set=new Set(); players.forEach(p=>(p.letterWinnerYears||[]).forEach(y=>set.add(Number(y)))); const have=[...set]; const want=yearsRange(2025,2000); return [...new Set([...want,...have])]; }
-function populateFilters(){
-  const lSel=byId('lvl'); lSel.innerHTML=''; LEVEL_ORDER.forEach(L=>{const o=document.createElement('option');o.value=L;o.textContent=L;lSel.appendChild(o);});
-  const gSel=byId('grad'); gSel.innerHTML=''; uniqueSortedGradYears().forEach(y=>{const o=document.createElement('option');o.value=String(y);o.textContent=y;gSel.appendChild(o);});
-  const rSel=byId('roster'); rSel.innerHTML=''; uniqueRosterYears().forEach(y=>{const o=document.createElement('option');o.value=String(y);o.textContent=y;rSel.appendChild(o);});
-}
-function getMultiValues(id){
-  const sel=byId(id);
-  if(!sel) return [];
-  return [...sel.options].filter(o=>o.selected && o.value!=='__ALL__').map(o=>o.value);
-}
 
-/* Default view: treat any "active*" as active */
-function isActive(p){ return /\bactive\b/i.test(String(p.status||'')); }
-const ACTIVE_BASE = players.filter(isActive);
-
-/* default oldest→newest (ties by name) */
+function isActive(p){ return String(p.status||'').toLowerCase()==='active'; }
 function sortByGradAsc(list){
   return [...list].sort((a,b)=>{
-    const ga=Number(a.graduatingClass)||9999, gb=Number(b.graduatingClass)||9999;
-    if(ga!==gb) return ga-gb;
+    const ga = Number(a.graduatingClass) || 9999;
+    const gb = Number(b.graduatingClass) || 9999;
+    if (ga !== gb) return ga - gb;
     return (a.name||'').localeCompare(b.name||'');
   });
 }
+const ACTIVE_BASE = players.filter(isActive);
 
+function addSelectAllOption(sel){
+  if (!sel) return;
+  const first = document.createElement('option');
+  first.value = '__ALL__';
+  first.textContent = 'ALL';
+  first.dataset.isAll = '1';
+  sel.insertBefore(first, sel.firstChild);
+  sel.addEventListener('change', () => {
+    const pickedAll = [...sel.selectedOptions].some(o => o.value === '__ALL__');
+    if (pickedAll){
+      [...sel.options].forEach(o => { if (o.value !== '__ALL__') o.selected = true; });
+      first.selected = false;
+    }
+  });
+}
+function populateFilters(){
+  const lSel=byId('lvl'); if(lSel){ lSel.innerHTML=''; LEVEL_ORDER.forEach(L=>{const o=document.createElement('option');o.value=L;o.textContent=L;lSel.appendChild(o)}); addSelectAllOption(lSel); }
+  const gSel=byId('grad'); if(gSel){ gSel.innerHTML=''; uniqueSortedGradYears().forEach(y=>{const o=document.createElement('option');o.value=String(y);o.textContent=y;gSel.appendChild(o)}); addSelectAllOption(gSel); }
+  const rSel=byId('roster'); if(rSel){ rSel.innerHTML=''; uniqueRosterYears().forEach(y=>{const o=document.createElement('option');o.value=String(y);o.textContent=y;rSel.appendChild(o)}); addSelectAllOption(rSel); }
+  const sSel=byId('status'); if(sSel) addSelectAllOption(sSel);
+}
+function getMultiValues(id){
+  const sel=byId(id); if(!sel) return [];
+  return [...sel.options].filter(o=>o.selected && o.value!=='__ALL__').map(o=>o.value);
+}
 function applyFilters(){
   const qLeft=(byId('localSearch')?.value||'').toLowerCase().trim();
   const qRight=(byId('filterName')?.value||'').toLowerCase().trim();
   const q=qRight||qLeft;
-
   const levels=getMultiValues('lvl').map(s=>s.toUpperCase());
   const grads=getMultiValues('grad');
   const years=getMultiValues('roster').map(Number);
   const stats=getMultiValues('status').map(s=>s.toLowerCase());
 
-  const usingAnyFilter = q || levels.length || grads.length || years.length || stats.length;
-  const base = usingAnyFilter ? players : ACTIVE_BASE;
+  // When any filters are used, search across ALL players (active+retired).
+  const base = players;
 
   const out=base.filter(p=>{
     const name=(p.name||'').toLowerCase();
     if(q && !name.includes(q)) return false;
-    if(levels.length){
-      const L=String(p.currentLevel||'').toUpperCase().replace('AAA','TRIPLE-A').replace('AA','DOUBLE-A');
-      if(!levels.includes(L)) return false;
-    }
-    if(grads.length && !grads.includes(String(p.graduatingClass||''))) return false;
-    if(years.length){
-      const lw=(p.letterWinnerYears||[]).map(Number);
-      if(!lw.some(y=>years.includes(y))) return false;
-    }
-    if(stats.length){
-      if(!stats.includes(String(p.status||'').toLowerCase())) return false;
-    }
+    if(levels.length){ const L=String(p.currentLevel||'').toUpperCase().replace('AAA','TRIPLE-A').replace('AA','DOUBLE-A'); if(!levels.includes(L)) return false; }
+    if(grads.length && !grads.includes(String(p.graduatingClass))) return false;
+    if(years.length){ const lw=(p.letterWinnerYears||[]).map(Number); if(!lw.some(y=>years.includes(y))) return false; }
+    if(stats.length){ if(!stats.includes(String(p.status||'').toLowerCase())) return false; }
     return true;
   });
 
@@ -761,35 +661,30 @@ function resetAll(){
   render(sortByGradAsc(ACTIVE_BASE));
 }
 
-/* interactions */
-const INTERACTIVE_SEL='[data-noflip], .tabbtn, .action-chip, a,button,input,select,textarea';
+/* ------- interactions (flip + tabs + drawers) ------- */
+const INTERACTIVE_SEL='[data-noflip], .tabbtn, .action-chip, .funbtn, a, button, input, select, textarea';
+
 function toggle(card){ if(!card) return; card.classList.contains('front') ? (card.classList.remove('front'),card.classList.add('back')) : (card.classList.remove('back'),card.classList.add('front')); }
+
 function attachInteractions(){
   document.querySelectorAll('.card').forEach(c=>{ if(!c.classList.contains('front')&& !c.classList.contains('back')) c.classList.add('front'); });
-  // Click on edge hits to flip
   document.querySelectorAll('.card .hit').forEach(hit=>{
     hit.addEventListener('click', e=>{ if(e.target.closest(INTERACTIVE_SEL)) return; toggle(hit.closest('.card')); });
   });
-  // Swipe to flip (touch)
+  // swipe left/right flips
   let sx=0, swc=null;
   document.querySelectorAll('.card').forEach(card=>{
     card.addEventListener('touchstart', e=>{ if(e.target.closest(INTERACTIVE_SEL)) { swc=null; return; } swc=card; sx=e.touches[0].clientX; },{passive:true});
     card.addEventListener('touchend', e=>{ if(!swc) return; const dx=e.changedTouches[0].clientX-sx; if(Math.abs(dx)>40) toggle(swc); swc=null; });
   });
-  // FunZone tabs + title chip
-  document.querySelectorAll('.tiny-grid, .tab-stats').forEach(container=>{
-    container.addEventListener('click', (e)=>{
-      const btn=e.target.closest('.tabbtn, .action-chip.flat'); if(!btn) return;
-      e.stopPropagation();
-      const card=btn.closest('.card'); const pane=btn.dataset.tab||'stats';
-      // toggle active buttons
-      card.querySelectorAll('.tabbtn').forEach(b=>{
-        const on = b.dataset.tab===pane || (pane==='stats' && b.dataset.tab==='stats');
-        b.classList.toggle('active', on);
-        b.setAttribute('aria-pressed', on?'true':'false');
-      });
-      const statsChip=card.querySelector('.action-chip.flat.tab-stats'); if(statsChip) statsChip.classList.toggle('active', pane==='stats');
-      // show pane
+
+  // Funbar tabs
+  document.querySelectorAll('.funbar').forEach(bar=>{
+    bar.addEventListener('click', (e)=>{
+      const btn=e.target.closest('.funbtn'); if(!btn) return;
+      const card=btn.closest('.card');
+      const pane=btn.dataset.tab||'stats';
+      card.querySelectorAll('.funbtn').forEach(b=>b.classList.toggle('active', b===btn));
       card.querySelectorAll('.pane').forEach(p=>p.classList.toggle('active', p.dataset.pane===pane));
     },true);
   });
@@ -801,19 +696,13 @@ const drawerLeft=byId('drawerLeft'); const drawerRight=byId('drawerRight'); cons
 const iconSearch=byId('iconSearch'); const iconFilter=byId('iconFilter'); const iconReset=byId('iconReset'); const iconProfile=byId('iconProfile');
 let lastFocus=null;
 function setActiveIcon(btn,a){ btn?.classList.toggle('active',!!a); }
-
-function openLeft(){ closeRight(false); closeAuth(false); lastFocus=document.activeElement; drawerLeft.classList.add('open'); scrim.classList.add('open'); document.body.classList.add('no-scroll'); setActiveIcon(iconSearch,true); setActiveIcon(iconFilter,false); setActiveIcon(iconProfile,false); }
-function closeLeft(focus=true){ drawerLeft.classList.remove('open'); if(!drawerRight.classList.contains('open')&&!drawerAuth.classList.contains('open')){ scrim.classList.remove('open'); document.body.classList.remove('no-scroll'); } setActiveIcon(iconSearch,false); if(focus) lastFocus?.focus?.(); }
-
-function openRight(){ closeLeft(false); closeAuth(false); lastFocus=document.activeElement; drawerRight.classList.add('open'); scrim.classList.add('open'); document.body.classList.add('no-scroll'); setActiveIcon(iconFilter,true); setActiveIcon(iconSearch,false); setActiveIcon(iconProfile,false); }
-function closeRight(focus=true){ drawerRight.classList.remove('open'); if(!drawerLeft.classList.contains('open')&&!drawerAuth.classList.contains('open')){ scrim.classList.remove('open'); document.body.classList.remove('no-scroll'); } setActiveIcon(iconFilter,false); if(focus) lastFocus?.focus?.(); }
-
-function openAuth(){ closeLeft(false); closeRight(false); lastFocus=document.activeElement; drawerAuth.classList.add('open'); scrim.classList.add('open'); document.body.classList.add('no-scroll'); setActiveIcon(iconProfile,true); setActiveIcon(iconSearch,false); setActiveIcon(iconFilter,false); }
-function closeAuth(focus=true){ drawerAuth.classList.remove('open'); if(!drawerLeft.classList.contains('open')&&!drawerRight.classList.contains('open')){ scrim.classList.remove('open'); document.body.classList.remove('no-scroll'); } setActiveIcon(iconProfile,false); if(focus) lastFocus?.focus?.(); }
-
+function openLeft(){ closeRight(false); closeAuth(false); lastFocus=document.activeElement; drawerLeft.classList.add('open'); scrim.classList.add('open'); setActiveIcon(iconSearch,true); setActiveIcon(iconFilter,false); setActiveIcon(iconProfile,false); }
+function closeLeft(focus=true){ drawerLeft.classList.remove('open'); if(!drawerRight.classList.contains('open')&&!drawerAuth.classList.contains('open')){ scrim.classList.remove('open'); } setActiveIcon(iconSearch,false); if(focus) lastFocus?.focus?.(); }
+function openRight(){ closeLeft(false); closeAuth(false); lastFocus=document.activeElement; drawerRight.classList.add('open'); scrim.classList.add('open'); setActiveIcon(iconFilter,true); setActiveIcon(iconSearch,false); setActiveIcon(iconProfile,false); }
+function closeRight(focus=true){ drawerRight.classList.remove('open'); if(!drawerLeft.classList.contains('open')&&!drawerAuth.classList.contains('open')){ scrim.classList.remove('open'); } setActiveIcon(iconFilter,false); if(focus) lastFocus?.focus?.(); }
+function openAuth(){ closeLeft(false); closeRight(false); lastFocus=document.activeElement; drawerAuth.classList.add('open'); scrim.classList.add('open'); setActiveIcon(iconProfile,true); setActiveIcon(iconSearch,false); setActiveIcon(iconFilter,false); }
+function closeAuth(focus=true){ drawerAuth.classList.remove('open'); if(!drawerLeft.classList.contains('open')&&!drawerRight.classList.contains('open')){ scrim.classList.remove('open'); } setActiveIcon(iconProfile,false); if(focus) lastFocus?.focus?.(); }
 function closeDrawers(){ closeLeft(false); closeRight(false); closeAuth(); }
-
-/* binds */
 byId('openLeft').addEventListener('click', openLeft);
 byId('closeLeft').addEventListener('click', ()=>closeLeft());
 byId('closeRight').addEventListener('click', ()=>closeRight());
@@ -823,44 +712,26 @@ iconFilter.addEventListener('click', openRight);
 iconProfile.addEventListener('click', openAuth);
 iconReset.addEventListener('click', resetAll);
 scrim.addEventListener('click', closeDrawers);
-
-/* ESC */
 document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') closeDrawers(); });
 
-/* swipe-close drawers */
-function addSwipeClose(el,dir){ let sx=null,sy=null;
-  el.addEventListener('touchstart', e=>{ sx=e.touches[0].clientX; sy=e.touches[0].clientY; },{passive:true});
-  el.addEventListener('touchend', e=>{ if(sx==null) return; const dx=e.changedTouches[0].clientX-sx; const dy=e.changedTouches[0].clientY-sy;
-    if(Math.abs(dx)>40 && Math.abs(dx)>Math.abs(dy)){ if(dir==='left'&&dx<0) closeLeft(); if(dir==='right'&&dx>0){ el===drawerAuth?closeAuth():closeRight(); } }
-    sx=sy=null;
-  });
-}
-addSwipeClose(drawerLeft,'left'); addSwipeClose(drawerRight,'right'); addSwipeClose(drawerAuth,'right');
+/* right drawer: By Player filter (auto-close on Enter) */
+byId('filterName').addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ e.preventDefault(); applyFilters(); closeRight(); } });
 
-/* left drawer live search w/ debounce */
+/* left drawer search */
 const localSearch=byId('localSearch'); const localResults=byId('localResults');
 function renderLocalResults(q){
   localResults.innerHTML=''; if(!q) return;
   players.filter(p=>(p.name||'').toLowerCase().includes(q.toLowerCase())).slice(0,50).forEach(p=>{
     const li=document.createElement('li'); const yr=p.graduatingClass?` (Class of ${p.graduatingClass})`:''; li.textContent=`${p.name}${yr}`;
+    li.style.padding='8px 6px'; li.style.borderRadius='8px'; li.style.cursor='pointer';
+    li.addEventListener('mouseenter',()=>li.style.background='#121826'); li.addEventListener('mouseleave',()=>li.style.background='transparent');
     li.addEventListener('click', ()=>{ window.location.href=`profile.html?id=${encodeURIComponent(p.id)}`; closeLeft(); });
     localResults.appendChild(li);
   });
 }
-if(localSearch){
-  localSearch.addEventListener('input', (e)=>{ clearTimeout(localSearch._t); localSearch._t=setTimeout(()=>renderLocalResults(e.target.value), 90);});
-}
+localSearch.addEventListener('input', (e)=>renderLocalResults(e.target.value));
 
-/* right drawer: By Player Enter auto-apply & close */
-byId('filterName').addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ e.preventDefault(); applyFilters(); closeRight(); } });
-
-/* filters: instant apply */
-['lvl','grad','roster','status'].forEach(id=>{
-  const el = byId(id);
-  if (el) el.addEventListener('change', applyFilters);
-});
-
-/* Splash init */
+/* Splash show (mobile/tablet only) */
 function runSplash(){
   const isSmall = window.matchMedia('(max-width: 1024px)').matches;
   const splash = document.getElementById('splash');
@@ -869,23 +740,28 @@ function runSplash(){
   splash.classList.add('show');
 
   const sfx = document.getElementById('splashSfx');
-  if (sfx && sfx.querySelector('source')){
-    sfx.play().catch(()=>{
-      const one = ()=>{ sfx.play().finally(()=>{
-        window.removeEventListener('pointerdown',one,true);
-        window.removeEventListener('keydown',one,true);
-      })};
-      window.addEventListener('pointerdown',one,true);
-      window.addEventListener('keydown',one,true);
+  const tryPlay = () => {
+    if(!sfx || !sfx.querySelector('source')) return;
+    sfx.play().catch(() => {
+      const oneShot = () => { sfx.play().finally(()=>{ window.removeEventListener('pointerdown', oneShot, true); window.removeEventListener('keydown', oneShot, true); }); };
+      window.addEventListener('pointerdown', oneShot, true);
+      window.addEventListener('keydown', oneShot, true);
     });
-  }
-  setTimeout(()=>{ splash.classList.add('hide'); setTimeout(()=>splash.remove(),520); }, 1200);
+  };
+  tryPlay();
+
+  setTimeout(() => {
+    splash.classList.add('hide');
+    setTimeout(() => splash.remove(), 520);
+  }, 1200);
 }
 
 /* boot */
 document.addEventListener('DOMContentLoaded', ()=>{
+  // drawers closed by default
+  ['drawerLeft','drawerRight','drawerAuth'].forEach(id=>{ const el=byId(id); if(el) el.classList.remove('open'); });
   populateFilters();
-  // default: Active only (Active 2025 + Active 2024), oldest -> newest
+  // Default: Active only, oldest→newest (Cody first)
   render(sortByGradAsc(ACTIVE_BASE));
   runSplash();
 });
