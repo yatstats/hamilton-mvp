@@ -25,8 +25,10 @@ img{max-width:100%;display:block}
 /* ---------- HEADER ---------- */
 .site-header{
   position:fixed;inset:0 0 auto 0;height:var(--headerH);z-index:60;background:#000;border-bottom:1px solid var(--ring);
-  display:grid;grid-template-columns:auto 1fr auto;gap:8px;padding:8px 10px 6px;
-  align-items:start;
+  display:flex; flex-direction:column; gap:8px; padding:8px 10px 6px;
+}
+.header-top-content {
+  display:flex; justify-content:space-between; align-items:flex-start; width:100%;
 }
 .h-left{display:flex;flex-direction:column;gap:8px;min-width:0;align-items:flex-start;}
 .top-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
@@ -36,7 +38,7 @@ img{max-width:100%;display:block}
 .hdr-icon.active{background:#fff}.hdr-icon.active svg{color:#000}
 
 /* Hamilton block */
-.h-logos{display:flex;align-items:flex-end;gap:8px}
+.h-logos{display:flex;align-items:center;gap:8px}
 .ham-brand{display:flex;gap:6px;align-items:center;}
 .ham-logo{height:80px;width:auto}
 .ham-type{line-height:1;display:flex;flex-direction:column;gap:2px;}
@@ -45,7 +47,10 @@ img{max-width:100%;display:block}
 .ham-line3{font-family:"Anton",sans-serif;font-size:19px;letter-spacing:.01em;margin-top:0;}
 
 /* center nav (desktop) */
-.nav-desktop{display:flex;gap:16px;align-self:center;justify-self:center;flex-wrap:wrap}
+.nav-desktop{
+  position:absolute; top: 50%; left:50%; transform:translate(-50%,-50%);
+  display:flex;gap:16px;align-self:center;justify-self:center;flex-wrap:wrap
+}
 @media (max-width:1260px){ .nav-desktop{display:none} }
 .font-slim{font-family:"Roboto Condensed",sans-serif;font-weight:300}
 .font-strong{font-family:"Anton",sans-serif}
@@ -55,8 +60,7 @@ img{max-width:100%;display:block}
 
 /* right logo */
 .h-right{display:flex;align-items:flex-start;min-width:0}
-.ystats-logo{height:36px;width:auto;object-fit:contain;max-width:40vw}
-@media (max-width:520px){ .ystats-logo{height:28px;max-width:54vw} }
+.ystats-logo{height:36px;width:auto;object-fit:contain;}
 
 /* ---------- TAGLINE ---------- */
 .tagline-wrap{position:sticky;top:var(--headerH);z-index:40;background:#000;border-bottom:1px solid var(--ring)}
@@ -196,48 +200,74 @@ body.no-scroll{overflow:hidden}
 /* utility */
 .hidden{display:none !important}
 
-/* ---------- HEADER RESPONSIVENESS (ADDED) ---------- */
+/* ---------- HEADER RESPONSIVENESS ---------- */
 @media (max-width: 640px) {
   :root {
     --headerH: 100px;
   }
+  .site-header {
+    position:relative;
+    flex-direction:row;
+    justify-content:space-between;
+    align-items:flex-start;
+  }
+  .header-top-content {
+    order:1;
+    width:auto;
+  }
+  .h-left {
+    order:2;
+    width:100%;
+  }
+  .h-right {
+    order: 3;
+    width:auto;
+  }
   .ham-logo {
     height: 50px;
   }
-  .ham-type {
-    display: none;
-  }
   .top-row {
-    gap: 4px;
+    gap: 2px;
   }
   .ystats-logo {
     height: 30px;
   }
+  .ham-line2 { font-size: 15px; }
+  .ham-line3 { font-size: 16px; }
+}
+
+@media (max-width: 420px) {
+    .ham-type { display: none; }
 }
 </style>
 </head>
 <body>
 
 <header class="site-header">
+  <div class="header-top-content">
+      <div class="top-row">
+        <button class="hambtn" id="openLeft" aria-label="Open Navigation">
+          <svg viewBox="0 0 24 24"><path fill="currentColor" d="M3 6h18v2H3zM3 11h18v2H3zM3 16h18v2H3z"/></svg>
+        </button>
+        <button class="hdr-icon" id="iconProfile" aria-label="Account" title="Account">
+          <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm0 2c-4.2 0-8 2.1-8 5v1h16v-1c0-2.9-3.8-5-8-5z"/></svg>
+        </button>
+        <button class="hdr-icon" id="iconSearch" aria-label="Search" title="Search">
+          <svg viewBox="0 0 24 24"><path fill="currentColor" d="M11 4a7 7 0 1 1 0 14 7 7 0 0 1 0-14zm9.7 15.3-3.4-3.4a9 9 0 1 0-1.4 1.4l3.4 3.4a1 1 0 0 0 1.4-1.4z"/></svg>
+        </button>
+        <button class="hdr-icon" id="iconFilter" aria-label="Filters" title="Filters">
+          <svg viewBox="0 0 24 24"><path fill="currentColor" d="M3 5h18l-6.5 7.5V20l-5-2v-5.5L3 5z"/></svg>
+        </button>
+        <button class="hdr-icon" id="iconReset" aria-label="Reset" title="Reset">
+          <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 5V2L8 6l4 4V7a5 5 0 1 1-5 5H5a7 7 0 1 0 7-7z"/></svg>
+        </button>
+      </div>
+      <div class="h-right">
+        <img class="ystats-logo" id="ystatsLogo" src="https://i.postimg.cc/C5mwXpQy/35878-20250830-222027-0000.png" alt="YAT?STATS"/>
+      </div>
+  </div>
+  
   <div class="h-left">
-    <div class="top-row">
-      <button class="hambtn" id="openLeft" aria-label="Open Navigation">
-        <svg viewBox="0 0 24 24"><path fill="currentColor" d="M3 6h18v2H3zM3 11h18v2H3zM3 16h18v2H3z"/></svg>
-      </button>
-      <button class="hdr-icon" id="iconProfile" aria-label="Account" title="Account">
-        <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm0 2c-4.2 0-8 2.1-8 5v1h16v-1c0-2.9-3.8-5-8-5z"/></svg>
-      </button>
-      <button class="hdr-icon" id="iconSearch" aria-label="Search" title="Search">
-        <svg viewBox="0 0 24 24"><path fill="currentColor" d="M11 4a7 7 0 1 1 0 14 7 7 0 0 1 0-14zm9.7 15.3-3.4-3.4a9 9 0 1 0-1.4 1.4l3.4 3.4a1 1 0 0 0 1.4-1.4z"/></svg>
-      </button>
-      <button class="hdr-icon" id="iconFilter" aria-label="Filters" title="Filters">
-        <svg viewBox="0 0 24 24"><path fill="currentColor" d="M3 5h18l-6.5 7.5V20l-5-2v-5.5L3 5z"/></svg>
-      </button>
-      <button class="hdr-icon" id="iconReset" aria-label="Reset" title="Reset">
-        <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 5V2L8 6l4 4V7a5 5 0 1 1-5 5H5a7 7 0 1 0 7-7z"/></svg>
-      </button>
-    </div>
-
     <div class="h-logos">
       <div class="ham-brand">
         <img class="ham-logo" id="hamLogo" src="https://i.postimg.cc/2jwjVn8H/32900-20250830-222044-0000.png" alt="Hamilton H"/>
@@ -259,9 +289,6 @@ body.no-scroll{overflow:hidden}
     <a href="#" class="font-slim nav-slim">PCDACTION</a><a href="#" class="font-strong nav-strong">PARTNER PROGRAM</a>
   </nav>
 
-  <div class="h-right">
-    <img class="ystats-logo" id="ystatsLogo" src="https://i.postimg.cc/C5mwXpQy/35878-20250830-222027-0000.png" alt="YAT?STATS"/>
-  </div>
 </header>
 
 <div class="tagline-wrap">
@@ -369,7 +396,7 @@ body.no-scroll{overflow:hidden}
 </main>
 
 <footer class="footer">
-  <div class="build-pill">BUILD: ham-v4.6.5</div>
+  <div class="build-pill">BUILD: ham-v4.6.6</div>
 </footer>
 
 <div id="splash" class="splash" aria-hidden="true">
