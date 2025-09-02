@@ -3,104 +3,93 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>hamilton.yatstats.com — WHERE THEY YAT?</title>
+<title>hamilton.yatstats.com — WHERE THEY YAT? (ham-v4.5.0)</title>
 
 <style>
 :root{
-  --maroon:#7A0019; --ring:#2b2f36; --bg:#0b0d12; --panel:#10141b; --ink:#f8fafc; --muted:#9aa1ab;
-  --ink2:#d6d8dd; --accent:#ffffff; --headerH:112px;
+  --maroon:#7A0019; --ring:#2a2e35; --bg:#0f1115; --ink:#e5e7eb; --muted:#9aa1ab;
+  --panel:#12161d; --chip:#1b2130; --headerH:112px;
 }
 *{box-sizing:border-box}
 html,body{margin:0;padding:0}
-body{background:var(--bg);font:15px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,"Apple Color Emoji","Segoe UI Emoji";color:var(--ink)}
-a{text-decoration:none;color:inherit}
+body{background:var(--bg);color:var(--ink);font:15px/1.45 ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial,"Apple Color Emoji","Segoe UI Emoji"}
+
+a{color:inherit;text-decoration:none}
 button{font:inherit;color:inherit}
 
-/* HEADER */
+/* ---------- HEADER ---------- */
 .site-header{
   position:fixed; inset:0 0 auto 0; height:var(--headerH); z-index:60;
-  background:#0e1117; border-bottom:1px solid var(--ring);
-  display:grid; grid-template-rows:auto auto; gap:6px; padding:8px 10px 6px;
+  background:#0b0f14; border-bottom:1px solid var(--ring);
+  display:grid; grid-template-columns:auto 1fr auto; gap:10px; padding:8px 10px 6px;
 }
 
-/* Top icon row */
-.h-top{display:flex; align-items:center; gap:10px}
-.hambtn{width:36px;height:36px;border:0;background:transparent;display:grid;place-items:center;cursor:pointer}
-.hdr-icons{display:flex;gap:8px;align-items:center}
-.hdr-icon{width:40px;height:40px;padding:0;border:0;background:transparent;border-radius:8px;display:grid;place-items:center;cursor:pointer}
-.hdr-icon svg{width:20px;height:20px;color:var(--ink)}
-.hdr-icon:hover{background:rgba(255,255,255,.06)}
-.hdr-icon:focus-visible{outline:2px solid #fff;outline-offset:2px;border-radius:8px}
-.hdr-icon.active{background:#fff}
-.hdr-icon.active svg{color:#000}
+/* Top icon row (left) ------------------------------------------------------ */
+.h-left{min-width:0}
+.top-row{display:flex;align-items:center;gap:8px}
+.hambtn,.hdr-icon{width:36px;height:36px;padding:0;border:0;background:transparent;border-radius:8px;display:grid;place-items:center;cursor:pointer}
+.hambtn svg,.hdr-icon svg{width:20px;height:20px}
+.hdr-icon:hover,.hambtn:hover{background:rgba(255,255,255,.06)}
+.hdr-icon:focus-visible,.hambtn:focus-visible{outline:2px solid #fff;outline-offset:2px;border-radius:8px}
+.hdr-icon.active{background:#fff;color:#000}
 
-/* Second row: logos line */
-.h-bot{display:grid; grid-template-columns:auto 1fr auto; align-items:center}
-.brand-left{display:flex; align-items:center; gap:10px; min-width:0}
-.h-logo{height:42px;width:auto;display:block}
-
-/* school block (icon + three lines) */
-.school-block{display:flex; align-items:flex-end; gap:10px; min-width:0}
-.school-icon{height:42px;width:auto;display:block; filter:drop-shadow(0 0 10px rgba(255,255,255,.06))}
-.school-type{display:flex; flex-direction:column; line-height:1}
-.school-line1{font-size:10px; letter-spacing:.06em; color:#cbd5e1; font-weight:600; margin-bottom:0; font-stretch:condensed; font-variation-settings:"wdth" 80}
-.school-line2{font-size:12px; font-weight:900; letter-spacing:.02em}
-.school-line3{font-size:14px; font-weight:900; letter-spacing:.02em}
-
-/* right logo (YAT?STATS) */
-.ystats-wrap{justify-self:end}
-.ystats-logo{height:36px; width:auto; max-width:min(40vw, 260px); display:block}
-
-/* Nav bar */
-.nav-desktop{
-  display:flex; gap:16px; align-items:center; justify-content:center;
-  padding:6px 0 0; grid-column:1 / -1;
+/* Logos row --------------------------------------------------------------- */
+.logos-row{
+  margin-top:6px; display:flex; align-items:center; gap:10px; min-width:0;
 }
-@media (max-width:1160px){ .nav-desktop{display:none} }
+.school-block{display:flex; align-items:center; gap:8px; min-width:0}
+.school-logo{height:40px;width:auto;display:block;flex:0 0 auto; filter:drop-shadow(0 0 4px rgba(255,255,255,.15))}
+.school-text{display:flex;flex-direction:column;justify-content:center;line-height:1;gap:0}
+.school-line1{font-size:10px;letter-spacing:.06em;color:#cbd5e1;font-stretch:condensed;font-weight:500;margin-top:0;transform:translateY(-1px)}
+.school-line2{font-size:14px;font-weight:900;letter-spacing:.02em;margin-top:0}
+.school-line3{font-size:16px;font-weight:900;letter-spacing:.02em;margin-top:-1px}
+.yat-logo{margin-left:auto; max-height:40px; width:auto; display:block; object-fit:contain; filter:drop-shadow(0 2px 8px rgba(255,255,255,.18))}
+@media (max-width:420px){ .yat-logo{max-height:36px} }
 
-/* two-tone link */
-.nav-link{display:inline-flex; align-items:baseline; white-space:nowrap}
-.nav-grey{color:#9aa1ab; font-weight:700; letter-spacing:.02em; font-stretch:condensed; font-variation-settings:"wdth" 80}
-.nav-black{color:#fff; font-weight:900; letter-spacing:.01em; margin-left:-1px}
-.nav-link:hover .nav-black{text-decoration:underline}
+/* Center desktop nav ------------------------------------------------------ */
+.nav-desktop{align-self:center;justify-self:center; display:flex; gap:16px; min-width:0}
+.nav-desktop a{white-space:nowrap}
+.nav-gray{color:#9aa1ab; font-weight:700; letter-spacing:.02em; font-stretch:condensed}
+.nav-black{color:#fff; font-weight:900; letter-spacing:.01em}
 
-/* TAGLINE */
-.tagline-wrap{position:sticky;top:var(--headerH);z-index:40;background:#0e1117;border-bottom:1px solid var(--ring)}
-.tagline{display:flex;align-items:center;justify-content:center;padding:8px 10px}
-.tag-grey{color:#9aa1ab;font-weight:800;letter-spacing:.02em; font-stretch:condensed; font-variation-settings:"wdth" 75}
-.tag-strong{color:#fff;font-weight:900;letter-spacing:-.01em;margin-left:-1px}
+/* TAGLINE ----------------------------------------------------------------- */
+.tagline-wrap{position:sticky; top:var(--headerH); z-index:40; background:#0b0f14; border-bottom:1px solid var(--ring)}
+.tagline{display:flex;align-items:center;justify-content:space-between;padding:8px 10px}
+.tag-text{font-size:14px;line-height:1.05}
+.tag-grey{color:#9aa1ab; font-weight:800; font-stretch:condensed; letter-spacing:.02em}
+.tag-strong{color:#fff; font-weight:900; letter-spacing:.01em}
+.tag-tight{letter-spacing:-.02em}
+.tag-grey,.tag-strong{font-variation-settings:"wdth" 85}
 
-/* GRID (5→4→3→2→1) */
-main{padding:calc(var(--headerH) + 44px) 0 88px}
+/* GRID -------------------------------------------------------------------- */
+main{padding:calc(var(--headerH) + 44px) 0 84px}
 .grid{padding:10px;display:grid;grid-template-columns:repeat(1,minmax(0,1fr));gap:12px}
 @media (min-width:560px){ .grid{grid-template-columns:repeat(2,minmax(0,1fr))} }
 @media (min-width:820px){ .grid{grid-template-columns:repeat(3,minmax(0,1fr))} }
 @media (min-width:1100px){ .grid{grid-template-columns:repeat(4,minmax(0,1fr))} }
 @media (min-width:1440px){ .grid{grid-template-columns:repeat(5,minmax(0,1fr))} }
 
-/* CARD / FLIP */
-.card{background:#000;border:0;border-radius:16px;overflow:hidden;position:relative;user-select:none;aspect-ratio:5/7;min-height:280px; touch-action:pan-y;}
+/* CARD / FLIP ------------------------------------------------------------- */
+.card{background:#000;border:0;border-radius:12px;overflow:hidden;position:relative;user-select:none;aspect-ratio:5/7;min-height:280px;touch-action:pan-y}
 .flip-card{perspective:1200px}
 .flip-inner{position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform .55s cubic-bezier(.2,.7,.2,1)}
 .card.front  .flip-inner{ transform:rotateY(0) }
 .card.back   .flip-inner{ transform:rotateY(180deg) }
 .face{position:absolute; inset:0; backface-visibility:hidden; -webkit-backface-visibility:hidden; overflow:hidden}
 
-/* FRONT */
+/* FRONT ------------------------------------------------------------------- */
 .front-face{transform:rotateY(0)}
 .card-img{position:absolute; inset:0; width:100%; height:100%; object-fit:cover; background:#111}
 .bottom-grad{position:absolute; left:0; right:0; bottom:0; height:66%; background:linear-gradient(to top, rgba(0,0,0,.98) 0%, rgba(0,0,0,.92) 30%, rgba(0,0,0,.86) 48%, rgba(0,0,0,0) 76%); pointer-events:none; z-index:1;}
 .front-left, .front-right{position:absolute; z-index:3; color:#fff; text-shadow:0 1px 2px rgba(0,0,0,.45)}
-.front-left{left:12px; bottom:12px; width:46%}
+.front-left{left:12px; bottom:12px; width:50%}
 .front-right{right:12px; bottom:10px; width:72%; text-align:right}
 .name{font-weight:900;text-transform:uppercase;letter-spacing:.02em;font-size:18px;line-height:1.06}
 .team{font-size:13px;opacity:.98}
 .parent{font-size:12px;opacity:.92;margin-top:2px}
 .spacer-6{height:6px}
-
-/* chips */
 .stack{display:flex;flex-direction:column;gap:4px;margin-top:4px;align-items:flex-start}
-.chip{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.14);color:#fff;border:1px solid rgba(255,255,255,.24);border-radius:999px;padding:2px 8px 3px;font-weight:800;font-size:10px;letter-spacing:.06em}
+.chip{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.08);color:#fff;border:1px solid rgba(255,255,255,.14);border-radius:999px;padding:2px 8px 3px;font-weight:800;font-size:10px;letter-spacing:.06em}
 .chip.level.mlb{background:#7A0019;border-color:#7A0019}
 .chip.level.triple-a{background:#2563eb;border-color:#2563eb}
 .chip.level.double-a{background:#3b82f6;border-color:#3b82f6}
@@ -108,140 +97,113 @@ main{padding:calc(var(--headerH) + 44px) 0 88px}
 .chip.level.low-a{background:#3730a3;border-color:#3730a3}
 .chip.level.rookie{background:#0f766e;border-color:#0f766e}
 .chip.level.indy{background:#3f6212;border-color:#3f6212}
-.chip.level.ncaa-d1{background:#166534;border-color:#166534}
-.chip.level.ncaa-d2{background:#047857;border-color:#047857}
-.chip.level.ncaa-d3{background:#065f46;border-color:#065f46}
+.chip.level.ncaa-d1,.chip.level.ncaa{background:#166534;border-color:#166534}
 .chip.level.naia{background:#9333ea;border-color:#9333ea}
 .chip.level.juco{background:#0d9488;border-color:#0d9488}
 .chip.status{background:#16a34a;border-color:#16a34a}
 .chip.status.retired{background:#6b7280;border-color:#6b7280}
 .chip.class{background:#374151;border-color:#374151}
-
-/* letter dots */
 .letters{display:flex;gap:6px;align-items:center;margin-top:6px}
 .letter-dot{width:20px;height:20px;border-radius:50%;background:#fff;color:var(--maroon);display:grid;place-items:center;font-weight:900;font-size:11px;border:1px solid rgba(0,0,0,.15)}
-
-/* right side text */
 .next-chip,.last-chip{display:inline-block;background:rgba(255,255,255,.14);color:#fff;border:1px solid rgba(255,255,255,.24);border-radius:999px;padding:2px 8px 3px;font-size:10px;font-weight:900;letter-spacing:.12em;margin-bottom:3px}
-.right-line{font-size:12px;font-weight:800;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.right-line{font-size:12px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .last3{margin-top:10px;width:100%;margin-left:auto}
 .last3 .item{font-size:12px;color:#e5e7eb;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:right}
 
-/* BACK */
-.back-face{transform:rotateY(180deg);background:#0f131a;color:#e5e7eb;display:grid;grid-template-rows:auto 1fr auto;height:100%}
+/* BACK -------------------------------------------------------------------- */
+.back-face{transform:rotateY(180deg);background:#fff;color:#111;display:grid;grid-template-rows:auto 1fr auto;height:100%}
+
+/* Back top area: profile text + HS image */
 .back-top{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:10px 12px 6px;align-items:start}
-.back-left{min-width:0;display:flex;flex-direction:column}
-.stats-name{font-weight:900;text-transform:uppercase;letter-spacing:.02em;font-size:16px;margin:0 0 2px}
-.team-line{color:#cbd5e1;font-size:13px;line-height:1.15;margin-top:2px}
-.parent-line{color:#94a3b8;font-size:12px;line-height:1.1;margin-top:0}
-
-/* small inline profile link block (replaces big button) */
 .profile-mini{
-  margin-top:6px; background:#0b0f15; border:1px solid #273041; color:#e5e7eb;
-  border-radius:10px; padding:8px 10px; line-height:1.05; font-weight:800;
-  display:inline-block; max-width:100%; text-align:left;
+  align-self:start; justify-self:start; text-align:left; max-width:95%;
+  background:#0f172a; color:#fff; border-radius:10px; padding:8px 10px; line-height:1.1;
 }
-.profile-mini .l1{font-size:13px}
-.profile-mini .l2{font-size:11px; color:#cbd5e1}
-.profile-mini .l3{font-size:11px; color:#94a3b8; margin-top:0}
-
-/* HS image */
-.back-right{display:flex;flex-direction:column;align-items:flex-end}
-.hs-box{flex:1 1 auto;width:100%;aspect-ratio:3/4;position:relative;overflow:hidden;border-radius:12px;background:#0b0f15;border:1px solid #273041}
+.profile-mini .p1{font-weight:900; letter-spacing:.02em}
+.profile-mini .p2,.profile-mini .p3{font-size:12px; opacity:.9; margin-top:2px}
+.profile-mini:hover{background:#111827}
+.back-right{display:flex;flex-direction:column}
+.hs-box{flex:1 1 auto;width:100%;aspect-ratio:3/4;position:relative;overflow:hidden;border-radius:10px;background:#d1d5db}
 .hs-box img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 
-/* Fun Zone (big) */
-.back-bottom{border-top:1px solid #202735;padding:8px 10px 12px;min-height:0;overflow:hidden;display:flex;flex-direction:column}
-.funzone{flex:1 1 auto; min-height:0; overflow:auto; border-radius:12px; background:#0b0f15; border:1px solid #1f2937; padding:10px}
-.pane{display:none; min-height:0; overflow:auto; animation:fade .18s ease}
+/* Fun Zone (large) + panes */
+.back-bottom{border-top:1px solid #e5e7eb;padding:10px 12px 12px;min-height:0;overflow:hidden;display:flex;flex-direction:column}
+.pane{display:none;min-height:0;overflow:auto;flex:1;animation:slide .18s ease}
 .pane.active{display:block}
-@keyframes fade{from{opacity:.3; transform:translateY(4px)} to{opacity:1; transform:none}}
-
-/* 8-icon bar at bottom */
-.tab-icons{display:grid; grid-template-columns:repeat(8,1fr); gap:8px; margin-top:8px}
-.tabbtn{
-  height:36px; display:grid; place-items:center; border-radius:10px;
-  border:1px solid #2a3446; background:#0b0f15; cursor:pointer;
-}
-.tabbtn svg{width:16px; height:16px; color:#e5e7eb}
-.tabbtn.active{background:#ffffff;border-color:#ffffff}
-.tabbtn.active svg{color:#000}
-
-/* 12 stat tiles grid */
+@keyframes slide{from{opacity:.2;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
 .kv-wrap12{display:grid;grid-template-columns:repeat(4,1fr);grid-auto-rows:1fr;gap:8px;height:100%}
-.kv{background:#0b0f15;border:1px solid #273041;border-radius:12px;text-align:center;padding:8px;display:flex;flex-direction:column;justify-content:center}
-.kv .k{font-size:11px;color:#9aa1ab}
-.kv .v{font-weight:900; color:#fff}
+.kv{background:#f3f4f6;border-radius:10px;text-align:center;padding:8px;display:flex;flex-direction:column;justify-content:center}
+.kv .k{font-size:11px;color:#6b7280}
+.kv .v{font-weight:800}
+.funzone{position:relative; z-index:5}
 
-/* flip zones (top only; never overlap icon row) */
-.hit{
-  position:absolute; top:0; height:68%; width:22%; z-index:2; background:transparent; border:0;
+/* Icon bar (8 icons) at bottom */
+.iconbar{
+  display:grid; grid-template-columns:repeat(8,1fr); gap:6px; margin-top:10px;
 }
+.i8{height:34px; display:grid; place-items:center; border:1px solid #e5e7eb; border-radius:8px; background:#fff; cursor:pointer}
+.i8 svg{width:16px;height:16px;color:#111}
+.i8.active{background:#111;border-color:#111}
+.i8.active svg{color:#fff}
+
+/* Flip hit zones: only top 68% so icons are never blocked */
+.hit{position:absolute; top:0; height:68%; width:22%; z-index:2; background:transparent}
 .hit.left{left:0}.hit.right{right:0}
 @media (max-width:480px){ .hit{height:65%; width:26%} }
 
-/* DRAWERS */
+/* DRAWERS ----------------------------------------------------------------- */
 .scrim{position:fixed;left:0;right:0;top:var(--headerH);bottom:0;background:rgba(0,0,0,.5);opacity:0;pointer-events:none;transition:opacity .25s ease;z-index:55}
 .scrim.open{opacity:1;pointer-events:auto}
 body.no-scroll{overflow:hidden}
 
-/* LEFT drawer */
-.drawer-left{position:fixed;top:var(--headerH);bottom:0;left:0;width:360px;max-width:90vw;background:#0f131a;border-right:1px solid #202735;transform:translateX(-100%);transition:transform .25s ease;z-index:56;display:flex;flex-direction:column;color:#e5e7eb}
+.drawer{position:fixed;top:var(--headerH);bottom:0;width:360px;max-width:90vw;background:#0b0f14;border:1px solid var(--ring);color:#fff;transition:transform .25s ease;z-index:56;display:flex;flex-direction:column}
+.drawer-header{height:56px;border-bottom:1px solid var(--ring);display:flex;align-items:center;justify-content:space-between;padding:0 12px}
+.closebtn{width:34px;height:34px;border:0;background:transparent;display:grid;place-items:center;cursor:pointer}
+.closebtn svg{width:18px;height:18px;color:#fff}
+
+/* left (nav + search) */
+.drawer-left{left:0;transform:translateX(-100%)}
 .drawer-left.open{transform:translateX(0)}
-.drawer-left .drawer-header{height:56px;border-bottom:1px solid #202735;display:flex;align-items:center;justify-content:space-between;padding:0 12px}
-.left-title{font-weight:900;letter-spacing:.12em;text-transform:uppercase;font-size:12px;color:#cbd5e1}
 .left-content{padding:12px;min-height:0;overflow:auto}
-.nav-left-list{display:flex;flex-direction:column;gap:8px;margin-bottom:10px}
-.nav-left-link{color:#e5e7eb;text-transform:uppercase;letter-spacing:.12em;font-weight:700;font-size:12px;line-height:1;padding:10px 6px 8px 4px;border-radius:6px}
-.nav-left-link:hover{background:#121826}
-.nav-left-sep{height:1px;background:#202735;margin:8px 0}
+.nav-left-list{display:flex;flex-direction:column;gap:10px;margin-bottom:12px}
+.nav-left-link{color:#e5e7eb;text-transform:uppercase;letter-spacing:.12em;font-weight:600;font-size:13px;line-height:1;padding:10px 6px 8px 4px;border-radius:6px}
+.nav-left-link:hover{background:#11151d}
 .left-search-h{font-weight:900;letter-spacing:.12em;text-transform:uppercase;font-size:12px;color:#cbd5e1;margin:2px 0 8px}
-.left-search .ghost{display:block;width:100%;background:#0b0f15;border:1px solid #273041;border-radius:10px;padding:10px 12px;font-size:14px;color:#e5e7eb;outline:none}
+.left-search .ghost{display:block;width:100%;background:#0f131b;border:1px solid #263044;border-radius:10px;padding:10px 12px;font-size:14px;color:#fff;outline:none}
 .left-results{margin-top:8px;list-style:none;padding:0}
 .left-results li{padding:8px 6px;border-radius:8px;cursor:pointer}
-.left-results li:hover{background:#121826}
+.left-results li:hover{background:#11151d}
+.global-line{margin-top:12px;font-size:12px;color:#cbd5e1;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
 
-/* RIGHT drawer */
-.drawer-right{position:fixed;top:var(--headerH);bottom:0;right:0;width:420px;max-width:92vw;background:#0f131a;border-left:1px solid #202735;transform:translateX(100%);transition:transform .25s ease;z-index:56;display:flex;flex-direction:column;color:#e5e7eb}
+/* right (filters) */
+.drawer-right{right:0;transform:translateX(100%); width:420px; max-width:92vw}
 .drawer-right.open{transform:translateX(0)}
-.drawer-right .drawer-header{height:56px;border-bottom:1px solid #202735;display:flex;align-items:center;justify-content:space-between;padding:0 12px}
-.right-title{font-weight:900;letter-spacing:.12em;text-transform:uppercase;font-size:12px;color:#cbd5e1}
 .drawer-body{min-height:0;overflow:auto}
 .drawer-content{display:block;padding:12px 12px 22px}
-.rail{border:1px solid #202735;border-radius:12px;margin-bottom:10px;overflow:hidden;background:#0b0f15}
-.rail summary{list-style:none;cursor:pointer;padding:9px 12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;font-size:12px;color:#cbd5e1;border-bottom:1px solid #202735}
+.rail{border:1px solid #263044;border-radius:10px;margin-bottom:10px;overflow:hidden;background:#0f131b}
+.rail summary{list-style:none;cursor:pointer;padding:10px 12px;font-weight:900;letter-spacing:.14em;text-transform:uppercase;font-size:12px;color:#cbd5e1;border-bottom:1px solid #263044}
 .rail summary::-webkit-details-marker{display:none}
-.rail .inner{padding:8px 10px;max-height:40vh;overflow:auto}
-.ghost{display:block;width:100%;background:#0b0f15;border:1px solid #273041;border-radius:10px;padding:10px;font-size:13px;color:#e5e7eb;outline:none}
-.select-multi{height:110px}
-.hint{color:#64748b;font-size:11px;margin:4px 2px 10px}
-@media (min-width:1024px){ .drawer-right{width:300px;max-width:24vw} }
+.rail .inner{padding:10px;max-height:40vh;overflow:auto}
+.ghost{display:block;width:100%;background:#0b0f14;border:1px solid #263044;border-radius:10px;padding:10px;font-size:13px;color:#e5e7eb;outline:none}
+.select-multi{height:120px}
+.hint{color:#9aa1ab;font-size:11px;margin:4px 2px 10px}
 
-/* AUTH drawer (starts hidden) */
-.drawer-auth{position:fixed;top:var(--headerH);bottom:0;right:0;width:420px;max-width:92vw;background:#0f131a;border-left:1px solid #202735;transform:translateX(100%);transition:transform .25s ease;z-index:56;display:flex;flex-direction:column;color:#e5e7eb}
+/* auth */
+.drawer-auth{right:0;transform:translateX(100%); width:360px; max-width:92vw}
 .drawer-auth.open{transform:translateX(0)}
-.drawer-auth .drawer-header{height:56px;border-bottom:1px solid #202735;display:flex;align-items:center;justify-content:space-between;padding:0 12px}
-.auth-title{font-weight:900;letter-spacing:.12em;text-transform:uppercase;font-size:12px;color:#cbd5e1}
 .auth-body{min-height:0;overflow:auto;padding:12px 12px 22px}
-.input{display:block;width:100%;background:#0b0f15;border:1px solid #273041;border-radius:10px;padding:12px 12px;font-size:14px;color:#e5e7eb;outline:none}
+.input{display:block;width:100%;background:#0f131b;border:1px solid #263044;border-radius:10px;padding:12px 12px;font-size:14px;color:#fff;outline:none}
 .btn-primary{display:inline-block;width:100%;background:#fff;color:#000;border:1px solid #fff;border-radius:10px;padding:10px 12px;font-weight:900;letter-spacing:.06em;cursor:pointer;margin-top:10px}
 
-/* drawer close button */
-.closebtn{width:34px;height:34px;border:0;background:transparent;display:grid;place-items:center;cursor:pointer}
-.closebtn svg{width:18px;height:18px;color:#e5e7eb}
-
-/* FOOTER */
-.footer{position:fixed;left:0;right:0;bottom:0;height:76px;background:#0e1117;color:#fff;display:flex;align-items:center;justify-content:center;z-index:10}
+/* FOOTER ------------------------------------------------------------------ */
+.footer{position:fixed;left:0;right:0;bottom:0;height:72px;background:#000;color:#fff;display:flex;align-items:center;justify-content:center;z-index:10}
 .footer img{max-height:60px;width:auto}
-.build-pill{position:absolute;left:10px;bottom:10px;background:rgba(255,255,255,.08);color:#fff;font-size:12px;padding:6px 10px;border-radius:12px;border:1px solid rgba(255,255,255,.12)}
+.build-pill{position:absolute;left:10px;bottom:10px;background:rgba(255,255,255,.12);color:#fff;font-size:12px;padding:6px 10px;border-radius:12px}
 
 /* --- Splash (mobile/tablet only) --- */
 .splash{
-  position:fixed; inset:0;
-  background:#000; color:#fff;
-  z-index:1000;
-  opacity:1; transition:opacity .5s ease;
-  display:none;
+  position:fixed; inset:0; background:#000; color:#fff; z-index:1000;
+  opacity:1; transition:opacity .5s ease; display:none;
 }
 .splash.show{ display:block; }
 .splash.hide{ opacity:0; pointer-events:none }
@@ -250,10 +212,10 @@ body.no-scroll{overflow:hidden}
 .splash-logo img{ display:block; width:100%; height:auto; filter: drop-shadow(0 2px 12px rgba(255,255,255,.18)); }
 .splash-logo::after{
   content:""; position:absolute; inset:0;
-  background:linear-gradient(105deg, rgba(255,255,255,0) 10%, rgba(255,255,255,.22) 20%, rgba(255,255,255,0) 32%);
-  transform:translateX(-140%); animation:logoShimmer 1.6s ease-out .6s 1 forwards; pointer-events:none; mix-blend-mode:screen;
+  background: linear-gradient(105deg, rgba(255,255,255,0) 10%, rgba(255,255,255,.22) 20%, rgba(255,255,255,0) 32%);
+  transform: translateX(-140%); animation:logoShimmer 1.6s ease-out 0.6s 1 forwards; mix-blend-mode:screen; pointer-events:none;
 }
-@keyframes logoZoom{0%{transform:scale(.85);opacity:.0}60%{transform:scale(1.02);opacity:1}100%{transform:scale(1)}}
+@keyframes logoZoom{0%{transform:scale(.85);opacity:0}60%{transform:scale(1.02);opacity:1}100%{transform:scale(1)}}
 @keyframes logoGlow{0%,100%{filter: drop-shadow(0 2px 10px rgba(255,255,255,.18))}50%{filter: drop-shadow(0 2px 18px rgba(255,255,255,.28))}}
 @keyframes logoShimmer{0%{transform:translateX(-140%)}100%{transform:translateX(140%)}}
 @media (min-width:1025px){ .splash{ display:none !important } }
@@ -261,31 +223,17 @@ body.no-scroll{overflow:hidden}
 </head>
 <body>
 
-<!-- Splash -->
-<div id="splash" class="splash" aria-hidden="true">
-  <div class="splash-inner">
-    <div class="splash-logo" aria-label="YATSTATS">
-      <img id="splashLogo"
-        src="https://i.postimg.cc/C5mwXpQy/35878-20250830-222027-0000.png"
-        alt="YAT?STATS" width="100" height="28" decoding="async" loading="eager" />
-    </div>
-  </div>
-  <audio id="splashSfx" preload="auto">
-    <!-- <source src="splash.mp3" type="audio/mpeg"> -->
-  </audio>
-</div>
-
 <header class="site-header">
-  <!-- top icons row -->
-  <div class="h-top">
-    <button class="hambtn" id="openLeft" aria-label="Open Navigation">
-      <svg viewBox="0 0 24 24" width="22" height="22"><path fill="currentColor" d="M3 6h18v2H3zM3 11h18v2H3zM3 16h18v2H3z"/></svg>
-    </button>
-    <div class="hdr-icons">
+  <!-- LEFT: Top icons + logos row -->
+  <div class="h-left">
+    <div class="top-row">
+      <button class="hambtn" id="openLeft" aria-label="Open Navigation">
+        <svg viewBox="0 0 24 24"><path fill="currentColor" d="M3 6h18v2H3zM3 11h18v2H3zM3 16h18v2H3z"/></svg>
+      </button>
       <button class="hdr-icon" id="iconProfile" aria-label="Account" title="Account">
         <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm0 2c-4.2 0-8 2.1-8 5v1h16v-1c0-2.9-3.8-5-8-5z"/></svg>
       </button>
-      <button class="hdr-icon" id="iconSearch" aria-label="Search" title="Search">
+      <button class="hdr-icon" id="iconSearch" aria-label="Search/Navigation" title="Search / Navigation">
         <svg viewBox="0 0 24 24"><path fill="currentColor" d="M11 4a7 7 0 1 1 0 14 7 7 0 0 1 0-14zm9.7 15.3-3.4-3.4a9 9 0 1 0-1.4 1.4l3.4 3.4a1 1 0 0 0 1.4-1.4z"/></svg>
       </button>
       <button class="hdr-icon" id="iconFilter" aria-label="Filters" title="Filters">
@@ -295,41 +243,43 @@ body.no-scroll{overflow:hidden}
         <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 5V2L8 6l4 4V7a5 5 0 1 1-5 5H5a7 7 0 1 0 7-7z"/></svg>
       </button>
     </div>
-  </div>
 
-  <!-- logos row -->
-  <div class="h-bot">
-    <div class="brand-left">
+    <div class="logos-row">
+      <!-- School block: H + 3 type lines -->
       <div class="school-block">
-        <img class="school-icon" src="https://i.postimg.cc/2jwjVn8H/32900-20250830-222044-0000.png" alt="Hamilton HS"/>
-        <div class="school-type">
+        <img class="school-logo" src="https://i.postimg.cc/2jwjVn8H/32900-20250830-222044-0000.png" alt="Hamilton H"/>
+        <div class="school-text">
           <div class="school-line1">CHANDLER, AZ</div>
           <div class="school-line2">HAMILTON HIGH SCHOOL</div>
           <div class="school-line3">ACTIVE ALUMNI</div>
         </div>
       </div>
-    </div>
-    <nav class="nav-desktop">
-      <a href="#" class="nav-link"><span class="nav-grey">where&nbsp;they</span><span class="nav-black">YAT?</span></a>
-      <a href="#" class="nav-link"><span class="nav-grey">active&nbsp;alumni</span><span class="nav-black">News</span></a>
-      <a href="#" class="nav-link"><span class="nav-grey">next&nbsp;level&nbsp;</span><span class="nav-black">All-Time&nbsp;List</span></a>
-      <a href="#" class="nav-link"><span class="nav-grey">NIL&nbsp;&nbsp;YAT-A-BOY</span><span class="nav-black">Marketplace</span></a>
-      <a href="#" class="nav-link"><span class="nav-grey">the&nbsp;</span><span class="nav-black">Current&nbsp;Team</span></a>
-      <a href="#" class="nav-link"><span class="nav-grey">PCD&nbsp;Action&nbsp;</span><span class="nav-black">Partner&nbsp;Program</span></a>
-    </nav>
-    <div class="ystats-wrap">
-      <img class="ystats-logo" src="https://i.postimg.cc/C5mwXpQy/35878-20250830-222027-0000.png" alt="YAT?STATS"/>
+
+      <img class="yat-logo" src="https://i.postimg.cc/C5mwXpQy/35878-20250830-222027-0000.png" alt="YAT?STATS"/>
     </div>
   </div>
+
+  <!-- CENTER: Desktop nav -->
+  <nav class="nav-desktop" aria-label="Primary">
+    <a href="#"><span class="nav-gray">WHERE THEY</span><span class="nav-black">YAT?</span></a>
+    <a href="#"><span class="nav-gray">ACTIVE ALUMNI</span><span class="nav-black">NEWS</span></a>
+    <a href="#"><span class="nav-gray">NEXT LEVEL</span><span class="nav-black">ALL-TIME LIST</span></a>
+    <a href="#"><span class="nav-gray">NIL &amp; YAT-A-BOY</span><span class="nav-black">MARKETPLACE</span></a>
+    <a href="#"><span class="nav-gray">THE</span><span class="nav-black">CURRENT TEAM</span></a>
+    <a href="#"><span class="nav-gray">PCD ACTION</span><span class="nav-black">PARTNER PROGRAM</span></a>
+  </nav>
+
+  <!-- RIGHT column intentionally empty to preserve grid -->
+  <div></div>
 </header>
 
 <!-- TAGLINE -->
 <div class="tagline-wrap">
   <div class="tagline">
-    <div>
-      <span class="tag-grey">WHERE&nbsp;THEY</span><span class="tag-strong">YAT?</span>
+    <div class="tag-text">
+      <span class="tag-grey">WHERE THEY</span><span class="tag-strong tag-tight">YAT?</span>
       &nbsp;&nbsp;
-      <span class="tag-grey">SWIPE&nbsp;FOR</span><span class="tag-strong">STATS!</span>
+      <span class="tag-grey">SWIPE FOR</span><span class="tag-strong tag-tight">STATS!</span>
     </div>
   </div>
 </div>
@@ -337,8 +287,8 @@ body.no-scroll{overflow:hidden}
 <!-- SCRIM -->
 <div class="scrim" id="scrim"></div>
 
-<!-- LEFT DRAWER -->
-<aside class="drawer-left" id="drawerLeft" aria-hidden="true" role="navigation">
+<!-- LEFT DRAWER (Navigation + Player Search) -->
+<aside class="drawer drawer-left" id="drawerLeft" aria-hidden="true" role="navigation">
   <div class="drawer-header">
     <div class="left-title">Navigation</div>
     <button class="closebtn" id="closeLeft" aria-label="Close">
@@ -353,19 +303,25 @@ body.no-scroll{overflow:hidden}
       <a class="nav-left-link" href="#">NIL &amp; YAT-A-BOY MARKETPLACE</a>
       <a class="nav-left-link" href="#">THE CURRENT TEAM</a>
       <a class="nav-left-link" href="#">PCDACTION PARTNER PROGRAM</a>
-      <div class="nav-left-sep"></div>
+      <div style="height:1px;background:#1e232c;margin:8px 0"></div>
     </div>
 
     <div class="left-search">
       <div class="left-search-h">PLAYER PROFILE SEARCH</div>
       <input id="localSearch" type="text" class="ghost" placeholder="Type a player name…" autocomplete="off"/>
       <ul id="localResults" class="left-results"></ul>
+
+      <div class="global-line">
+        <svg class="mini-icon" viewBox="0 0 24 24" width="14" height="14"><path fill="currentColor" d="M11 4a7 7 0 1 1 0 14 7 7 0 0 1 0-14zm9.7 15.3-3.4-3.4a9 9 0 1 0-1.4 1.4l3.4 3.4a1 1 0 0 0 1.4-1.4z"/></svg>
+        <a href="https://www.yatstats.com" target="_blank" rel="noopener">GLOBAL PLAYER SEARCH</a> |
+        <a href="https://www.yatstats.com" target="_blank" rel="noopener">GLOBAL SCHOOL SEARCH</a>
+      </div>
     </div>
   </div>
 </aside>
 
-<!-- RIGHT DRAWER (Filters only; no Sort) -->
-<aside class="drawer-right" id="drawerRight" aria-hidden="true" role="dialog" aria-modal="true">
+<!-- RIGHT DRAWER (Filters) -->
+<aside class="drawer drawer-right" id="drawerRight" aria-hidden="true" role="dialog" aria-modal="true">
   <div class="drawer-header">
     <div class="right-title">Filters</div>
     <button class="closebtn" id="closeRight" aria-label="Close">
@@ -408,12 +364,13 @@ body.no-scroll{overflow:hidden}
           </select>
         </div>
       </details>
+      <!-- (Sort controls removed on purpose) -->
     </div>
   </div>
 </aside>
 
-<!-- AUTH DRAWER (starts closed) -->
-<aside class="drawer-auth" id="drawerAuth" aria-hidden="true" role="dialog" aria-modal="true">
+<!-- AUTH DRAWER (hidden on load) -->
+<aside class="drawer drawer-auth" id="drawerAuth" aria-hidden="true" role="dialog" aria-modal="true">
   <div class="drawer-header">
     <div class="auth-title">Sign Up | Login</div>
     <button class="closebtn" id="closeAuth" aria-label="Close">
@@ -438,66 +395,110 @@ body.no-scroll{overflow:hidden}
   <div class="build-pill">BUILD: ham-v4.5.0</div>
 </footer>
 
+<!-- Splash -->
+<div id="splash" class="splash" aria-hidden="true">
+  <div class="splash-inner">
+    <div class="splash-logo" aria-label="YATSTATS">
+      <img id="splashLogo"
+        src="https://i.postimg.cc/C5mwXpQy/35878-20250830-222027-0000.png"
+        alt="YATSTATS" width="100" height="28" decoding="async" loading="eager"/>
+    </div>
+  </div>
+  <audio id="splashSfx" preload="auto">
+    <!-- <source src="splash-sound.mp3" type="audio/mpeg"> -->
+  </audio>
+</div>
+
 <script>
-/* Splash: mobile/tablet only */
-function runSplash(){
-  const isSmall = window.matchMedia('(max-width: 1024px)').matches;
-  const splash = document.getElementById('splash');
-  if(!splash) return;
-  if(!isSmall){ splash.remove(); return; }
-  splash.classList.add('show');
-
-  const sfx = document.getElementById('splashSfx');
-  const tryPlay = () => {
-    if(!sfx || !sfx.querySelector('source')) return;
-    sfx.play().catch(() => {
-      const oneShot = () => {
-        sfx.play().finally(() => {
-          window.removeEventListener('pointerdown', oneShot, true);
-          window.removeEventListener('keydown', oneShot, true);
-        });
-      };
-      window.addEventListener('pointerdown', oneShot, true);
-      window.addEventListener('keydown', oneShot, true);
-    });
-  };
-  tryPlay();
-
-  setTimeout(() => {
-    splash.classList.add('hide');
-    setTimeout(() => splash.remove(), 520);
-  }, 1200);
-}
-
 /* helpers */
 const byId = id => document.getElementById(id);
 function lvlClass(l){return String(l||'').toLowerCase().replace(/\s+/g,'-').replace('aaa','triple-a').replace('aa','double-a')}
-function teamAndParent(p){ const raw=String(p.team||''); const parts=raw.split('—'); const team=(parts[0]||raw).trim(); let parent=(parts[1]||'').trim(); if((p.currentLevel||'').toUpperCase()==='MLB') parent=''; return {team,parent}; }
+function teamAndParent(p){
+  const raw=String(p.team||''); const parts=raw.split('—'); const team=(parts[0]||raw).trim();
+  let parent=(parts[1]||'').trim(); if((p.currentLevel||'').toUpperCase()==='MLB') parent='';
+  return {team,parent};
+}
 function fmtLast3(g){ return `${g.date||'—'} • ${g.opp||'—'} — ${g.line||'—'}`; }
-function formatNextTwoLines(ng){ if(!ng) return ['—','—']; const ds=String(ng.date||'').trim(); const mmdd=(ds.match(/\b(\d{1,2}\/\d{1,2})\b/)||[, '—'])[1]; let time=(ds.match(/(\d{1,2}:\d{2}\s*[AP]M)/i)||[, '—'])[1]?.toUpperCase()||'—'; const tz=(ds.match(/\b(ET|CT|MT|PT|AZ)\b/i)||[, ''])[1]?.toUpperCase()||''; if(tz && !time.includes(tz)) time=`${time} ${tz}`; return [`${mmdd} - ${time}`.trim(), String(ng.opponent||'—').trim()||'—']; }
+function formatNextTwoLines(ng){ if(!ng) return ['—','—']; const ds=String(ng.date||'').trim();
+  const mmdd=(ds.match(/\b(\d{1,2}\/\d{1,2})\b/)||[, '—'])[1]; let time=(ds.match(/(\d{1,2}:\d{2}\s*[AP]M)/i)||[, '—'])[1].toUpperCase();
+  const tz=(ds.match(/\b(ET|CT|MT|PT|AZ)\b/i)||[, ''])[1]?.toUpperCase()||''; if(tz && !time.includes(tz)) time=`${time} ${tz}`;
+  return [`${mmdd} - ${time}`.trim(), String(ng.opponent||'—').trim()||'—']; }
 
-/* demo data (keep for now; can be replaced with CSV loader on request) */
-const playersRaw = [
-  { id:"cody-bellinger", name:"CODY BELLINGER", graduatingClass:2013, currentLevel:"MLB", status:"Active",
-    position:"CF/1B", team:"New York Yankees",
+/* -------- CSV-driven roster + optional enrichment -------- */
+const CSV_DATA = `player,pos,ht,wt,ba,th,born,place,hilvl,mlb years,stat years
+Shane Anderson,ut,5-11,195,R,R, ,"Chandler,AZ",NCAA, ,2021-2025
+DJ Barrett,p-of,6-1,190,R,R, ,"Gilbert,AZ",JrCollege, ,2024-2025
+Cody Bellinger,cf-1b,6-4,203,L,L,1995-07-13,"Scottsdale,AZ",MLB,2017-2025,2013-2025
+Dom Hamel,p,6-2,206,R,R,1999-03-02,"Chandler,AZ",AAA, ,2018-2025
+Logan Boyer,p,6-3,215,R,R,1998-01-24,"Chandler,AZ",AAA, ,2017-2025
+Drew Swift,ss-2b,6-0,165,R,R,1999-02-15,"Chandler,AZ",AAA, ,2018-2025
+Patrick Murphy,p,6-5,211,R,R,1995-06-10,"Chandler,AZ",MLB,2020-2022,2014-2025
+Brock Selvidge,p,6-3,205,R,L,2002-08-28,"Carrolton,TX",AA, ,2021-2025
+Luke Thiele,if,6-0,195,R,R,2002-12-19,"Chandler,AZ",NCAA, ,2023-2025
+Tyler Wilson,lf-rf,6-2,210,B,R,2002-07-10,"Tainan,TW",A+, ,2021-2025
+`;
+
+/* tiny CSV parser */
+function parseCSV(text){
+  const rows=[]; let i=0, field='', row=[], inQ=false;
+  const pushField=()=>{row.push(field);field='';};
+  const pushRow=()=>{rows.push(row);row=[];};
+  while(i<text.length){
+    const c=text[i++];
+    if(inQ){
+      if(c==='"' && text[i]==='"'){ field+='"'; i++; }
+      else if(c==='"'){ inQ=false; }
+      else field+=c;
+    }else{
+      if(c==='"'){ inQ=true; }
+      else if(c===','){ pushField(); }
+      else if(c==='\n' || c==='\r'){ if(field!==''||row.length){ pushField(); pushRow(); } }
+      else field+=c;
+    }
+  }
+  if(field!==''||row.length){ pushField(); pushRow(); }
+  const headers=rows.shift().map(h=>h.trim().toLowerCase());
+  return rows.filter(r=>r.length&&r.some(v=>String(v).trim()!==''))
+             .map(r=>{const o={}; headers.forEach((h,i)=>o[h]=(r[i]??'').trim()); return o;});
+}
+function mapLevel(lvl){
+  const t=String(lvl||'').toUpperCase().trim();
+  if(t==='AAA') return 'Triple-A';
+  if(t==='AA')  return 'Double-A';
+  if(t==='A+' || t==='A PLUS') return 'High-A';
+  if(t==='A'  || t==='SINGLE-A') return 'Low-A';
+  if(t.includes('JR')) return 'JUCO';
+  if(t==='NCAA') return 'NCAA';
+  if(t==='INDY' || t==='INDEPENDENT') return 'INDY';
+  return t;
+}
+const slugify = s => String(s).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'');
+
+/* Optional enrichment (images, teams, stats, etc.) keyed by slug id */
+const enrich = {
+  "cody-bellinger": {
+    team:"New York Yankees",
     frontImg:"https://i.postimg.cc/9F19KG5h/new-york-yankees-outfielder-cody-bellinger.jpg",
     highSchoolImg:"https://i.postimg.cc/Jhq690Lg/01-Bellinger-Front-page-00001.jpg",
+    currentLevel:"MLB",
+    status:"Active",
     batting:{avg:".284",obp:".345",slg:".520",ops:".865",hits:"150",runs:"95",hr:"35",rbi:"105"},
     nextGame:{opponent:"@ BOSTON RED SOX", date:"7/15 5:10 PM AZ"},
     last3:[{date:"7/12",opp:"@ BOS",line:"2-4, HR, 2 RBI"},{date:"7/11",opp:"@ BOS",line:"1-3, BB"},{date:"7/10",opp:"vs TOR",line:"0-4"}],
     letterWinnerYears:[2012,2013]
   },
-  { id:"patrick-murphy", name:"PATRICK MURPHY", graduatingClass:2013, currentLevel:"KBO", status:"Active",
-    position:"P", team:"KT Wiz Suwon — KBO",
+  "patrick-murphy": {
+    team:"KT Wiz Suwon — KBO",
     frontImg:"https://i.postimg.cc/JnCXccvC/MURPH.avif",
     highSchoolImg:"https://i.postimg.cc/pdxcG8gz/02-Murphy-Front-page-00001.jpg",
+    currentLevel:"KBO", status:"Active",
     pitching:{era:"3.22",so:"71",whip:"1.09",oba:".224",kbb:"3.6",fip:"3.45",ip:"112.0",er:"40",hr:"8",qs:"10",w:"8",sv:"0"},
     nextGame:{opponent:"vs KIA TIGERS", date:"8/29 2:30AM AZ"},
     last3:[{date:"8/27",opp:"vs KIA",line:"6.0 IP, 1 ER, 7 K"},{date:"8/23",opp:"@ KIA",line:"5.2 IP, 2 ER, 5 K"},{date:"8/20",opp:"vs SSG",line:"7.0 IP, 0 ER, 8 K"}],
     letterWinnerYears:[2012,2013]
   },
-  { id:"dom-hamel", name:"DOM HAMEL", graduatingClass:2017, currentLevel:"Triple-A", status:"Active",
-    position:"P", team:"Syracuse Mets — New York Mets",
+  "dom-hamel": {
+    team:"Syracuse Mets — New York Mets", currentLevel:"Triple-A", status:"Active",
     frontImg:"https://i.postimg.cc/rwYchfnt/20250804-151814.jpg",
     highSchoolImg:"https://i.postimg.cc/VLC7zDwX/23-Hamel-Front-page-00001.jpg",
     pitching:{era:"3.89",so:"93",whip:"1.18"},
@@ -505,8 +506,8 @@ const playersRaw = [
     last3:[{date:"8/26",opp:"@ SWB",line:"1.0 IP, 1 ER, 1 K"},{date:"8/21",opp:"vs IND",line:"1.0 IP, 7 ER"},{date:"8/15",opp:"@ ROC",line:"1.0 IP, 1 ER"}],
     letterWinnerYears:[2016,2017]
   },
-  { id:"drew-swift", name:"DREW SWIFT", graduatingClass:2017, currentLevel:"Triple-A", status:"Active",
-    position:"SS", team:"Las Vegas Aviators — Athletics",
+  "drew-swift": {
+    team:"Las Vegas Aviators — Athletics", currentLevel:"Triple-A", status:"Active",
     frontImg:"https://i.postimg.cc/GmmSKFsV/AISelect-20250826-023939-Instagram.jpg",
     highSchoolImg:"https://i.postimg.cc/0j6VMCwR/04-Swift-Front-page-00001.jpg",
     batting:{avg:".271",obp:".335",slg:".414",ops:".749",hits:"114",runs:"68",hr:"10",rbi:"52",doubles:"24",triples:"3",sb:"18",bb:"41"},
@@ -514,11 +515,28 @@ const playersRaw = [
     last3:[{date:"08/25",opp:"@ ABQ",line:"2-5, 2B, R"},{date:"08/24",opp:"@ ABQ",line:"1-3, BB, SB"},{date:"08/23",opp:"@ ABQ",line:"0-4"}],
     letterWinnerYears:[2014,2015,2016,2017]
   }
-];
+};
 
-const players = [...playersRaw].sort((a,b)=>(+a.graduatingClass||0)-(+b.graduatingClass||0));
+/* Build players from CSV + enrichment */
+function csvPlayers(){
+  const rows = parseCSV(CSV_DATA);
+  return rows.map(r=>{
+    const id = slugify(r.player);
+    const level = mapLevel(r.hilvl);
+    const base = {
+      id, name: String(r.player||'').toUpperCase(),
+      position:(r.pos||'').toUpperCase(),
+      currentLevel: level,
+      status:'Active',
+      team:'', frontImg:'', highSchoolImg:'',
+      letterWinnerYears:[], graduatingClass: undefined,
+      batting:undefined, pitching:undefined, nextGame:undefined, last3:[]
+    };
+    return Object.assign(base, enrich[id]||{});
+  });
+}
 
-/* render */
+/* render helpers */
 function letterDots(years){ if(!years||!years.length) return ''; const sorted=[...years].sort((a,b)=>b-a); return `<div class="letters">${sorted.slice(0,4).map(y=>`<span class="letter-dot" title="${y}">${String(y).slice(-2)}</span>`).join('')}</div>`;}
 function makeKV(k,v){ return `<div class="kv"><div class="k">${k}</div><div class="v">${v??'—'}</div></div>`; }
 function makeStats12(p){
@@ -534,10 +552,19 @@ function makeStats12(p){
           ${makeKV('QS',x.qs||'—')} ${makeKV('HR',x.hr||'—')} ${makeKV('W',x.w||'—')} ${makeKV('SV',x.sv||'—')}`;
 }
 
-function makeIcon(id, title, d){
-  return `<button class="tabbtn" data-tab="${id}" title="${title}" aria-pressed="false" data-noflip>
-    <svg viewBox="0 0 24 24"><path fill="currentColor" d="${d}"/></svg>
-  </button>`;
+/* back-of-card tab icons (8) */
+function iconBtn(tab, active=false, label=''){
+  const svg = {
+    stats:'<path d="M5 3h2v18H5zM11 10h2v11h-2zM17 6h2v15h-2z"/>',
+    news:'<path d="M4 5h16v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5zm2 2v12h12V7H6z"/>',
+    yb:'<path d="M12 2 9 9H2l5.5 4L5 20l7-4 7 4-2.5-7L22 9h-7z"/>',
+    nil:'<path d="M3 5h18v2H3zm0 6h18v2H3zm0 6h10v2H3z"/>',
+    x:'<path d="M714 511 1160 0H996L689 356 420 0H0l463 607L0 1227h164l329-379 286 379h420zM327 120h154l646 873H973z"/>',
+    ig:'<path d="M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5zm5 5a5 5 0 1 0 .001 10.001A5 5 0 0 0 12 7zm6-2.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z"/>',
+    video:'<path d="M3 6h12a2 2 0 0 1 2 2v1l4-3v12l-4-3v1a2 2 0 0 1-2 2H3z"/>',
+    gallery:'<path d="M4 5h16v14H4zM7 8a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm0 8 4-5 3 3 2-2 3 4z"/>'
+  }[tab] || '<circle cx="12" cy="12" r="8"/>';
+  return `<button class="i8 ${active?'active':''}" data-tab="${tab}" title="${label||tab.toUpperCase()}"><svg viewBox="0 0 24 24">${svg}</svg></button>`;
 }
 
 function makeCard(p){
@@ -545,7 +572,6 @@ function makeCard(p){
   const {team,parent} = teamAndParent(p);
   const [ng1,ng2] = formatNextTwoLines(p.nextGame||{});
   const profUrl = `profile.html?id=${encodeURIComponent(p.id)}`;
-
   return `
 <article class="card flip-card front" tabindex="0" aria-label="${(p.name||'').toUpperCase()}">
   <button class="hit left"  data-toggle="prev" aria-label="Flip previous"></button>
@@ -581,16 +607,11 @@ function makeCard(p){
 
     <section class="face back-face">
       <div class="back-top">
-        <div class="back-left">
-          <div class="stats-name">${(p.name||'').toUpperCase()}</div>
-          <div class="team-line">${team||''}</div>
-          <div class="parent-line">${parent||''}</div>
-          <a class="profile-mini" href="${profUrl}" data-noflip>
-            <div class="l1">${(p.name||'').toUpperCase()}</div>
-            <div class="l2">${team||'—'}</div>
-            <div class="l3">${parent||'—'}</div>
-          </a>
-        </div>
+        <a class="profile-mini" href="${profUrl}" aria-label="Open full player profile">
+          <div class="p1">${(p.name||'').toUpperCase()}</div>
+          <div class="p2">${team||'&nbsp;'}</div>
+          <div class="p3">${parent||'&nbsp;'}</div>
+        </a>
         <div class="back-right">
           <div class="hs-box" aria-hidden="true">
             <img src="${(p.highSchoolImg||p.frontImg||'')}" alt="${(p.name||'HS')}" onerror="this.onerror=null;this.style.display='none'">
@@ -598,41 +619,38 @@ function makeCard(p){
         </div>
       </div>
 
-      <div class="back-bottom" data-noflip>
-        <div class="funzone">
-          <div class="pane pane-stats active" data-pane="stats"><div class="kv-wrap12">${makeStats12(p)}</div></div>
-          <div class="pane pane-news"  data-pane="news"><div style="color:#9aa1ab">Latest headlines placeholder.</div></div>
-          <div class="pane pane-yat"   data-pane="yat"><div style="color:#9aa1ab">YAT-A-BOY! gifting CTA placeholder.</div></div>
-          <div class="pane pane-nil"   data-pane="nil"><div style="color:#9aa1ab">NIL point totals placeholder.</div></div>
-          <div class="pane pane-x"     data-pane="x"><div style="color:#9aa1ab">X/Twitter posts placeholder.</div></div>
-          <div class="pane pane-ig"    data-pane="ig"><div style="color:#9aa1ab">Instagram posts placeholder.</div></div>
-          <div class="pane pane-vid"   data-pane="vid"><div style="color:#9aa1ab">Video feed placeholder.</div></div>
-          <div class="pane pane-gal"   data-pane="gal"><div style="color:#9aa1ab">Photo gallery placeholder.</div></div>
-        </div>
+      <div class="back-bottom funzone" data-noflip>
+        <div class="pane pane-stats active" data-pane="stats"><div class="kv-wrap12">${makeStats12(p)}</div></div>
+        <div class="pane pane-news" data-pane="news"><div style="color:#374151">Latest headlines placeholder.</div></div>
+        <div class="pane pane-yb" data-pane="yb"><div style="color:#374151">YAT-A-BOY! tipping / CTA placeholder.</div></div>
+        <div class="pane pane-nil" data-pane="nil"><div style="color:#374151">NIL points / totals placeholder.</div></div>
+        <div class="pane pane-x" data-pane="x"><div style="color:#374151">X/Twitter posts placeholder.</div></div>
+        <div class="pane pane-ig" data-pane="ig"><div style="color:#374151">Instagram posts placeholder.</div></div>
+        <div class="pane pane-video" data-pane="video"><div style="color:#374151">Video placeholder.</div></div>
+        <div class="pane pane-gallery" data-pane="gallery"><div style="color:#374151">Photo gallery placeholder.</div></div>
 
-        <div class="tab-icons" data-noflip>
-          ${makeIcon('stats','Season/Career Stats','M5 3h2v18H5zM11 10h2v11h-2zM17 6h2v15h-2z')}
-          ${makeIcon('news','News','M4 5h16v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5zm2 2v12h12V7H6zm1 1h10v3H7V8z')}
-          ${makeIcon('yat','YAT-A-BOY','M12 21 3 12h5V3h6v9h5z')}
-          ${makeIcon('nil','NIL Points','M12 2l9 4-9 4-9-4 9-4zm0 18l-9-4 3-1.3V11l6 2.7 6-2.7v3.7l3 1.3-9 4z')}
-          ${makeIcon('x','X Feed','M714 511 1160 0H996L689 356 420 0H0l463 607L0 1227h164l329-379 286 379h420zM327 120h154l646 873H973z')}
-          ${makeIcon('ig','Instagram','M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5zm5 5a5 5 0 1 0 .001 10.001A5 5 0 0 0 12 7zm6-2.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z')}
-          ${makeIcon('vid','Video','M4 6h10v12H4zM16 8l6 4-6 4z')}
-          ${makeIcon('gal','Gallery','M3 6h18v12H3zM6 16l4-5 3 4 2-3 3 4H6z')}
+        <div class="iconbar" data-noflip>
+          ${iconBtn('stats',true,'Stats')}
+          ${iconBtn('news',false,'News')}
+          ${iconBtn('yb',false,'YAT-A-BOY')}
+          ${iconBtn('nil',false,'NIL')}
+          ${iconBtn('x',false,'X')}
+          ${iconBtn('ig',false,'Instagram')}
+          ${iconBtn('video',false,'Video')}
+          ${iconBtn('gallery',false,'Gallery')}
         </div>
       </div>
     </section>
   </div>
 </article>`;
 }
-
 function render(list){ byId('grid').innerHTML = list.map(makeCard).join(''); attachInteractions(); }
 
-/* filters */
-const LEVEL_ORDER = ["MLB","TRIPLE-A","DOUBLE-A","HIGH-A","LOW-A","ROOKIE","INDY","NCAA","NCAA-D1","NCAA-D2","NCAA-D3","NAIA","JUCO"];
+/* filters (simple demo data for years) */
+const LEVEL_ORDER = ["MLB","TRIPLE-A","DOUBLE-A","HIGH-A","LOW-A","ROOKIE","INDY","NCAA","NAIA","JUCO","KBO","AA"];
 function yearsRange(start,end){const arr=[]; for(let y=start;y>=end;y--) arr.push(y); return arr;}
-function uniqueSortedGradYears(){ const set=new Set(players.map(p=>p.graduatingClass).filter(Boolean)); const have=[...set].map(Number); const want=yearsRange(2025,2000); return [...new Set([...want,...have])]; }
-function uniqueRosterYears(){ const set=new Set(); players.forEach(p=>(p.letterWinnerYears||[]).forEach(y=>set.add(Number(y)))); const have=[...set]; const want=yearsRange(2025,2000); return [...new Set([...want,...have])]; }
+function uniqueSortedGradYears(){ return yearsRange(2025,2000); }
+function uniqueRosterYears(){ return yearsRange(2025,2000); }
 function populateFilters(){
   const lSel=byId('lvl'); lSel.innerHTML=''; LEVEL_ORDER.forEach(L=>{const o=document.createElement('option');o.value=L;o.textContent=L;lSel.appendChild(o);});
   const gSel=byId('grad'); gSel.innerHTML=''; uniqueSortedGradYears().forEach(y=>{const o=document.createElement('option');o.value=String(y);o.textContent=y;gSel.appendChild(o);});
@@ -647,11 +665,11 @@ function applyFilters(){
   const grads=getMultiValues('grad');
   const years=getMultiValues('roster').map(Number);
   const stats=getMultiValues('status').map(s=>s.toLowerCase());
-  const out=players.filter(p=>{
+  const out=window.players.filter(p=>{
     const name=(p.name||'').toLowerCase();
     if(q && !name.includes(q)) return false;
     if(levels.length){ const L=String(p.currentLevel||'').toUpperCase().replace('AAA','TRIPLE-A').replace('AA','DOUBLE-A'); if(!levels.includes(L)) return false; }
-    if(grads.length && !grads.includes(String(p.graduatingClass))) return false;
+    if(grads.length && !grads.includes(String(p.graduatingClass||''))) return false;
     if(years.length){ const lw=(p.letterWinnerYears||[]).map(Number); if(!lw.some(y=>years.includes(y))) return false; }
     if(stats.length){ if(!stats.includes(String(p.status||'').toLowerCase())) return false; }
     return true;
@@ -662,51 +680,37 @@ function resetAll(){
   const ls=byId('localSearch'); if(ls) ls.value='';
   const fn=byId('filterName'); if(fn) fn.value='';
   ['lvl','grad','roster','status'].forEach(id=>{const sel=byId(id); if(sel) [...sel.options].forEach(o=>o.selected=false);});
-  render(players);
+  render(window.players);
 }
 
 /* interactions */
-const INTERACTIVE_SEL='[data-noflip], .tabbtn, .action-chip, a,button,input,select,textarea, .tab-icons *';
+const INTERACTIVE_SEL='[data-noflip], .tabbtn, .action-chip, .i8, a,button,input,select,textarea';
 function toggle(card){ if(!card) return; card.classList.contains('front') ? (card.classList.remove('front'),card.classList.add('back')) : (card.classList.remove('back'),card.classList.add('front')); }
-
 function attachInteractions(){
-  // initialize faces
   document.querySelectorAll('.card').forEach(c=>{ if(!c.classList.contains('front')&& !c.classList.contains('back')) c.classList.add('front'); });
-
-  // Tab icon switching
-  document.querySelectorAll('.tab-icons').forEach(bar=>{
-    bar.addEventListener('click', (e)=>{
-      const btn=e.target.closest('.tabbtn'); if(!btn) return;
-      const pane=btn.dataset.tab||'stats';
-      const card=btn.closest('.card');
-      card.querySelectorAll('.tabbtn').forEach(b=>b.classList.toggle('active', b===btn));
-      card.querySelectorAll('.pane').forEach(p=>p.classList.toggle('active', p.dataset.pane===pane));
-    }, true);
-  });
-
-  // Edge hit zones
+  // Edge hit buttons click
   document.querySelectorAll('.card .hit').forEach(hit=>{
     hit.addEventListener('click', e=>{ if(e.target.closest(INTERACTIVE_SEL)) return; toggle(hit.closest('.card')); });
   });
 
-  // Pointer-based swipe anywhere on card (except interactive)
+  // Pointer swipe anywhere on the card (except interactive)
   document.querySelectorAll('.card').forEach(card=>{
-    let sx=null, sy=null, tracking=false;
-    const MIN=40;
-    card.addEventListener('pointerdown', e=>{
-      if(e.target.closest(INTERACTIVE_SEL)) return;
-      sx=e.clientX; sy=e.clientY; tracking=true;
-    }, {passive:true});
-    card.addEventListener('pointerup', e=>{
-      if(!tracking) return;
-      const dx=e.clientX-sx, dy=e.clientY-sy;
-      if(Math.abs(dx)>MIN && Math.abs(dx)>Math.abs(dy)) toggle(card);
-      tracking=false; sx=sy=null;
-    }, {passive:true});
+    let sx=null, sy=null, tracking=false; const MIN=40;
+    const down=e=>{ if(e.target.closest(INTERACTIVE_SEL)) return; sx=e.clientX; sy=e.clientY; tracking=true; };
+    const up=e=>{ if(!tracking) return; const dx=e.clientX-sx; const dy=e.clientY-sy; if(Math.abs(dx)>MIN && Math.abs(dx)>Math.abs(dy)) toggle(card); tracking=false; sx=sy=null; };
+    card.addEventListener('pointerdown',down,{passive:true});
+    card.addEventListener('pointerup',up,{passive:true});
+    card.addEventListener('keydown',(e)=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); toggle(card); }});
+  });
 
-    // keyboard
-    card.addEventListener('keydown', e=>{
-      if(e.key==='Enter' || e.key===' '){ e.preventDefault(); toggle(card); }
+  // Icon bar → panes
+  document.querySelectorAll('.iconbar').forEach(bar=>{
+    bar.addEventListener('click', (e)=>{
+      const btn=e.target.closest('.i8'); if(!btn) return;
+      const pane=btn.dataset.tab;
+      const card=btn.closest('.card');
+      card.querySelectorAll('.i8').forEach(b=>b.classList.toggle('active', b.dataset.tab===pane));
+      card.querySelectorAll('.pane').forEach(p=>p.classList.toggle('active', p.dataset.pane===pane));
     });
   });
 }
@@ -744,7 +748,7 @@ scrim.addEventListener('click', closeDrawers);
 const localSearch=byId('localSearch'); const localResults=byId('localResults');
 function renderLocalResults(q){
   localResults.innerHTML=''; if(!q) return;
-  players.filter(p=>(p.name||'').toLowerCase().includes(q.toLowerCase())).slice(0,50).forEach(p=>{
+  window.players.filter(p=>(p.name||'').toLowerCase().includes(q.toLowerCase())).slice(0,50).forEach(p=>{
     const li=document.createElement('li'); const yr=p.graduatingClass?` (Class of ${p.graduatingClass})`:''; li.textContent=`${p.name}${yr}`;
     li.addEventListener('click', ()=>{ window.location.href=`profile.html?id=${encodeURIComponent(p.id)}`; closeLeft(); });
     localResults.appendChild(li);
@@ -752,14 +756,45 @@ function renderLocalResults(q){
 }
 localSearch.addEventListener('input', (e)=>renderLocalResults(e.target.value));
 
-/* right drawer: By Player filter (auto-close on Enter) */
+/* filters: By Player input (Enter applies & closes) */
 byId('filterName').addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ e.preventDefault(); applyFilters(); closeRight(); } });
+
+/* Splash control */
+function runSplash(){
+  const isSmall = window.matchMedia('(max-width: 1024px)').matches;
+  const splash = document.getElementById('splash');
+  if(!splash) return;
+  if(!isSmall){ splash.remove(); return; }
+  splash.classList.add('show');
+  const sfx = document.getElementById('splashSfx');
+  const tryPlay = () => {
+    if(!sfx || !sfx.querySelector('source')) return;
+    sfx.play().catch(() => {
+      const oneShot = () => { sfx.play().finally(() => {
+        window.removeEventListener('pointerdown', oneShot, true);
+        window.removeEventListener('keydown', oneShot, true);
+      }); };
+      window.addEventListener('pointerdown', oneShot, true);
+      window.addEventListener('keydown', oneShot, true);
+    });
+  };
+  tryPlay();
+  setTimeout(() => {
+    splash.classList.add('hide');
+    setTimeout(() => splash.remove(), 520);
+  }, 1200);
+}
 
 /* boot */
 document.addEventListener('DOMContentLoaded', ()=>{
-  runSplash();
+  // Build players from CSV + enrichment
+  window.players = csvPlayers().sort((a,b)=>(+a.graduatingClass||0)-(+b.graduatingClass||0));
   populateFilters();
-  render(players);
+  render(window.players);
+  // Auth drawer must be closed on load
+  drawerAuth.classList.remove('open');
+  // Splash (mobile/tablet only)
+  runSplash();
 });
 </script>
 </body>
