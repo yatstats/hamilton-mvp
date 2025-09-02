@@ -9,9 +9,10 @@
 
 <style>
 :root{
-  --bg:#0b0d12; --ink:#f3f4f6; --muted:#A6ADB7; /* slightly brighter for contrast */
+  --bg:#0b0d12; --ink:#f3f4f6; --muted:#A6ADB7;
   --ring:#1f2530; --ring2:#232a36;
-  --headerH:135px;
+  --headerH:135px;            /* desktop */
+  --headerH-sm:100px;         /* mobile */
   --drawer-min:300px; --drawer-max:520px; --drawer-mob:75vw;
   --accent:#ffffff; --chip:#0e1016;
   --touchEdge:18%;
@@ -23,60 +24,74 @@ a{color:inherit;text-decoration:none}
 button{font:inherit;color:inherit}
 img{max-width:100%;display:block}
 
-/* ---------- FOCUS VIZ ---------- */
+/* Focus */
 :focus-visible{outline:2px solid #fff; outline-offset:2px}
 .hdr-icon:focus-visible,.ibtn:focus-visible,.hambtn:focus-visible{outline:2px solid #fff}
 
-/* ---------- HEADER ---------- */
+/* ---------- HEADER (2 rows sticky) ---------- */
 .site-header{
-  position:fixed;inset:0 0 auto 0;height:var(--headerH);z-index:60;background:#000;border-bottom:1px solid var(--ring);
-  display:flex; flex-direction:column; gap:8px; padding:8px 10px 6px; position:relative;
+  position:sticky; top:0; z-index:60;
+  background:#000; border-bottom:1px solid var(--ring);
+  display:flex; flex-direction:column; gap:8px; padding:8px 10px 6px;
 }
 .header-top, .header-bottom { display:flex; width:100%; align-items:center; }
-.header-top { justify-content:space-between; }
-.header-bottom { justify-content:flex-start; }
-.top-row{display:flex;gap:2px;align-items:center;}
-.hambtn,.hdr-icon{width:38px;height:38px;border:0;background:transparent;border-radius:10px;display:grid;place-items:center;cursor:pointer}
+.header-top { justify-content:space-between; flex-wrap:nowrap; gap:8px; }
+.top-row{display:flex; align-items:center; gap:clamp(2px,1.2vw,8px); flex-wrap:nowrap; min-width:0;}
+.hambtn,.hdr-icon{width:38px;height:38px;border:0;background:transparent;border-radius:10px;display:grid;place-items:center;cursor:pointer;flex:0 0 auto}
 .hambtn svg,.hdr-icon svg{width:21px;height:21px;color:#fff}
 .hdr-icon:hover{background:rgba(255,255,255,.08)}
 .hdr-icon.active{background:#fff}.hdr-icon.active svg{color:#000}
 
-/* Hamilton block */
-.ham-brand{display:flex;gap:4px;align-items:center;}
-.ham-logo{height:80px;width:auto}
-.ham-type{line-height:1;display:flex;flex-direction:column;gap:2px;}
-.ham-line1{font-family:"Roboto Condensed",sans-serif;font-weight:300;font-size:12px;letter-spacing:.02em;color:var(--muted)}
-.ham-line2{font-family:"Anton",sans-serif;font-size:17px;letter-spacing:.01em;margin-top:0;}
-.ham-line3{font-family:"Anton",sans-serif;font-size:19px;letter-spacing:.01em;margin-top:0;}
+/* YAT?STATS pinned to top-right; scales but never wraps */
+.ystats-logo{flex:0 0 auto;height:clamp(24px,4.5vw,36px);width:auto;object-fit:contain}
 
-/* center nav (desktop) */
+/* Row 2: Hamilton H + 3-line type—always visible, acts as one unit */
+.header-bottom{justify-content:flex-start}
+.ham-brand{display:grid;grid-template-columns:auto 1fr;align-items:center;column-gap:6px}
+.ham-logo{--hamH:80px;height:var(--hamH);width:auto}
+.ham-type{
+  display:flex !important; flex-direction:column; justify-content:space-between; align-items:flex-start;
+  height:var(--hamH); padding-block:1px; min-width:0;
+}
+.ham-line1{font-family:"Roboto Condensed",sans-serif;font-weight:300;font-size:clamp(11px,1.6vw,12px);letter-spacing:.02em;color:var(--muted);line-height:1}
+.ham-line2{font-family:"Anton",sans-serif;font-size:clamp(13px,2.2vw,17px);letter-spacing:.01em;line-height:1}
+.ham-line3{font-family:"Anton",sans-serif;font-size:clamp(14px,2.4vw,19px);letter-spacing:.01em;line-height:1}
+
+/* center nav (desktop only, never wrap; hide when tight) */
 .nav-desktop{
   position:absolute; top: 50%; left:50%; transform:translate(-50%,-50%);
-  display:flex;gap:16px;align-self:center;justify-self:center;flex-wrap:wrap;
+  display:flex;gap:16px;white-space:nowrap;
 }
-@media (max-width:1260px){ .nav-desktop{display:none} }
+@media (max-width:1400px){ .nav-desktop{display:none} }
 .font-slim{font-family:"Roboto Condensed",sans-serif;font-weight:300}
 .font-strong{font-family:"Anton",sans-serif}
 .nav-desktop a{font-size:12px;text-transform:uppercase;white-space:nowrap}
 .nav-slim{color:#9aa1ab;letter-spacing:-.01em;margin-right:-1px}
 .nav-strong{color:#fff;letter-spacing:.01em}
 
-/* right logo */
-.ystats-logo{height:36px;width:auto;object-fit:contain;}
-
-/* ---------- TAGLINE ---------- */
-.tagline-wrap{position:sticky;top:var(--headerH);z-index:40;background:#000;border-bottom:1px solid var(--ring)}
+/* ---------- TAGLINE (sticky under header) ---------- */
+.tagline-wrap{position:sticky; top:calc(var(--headerH)); z-index:40; background:#000; border-bottom:1px solid var(--ring)}
 .tagline{display:flex;align-items:center;justify-content:space-between;padding:8px 10px}
-.tag-grey{color:var(--muted);font-family:"Roboto Condensed",sans-serif;font-weight:300;letter-spacing:-.01em;margin-right:-1px}
+.tag-grey{color:#9aa1ab;font-family:"Roboto Condensed",sans-serif;font-weight:300;letter-spacing:-.01em;margin-right:-1px}
 .tag-strong{color:#fff;font-family:"Anton",sans-serif;letter-spacing:.01em}
 
 /* ---------- GRID ---------- */
-main{padding:calc(var(--headerH) + 44px) 0 86px}
-.grid{padding:10px;display:grid;grid-template-columns:repeat(1,minmax(0,1fr));gap:12px}
+main{padding:10px 0 86px}
+.grid{
+  padding:10px; margin:0 auto;
+  display:grid; grid-template-columns:repeat(1,minmax(0,1fr)); gap:12px;
+  max-width:1400px;
+}
 @media (min-width:560px){ .grid{grid-template-columns:repeat(2,1fr)} }
 @media (min-width:820px){ .grid{grid-template-columns:repeat(3,1fr)} }
 @media (min-width:1100px){ .grid{grid-template-columns:repeat(4,1fr)} }
 @media (min-width:1440px){ .grid{grid-template-columns:repeat(5,1fr)} }
+
+/* Full-width card on 1-col; perfectly centered */
+@media (max-width:559px){
+  .grid{grid-template-columns:1fr}
+  .card{width:100%}
+}
 
 /* ---------- CARD / FLIP ---------- */
 .card{background:#000;border-radius:14px;overflow:hidden;position:relative;user-select:none;aspect-ratio:5/7;min-height:300px;
@@ -96,22 +111,24 @@ main{padding:calc(var(--headerH) + 44px) 0 86px}
 .front-right{right:12px;bottom:10px;width:72%;text-align:right}
 .name{font-weight:900;text-transform:uppercase;letter-spacing:.02em;font-size:18px;line-height:1.06}
 .team{font-size:13px}.parent{font-size:12px;opacity:.92;margin-top:2px}
-.stack{display:flex;flex-direction:column;gap:4px;margin-top:4px}
-.chip{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.14);color:#fff;border:1px solid rgba(255,255,255,.24);border-radius:999px;padding:2px 8px 3px;font-weight:800;font-size:10px;letter-spacing:.06em}
+.stack{display:flex;flex-direction:column;gap:4px;margin-top:6px}
+
+/* COMPACT CHIPS (short as possible, strong contrast) */
+.chip{
+  display:inline-flex;align-items:center;white-space:nowrap;
+  background:rgba(0,0,0,.65);color:#fff;border:1px solid rgba(255,255,255,.28);
+  border-radius:999px;padding:2px 6px;font-weight:800;font-size:10px;letter-spacing:.04em;
+  width:max-content; max-width:100%;
+}
 .chip.class{background:#374151;border-color:#374151}
+
+/* tiny class-year dots */
 .letters{display:flex;gap:6px;align-items:center;margin-top:6px}
 .letter-dot{width:20px;height:20px;border-radius:50%;background:#fff;color:#7A0019;display:grid;place-items:center;font-weight:900;font-size:11px;border:1px solid rgba(0,0,0,.15)}
-.next-chip,.last-chip{display:inline-block;background:rgba(255,255,255,.14);color:#fff;border:1px solid rgba(255,255,255,.24);border-radius:999px;padding:2px 8px 3px;font-size:10px;font-weight:900;letter-spacing:.12em;margin-bottom:3px}
+
+.next-chip,.last-chip{display:inline-block;background:rgba(0,0,0,.65);color:#fff;border:1px solid rgba(255,255,255,.28);border-radius:999px;padding:2px 6px;font-size:10px;font-weight:900;letter-spacing:.08em;margin-bottom:3px}
 .right-line{font-size:12px;font-weight:800;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .last3 .item{font-size:12px;color:#e5e7eb;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:right;margin-top:2px}
-
-/* “flip” control button (visible & SR friendly) */
-.flip-toggle{
-  position:absolute; top:10px; right:10px; z-index:3;
-  background:rgba(0,0,0,.6); color:#fff; border:1px solid rgba(255,255,255,.25);
-  border-radius:999px; padding:6px 10px; cursor:pointer; font-weight:800; letter-spacing:.06em; font-size:11px;
-}
-.card.back .flip-toggle{ background:#111; }
 
 /* BACK */
 .back-face{transform:rotateY(180deg);background:#fff;color:#111;display:grid;grid-template-rows:auto 1fr}
@@ -133,7 +150,7 @@ main{padding:calc(var(--headerH) + 44px) 0 86px}
 /* stats grid */
 .kv-wrap12{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
 .kv{background:#f3f4f6;border-radius:10px;text-align:center;padding:8px;display:flex;flex-direction:column;justify-content:center}
-.kv .k{font-size:11px;color:#374151} /* darker for contrast */
+.kv .k{font-size:11px;color:#374151}
 .kv .v{font-weight:800}
 
 /* 8-icon bar */
@@ -143,18 +160,17 @@ main{padding:calc(var(--headerH) + 44px) 0 86px}
 .ibtn.active{background:#111;border-color:#111}
 .ibtn.active svg{color:#fff}
 
-/* flip touch edges (front only) */
+/* Flip touch edges (front only) */
 .hit{position:absolute;top:0;bottom:0;width:var(--touchEdge);z-index:2;background:transparent;border:0}
 .hit.left{left:0}.hit.right{right:0}
 .card.back .hit{display:none}
-.hit[aria-hidden="true"]{pointer-events:auto} /* still clickable for mouse/touch */
 
 /* ---------- DRAWERS ---------- */
-.scrim{position:fixed;left:0;right:0;top:var(--headerH);bottom:0;background:rgba(0,0,0,.35);opacity:0;pointer-events:none;transition:opacity .25s ease;z-index:55}
+.scrim{position:fixed;left:0;right:0;top:calc(var(--headerH));bottom:0;background:rgba(0,0,0,.35);opacity:0;pointer-events:none;transition:opacity .25s ease;z-index:55}
 .scrim.open{opacity:1;pointer-events:auto}
 body.no-scroll{overflow:hidden}
 
-.drawer-left,.drawer-right,.drawer-auth{position:fixed;top:var(--headerH);bottom:0;right:0;width:clamp(var(--drawer-min),var(--drawer-mob),var(--drawer-max));background:#0b0f16;border-left:1px solid var(--ring2);transform:translateX(100%);transition:transform .25s ease;z-index:56;display:flex;flex-direction:column}
+.drawer-left,.drawer-right,.drawer-auth{position:fixed;top:calc(var(--headerH));bottom:0;right:0;width:clamp(var(--drawer-min),var(--drawer-mob),var(--drawer-max));background:#0b0f16;border-left:1px solid var(--ring2);transform:translateX(100%);transition:transform .25s ease;z-index:56;display:flex;flex-direction:column}
 .drawer-left{left:0;right:auto;border-left:0;border-right:1px solid var(--ring2);transform:translateX(-100%)}
 .drawer-left.open{transform:translateX(0)}
 .drawer-right.open,.drawer-auth.open{transform:translateX(0)}
@@ -179,7 +195,7 @@ body.no-scroll{overflow:hidden}
 .footer{position:fixed;left:0;right:0;bottom:0;height:72px;background:#000;color:#fff;display:flex;align-items:center;justify-content:center;z-index:10}
 .build-pill{position:absolute;left:10px;bottom:10px;background:rgba(255,255,255,.12);color:#fff;font-size:12px;padding:6px 10px;border-radius:12px}
 
-/* ---------- SPLASH (mobile + desktop) ---------- */
+/* ---------- SPLASH ---------- */
 .splash{position:fixed;inset:0;background:#000;z-index:1000;display:none;opacity:1;transition:opacity .5s}
 .splash.show{display:block}
 .splash.hide{opacity:0;pointer-events:none}
@@ -194,34 +210,26 @@ body.no-scroll{overflow:hidden}
 @keyframes logoZoom{0%{transform:scale(.85);opacity:.0}60%{transform:scale(1.03);opacity:1}100%{transform:scale(1)}}
 @keyframes logoGlow{0%,100%{filter:drop-shadow(0 2px 12px rgba(255,255,255,.18))}50%{filter:drop-shadow(0 2px 20px rgba(255,255,255,.28))}}
 .sponsor{margin-top:22px;text-align:center;color:#ddd;font-family:"Roboto Condensed",sans-serif;font-weight:300}
-.sponsor img{margin:8px auto 0;max-height:44px}
 
-/* utility */
-.hidden{display:none !important}
-
-/* ---------- REDUCED MOTION ---------- */
+/* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
   .flip-inner,.card,.splash,.splash-logo::after{transition:none !important;animation:none !important}
 }
 
-/* ---------- HEADER RESPONSIVENESS ---------- */
+/* Header height adjustments on small screens */
 @media (max-width: 640px) {
-  :root { --headerH: 100px; }
-  .ham-logo { height: 50px; }
-  .ystats-logo { height: 30px; }
-  .ham-line2 { font-size: 15px; }
-  .ham-line3 { font-size: 16px; }
-  .top-row { gap: 2px; }
-}
-
-@media (max-width: 420px) {
-  .ham-type { display: none; }
+  :root { --headerH: var(--headerH-sm); }
+  .ham-logo { --hamH: 50px; height: var(--hamH); }
+  .ham-type { height: var(--hamH); }
+  .hambtn,.hdr-icon{width:34px;height:34px}
+  .hambtn svg,.hdr-icon svg{width:19px;height:19px}
 }
 </style>
 </head>
 <body>
 
 <header class="site-header">
+  <!-- Row 1 -->
   <div class="header-top">
       <div class="top-row">
         <button class="hambtn" id="openLeft" aria-label="Open Navigation">
@@ -243,6 +251,7 @@ body.no-scroll{overflow:hidden}
       <img class="ystats-logo" id="ystatsLogo" src="https://i.postimg.cc/C5mwXpQy/35878-20250830-222027-0000.png" alt="YAT?STATS"/>
   </div>
   
+  <!-- Row 2 -->
   <div class="header-bottom">
     <div class="ham-brand">
       <img class="ham-logo" id="hamLogo" src="https://i.postimg.cc/2jwjVn8H/32900-20250830-222044-0000.png" alt="Hamilton H"/>
@@ -254,6 +263,7 @@ body.no-scroll{overflow:hidden}
     </div>
   </div>
 
+  <!-- Desktop center nav (auto hides before wrapping) -->
   <nav class="nav-desktop" aria-label="Primary">
     <a href="#" class="font-slim nav-slim">WHERE THEY</a><a href="#" class="font-strong nav-strong">YAT?</a>
     <a href="#" class="font-slim nav-slim">ACTIVE ALUMNI</a><a href="#" class="font-strong nav-strong">NEWS</a>
@@ -262,21 +272,22 @@ body.no-scroll{overflow:hidden}
     <a href="#" class="font-slim nav-slim">THE</a><a href="#" class="font-strong nav-strong">CURRENT TEAM</a>
     <a href="#" class="font-slim nav-slim">PCDACTION</a><a href="#" class="font-strong nav-strong">PARTNER PROGRAM</a>
   </nav>
-
 </header>
 
+<!-- Tagline (now: FLIP FOR STATS!) -->
 <div class="tagline-wrap">
   <div class="tagline">
     <div>
       <span class="tag-grey">WHERE THEY</span><span class="tag-strong">YAT?</span>
       &nbsp;&nbsp;
-      <span class="tag-grey">SWIPE FOR</span><span class="tag-strong">STATS!</span>
+      <span class="tag-grey">FLIP FOR</span><span class="tag-strong">STATS!</span>
     </div>
   </div>
 </div>
 
-<div class="scrim" id="scrim" aria-hidden="true"></div> <!-- present & used -->
+<div class="scrim" id="scrim" aria-hidden="true"></div>
 
+<!-- Left drawer -->
 <aside class="drawer-left" id="drawerLeft" aria-hidden="true" role="navigation" tabindex="-1">
   <div class="drawer-header">
     <div class="right-title">Navigation</div>
@@ -299,7 +310,7 @@ body.no-scroll{overflow:hidden}
       <input id="localSearch" type="text" class="ghost" placeholder="Type a player name…" autocomplete="off"/>
       <ul id="localResults" class="left-results" role="listbox" aria-label="Search results"></ul>
 
-      <div class="global-line">
+      <div class="global-line" style="margin-top:14px;font-size:12px;color:#c4c9d1;display:flex;gap:10px;align-items:center;flex-wrap:wrap">
         <span>GLOBAL YATSTATS PLATFORM SEARCHES</span>
         <a href="https://www.yatstats.com" target="_blank" rel="noopener">🌎🔍 by PLAYER</a> •
         <a href="https://www.yatstats.com" target="_blank" rel="noopener">🌎🔍 by TEAM</a>
@@ -308,6 +319,7 @@ body.no-scroll{overflow:hidden}
   </div>
 </aside>
 
+<!-- Right drawer (filters) -->
 <aside class="drawer-right" id="drawerRight" aria-hidden="true" role="dialog" aria-modal="true" tabindex="-1" aria-label="Filters">
   <div class="drawer-header">
     <div class="right-title">Filters</div>
@@ -349,6 +361,7 @@ body.no-scroll{overflow:hidden}
   </div>
 </aside>
 
+<!-- Auth drawer -->
 <aside class="drawer-auth" id="drawerAuth" aria-hidden="true" role="dialog" aria-modal="true" tabindex="-1" aria-label="Sign Up or Login">
   <div class="drawer-header">
     <div class="auth-title">Sign Up | Login</div>
@@ -373,6 +386,7 @@ body.no-scroll{overflow:hidden}
   <div class="build-pill">BUILD: ham-v4.6.7</div>
 </footer>
 
+<!-- Splash -->
 <div id="splash" class="splash" aria-hidden="true">
   <div class="splash-inner" id="splashInner">
     <div class="splash-top">
@@ -414,7 +428,10 @@ function formatNextTwoLines(ng){
 function letterDots(years){ if(!years||!years.length) return ''; const sorted=[...years].sort((a,b)=>b-a); return `<div class="letters">${sorted.slice(0,4).map(y=>`<span class="letter-dot" title="${y}">${String(y).slice(-2)}</span>`).join('')}</div>`;}
 function makeKV(k,v){ return `<div class="kv"><div class="k">${k}</div><div class="v">${v??'—'}</div></div>`; }
 
-/* ------------------- data (unchanged seed) ------------------- */
+/* ------------------- data ------------------- */
+/* Common embed for all players per your request */
+const COMMON_VIDEO = "https://www.youtube.com/embed/ZSoRzk-z35w?rel=0&modestbranding=1&playsinline=1";
+
 const playersSeed = [
   { id:"cody-bellinger", name:"CODY BELLINGER", graduatingClass:2013, currentLevel:"MLB", status:"Active 2025",
     position:"CF/1B", team:"New York Yankees",
@@ -426,7 +443,7 @@ const playersSeed = [
     letterWinnerYears:[2012,2013],
     gallery:["https://i.postimg.cc/YCHy0LPq/AISelect-20250830-142152-Photos-videos.jpg"],
     nilImg:"https://i.postimg.cc/BbfwF8vg/AISelect-20250901-144405-Gallery.jpg",
-    video:"https://www.youtube.com/embed/z0anHDZ8rz8?rel=0&modestbranding=1&playsinline=1"
+    video:COMMON_VIDEO
   },
   { id:"patrick-murphy", name:"PATRICK MURPHY", graduatingClass:2013, currentLevel:"KBO", status:"Active 2025",
     position:"P", team:"KT Wiz Suwon — KBO",
@@ -436,7 +453,7 @@ const playersSeed = [
     nextGame:{opponent:"vs KIA TIGERS", date:"8/29 2:30AM AZ"},
     last3:[{date:"8/27",opp:"vs KIA",line:"6.0 IP, 1 ER, 7 K"},{date:"8/23",opp:"@ KIA",line:"5.2 IP, 2 ER, 5 K"},{date:"8/20",opp:"vs SSG",line:"7.0 IP, 0 ER, 8 K"}],
     letterWinnerYears:[2012,2013],
-    video:"https://www.youtube.com/embed/z0anHDZ8rz8?rel=0&modestbranding=1&playsinline=1"
+    video:COMMON_VIDEO
   },
   { id:"dom-hamel", name:"DOM HAMEL", graduatingClass:2017, currentLevel:"Triple-A", status:"Active 2025",
     position:"P", team:"Syracuse Mets — New York Mets",
@@ -445,13 +462,15 @@ const playersSeed = [
     pitching:{era:"3.89",so:"93",whip:"1.18"},
     nextGame:{date:"8/28 - 3:35 PM AZ", opponent:"@ SCRANTON/ WILKES BARRE"},
     last3:[{date:"8/26",opp:"@ SWB",line:"1.0 IP, 1 ER, 1 K"},{date:"8/21",opp:"vs IND",line:"1.0 IP, 7 ER"},{date:"8/15",opp:"@ ROC",line:"1.0 IP, 1 ER"}],
-    letterWinnerYears:[2016,2017]
+    letterWinnerYears:[2016,2017],
+    video:COMMON_VIDEO
   },
   { id:"logan-boyer", name:"LOGAN BOYER", graduatingClass:2016, currentLevel:"Triple-A", status:"Active 2025",
     position:"P", team:"Oklahoma City — Los Angeles Dodgers",
     frontImg:"https://i.postimg.cc/c1Kq8Dkv/Logan-Boyer.jpg",
     highSchoolImg:"https://i.postimg.cc/gJtM27rH/11-Boyer-Front-page-00001.jpg",
-    letterWinnerYears:[2014,2015,2016]
+    letterWinnerYears:[2014,2015,2016],
+    video:COMMON_VIDEO
   },
   { id:"drew-swift", name:"DREW SWIFT", graduatingClass:2017, currentLevel:"Triple-A", status:"Active 2025",
     position:"SS", team:"Las Vegas Aviators — Athletics",
@@ -460,30 +479,35 @@ const playersSeed = [
     batting:{avg:".271",obp:".335",slg:".414",ops:".749",hits:"114",runs:"68",hr:"10",rbi:"52",doubles:"24",triples:"3",sb:"18",bb:"41"},
     nextGame:{ date:"8/28 - 5:05 PM AZ", opponent:"vs. IOWA" },
     last3:[{date:"08/25",opp:"@ ABQ",line:"2-5, 2B, R"},{date:"08/24",opp:"@ ABQ",line:"1-3, BB, SB"},{date:"08/23",opp:"@ ABQ",line:"0-4"}],
-    letterWinnerYears:[2014,2015,2016,2017]
+    letterWinnerYears:[2014,2015,2016,2017],
+    video:COMMON_VIDEO
   },
   { id:"brock-selvidge", name:"BROCK SELVIDGE", graduatingClass:2021, currentLevel:"Double-A", status:"Active 2025",
     position:"P", team:"Somerset Patriots — New York Yankees",
     frontImg:"https://i.postimg.cc/kgSyd4xs/AISelect-20250826-020305-Instagram.jpg",
     highSchoolImg:"https://i.postimg.cc/vTp3W6r1/22-Selvidge-Front-page-00001.jpg",
-    letterWinnerYears:[2018,2019,2020,2021]
+    letterWinnerYears:[2018,2019,2020,2021],
+    video:COMMON_VIDEO
   },
   { id:"jorge-flores", name:"JORGE FLORES", graduatingClass:2010, currentLevel:"AAA", status:"Retired",
     position:"SS", team:"Formerly — Blue Jays Org",
     frontImg:"https://i.postimg.cc/7LZ8PNs8/flores.jpg",
-    highSchoolImg:"https://i.postimg.cc/7LZ8PNs8/flores.jpg"
+    highSchoolImg:"https://i.postimg.cc/7LZ8PNs8/flores.jpg",
+    video:COMMON_VIDEO
   },
   { id:"luke-thiele", name:"LUKE THIELE", graduatingClass:2021, currentLevel:"NCAA-D1", status:"Active 2025",
     position:"IF", team:"Washington State — Pac-12",
     frontImg:"https://i.postimg.cc/593zLzmD/luke-theil.jpg",
     highSchoolImg:"https://i.postimg.cc/LXYrnvvj/45-Thiele-Front-page-00001.jpg",
-    letterWinnerYears:[2020,2021]
+    letterWinnerYears:[2020,2021],
+    video:COMMON_VIDEO
   },
   { id:"tyler-wilson", name:"TYLER WILSON", graduatingClass:2021, currentLevel:"High-A", status:"Active 2025",
     position:"LF/RF", team:"Hudson Valley Renegades — New York Yankees",
     frontImg:"https://i.postimg.cc/pXpZqkrg/1756201702161-1.jpg",
     highSchoolImg:"https://i.postimg.cc/PxXbZQ0V/34-Wilson-Front-page-00001.jpg",
-    letterWinnerYears:[2018,2019,2020]
+    letterWinnerYears:[2018,2019,2020],
+    video:COMMON_VIDEO
   }
 ];
 
@@ -513,17 +537,25 @@ function makeStats12(p){
   return `<div style="color:#374151;padding:8px">No stats yet.</div>`;
 }
 
+function tabIcon(k){
+  const map={
+    stats:'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M5 3h2v18H5zM11 10h2v11h-2zM17 6h2v15h-2z"/></svg>',
+    news:'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M4 5h16v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5zm2 2v12h12V7H6zm1 1h10v3H7V8z"/></svg>',
+    yat:'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 21.35 10.55 20.03C5.4 15.36 2 12.28 2 8.5A5.5 5.5 0 0 1 7.5 3C9.24 3 10.91 3.81 12 5.08 13.09 3.81 14.76 3 16.5 3 21 3 24 6.5 24 10.5c0 3.78-3.4 6.86-8.55 11.53L12 21.35z"/></svg>',
+    nil:'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 1 3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 2.2L19 6v5c0 4.52-3.01 8.77-7 10-3.99-1.23-7-5.48-7-10V6l7-2.8zM11 7h2v6h3l-4 4-4-4h3z"/></svg>',
+    x:'<svg viewBox="0 0 1200 1227"><path fill="currentColor" d="M714 511 1160 0H996L689 356 420 0H0l463 607L0 1227h164l329-379 286 379h420zM327 120h154l646 873H973z"/></svg>',
+    ig:'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5zm5 5a5 5 0 1 0 .001 10.001A5 5 0 0 0 12 7zm6-2.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z"/></svg>',
+    video:'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M8 5v14l11-7zM5 5h2v14H5z"/></svg>',
+    gallery:'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M21 19V5a2 2 0 0 0-2-2H5C3.9 3 3 3.9 3 5v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5zM8 8a2 2 0 1 1 4 0 2 2 0 0 1-4 0z"/></svg>'
+  };
+  return map[k]||map.stats;
+}
+
 function makeCard(p){
-  const lvl = lvlClass(p.currentLevel);
   const {team,parent} = teamAndParent(p);
   const [ng1,ng2] = formatNextTwoLines(p.nextGame||{});
   const statsTitle = dynamicStatsTitle(p);
   const cardId = p.id || `player-${Math.random().toString(36).slice(2)}`;
-
-  // NEW/CHANGED: visible flip button + better aria
-  const flipBtn = `<button class="flip-toggle" data-action="flip" aria-label="Flip card">FLIP</button>`;
-
-  // panes ids for aria-controls
   const paneIds = {
     stats: `${cardId}-pane-stats`,
     news: `${cardId}-pane-news`,
@@ -542,7 +574,6 @@ function makeCard(p){
 
   <div class="flip-inner">
     <section class="face front-face" aria-label="Front of card">
-      ${flipBtn}
       <img class="card-img" src="${(p.frontImg||p.highSchoolImg||'')}" alt="${p.name}" loading="lazy" onerror="this.onerror=null;this.style.display='none'">
       <div class="bottom-grad"></div>
       <div class="front-left">
@@ -570,7 +601,6 @@ function makeCard(p){
     </section>
 
     <section class="face back-face" aria-label="Back of card">
-      ${flipBtn}
       <div class="back-top">
         <div class="profile-block">
           <a class="profile-link" href="#profile" data-profile="${p.id}">
@@ -597,7 +627,7 @@ function makeCard(p){
         <div role="tabpanel" class="pane pane-x" id="${paneIds.x}" data-pane="x" aria-labelledby="tab-${cardId}-x" aria-hidden="true"><div style="color:#111">X/Twitter posts placeholder.</div></div>
         <div role="tabpanel" class="pane pane-ig" id="${paneIds.ig}" data-pane="ig" aria-labelledby="tab-${cardId}-ig" aria-hidden="true"><div style="color:#111">Instagram posts placeholder.</div></div>
         <div role="tabpanel" class="pane pane-video" id="${paneIds.video}" data-pane="video" aria-labelledby="tab-${cardId}-video" aria-hidden="true">
-          ${p.video?`<iframe width="100%" height="220" src="${p.video}" title="Video" frameborder="0" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>`:`<div style="color:#111">Video will play here.</div>`}
+          <iframe width="100%" height="220" src="${p.video||COMMON_VIDEO}" title="Video" frameborder="0" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
         </div>
         <div role="tabpanel" class="pane pane-gallery" id="${paneIds.gallery}" data-pane="gallery" aria-labelledby="tab-${cardId}-gallery" aria-hidden="true">
           ${p.gallery&&p.gallery.length?`
@@ -607,9 +637,9 @@ function makeCard(p){
         </div>
 
         <div class="iconbar" role="tablist" aria-label="Card details" data-noflip>
-          ${Object.keys(paneIds).map((k, idx)=>`
+          ${Object.entries(paneIds).map(([k,id])=>`
           <button role="tab" class="ibtn ${k==='stats'?'active':''}" data-tab="${k}" title="${k.toUpperCase()}"
-            aria-selected="${k==='stats'?'true':'false'}" id="tab-${cardId}-${k}" aria-controls="${paneIds[k]}">
+            aria-selected="${k==='stats'?'true':'false'}" id="tab-${cardId}-${k}" aria-controls="${id}">
             ${tabIcon(k)}
           </button>`).join('')}
         </div>
@@ -617,21 +647,6 @@ function makeCard(p){
     </section>
   </div>
 </article>`;
-}
-
-// icons factory (unchanged glyphs)
-function tabIcon(k){
-  const map={
-    stats:'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M5 3h2v18H5zM11 10h2v11h-2zM17 6h2v15h-2z"/></svg>',
-    news:'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M4 5h16v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5zm2 2v12h12V7H6zm1 1h10v3H7V8z"/></svg>',
-    yat:'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 21.35 10.55 20.03C5.4 15.36 2 12.28 2 8.5A5.5 5.5 0 0 1 7.5 3C9.24 3 10.91 3.81 12 5.08 13.09 3.81 14.76 3 16.5 3 21 3 24 6.5 24 10.5c0 3.78-3.4 6.86-8.55 11.53L12 21.35z"/></svg>',
-    nil:'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 1 3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 2.2L19 6v5c0 4.52-3.01 8.77-7 10-3.99-1.23-7-5.48-7-10V6l7-2.8zM11 7h2v6h3l-4 4-4-4h3z"/></svg>',
-    x:'<svg viewBox="0 0 1200 1227"><path fill="currentColor" d="M714 511 1160 0H996L689 356 420 0H0l463 607L0 1227h164l329-379 286 379h420zM327 120h154l646 873H973z"/></svg>',
-    ig:'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5zm5 5a5 5 0 1 0 .001 10.001A5 5 0 0 0 12 7zm6-2.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z"/></svg>',
-    video:'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M8 5v14l11-7zM5 5h2v14H5z"/></svg>',
-    gallery:'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M21 19V5a2 2 0 0 0-2-2H5C3.9 3 3 3.9 3 5v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5zM8 8a2 2 0 1 1 4 0 2 2 0 0 1-4 0z"/></svg>'
-  };
-  return map[k]||map.stats;
 }
 
 function render(list){ byId('grid').innerHTML = list.map(makeCard).join(''); attachInteractions(); }
@@ -689,9 +704,13 @@ function resetAll(){
 
 /* ------------------- interactions ------------------- */
 const INTERACTIVE_SEL='[data-noflip], .tabbtn, .action-chip, .iconbar, .ibtn, a,button,input,select,textarea';
-function toggle(card){ if(!card) return; card.classList.contains('front') ? (card.classList.remove('front'),card.classList.add('back')) : (card.classList.remove('back'),card.classList.add('front')); }
+function toggle(card){
+  if(!card) return;
+  if(card.classList.contains('front')){ card.classList.remove('front'); card.classList.add('back'); }
+  else { card.classList.remove('back'); card.classList.add('front'); }
+}
 function attachInteractions(){
-  // Tabs: click
+  // Tabs
   $$('.iconbar').forEach(bar=>{
     bar.addEventListener('click', (e)=>{
       const btn=e.target.closest('.ibtn'); if(!btn) return;
@@ -707,31 +726,22 @@ function attachInteractions(){
             panel.setAttribute('aria-hidden', String(!isSelected));
           }
       });
-      // ensure only one active pane
       card.querySelectorAll('.pane').forEach(p=>p.classList.toggle('active', p.dataset.pane===pane));
     },true);
   });
 
-  // Flip via invisible hit zones + visible FLIP button
+  // Flip via sides, swipe, keyboard
   $$('.card').forEach(card=>{
     if(!card.classList.contains('front')&& !card.classList.contains('back')) card.classList.add('front');
 
-    // visible flip button
-    $$('.flip-toggle', card).forEach(btn=>{
-      btn.addEventListener('click', ()=>toggle(card));
-    });
-
-    // mouse/touch on side gutters
     $$('.hit',card).forEach(hit=>{
       hit.addEventListener('click', e=>{ if(e.target.closest(INTERACTIVE_SEL)) return; toggle(card); });
     });
 
-    // swipe
     let sx=0,sy=0, active=false;
     card.addEventListener('touchstart', e=>{ if(e.target.closest(INTERACTIVE_SEL)) return; active=true; sx=e.touches[0].clientX; sy=e.touches[0].clientY; },{passive:true});
     card.addEventListener('touchend', e=>{ if(!active) return; const dx=e.changedTouches[0].clientX-sx; const dy=e.changedTouches[0].clientY-sy; if(Math.abs(dx)>40 && Math.abs(dx)>Math.abs(dy)) toggle(card); active=false; },{passive:true});
 
-    // keyboard: Enter/Space toggles; ArrowLeft/Right too
     card.addEventListener('keydown', (e)=>{
       const k=e.key;
       if(k==='Enter' || k===' ' || k==='Spacebar'){ e.preventDefault(); toggle(card); }
@@ -739,9 +749,9 @@ function attachInteractions(){
     });
   });
 
-  // profile links: keep in-page
+  // profile links stay in-page for now
   $$('a.profile-link').forEach(a=>{
-    a.addEventListener('click', (e)=>{ e.preventDefault(); /* hook to router/modal here */ });
+    a.addEventListener('click', (e)=>{ e.preventDefault(); /* hook router here */ });
   });
 }
 
@@ -785,26 +795,24 @@ iconFilter.addEventListener('click', openRight);
 iconProfile.addEventListener('click', openAuth);
 iconReset.addEventListener('click', resetAll);
 scrim.addEventListener('click', closeDrawers);
-
-// Escape closes drawers
 window.addEventListener('keydown', (e)=>{ if(e.key==='Escape'){ closeDrawers(); }});
 
-byId('filterName').addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ e.preventDefault(); applyFilters(); closeRight(); } });
+byId('filterName')?.addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ e.preventDefault(); applyFilters(); closeRight(); } });
 
 const localSearch=byId('localSearch'); const localResults=byId('localResults');
 function renderLocalResults(q){
   localResults.innerHTML=''; if(!q) return;
-  players.filter(p=>(p.name||'').toLowerCase().includes(q.toLowerCase())).slice(0,50).forEach((p,i)=>{
+  players.filter(p=>(p.name||'').toLowerCase().includes(q.toLowerCase())).slice(0,50).forEach((p)=>{
     const li=document.createElement('li'); const yr=p.graduatingClass?` (Class of ${p.graduatingClass})`:''; li.textContent=`${p.name}${yr}`;
     li.setAttribute('role','option'); li.tabIndex=0;
-    li.addEventListener('click', ()=>{ /* hook to router: window.location.hash=`#/profile/${p.id}` */ closeLeft(); });
+    li.addEventListener('click', ()=>{ /* hook to router */ closeLeft(); });
     li.addEventListener('keydown', (e)=>{ if(e.key==='Enter' || e.key===' '){ e.preventDefault(); li.click(); }});
     localResults.appendChild(li);
   });
 }
-localSearch.addEventListener('input', (e)=>renderLocalResults(e.target.value));
+localSearch?.addEventListener('input', (e)=>renderLocalResults(e.target.value));
 
-/* ------------------- default view: Active only, oldest class first ------------------- */
+/* ------------------- default view: Active only oldest class first ------------------- */
 const players = [...playersSeed];
 function playersDefaultView(){
   return players
@@ -817,38 +825,15 @@ function runSplash(){
   const splash = byId('splash'); if(!splash) return;
   splash.classList.add('show');
   const hide = ()=>{ splash.classList.add('hide'); setTimeout(()=>splash.remove(),520); window.removeEventListener('pointerdown', hide, true); };
-  setTimeout(hide, 900); // slightly faster to content
+  setTimeout(hide, 900);
   window.addEventListener('pointerdown', hide, true);
-}
-
-/* ------------------- LIGHT VIRTUAL RENDER ------------------- */
-// Render first 8 cards, then lazy-render rest when scrolled/idle
-function renderVirtually(list){
-  const first = list.slice(0,8);
-  const rest = list.slice(8);
-  render(first);
-  if(rest.length===0) return;
-  // sentinel to append later
-  const observer = new IntersectionObserver((entries)=>{
-    if(entries.some(e=>e.isIntersecting)){
-      byId('grid').insertAdjacentHTML('beforeend', rest.map(makeCard).join(''));
-      attachInteractions();
-      observer.disconnect();
-    }
-  });
-  // create sentinel
-  const sentinel = document.createElement('div');
-  sentinel.style.height='2px';
-  byId('grid').appendChild(sentinel);
-  observer.observe(sentinel);
 }
 
 /* ------------------- boot ------------------- */
 document.addEventListener('DOMContentLoaded', ()=>{
   populateFilters(players);
 
-  const filterControls = ['lvl', 'grad', 'roster', 'status'];
-  filterControls.forEach(id => {
+  ['lvl', 'grad', 'roster', 'status'].forEach(id => {
     const el = byId(id);
     if (el) {
       el.addEventListener('change', (event) => {
@@ -862,10 +847,9 @@ document.addEventListener('DOMContentLoaded', ()=>{
     }
   });
   
-  byId('filterName').addEventListener('input', applyFilters);
+  byId('filterName')?.addEventListener('input', applyFilters);
 
-  // Initial render (virtual)
-  renderVirtually(playersDefaultView());
+  render(playersDefaultView());
   runSplash();
 });
 </script>
