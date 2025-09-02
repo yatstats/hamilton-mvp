@@ -23,8 +23,6 @@ body{background:#000;color:var(--ink);font:15px/1.45 system-ui,-apple-system,Seg
 a{color:inherit;text-decoration:none}
 button{font:inherit;color:inherit}
 img{max-width:100%;display:block}
-
-/* Focus */
 :focus-visible{outline:2px solid #fff; outline-offset:2px}
 .hdr-icon:focus-visible,.ibtn:focus-visible,.hambtn:focus-visible{outline:2px solid #fff}
 
@@ -42,7 +40,7 @@ img{max-width:100%;display:block}
 .hdr-icon:hover{background:rgba(255,255,255,.08)}
 .hdr-icon.active{background:#fff}.hdr-icon.active svg{color:#000}
 
-/* YAT?STATS pinned to top-right; scales but never wraps */
+/* YAT?STATS pinned top-right; scales but never wraps */
 .ystats-logo{flex:0 0 auto;height:clamp(24px,4.5vw,36px);width:auto;object-fit:contain}
 
 /* Row 2: Hamilton H + 3-line type—always visible, acts as one unit */
@@ -59,7 +57,7 @@ img{max-width:100%;display:block}
 
 /* center nav (desktop only, never wrap; hide when tight) */
 .nav-desktop{
-  position:absolute; top: 50%; left:50%; transform:translate(-50%,-50%);
+  position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
   display:flex;gap:16px;white-space:nowrap;
 }
 @media (max-width:1400px){ .nav-desktop{display:none} }
@@ -86,16 +84,15 @@ main{padding:10px 0 86px}
 @media (min-width:820px){ .grid{grid-template-columns:repeat(3,1fr)} }
 @media (min-width:1100px){ .grid{grid-template-columns:repeat(4,1fr)} }
 @media (min-width:1440px){ .grid{grid-template-columns:repeat(5,1fr)} }
-
-/* Full-width card on 1-col; perfectly centered */
-@media (max-width:559px){
-  .grid{grid-template-columns:1fr}
-  .card{width:100%}
-}
+@media (max-width:559px){ .grid{grid-template-columns:1fr} .card{width:100%} }
 
 /* ---------- CARD / FLIP ---------- */
-.card{background:#000;border-radius:14px;overflow:hidden;position:relative;user-select:none;aspect-ratio:5/7;min-height:300px;
-  box-shadow:0 2px 10px rgba(0,0,0,.55);transform:translateY(0);transition:transform .18s, box-shadow .18s}
+.card{
+  background:#000;border-radius:14px;overflow:hidden;position:relative;user-select:none;
+  aspect-ratio:5/7; /* authentic 2.5x3.5 */
+  min-height:300px; box-shadow:0 2px 10px rgba(0,0,0,.55);
+  transform:translateY(0);transition:transform .18s, box-shadow .18s
+}
 .card:hover{transform:translateY(-4px);box-shadow:0 12px 28px rgba(0,0,0,.6)}
 .flip-card{perspective:1200px}
 .flip-inner{position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform .55s cubic-bezier(.2,.7,.2,1)}
@@ -113,7 +110,7 @@ main{padding:10px 0 86px}
 .team{font-size:13px}.parent{font-size:12px;opacity:.92;margin-top:2px}
 .stack{display:flex;flex-direction:column;gap:4px;margin-top:6px}
 
-/* COMPACT CHIPS (short as possible, strong contrast) */
+/* COMPACT CHIPS */
 .chip{
   display:inline-flex;align-items:center;white-space:nowrap;
   background:rgba(0,0,0,.65);color:#fff;border:1px solid rgba(255,255,255,.28);
@@ -121,42 +118,62 @@ main{padding:10px 0 86px}
   width:max-content; max-width:100%;
 }
 .chip.class{background:#374151;border-color:#374151}
-
-/* tiny class-year dots */
 .letters{display:flex;gap:6px;align-items:center;margin-top:6px}
 .letter-dot{width:20px;height:20px;border-radius:50%;background:#fff;color:#7A0019;display:grid;place-items:center;font-weight:900;font-size:11px;border:1px solid rgba(0,0,0,.15)}
-
 .next-chip,.last-chip{display:inline-block;background:rgba(0,0,0,.65);color:#fff;border:1px solid rgba(255,255,255,.28);border-radius:999px;padding:2px 6px;font-size:10px;font-weight:900;letter-spacing:.08em;margin-bottom:3px}
 .right-line{font-size:12px;font-weight:800;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .last3 .item{font-size:12px;color:#e5e7eb;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:right;margin-top:2px}
 
-/* BACK */
-.back-face{transform:rotateY(180deg);background:#fff;color:#111;display:grid;grid-template-rows:auto 1fr}
-.back-top{display:grid;grid-template-columns:1fr 180px;gap:12px;padding:10px 12px 6px;align-items:start}
-@media (min-width:420px){ .back-top{grid-template-columns:1fr 210px} }
-
-.profile-block{display:flex;flex-direction:column;gap:6px}
+/* ---------- BACK (5:7 with your quadrants) ---------- */
+/* Layout:
+   Top row = two 2x3 quadrants (profile | HS image)
+   Bottom row = fun zone (2x1.5), with title at its top.
+*/
+.back-face{
+  transform:rotateY(180deg); background:#fff; color:#111;
+  display:grid; grid-template-rows: 1fr 1.5fr; grid-template-columns: 1fr 1fr;
+  grid-template-areas:
+    "profile hs"
+    "fun     fun";
+  gap:8px; padding:10px 12px;
+}
+.profile-block{
+  grid-area:profile; display:flex; flex-direction:column; gap:6px; min-height:0;
+  /* the block itself sits at the top slice (2x1 feel) */
+}
 .profile-link{display:block;text-align:right;border:1px solid #111;border-radius:10px;padding:8px 10px;background:#111;color:#fff}
 .profile-link .pn{font-weight:900;font-size:16px;letter-spacing:.02em}
 .profile-link .pt{font-size:12px;opacity:.95;margin-top:2px;line-height:1.15}
-.hs-box{width:100%;aspect-ratio:3/4;border-radius:10px;overflow:hidden;background:#d2d6db}
+
+.hs-box{grid-area:hs;width:100%;height:100%;border-radius:10px;overflow:hidden;background:#d2d6db}
 .hs-box img{width:100%;height:100%;object-fit:cover}
 
-.fun-title{font-family:"Anton",sans-serif;font-size:13px;letter-spacing:.12em;margin:6px 0 0 2px}
-.back-bottom{border-top:1px solid #e5e7eb;padding:8px 10px 10px;display:flex;flex-direction:column;min-height:0}
-.pane{display:none;min-height:0;overflow:auto;flex:1}
+/* Bottom half: title + fun panes (no inner scroll) */
+.back-bottom{grid-area:fun; display:flex; flex-direction:column; min-height:0}
+.fun-title{
+  font-family:"Anton",sans-serif; font-size:13px; letter-spacing:.12em;
+  margin:0 0 6px; text-align:center; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  border-top:1px solid #e5e7eb; padding-top:8px;
+}
+.pane{display:none; flex:1; overflow:hidden; padding:0 2px}
 .pane.active{display:block}
 
-/* stats grid */
-.kv-wrap12{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
-.kv{background:#f3f4f6;border-radius:10px;text-align:center;padding:8px;display:flex;flex-direction:column;justify-content:center}
+/* stats grid inside fun zone */
+.kv-wrap12{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.kv{background:#f3f4f6;border-radius:10px;text-align:center;padding:6px;display:flex;flex-direction:column;justify-content:center}
 .kv .k{font-size:11px;color:#374151}
 .kv .v{font-weight:800}
 
-/* 8-icon bar */
-.iconbar{display:grid;grid-template-columns:repeat(8,1fr);gap:8px;margin-top:8px}
-.ibtn{height:34px;border-radius:9px;border:1px solid #d0d6e0;background:#fff;display:grid;place-items:center;cursor:pointer}
+/* Iconbar OUTSIDE the card (only when back face is showing) */
+.iconbar-external{
+  display:none; grid-template-columns:repeat(8,1fr); gap:6px; margin-top:6px;
+}
+.card.back + .iconbar-external{ display:grid; } /* show only when the card is flipped */
+.ibtn{
+  height:32px;border-radius:9px;cursor:pointer;border:1px solid transparent;background:transparent;display:grid;place-items:center
+}
 .ibtn svg{width:16px;height:16px;color:#111}
+.ibtn:hover{background:#f3f4f6}
 .ibtn.active{background:#111;border-color:#111}
 .ibtn.active svg{color:#fff}
 
@@ -195,7 +212,7 @@ body.no-scroll{overflow:hidden}
 .footer{position:fixed;left:0;right:0;bottom:0;height:72px;background:#000;color:#fff;display:flex;align-items:center;justify-content:center;z-index:10}
 .build-pill{position:absolute;left:10px;bottom:10px;background:rgba(255,255,255,.12);color:#fff;font-size:12px;padding:6px 10px;border-radius:12px}
 
-/* ---------- SPLASH ---------- */
+/* SPLASH */
 .splash{position:fixed;inset:0;background:#000;z-index:1000;display:none;opacity:1;transition:opacity .5s}
 .splash.show{display:block}
 .splash.hide{opacity:0;pointer-events:none}
@@ -254,7 +271,7 @@ body.no-scroll{overflow:hidden}
   <!-- Row 2 -->
   <div class="header-bottom">
     <div class="ham-brand">
-      <img class="ham-logo" id="hamLogo" src="https://i.postimg.cc/2jwjVn8H/32900-20250830-222044-0000.png" alt="Hamilton H"/>
+      <img class="ham-logo" id="hamLogo" src="https://i.postimg.cc/pL0fbJsg/hamilton-logo-png.jpg" alt="Hamilton H"/>
       <div class="ham-type">
         <div class="ham-line1">CHANDLER, AZ</div>
         <div class="ham-line2">HAMILTON HIGH SCHOOL</div>
@@ -274,7 +291,7 @@ body.no-scroll{overflow:hidden}
   </nav>
 </header>
 
-<!-- Tagline (now: FLIP FOR STATS!) -->
+<!-- Tagline -->
 <div class="tagline-wrap">
   <div class="tagline">
     <div>
@@ -396,7 +413,7 @@ body.no-scroll{overflow:hidden}
     </div>
     <div class="splash-bottom">
       <div class="splash-logo zoom-in" style="width:min(28vw,160px)">
-        <img id="splashLogoBottom" src="https://i.postimg.cc/2jwjVn8H/32900-20250830-222044-0000.png" alt="Hamilton H">
+        <img id="splashLogoBottom" src="https://i.postimg.cc/pL0fbJsg/hamilton-logo-png.jpg" alt="Hamilton H">
       </div>
       <div class="sponsor" id="sponsorBlock">
         presented by <strong>Primary Source</strong>
@@ -410,26 +427,14 @@ body.no-scroll{overflow:hidden}
 const byId = id => document.getElementById(id);
 const $ = (sel,root=document)=>root.querySelector(sel);
 const $$ = (sel,root=document)=>Array.from(root.querySelectorAll(sel));
-
 function lvlClass(l){return String(l||'').toLowerCase().replace(/\s+/g,'-').replace('aaa','triple-a').replace('aa','double-a')}
 function teamAndParent(p){ const raw=String(p.team||''); const parts=raw.split('—'); const team=(parts[0]||raw).trim(); let parent=(parts[1]||'').trim(); if((p.currentLevel||'').toUpperCase()==='MLB') parent=''; return {team,parent}; }
 function fmtLast3(g){ return `${g.date||'—'} • ${g.opp||'—'} — ${g.line||'—'}`; }
-function formatNextTwoLines(ng){
-  if(!ng) return ['—','—'];
-  const ds=String(ng.date||'').trim();
-  const mmdd=(ds.match(/\b(\d{1,2}\/\d{1,2})\b/)||[, '—'])[1];
-  let time=(ds.match(/(\d{1,2}:\d{2}\s*[AP]M)/i)||[, '—'])[1];
-  if(time) time=time.toUpperCase();
-  const tz=(ds.match(/\b(ET|CT|MT|PT|AZ)\b/i)||[, ''])[1];
-  const tzU=(tz||'').toUpperCase();
-  if(tzU && time && !time.includes(tzU)) time=`${time} ${tzU}`;
-  return [`${mmdd} - ${time}`.trim(), String(ng.opponent||'—').trim()||'—'];
-}
+function formatNextTwoLines(ng){ if(!ng) return ['—','—']; const ds=String(ng.date||'').trim(); const mmdd=(ds.match(/\b(\d{1,2}\/\d{1,2})\b/)||[, '—'])[1]; let time=(ds.match(/(\d{1,2}:\d{2}\s*[AP]M)/i)||[, '—'])[1]; if(time) time=time.toUpperCase(); const tz=(ds.match(/\b(ET|CT|MT|PT|AZ)\b/i)||[, ''])[1]; const tzU=(tz||'').toUpperCase(); if(tzU && time && !time.includes(tzU)) time=`${time} ${tzU}`; return [`${mmdd} - ${time}`.trim(), String(ng.opponent||'—').trim()||'—']; }
 function letterDots(years){ if(!years||!years.length) return ''; const sorted=[...years].sort((a,b)=>b-a); return `<div class="letters">${sorted.slice(0,4).map(y=>`<span class="letter-dot" title="${y}">${String(y).slice(-2)}</span>`).join('')}</div>`;}
 function makeKV(k,v){ return `<div class="kv"><div class="k">${k}</div><div class="v">${v??'—'}</div></div>`; }
 
 /* ------------------- data ------------------- */
-/* Common embed for all players per your request */
 const COMMON_VIDEO = "https://www.youtube.com/embed/ZSoRzk-z35w?rel=0&modestbranding=1&playsinline=1";
 
 const playersSeed = [
@@ -537,20 +542,6 @@ function makeStats12(p){
   return `<div style="color:#374151;padding:8px">No stats yet.</div>`;
 }
 
-function tabIcon(k){
-  const map={
-    stats:'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M5 3h2v18H5zM11 10h2v11h-2zM17 6h2v15h-2z"/></svg>',
-    news:'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M4 5h16v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5zm2 2v12h12V7H6zm1 1h10v3H7V8z"/></svg>',
-    yat:'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 21.35 10.55 20.03C5.4 15.36 2 12.28 2 8.5A5.5 5.5 0 0 1 7.5 3C9.24 3 10.91 3.81 12 5.08 13.09 3.81 14.76 3 16.5 3 21 3 24 6.5 24 10.5c0 3.78-3.4 6.86-8.55 11.53L12 21.35z"/></svg>',
-    nil:'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 1 3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 2.2L19 6v5c0 4.52-3.01 8.77-7 10-3.99-1.23-7-5.48-7-10V6l7-2.8zM11 7h2v6h3l-4 4-4-4h3z"/></svg>',
-    x:'<svg viewBox="0 0 1200 1227"><path fill="currentColor" d="M714 511 1160 0H996L689 356 420 0H0l463 607L0 1227h164l329-379 286 379h420zM327 120h154l646 873H973z"/></svg>',
-    ig:'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5zm5 5a5 5 0 1 0 .001 10.001A5 5 0 0 0 12 7zm6-2.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z"/></svg>',
-    video:'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M8 5v14l11-7zM5 5h2v14H5z"/></svg>',
-    gallery:'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M21 19V5a2 2 0 0 0-2-2H5C3.9 3 3 3.9 3 5v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5zM8 8a2 2 0 1 1 4 0 2 2 0 0 1-4 0z"/></svg>'
-  };
-  return map[k]||map.stats;
-}
-
 function makeCard(p){
   const {team,parent} = teamAndParent(p);
   const [ng1,ng2] = formatNextTwoLines(p.nextGame||{});
@@ -601,29 +592,40 @@ function makeCard(p){
     </section>
 
     <section class="face back-face" aria-label="Back of card">
-      <div class="back-top">
-        <div class="profile-block">
-          <a class="profile-link" href="#profile" data-profile="${p.id}">
-            <div class="pn">${(p.name||'').toUpperCase()}</div>
-            <div class="pt">${team||'&nbsp;'}<br>${parent||'&nbsp;'}</div>
-          </a>
-          <div class="fun-title" data-title>${statsTitle}</div>
-        </div>
-        <div class="hs-box" aria-hidden="true">
-          <img src="${(p.highSchoolImg||p.frontImg||'')}" alt="" loading="lazy" onerror="this.onerror=null;this.style.display='none'">
-        </div>
+      <!-- top-left quadrant -->
+      <div class="profile-block">
+        <a class="profile-link" href="#profile" data-profile="${p.id}">
+          <div class="pn">${(p.name||'').toUpperCase()}</div>
+          <div class="pt">${team||'&nbsp;'}<br>${parent||'&nbsp;'}</div>
+        </a>
       </div>
 
+      <!-- top-right quadrant -->
+      <div class="hs-box" aria-hidden="true">
+        <img src="${(p.highSchoolImg||p.frontImg||'')}" alt="" loading="lazy" onerror="this.onerror=null;this.style.display='none'">
+      </div>
+
+      <!-- bottom half -->
       <div class="back-bottom" data-noflip>
-        <div role="tabpanel" class="pane pane-stats active" id="${paneIds.stats}" data-pane="stats" aria-labelledby="tab-${cardId}-stats" aria-hidden="false"><div class="kv-wrap12">${makeStats12(p)}</div></div>
-        <div role="tabpanel" class="pane pane-news" id="${paneIds.news}" data-pane="news" aria-labelledby="tab-${cardId}-news" aria-hidden="true"><div style="color:#374151;font-size:14px">
-          <div><strong>Latest:</strong> ${p.name} makes headlines — on-platform story rendering here.</div>
-          <p style="margin:.4em 0 0">Short summary lives here. We’ll wire real feeds to this pane.</p>
-        </div></div>
+        <div class="fun-title" data-title>${statsTitle}</div>
+
+        <div role="tabpanel" class="pane pane-stats active" id="${paneIds.stats}" data-pane="stats" aria-labelledby="tab-${cardId}-stats" aria-hidden="false">
+          <div class="kv-wrap12">${makeStats12(p)}</div>
+        </div>
+
+        <div role="tabpanel" class="pane pane-news" id="${paneIds.news}" data-pane="news" aria-labelledby="tab-${cardId}-news" aria-hidden="true">
+          <div style="color:#374151;font-size:14px">
+            <div><strong>Latest:</strong> ${p.name} makes headlines — on-platform story rendering here.</div>
+            <p style="margin:.4em 0 0">Short summary lives here. We’ll wire real feeds to this pane.</p>
+          </div>
+        </div>
+
         <div role="tabpanel" class="pane pane-yat" id="${paneIds.yat}" data-pane="yat" aria-labelledby="tab-${cardId}-yat" aria-hidden="true"><div style="color:#111">YAT-A-BOY! virtual gifting — CTA placeholder.</div></div>
+
         <div role="tabpanel" class="pane pane-nil" id="${paneIds.nil}" data-pane="nil" aria-labelledby="tab-${cardId}-nil" aria-hidden="true">
           ${p.nilImg?`<img src="${p.nilImg}" alt="NIL score" style="width:100%;height:auto;border-radius:10px" loading="lazy">`:`<div style="color:#111">NIL points will appear here.</div>`}
         </div>
+
         <div role="tabpanel" class="pane pane-x" id="${paneIds.x}" data-pane="x" aria-labelledby="tab-${cardId}-x" aria-hidden="true"><div style="color:#111">X/Twitter posts placeholder.</div></div>
         <div role="tabpanel" class="pane pane-ig" id="${paneIds.ig}" data-pane="ig" aria-labelledby="tab-${cardId}-ig" aria-hidden="true"><div style="color:#111">Instagram posts placeholder.</div></div>
         <div role="tabpanel" class="pane pane-video" id="${paneIds.video}" data-pane="video" aria-labelledby="tab-${cardId}-video" aria-hidden="true">
@@ -635,18 +637,33 @@ function makeCard(p){
               ${p.gallery.map(src=>`<img src="${src}" loading="lazy" style="display:inline-block;height:220px;object-fit:cover;border-radius:10px;margin-right:8px" alt="Gallery image">`).join('')}
             </div>`:`<div style="color:#111">Gallery coming soon.</div>`}
         </div>
-
-        <div class="iconbar" role="tablist" aria-label="Card details" data-noflip>
-          ${Object.entries(paneIds).map(([k,id])=>`
-          <button role="tab" class="ibtn ${k==='stats'?'active':''}" data-tab="${k}" title="${k.toUpperCase()}"
-            aria-selected="${k==='stats'?'true':'false'}" id="tab-${cardId}-${k}" aria-controls="${id}">
-            ${tabIcon(k)}
-          </button>`).join('')}
-        </div>
       </div>
     </section>
   </div>
+
+  <!-- Iconbar OUTSIDE the card -->
+  <div class="iconbar-external" role="tablist" aria-label="Card details" data-noflip>
+    ${Object.entries(paneIds).map(([k,id])=>`
+    <button role="tab" class="ibtn ${k==='stats'?'active':''}" data-tab="${k}" title="${k.toUpperCase()}"
+      aria-selected="${k==='stats'?'true':'false'}" aria-controls="${id}">
+      ${tabIcon(k)}
+    </button>`).join('')}
+  </div>
 </article>`;
+}
+
+function tabIcon(k){
+  const map={
+    stats:'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M5 3h2v18H5zM11 10h2v11h-2zM17 6h2v15h-2z"/></svg>',
+    news:'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M4 5h16v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5zm2 2v12h12V7H6zm1 1h10v3H7V8z"/></svg>',
+    yat:'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 21.35 10.55 20.03C5.4 15.36 2 12.28 2 8.5A5.5 5.5 0 0 1 7.5 3C9.24 3 10.91 3.81 12 5.08 13.09 3.81 14.76 3 16.5 3 21 3 24 6.5 24 10.5c0 3.78-3.4 6.86-8.55 11.53L12 21.35z"/></svg>',
+    nil:'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 1 3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 2.2L19 6v5c0 4.52-3.01 8.77-7 10-3.99-1.23-7-5.48-7-10V6l7-2.8zM11 7h2v6h3l-4 4-4-4h3z"/></svg>',
+    x:'<svg viewBox="0 0 1200 1227"><path fill="currentColor" d="M714 511 1160 0H996L689 356 420 0H0l463 607L0 1227h164l329-379 286 379h420zM327 120h154l646 873H973z"/></svg>',
+    ig:'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5zm5 5a5 5 0 1 0 .001 10.001A5 5 0 0 0 12 7zm6-2.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z"/></svg>',
+    video:'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M8 5v14l11-7zM5 5h2v14H5z"/></svg>',
+    gallery:'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M21 19V5a2 2 0 0 0-2-2H5C3.9 3 3 3.9 3 5v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5zM8 8a2 2 0 1 1 4 0 2 2 0 0 1-4 0z"/></svg>'
+  };
+  return map[k]||map.stats;
 }
 
 function render(list){ byId('grid').innerHTML = list.map(makeCard).join(''); attachInteractions(); }
@@ -703,87 +720,60 @@ function resetAll(){
 }
 
 /* ------------------- interactions ------------------- */
-const INTERACTIVE_SEL='[data-noflip], .tabbtn, .action-chip, .iconbar, .ibtn, a,button,input,select,textarea';
-function toggle(card){
-  if(!card) return;
-  if(card.classList.contains('front')){ card.classList.remove('front'); card.classList.add('back'); }
-  else { card.classList.remove('back'); card.classList.add('front'); }
-}
+const INTERACTIVE_SEL='[data-noflip], .iconbar-external, .ibtn, a,button,input,select,textarea';
+function toggle(card){ if(!card) return; card.classList.contains('front') ? (card.classList.remove('front'),card.classList.add('back')) : (card.classList.remove('back'),card.classList.add('front')); }
+
 function attachInteractions(){
-  // Tabs
-  $$('.iconbar').forEach(bar=>{
+  // Tabs (iconbar outside card)
+  $$('.iconbar-external').forEach(bar=>{
     bar.addEventListener('click', (e)=>{
       const btn=e.target.closest('.ibtn'); if(!btn) return;
-      const card=btn.closest('.card'); const pane=btn.dataset.tab||'stats';
-      card.querySelectorAll('.ibtn[role="tab"]').forEach(b => {
-          const isSelected = (b === btn);
-          b.classList.toggle('active', isSelected);
-          b.setAttribute('aria-selected', String(isSelected));
-          const paneId = b.getAttribute('aria-controls');
-          const panel = paneId && byId(paneId);
-          if(panel){
-            panel.classList.toggle('active', isSelected);
-            panel.setAttribute('aria-hidden', String(!isSelected));
-          }
+      const card = bar.previousElementSibling; // the article.card
+      if(!card || !card.classList.contains('card')) return;
+
+      // Update button states
+      bar.querySelectorAll('.ibtn').forEach(b=>{
+        const isSel = (b===btn);
+        b.classList.toggle('active', isSel);
+        b.setAttribute('aria-selected', String(isSel));
       });
-      card.querySelectorAll('.pane').forEach(p=>p.classList.toggle('active', p.dataset.pane===pane));
-    },true);
+
+      // Swap panes on the back of the card
+      const pane = btn.dataset.tab || 'stats';
+      const back = card.querySelector('.back-face');
+      if(!back) return;
+      back.querySelectorAll('.pane').forEach(p=>p.classList.toggle('active', p.dataset.pane===pane));
+    }, true);
   });
 
-  // Flip via sides, swipe, keyboard
+  // Flip interactions
   $$('.card').forEach(card=>{
     if(!card.classList.contains('front')&& !card.classList.contains('back')) card.classList.add('front');
 
+    // Click edges to flip
     $$('.hit',card).forEach(hit=>{
       hit.addEventListener('click', e=>{ if(e.target.closest(INTERACTIVE_SEL)) return; toggle(card); });
     });
 
+    // Swipe to flip (mobile)
     let sx=0,sy=0, active=false;
     card.addEventListener('touchstart', e=>{ if(e.target.closest(INTERACTIVE_SEL)) return; active=true; sx=e.touches[0].clientX; sy=e.touches[0].clientY; },{passive:true});
     card.addEventListener('touchend', e=>{ if(!active) return; const dx=e.changedTouches[0].clientX-sx; const dy=e.changedTouches[0].clientY-sy; if(Math.abs(dx)>40 && Math.abs(dx)>Math.abs(dy)) toggle(card); active=false; },{passive:true});
-
-    card.addEventListener('keydown', (e)=>{
-      const k=e.key;
-      if(k==='Enter' || k===' ' || k==='Spacebar'){ e.preventDefault(); toggle(card); }
-      if(k==='ArrowLeft' || k==='ArrowRight'){ e.preventDefault(); toggle(card); }
-    });
-  });
-
-  // profile links stay in-page for now
-  $$('a.profile-link').forEach(a=>{
-    a.addEventListener('click', (e)=>{ e.preventDefault(); /* hook router here */ });
   });
 }
 
-/* drawers & header icons + focus trap */
+/* drawers & header icons */
 const scrim=byId('scrim');
 const drawerLeft=byId('drawerLeft'); const drawerRight=byId('drawerRight'); const drawerAuth=byId('drawerAuth');
 const iconSearch=byId('iconSearch'); const iconFilter=byId('iconFilter'); const iconReset=byId('iconReset'); const iconProfile=byId('iconProfile');
 let lastFocus=null;
-
 function setActiveIcon(btn,a){ btn?.classList.toggle('active',!!a); }
-
-function trapFocus(container){
-  const focusables = 'a[href],button:not([disabled]),input,select,textarea,[tabindex]:not([tabindex="-1"])';
-  const nodes = Array.from(container.querySelectorAll(focusables)).filter(el=>el.offsetParent!==null || el.getAttribute('aria-hidden')!=='true');
-  const first = nodes[0], last = nodes[nodes.length-1];
-  function onKey(e){
-    if(e.key!=='Tab') return;
-    if(nodes.length===0) return;
-    if(e.shiftKey && document.activeElement===first){ e.preventDefault(); last.focus(); }
-    else if(!e.shiftKey && document.activeElement===last){ e.preventDefault(); first.focus(); }
-  }
-  container.addEventListener('keydown', onKey);
-  return ()=>container.removeEventListener('keydown', onKey);
-}
-let untrap = ()=>{};
-
-function openLeft(){ closeRight(false); closeAuth(false); lastFocus=document.activeElement; drawerLeft.classList.add('open'); scrim.classList.add('open'); document.body.classList.add('no-scroll'); setActiveIcon(iconSearch,true); setActiveIcon(iconFilter,false); setActiveIcon(iconProfile,false); drawerLeft.setAttribute('aria-hidden','false'); drawerLeft.focus(); untrap=trapFocus(drawerLeft); }
-function closeLeft(focus=true){ drawerLeft.classList.remove('open'); drawerLeft.setAttribute('aria-hidden','true'); if(!drawerRight.classList.contains('open')&&!drawerAuth.classList.contains('open')){ scrim.classList.remove('open'); document.body.classList.remove('no-scroll'); } setActiveIcon(iconSearch,false); untrap(); if(focus) lastFocus?.focus?.(); }
-function openRight(){ closeLeft(false); closeAuth(false); lastFocus=document.activeElement; drawerRight.classList.add('open'); scrim.classList.add('open'); document.body.classList.add('no-scroll'); setActiveIcon(iconFilter,true); setActiveIcon(iconSearch,false); setActiveIcon(iconProfile,false); drawerRight.setAttribute('aria-hidden','false'); drawerRight.focus(); untrap=trapFocus(drawerRight); }
-function closeRight(focus=true){ drawerRight.classList.remove('open'); drawerRight.setAttribute('aria-hidden','true'); if(!drawerLeft.classList.contains('open')&&!drawerAuth.classList.contains('open')){ scrim.classList.remove('open'); document.body.classList.remove('no-scroll'); } setActiveIcon(iconFilter,false); untrap(); if(focus) lastFocus?.focus?.(); }
-function openAuth(){ closeLeft(false); closeRight(false); lastFocus=document.activeElement; drawerAuth.classList.add('open'); scrim.classList.add('open'); document.body.classList.add('no-scroll'); setActiveIcon(iconProfile,true); setActiveIcon(iconSearch,false); setActiveIcon(iconFilter,false); drawerAuth.setAttribute('aria-hidden','false'); drawerAuth.focus(); untrap=trapFocus(drawerAuth); }
-function closeAuth(focus=true){ drawerAuth.classList.remove('open'); drawerAuth.setAttribute('aria-hidden','true'); if(!drawerLeft.classList.contains('open')&&!drawerRight.classList.contains('open')){ scrim.classList.remove('open'); document.body.classList.remove('no-scroll'); } setActiveIcon(iconProfile,false); untrap(); if(focus) lastFocus?.focus?.(); }
+function openLeft(){ closeRight(false); closeAuth(false); lastFocus=document.activeElement; drawerLeft.classList.add('open'); scrim.classList.add('open'); document.body.classList.add('no-scroll'); setActiveIcon(iconSearch,true); setActiveIcon(iconFilter,false); setActiveIcon(iconProfile,false); }
+function closeLeft(focus=true){ drawerLeft.classList.remove('open'); if(!drawerRight.classList.contains('open')&&!drawerAuth.classList.contains('open')){ scrim.classList.remove('open'); document.body.classList.remove('no-scroll'); } setActiveIcon(iconSearch,false); if(focus) lastFocus?.focus?.(); }
+function openRight(){ closeLeft(false); closeAuth(false); lastFocus=document.activeElement; drawerRight.classList.add('open'); scrim.classList.add('open'); document.body.classList.add('no-scroll'); setActiveIcon(iconFilter,true); setActiveIcon(iconSearch,false); setActiveIcon(iconProfile,false); }
+function closeRight(focus=true){ drawerRight.classList.remove('open'); if(!drawerLeft.classList.contains('open')&&!drawerAuth.classList.contains('open')){ scrim.classList.remove('open'); document.body.classList.remove('no-scroll'); } setActiveIcon(iconFilter,false); if(focus) lastFocus?.focus?.(); }
+function openAuth(){ closeLeft(false); closeRight(false); lastFocus=document.activeElement; drawerAuth.classList.add('open'); scrim.classList.add('open'); document.body.classList.add('no-scroll'); setActiveIcon(iconProfile,true); setActiveIcon(iconSearch,false); setActiveIcon(iconFilter,false); }
+function closeAuth(focus=true){ drawerAuth.classList.remove('open'); if(!drawerLeft.classList.contains('open')&&!drawerRight.classList.contains('open')){ scrim.classList.remove('open'); document.body.classList.remove('no-scroll'); } setActiveIcon(iconProfile,false); if(focus) lastFocus?.focus?.(); }
 function closeDrawers(){ closeLeft(false); closeRight(false); closeAuth(); }
 
 byId('openLeft').addEventListener('click', openLeft);
@@ -795,24 +785,21 @@ iconFilter.addEventListener('click', openRight);
 iconProfile.addEventListener('click', openAuth);
 iconReset.addEventListener('click', resetAll);
 scrim.addEventListener('click', closeDrawers);
-window.addEventListener('keydown', (e)=>{ if(e.key==='Escape'){ closeDrawers(); }});
 
-byId('filterName')?.addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ e.preventDefault(); applyFilters(); closeRight(); } });
+byId('filterName').addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ e.preventDefault(); applyFilters(); closeRight(); } });
 
 const localSearch=byId('localSearch'); const localResults=byId('localResults');
 function renderLocalResults(q){
   localResults.innerHTML=''; if(!q) return;
-  players.filter(p=>(p.name||'').toLowerCase().includes(q.toLowerCase())).slice(0,50).forEach((p)=>{
+  players.filter(p=>(p.name||'').toLowerCase().includes(q.toLowerCase())).slice(0,50).forEach(p=>{
     const li=document.createElement('li'); const yr=p.graduatingClass?` (Class of ${p.graduatingClass})`:''; li.textContent=`${p.name}${yr}`;
-    li.setAttribute('role','option'); li.tabIndex=0;
-    li.addEventListener('click', ()=>{ /* hook to router */ closeLeft(); });
-    li.addEventListener('keydown', (e)=>{ if(e.key==='Enter' || e.key===' '){ e.preventDefault(); li.click(); }});
+    li.addEventListener('click', ()=>{ window.location.href=`#profile-${encodeURIComponent(p.id)}`; closeLeft(); });
     localResults.appendChild(li);
   });
 }
-localSearch?.addEventListener('input', (e)=>renderLocalResults(e.target.value));
+localSearch.addEventListener('input', (e)=>renderLocalResults(e.target.value));
 
-/* ------------------- default view: Active only oldest class first ------------------- */
+/* ------------------- default view: Active only, oldest class first ------------------- */
 const players = [...playersSeed];
 function playersDefaultView(){
   return players
@@ -825,7 +812,7 @@ function runSplash(){
   const splash = byId('splash'); if(!splash) return;
   splash.classList.add('show');
   const hide = ()=>{ splash.classList.add('hide'); setTimeout(()=>splash.remove(),520); window.removeEventListener('pointerdown', hide, true); };
-  setTimeout(hide, 900);
+  setTimeout(hide, 1400);
   window.addEventListener('pointerdown', hide, true);
 }
 
@@ -833,7 +820,8 @@ function runSplash(){
 document.addEventListener('DOMContentLoaded', ()=>{
   populateFilters(players);
 
-  ['lvl', 'grad', 'roster', 'status'].forEach(id => {
+  const filterControls = ['lvl', 'grad', 'roster', 'status'];
+  filterControls.forEach(id => {
     const el = byId(id);
     if (el) {
       el.addEventListener('change', (event) => {
@@ -847,7 +835,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
     }
   });
   
-  byId('filterName')?.addEventListener('input', applyFilters);
+  byId('filterName').addEventListener('input', applyFilters);
 
   render(playersDefaultView());
   runSplash();
