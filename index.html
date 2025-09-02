@@ -2,274 +2,338 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>hamilton.yatstats.com — WHERE THEY YAT?</title>
 
-<!-- Fonts -->
-<link href="https://fonts.googleapis.com/css2?family=Anton&family=Roboto+Condensed:wght@300;400;700&display=swap" rel="stylesheet"/>
+<!-- Fonts: skinny condensed (gray) + bold display (black) -->
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Roboto+Condensed:wght@300;400;700&display=swap" rel="stylesheet">
 
 <style>
 :root{
-  --bg:#0a0b0f; --ink:#eaeef5; --muted:#9aa1ab; --ring:#222831;
-  --headerH:118px;
-  --cardRadius:14px;
-  --drawerW: min(75vw, 520px);
-  --hi:#FFFFFF; --lo:#0a0b0f;
+  --maroon:#7A0019; --ring:#E3E6EA; --bg:#0b0d12; --ink:#111827; --muted:#9aa1ab;
+  --headerH:100px;
+
+  /* Drawer widths */
+  --drawer-min:280px; --drawer-max:520px; --drawer-mob:75vw;
 }
 
-/* Reset / base */
 *{box-sizing:border-box}
-html,body{height:100%}
-html,body{margin:0}
-body{background:#000;color:var(--ink);font:15px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial}
+html,body{margin:0;padding:0}
+body{background:var(--bg);font:15px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,"Apple Color Emoji","Segoe UI Emoji";color:#f3f4f6}
+a{text-decoration:none;color:inherit}
+button{font:inherit;color:inherit}
 
-/* a11y focus */
-:focus-visible{outline:2px solid #fff;outline-offset:2px;border-radius:8px}
-
-/* ---------- HEADER ---------- */
+/* HEADER */
 .site-header{
-  position:fixed;inset:0 0 auto 0;height:var(--headerH);z-index:60;background:#0b0d12;border-bottom:1px solid var(--ring);
-  display:grid;grid-template-columns:auto 1fr auto;gap:8px;padding:10px 10px 6px;
+  position:fixed; inset:0 0 auto 0; height:var(--headerH); z-index:60;
+  background:#000; border-bottom:1px solid #222;
+  display:grid; grid-template-columns:auto 1fr auto; gap:8px; align-items:start;
+  padding:8px 8px 6px;
 }
+.h-left{display:flex;align-items:flex-start;gap:8px;min-width:0}
+.hambtn{width:36px;height:36px;border:0;background:transparent;display:grid;place-items:center;cursor:pointer}
+.hambtn svg{color:#fff}
+.h-icons{display:flex;gap:8px;align-items:center;margin-left:6px}
+.hdr-icon{width:36px;height:36px;padding:0;border:0;background:transparent;border-radius:8px;display:grid;place-items:center;cursor:pointer}
+.hdr-icon svg{width:20px;height:20px;color:#fff}
+.hdr-icon:hover{background:rgba(255,255,255,.08)}
+.hdr-icon:focus-visible{outline:2px solid #fff;outline-offset:2px;border-radius:8px}
+.hdr-icon.active{background:#fff}
+.hdr-icon.active svg{color:#000}
 
-/* top row icons (left) */
-.h-left{display:flex;flex-direction:column;gap:6px;min-width:0}
-.top-row{display:flex;gap:8px;align-items:center;flex-wrap:nowrap}
-.iconbtn{width:38px;height:38px;border:0;background:transparent;border-radius:10px;display:grid;place-items:center;cursor:pointer}
-.iconbtn svg{width:21px;height:21px;color:#fff}
-.iconbtn:hover{background:rgba(255,255,255,.08)}
-.iconbtn.active{background:#fff}.iconbtn.active svg{color:#000}
+/* Logos row (under icons) */
+.h-logos{display:flex;align-items:flex-end; gap:8px; margin-top:6px}
+.ham-logo{height:38px;width:auto;display:block;object-fit:contain}
+.ystats-logo{height:32px;width:auto;display:block;object-fit:contain;margin-left:auto}
 
-/* Hamilton block + YATSTATS */
-.h-logos{display:flex;align-items:flex-end;gap:10px}
-.ham-brand{display:flex;gap:10px;align-items:flex-end}
-.ham-logo{height:44px;width:auto;object-fit:contain}
-.ham-type{line-height:1;display:flex;flex-direction:column;gap:0}
-.ham-line1{font-family:"Roboto Condensed",sans-serif;font-weight:300;font-size:12px;letter-spacing:0;transform:translateY(2px)}
-.ham-line2{font-family:"Anton",sans-serif;font-size:18px;letter-spacing:.01em}
-.ham-line3{font-family:"Anton",sans-serif;font-size:20px;letter-spacing:.01em;margin-top:-2px}
-.ystats-logo{height:38px;max-width:44vw;width:auto;object-fit:contain;margin-left:auto;flex:0 1 auto}
-
-/* Header center nav (desktop) */
-.nav-desktop{display:flex;gap:16px;align-self:center;justify-self:center;flex-wrap:wrap}
+/* NAV: desktop top row */
+.nav-desktop{display:flex;gap:14px;align-self:center;justify-self:center}
 @media (max-width:1260px){ .nav-desktop{display:none} }
-.nav-desktop a{font-size:12px;text-transform:uppercase;white-space:nowrap}
-.font-slim{font-family:"Roboto Condensed",sans-serif;font-weight:300;letter-spacing:0;color:#aeb6c2}
-.font-strong{font-family:"Anton",sans-serif;letter-spacing:.01em;color:#fff}
-.touching{margin-left:-2px} /* gray & black words kiss */
 
-/* ---------- TAGLINE ---------- */
-.tagline-wrap{position:sticky;top:var(--headerH);z-index:40;background:#0b0d12;border-bottom:1px solid var(--ring)}
-.tagline{display:flex;align-items:center;justify-content:space-between;padding:8px 12px}
-.tag-slim{font-family:"Roboto Condensed",sans-serif;font-weight:300;color:#aeb6c2;letter-spacing:0}
-.tag-strong{font-family:"Anton",sans-serif;color:#fff;letter-spacing:.01em}
-.tag-slim+.tag-strong{margin-left:-2px}
+/* Two-font navigation + tagline */
+.font-slim{ font-family:"Roboto Condensed",system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif; font-weight:300; letter-spacing:.04em }
+.font-strong{ font-family:"Anton",system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif; font-weight:400; letter-spacing:.01em }
+.nav-desktop a{font-size:12px;text-transform:uppercase;color:#fff;white-space:nowrap;padding:4px 0;letter-spacing:.06em}
+.nav-desktop a, .nav-left-link{ display:inline-flex; gap:0; align-items:baseline }
+.nav-slim{ color:#9aa1ab }
+.nav-strong{ color:#fff }
 
-/* shrink logo / tighten icons on small screens */
-@media (max-width:520px){
-  .ystats-logo{height:30px;max-width:50vw}
-  .top-row{gap:6px}
-}
+/* TAGLINE */
+.tagline-wrap{position:sticky;top:var(--headerH);z-index:40;background:#000;border-bottom:1px solid #222}
+.tagline{display:flex;align-items:center;justify-content:space-between;padding:8px 10px}
+.tag-text{font-size:14px;line-height:1.1;color:#fff}
+.tag-grey{ color:#9aa1ab }
+.tagline .tag-grey{ font-family:"Roboto Condensed",system-ui; font-weight:300; letter-spacing:.02em }
+.tagline .tag-strong{ font-family:"Anton",system-ui; font-weight:400; letter-spacing:0 }
+.tagline .tag-tight{ letter-spacing:-.02em }
 
-/* ---------- GRID ---------- */
-main{padding:calc(var(--headerH) + 44px) 0 96px}
+/* GRID (5→4→3→2→1) */
+main{padding:calc(var(--headerH) + 44px) 0 84px}
 .grid{padding:10px;display:grid;grid-template-columns:repeat(1,minmax(0,1fr));gap:12px}
-@media (min-width:560px){ .grid{grid-template-columns:repeat(2,1fr)} }
-@media (min-width:820px){ .grid{grid-template-columns:repeat(3,1fr)} }
-@media (min-width:1100px){ .grid{grid-template-columns:repeat(4,1fr)} }
-@media (min-width:1440px){ .grid{grid-template-columns:repeat(5,1fr)} }
+@media (min-width:560px){ .grid{grid-template-columns:repeat(2,minmax(0,1fr))} }
+@media (min-width:820px){ .grid{grid-template-columns:repeat(3,minmax(0,1fr))} }
+@media (min-width:1100px){ .grid{grid-template-columns:repeat(4,minmax(0,1fr))} }
+@media (min-width:1440px){ .grid{grid-template-columns:repeat(5,minmax(0,1fr))} }
 
-/* ---------- CARD / FLIP ---------- */
-.card{background:#000;border-radius:var(--cardRadius);overflow:hidden;position:relative;user-select:none;aspect-ratio:5/7;min-height:280px;
-  box-shadow:0 2px 10px rgba(0,0,0,.55);transform:translateY(0);transition:transform .2s, box-shadow .2s}
-.card:hover{transform:translateY(-5px);box-shadow:0 14px 28px rgba(0,0,0,.6)}
+/* CARD / FLIP */
+.card{background:#000;border:0;border-radius:12px;overflow:hidden;position:relative;user-select:none;aspect-ratio:5/7;min-height:280px;
+  box-shadow:0 2px 10px rgba(0,0,0,.5); transform:translateY(0); transition:transform .2s ease, box-shadow .2s ease;
+}
+.card:hover{ transform:translateY(-4px); box-shadow:0 10px 24px rgba(0,0,0,.6) } /* hover lift restored */
 .flip-card{perspective:1200px}
 .flip-inner{position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform .55s cubic-bezier(.2,.7,.2,1)}
-.card.front .flip-inner{transform:rotateY(0)} .card.back .flip-inner{transform:rotateY(180deg)}
-.face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;overflow:hidden}
+.card.front  .flip-inner{ transform:rotateY(0) }
+.card.back   .flip-inner{ transform:rotateY(180deg) }
+.face{position:absolute; inset:0; backface-visibility:hidden; -webkit-backface-visibility:hidden; overflow:hidden}
 
 /* FRONT */
 .front-face{transform:rotateY(0)}
-.card-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#111}
-.bottom-grad{position:absolute;left:0;right:0;bottom:0;height:66%;background:linear-gradient(to top,rgba(0,0,0,.98),rgba(0,0,0,.1));z-index:1}
-.front-left,.front-right{position:absolute;z-index:2;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.45)}
-.front-left{left:12px;bottom:12px;width:46%}
-.front-right{right:12px;bottom:10px;width:72%;text-align:right}
+.card-img{position:absolute; inset:0; width:100%; height:100%; object-fit:cover; background:#111}
+.bottom-grad{position:absolute; left:0; right:0; bottom:0; height:66%; background:linear-gradient(to top, rgba(0,0,0,.98) 0%, rgba(0,0,0,.92) 30%, rgba(0,0,0,.86) 48%, rgba(0,0,0,0) 76%); pointer-events:none; z-index:1;}
+.front-left, .front-right{position:absolute; z-index:3; color:#fff; text-shadow:0 1px 2px rgba(0,0,0,.45)}
+.front-left{left:12px; bottom:12px; width:46%}
+.front-right{right:12px; bottom:10px; width:72%; text-align:right}
 .name{font-weight:900;text-transform:uppercase;letter-spacing:.02em;font-size:18px;line-height:1.06}
-.team{font-size:13px}.parent{font-size:12px;opacity:.92;margin-top:2px}
-.stack{display:flex;flex-direction:column;gap:4px;margin-top:4px}
+.team{font-size:13px;opacity:.98}
+.parent{font-size:12px;opacity:.92;margin-top:2px}
+.spacer-6{height:6px}
+
+/* chips */
+.stack{display:flex;flex-direction:column;gap:4px;margin-top:4px;align-items:flex-start}
 .chip{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.14);color:#fff;border:1px solid rgba(255,255,255,.24);border-radius:999px;padding:2px 8px 3px;font-weight:800;font-size:10px;letter-spacing:.06em}
+.chip.level.mlb{background:#7A0019;border-color:#7A0019}
+.chip.level.triple-a{background:#2563eb;border-color:#2563eb}
+.chip.level.double-a{background:#3b82f6;border-color:#3b82f6}
+.chip.level.high-a{background:#4338ca;border-color:#4338ca}
+.chip.level.low-a{background:#3730a3;border-color:#3730a3}
+.chip.level.rookie{background:#0f766e;border-color:#0f766e}
+.chip.level.indy{background:#3f6212;border-color:#3f6212}
+.chip.level.ncaa-d1{background:#166534;border-color:#166534}
+.chip.level.naia{background:#9333ea;border-color:#9333ea}
+.chip.level.juco{background:#0d9488;border-color:#0d9488}
+.chip.status{background:#16a34a;border-color:#16a34a}
+.chip.status.retired{background:#6b7280;border-color:#6b7280}
 .chip.class{background:#374151;border-color:#374151}
+
+/* letter dots */
 .letters{display:flex;gap:6px;align-items:center;margin-top:6px}
-.letter-dot{width:20px;height:20px;border-radius:50%;background:#fff;color:#7A0019;display:grid;place-items:center;font-weight:900;font-size:11px;border:1px solid rgba(0,0,0,.15)}
+.letter-dot{width:20px;height:20px;border-radius:50%;background:#fff;color:var(--maroon);display:grid;place-items:center;font-weight:900;font-size:11px;border:1px solid rgba(0,0,0,.15)}
+
+/* right side text */
 .next-chip,.last-chip{display:inline-block;background:rgba(255,255,255,.14);color:#fff;border:1px solid rgba(255,255,255,.24);border-radius:999px;padding:2px 8px 3px;font-size:10px;font-weight:900;letter-spacing:.12em;margin-bottom:3px}
 .right-line{font-size:12px;font-weight:800;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.last3 .item{font-size:12px;color:#e5e7eb;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:right;margin-top:2px}
+.last3{margin-top:10px;width:100%;margin-left:auto}
+.last3 .item{font-size:12px;color:#e5e7eb;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:right}
 
-/* BACK (approved) */
-.back-face{transform:rotateY(180deg);background:#fff;color:#111;display:grid;grid-template-rows:auto 1fr}
-.back-top{
-  display:grid;
-  grid-template-columns:1.2fr 1fr;
-  gap:12px;
-  padding:12px 12px 6px;
-  align-items:start;
+/* BACK */
+.back-face{transform:rotateY(180deg);background:#fff;color:#111;display:grid;grid-template-rows:1fr 1fr;height:100%}
+.back-top{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:10px 12px 6px;align-items:start}
+.back-left{min-width:0;display:flex;flex-direction:column;gap:6px}
+.stats-name{font-weight:900;text-transform:uppercase;letter-spacing:.02em;font-size:16px;margin-bottom:2px}
+.team-line{color:#1f2937;font-size:13px;line-height:1.15;margin-top:2px}
+.parent-line{color:#6b7280;font-size:12px;line-height:1.1;margin-top:2px}
+
+/* Profile button now 3-line text block (top-left quadrant), right-justified */
+.profile-info{
+  display:block; text-align:right; margin-top:2px;
+  background:#111; color:#fff; border:1px solid #111; border-radius:10px;
+  padding:6px 10px; font-weight:800; letter-spacing:.02em;
 }
-.profile-block{
-  display:flex;flex-direction:column;gap:4px;text-align:right;align-items:flex-end
-}
-.profile-name{font-weight:900;text-transform:uppercase;letter-spacing:.02em;font-size:16px}
-.profile-two{font-size:12px;line-height:1.05;color:#4b5563;margin-top:-2px}
-.hs-box{border-radius:10px;overflow:hidden;background:#d1d5db;position:relative;aspect-ratio:3/4}
+.profile-info .l1{font-size:12px}
+.profile-info .l2,.profile-info .l3{font-size:11px; opacity:.9; line-height:1.1}
+
+/* HS image on right stays */
+.back-right{display:flex;flex-direction:column}
+.hs-box{flex:1 1 auto;width:100%;aspect-ratio:3/4;position:relative;overflow:hidden;border-radius:8px;background:#d1d5db}
 .hs-box img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 
-/* FunZone */
-.funzone{border-top:1px solid #e5e7eb;padding:10px 12px 12px;min-height:0;display:flex;flex-direction:column;gap:8px}
-.fun-title{font-size:12px;font-weight:900;letter-spacing:.14em}
-.fun-pane{display:none;min-height:0;overflow:auto}
-.fun-pane.active{display:block}
-
-/* stat grid */
-.kv-wrap12{display:grid;grid-template-columns:repeat(4,1fr);grid-auto-rows:1fr;gap:8px}
+/* Fun Zone (bigger), icon bar at bottom */
+.back-bottom{border-top:1px solid var(--ring);padding:10px 8px 8px;min-height:0;overflow:hidden;display:flex;flex-direction:column}
+.pane{display:none;min-height:0;overflow:auto;flex:1;animation:slide .18s ease}
+.pane.active{display:block}
+@keyframes slide{from{opacity:.2;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.kv-wrap12{display:grid;grid-template-columns:repeat(4,1fr);grid-auto-rows:1fr;gap:8px;height:100%}
 .kv{background:#f3f4f6;border-radius:10px;text-align:center;padding:8px;display:flex;flex-direction:column;justify-content:center}
-.kv .k{font-size:10px;color:#6b7280}
+.kv .k{font-size:11px;color:#6b7280}
 .kv .v{font-weight:800}
 
-/* 8 icon bar (bottom of card) */
-.iconbar{margin-top:auto;display:grid;grid-template-columns:repeat(8,1fr);gap:6px}
-.i8{height:34px;border-radius:9px;border:1px solid #e5e7eb;background:#fff;display:grid;place-items:center;cursor:pointer}
-.i8 svg{width:16px;height:16px;color:#111}
-.i8.active{background:#111;border-color:#111}
-.i8.active svg{color:#fff}
+/* Icon bar (8 icons) */
+.funbar{display:grid;grid-template-columns:repeat(8,1fr);gap:6px;margin-top:8px}
+.funbtn{height:30px;display:grid;place-items:center;border-radius:8px;border:1px solid #e5e7eb;background:#fff;cursor:pointer;transition:background .15s,border-color .15s}
+.funbtn svg{width:16px;height:16px;color:#111}
+.funbtn.active{background:#111;border-color:#111}
+.funbtn.active svg{color:#fff}
+.funbtn:focus-visible{outline:2px solid #111;outline-offset:2px}
 
-/* hit areas to flip (smaller so they don't block icon taps) */
-.hit{position:absolute;top:0;bottom:0;width:16%;z-index:1;background:transparent;border:0}
+/* Flip zones (edges) – no visual, and do NOT block inner controls */
+.hit{position:absolute;top:0;bottom:0;width:20%;z-index:1;background:transparent;border:0;pointer-events:auto}
 .hit.left{left:0}.hit.right{right:0}
+@media (max-width:480px){ .hit{width:24%} }
+/* ensure inner controls sit above flip zones */
+.card .face *[data-noflip], .funbar, .tiny-grid, .profile-info { position:relative; z-index:2 }
 
-/* drawers */
+/* SCRIM */
 .scrim{position:fixed;left:0;right:0;top:var(--headerH);bottom:0;background:rgba(0,0,0,.35);opacity:0;pointer-events:none;transition:opacity .25s ease;z-index:55}
 .scrim.open{opacity:1;pointer-events:auto}
 body.no-scroll{overflow:hidden}
 
-.drawer{position:fixed;top:var(--headerH);bottom:0;width:var(--drawerW);max-width:92vw;background:#0b0d12;border-inline:1px solid var(--ring);transform:translateX(-100%);transition:transform .25s ease;z-index:56;color:#e5e7eb}
-.drawer.right{right:0;left:auto;transform:translateX(100%)}
-.drawer.open{transform:translateX(0)}
-.drawer-header{height:56px;border-bottom:1px solid var(--ring);display:flex;align-items:center;justify-content:space-between;padding:0 12px}
-.closebtn{width:34px;height:34px;border:0;background:transparent;display:grid;place-items:center;cursor:pointer}
-.drawer-content{padding:12px;min-height:0;overflow:auto}
-.rail{border:1px solid #2a2f3a;border-radius:12px;margin-bottom:12px;overflow:hidden;background:#0f121a}
-.rail summary{list-style:none;cursor:pointer;padding:10px 12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;font-size:12px;border-bottom:1px solid #1c2029;color:#cbd5e1}
+/* LEFT drawer (nav + PLAYER PROFILE SEARCH) */
+.drawer-left{position:fixed;top:var(--headerH);bottom:0;left:0;width:clamp(var(--drawer-min), var(--drawer-mob), var(--drawer-max));max-width:92vw;background:#0f1115;border-right:1px solid #222;transform:translateX(-100%);transition:transform .25s ease;z-index:56;display:flex;flex-direction:column}
+.drawer-left.open{transform:translateX(0)}
+.drawer-left .drawer-header{height:56px;border-bottom:1px solid #222;display:flex;align-items:center;justify-content:space-between;padding:0 12px;color:#fff}
+.left-title{font-weight:900;letter-spacing:.12em;text-transform:uppercase;font-size:12px;color:#9aa1ab}
+.left-content{padding:12px;min-height:0;overflow:auto;color:#e5e7eb}
+.nav-left-list{display:flex;flex-direction:column;gap:8px;margin-bottom:10px}
+.nav-left-link{text-decoration:none;color:#e5e7eb;text-transform:uppercase;letter-spacing:.12em;font-weight:400;font-size:13px;line-height:1;padding:10px 6px 8px 4px;border-radius:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nav-left-link:hover{background:#171a22}
+.nav-left-sep{height:1px;background:#222;margin:8px 0}
+.left-search-h{font-weight:900;letter-spacing:.12em;text-transform:uppercase;font-size:12px;color:#9aa1ab;margin:2px 0 8px}
+.left-search .ghost{display:block;width:100%;background:#151923;border:1px solid #2a2f3a;border-radius:10px;padding:10px 12px;font-size:14px;color:#fff;outline:none}
+.left-results{margin-top:8px;list-style:none;padding:0}
+.left-results li{padding:8px 6px;border-radius:8px;cursor:pointer}
+.left-results li:hover{background:#171a22}
+.global-line{margin-top:16px;font-size:12px;color:#9aa1ab;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.global-line .mini-icon{width:14px;height:14px;color:#fff}
+
+/* RIGHT drawer (filters) */
+.drawer-right{position:fixed;top:var(--headerH);bottom:0;right:0;width:clamp(var(--drawer-min), var(--drawer-mob), var(--drawer-max));max-width:92vw;background:#fff;border-left:1px solid var(--ring);transform:translateX(100%);transition:transform .25s ease;z-index:56;display:flex;flex-direction:column}
+.drawer-right.open{transform:translateX(0)}
+.drawer-right .drawer-header{height:56px;border-bottom:1px solid var(--ring);display:flex;align-items:center;justify-content:space-between;padding:0 12px}
+.right-title{font-weight:900;letter-spacing:.12em;text-transform:uppercase;font-size:12px;color:#374151}
+.drawer-body{min-height:0;overflow:auto}
+.drawer-content{display:block;padding:12px 12px 22px}
+.rail{border:1px solid #e5e7eb;border-radius:10px;margin-bottom:10px;overflow:hidden;background:#fff}
+.rail summary{list-style:none;cursor:pointer;padding:9px 12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;font-size:12px;color:#374151;border-bottom:1px solid #e5e7eb}
 .rail summary::-webkit-details-marker{display:none}
-.rail .inner{padding:10px}
-.ghost{width:100%;background:#0f141c;border:1px solid #2a2f3a;border-radius:10px;padding:10px;font-size:13px;color:#e5e7eb;outline:none}
-.select-multi{height:126px}
+.rail .inner{padding:8px 10px;max-height:40vh;overflow:auto}
+.ghost{display:block;width:100%;background:#eef1f5;border:1px solid #d7dce2;border-radius:8px;padding:10px;font-size:13px;color:#111;outline:none}
+.select-multi{height:110px}
+.hint{color:#9aa1ab;font-size:11px;margin:4px 2px 10px}
 
-/* Left drawer nav typography mirrors header */
-.nav-left-list{display:flex;flex-direction:column;gap:10px;margin-bottom:10px}
-.nav-left-link{display:block;text-transform:uppercase}
-.nav-left-link .gray{font-family:"Roboto Condensed",sans-serif;font-weight:300;color:#aeb6c2;letter-spacing:0}
-.nav-left-link .black{font-family:"Anton",sans-serif;color:#fff;letter-spacing:.01em}
-.nav-left-link .black.touching{margin-left:-2px}
+/* AUTH drawer */
+.drawer-auth{position:fixed;top:var(--headerH);bottom:0;right:0;width:clamp(var(--drawer-min), var(--drawer-mob), var(--drawer-max));max-width:92vw;background:#fff;border-left:1px solid var(--ring);transform:translateX(100%);transition:transform .25s ease;z-index:56;display:flex;flex-direction:column}
+.drawer-auth.open{transform:translateX(0)}
+.drawer-auth .drawer-header{height:56px;border-bottom:1px solid var(--ring);display:flex;align-items:center;justify-content:space-between;padding:0 12px}
+.auth-title{font-weight:900;letter-spacing:.12em;text-transform:uppercase;font-size:12px;color:#374151}
+.auth-body{min-height:0;overflow:auto;padding:12px 12px 22px}
+.input{display:block;width:100%;background:#eef1f5;border:1px solid #d7dce2;border-radius:10px;padding:12px 12px;font-size:14px;color:#111;outline:none}
+.btn-primary{display:inline-block;width:100%;background:#111;color:#fff;border:1px solid #111;border-radius:10px;padding:10px 12px;font-weight:800;letter-spacing:.06em;cursor:pointer;margin-top:10px}
 
-/* Footer */
-.footer{position:fixed;left:0;right:0;bottom:0;height:76px;background:#000;color:#fff;display:flex;align-items:center;justify-content:center;z-index:10}
+/* drawer close buttons */
+.closebtn{width:34px;height:34px;border:0;background:transparent;display:grid;place-items:center;cursor:pointer}
+.closebtn svg{width:18px;height:18px}
+
+/* FOOTER */
+.footer{position:fixed;left:0;right:0;bottom:0;height:72px;background:#000;color:#fff;display:flex;align-items:center;justify-content:center;z-index:10}
+.footer img{max-height:60px;width:auto}
 .build-pill{position:absolute;left:10px;bottom:10px;background:rgba(255,255,255,.12);color:#fff;font-size:12px;padding:6px 10px;border-radius:12px}
 
-/* ---------- SPLASH (MLB-style) ---------- */
-.splash{position:fixed;inset:0;background:#000;color:#fff;z-index:1000;opacity:1;transition:opacity .5s ease}
-.splash.hide{opacity:0;pointer-events:none}
-.splash-inner{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:space-between;align-items:center;padding:12vh 20px 12vh}
-.splash-top{display:flex;justify-content:center;align-items:center}
-.splash-brand{width:min(56vw,380px);max-width:420px}
-.splash-brand img{width:100%;height:auto;display:block;filter:drop-shadow(0 3px 14px rgba(255,255,255,.24))}
-.splash-brand{animation:logoZoom .9s ease-out forwards, logoGlow 2.6s ease-in-out 1s infinite}
-.splash-brand::after{
-  content:"";position:absolute;inset:auto;left:50%;top:33vh;width:min(56vw,380px);height:1px;pointer-events:none
+/* --- Splash (mobile/tablet only) --- */
+.splash{
+  position:fixed; inset:0; z-index:1000;
+  background:#000; color:#fff; display:none;
+  opacity:1; transition:opacity .5s ease;
 }
-.splash-bottom{display:flex;flex-direction:column;align-items:center;gap:14px}
-.sponsor-line{font-family:"Roboto Condensed",sans-serif;font-weight:300;letter-spacing:.08em}
-.sponsor-logo{width:min(42vw,220px)}
-.sponsor-logo img{width:100%;height:auto;display:block;filter:drop-shadow(0 2px 10px rgba(255,255,255,.2))}
-.splash-h{width:min(22vw,140px)}
-.splash-h img{width:100%;height:auto;display:block}
-
-@keyframes logoZoom{
-  0%{transform:scale(.82);opacity:.0}
-  60%{transform:scale(1.04);opacity:1}
-  100%{transform:scale(1)}
+.splash.show{ display:block; }
+.splash.hide{ opacity:0; pointer-events:none; }
+.splash-inner{
+  position:absolute; inset:0; display:grid;
+  grid-template-rows:33% 34% 33%; place-items:center;
 }
-@keyframes logoGlow{
-  0%,100%{filter:drop-shadow(0 2px 10px rgba(255,255,255,.16))}
-  50%{filter:drop-shadow(0 2px 18px rgba(255,255,255,.28))}
+.splash-top{ align-self:end; }
+.splash-bot{ align-self:start; }
+.splash-logo-top{
+  width:120px; height:auto;
+  animation:logoZoom .8s ease-out forwards, logoGlow 2.2s ease-in-out 1.2s infinite;
+  filter: drop-shadow(0 2px 12px rgba(255,255,255,.18));
+  position:relative;
 }
-
-/* utility */
-.hide{display:none}
-
-/* small fix for very small phones */
-@media (max-width:380px){
-  .hit{width:18%}
-  .profile-name{font-size:14px}
+.splash-logo-top::after{
+  content:""; position:absolute; inset:0;
+  background:linear-gradient(105deg, rgba(255,255,255,0) 10%, rgba(255,255,255,.22) 20%, rgba(255,255,255,0) 32%);
+  transform: translateX(-140%); pointer-events:none; mix-blend-mode:screen;
+  animation:logoShimmer 1.6s ease-out .6s 1 forwards;
 }
+.splash-logo-bot{
+  width:120px; height:auto;
+  filter: drop-shadow(0 2px 10px rgba(255,255,255,.12));
+  animation:logoZoom .8s ease-out .08s both;
+}
+@keyframes logoZoom{ 0%{ transform:scale(.85); opacity:0 } 60%{ transform:scale(1.03); opacity:1 } 100%{ transform:scale(1)} }
+@keyframes logoGlow{ 0%,100%{ filter:drop-shadow(0 2px 10px rgba(255,255,255,.18)) } 50%{ filter:drop-shadow(0 2px 18px rgba(255,255,255,.28)) } }
+@keyframes logoShimmer{ 0%{ transform:translateX(-140%) } 100%{ transform:translateX(140%) } }
+@media (min-width:1025px){ .splash{ display:none !important } }
 </style>
 </head>
 <body>
 
-<!-- HEADER -->
+<!-- Splash -->
+<div id="splash" class="splash" aria-hidden="true">
+  <div class="splash-inner">
+    <div></div>
+    <div class="splash-top">
+      <img class="splash-logo-top"
+        src="https://i.postimg.cc/C5mwXpQy/35878-20250830-222027-0000.png"
+        alt="YAT?STATS">
+    </div>
+    <div class="splash-bot">
+      <img class="splash-logo-bot"
+        src="https://i.postimg.cc/2jwjVn8H/32900-20250830-222044-0000.png"
+        alt="Hamilton H">
+    </div>
+  </div>
+  <audio id="splashSfx" preload="auto">
+    <!-- <source src="splash.mp3" type="audio/mpeg"> -->
+  </audio>
+</div>
+
 <header class="site-header">
   <div class="h-left">
-    <div class="top-row">
-      <button class="iconbtn" id="openLeft" aria-label="Open Navigation">
-        <svg viewBox="0 0 24 24"><path fill="currentColor" d="M3 6h18v2H3zM3 11h18v2H3zM3 16h18v2H3z"/></svg>
-      </button>
-      <button class="iconbtn" id="iconProfile" aria-label="Account">
+    <button class="hambtn" id="openLeft" aria-label="Open Navigation">
+      <svg viewBox="0 0 24 24" width="22" height="22"><path fill="currentColor" d="M3 6h18v2H3zM3 11h18v2H3zM3 16h18v2H3z"/></svg>
+    </button>
+
+    <div class="h-icons">
+      <button class="hdr-icon" id="iconProfile" aria-label="Account" title="Account">
         <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm0 2c-4.2 0-8 2.1-8 5v1h16v-1c0-2.9-3.8-5-8-5z"/></svg>
       </button>
-      <button class="iconbtn" id="iconSearch" aria-label="Search/Left Drawer">
+      <button class="hdr-icon" id="iconSearch" aria-label="Search" title="Search">
         <svg viewBox="0 0 24 24"><path fill="currentColor" d="M11 4a7 7 0 1 1 0 14 7 7 0 0 1 0-14zm9.7 15.3-3.4-3.4a9 9 0 1 0-1.4 1.4l3.4 3.4a1 1 0 0 0 1.4-1.4z"/></svg>
       </button>
-      <button class="iconbtn" id="iconFilter" aria-label="Filters">
+      <button class="hdr-icon" id="iconFilter" aria-label="Filters" title="Filters">
         <svg viewBox="0 0 24 24"><path fill="currentColor" d="M3 5h18l-6.5 7.5V20l-5-2v-5.5L3 5z"/></svg>
       </button>
-      <button class="iconbtn" id="iconReset" aria-label="Reset">
+      <button class="hdr-icon" id="iconReset" aria-label="Reset" title="Reset">
         <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 5V2L8 6l4 4V7a5 5 0 1 1-5 5H5a7 7 0 1 0 7-7z"/></svg>
       </button>
     </div>
 
     <div class="h-logos">
-      <div class="ham-brand">
-        <img class="ham-logo" src="https://i.postimg.cc/2jwjVn8H/32900-20250830-222044-0000.png" alt="H"/>
-        <div class="ham-type">
-          <div class="ham-line1">CHANDLER, AZ</div>
-          <div class="ham-line2">HAMILTON HIGH SCHOOL</div>
-          <div class="ham-line3">ACTIVE ALUMNI</div>
-        </div>
-      </div>
-      <img class="ystats-logo" src="https://i.postimg.cc/C5mwXpQy/35878-20250830-222027-0000.png" alt="YAT?STATS"/>
+      <img class="ham-logo" src="https://i.postimg.cc/2jwjVn8H/32900-20250830-222044-0000.png" alt="Hamilton HS"/>
     </div>
   </div>
 
-  <!-- Center nav (desktop) -->
-  <nav class="nav-desktop" aria-label="Primary">
-    <a href="#" class="nav-link"><span class="font-slim">WHERE THEY</span><span class="font-strong touching"> YAT?</span></a>
-    <a href="#" class="nav-link"><span class="font-slim">ACTIVE ALUMNI</span><span class="font-strong touching"> NEWS</span></a>
-    <a href="#" class="nav-link"><span class="font-slim">NEXT-LEVEL</span><span class="font-strong touching"> ALL-TIME LIST</span></a>
-    <a href="#" class="nav-link"><span class="font-slim">NIL &amp; YAT-A-BOY</span><span class="font-strong touching"> MARKETPLACE</span></a>
-    <a href="#" class="nav-link"><span class="font-slim">THE</span><span class="font-strong touching"> CURRENT TEAM</span></a>
-    <a href="#" class="nav-link"><span class="font-slim">PCD ACTION</span><span class="font-strong touching"> PARTNER PROGRAM</span></a>
+  <nav class="nav-desktop">
+    <a href="#where"><span class="nav-slim font-slim">Where They</span><span class="nav-strong font-strong">&nbsp;YAT?</span></a>
+    <a href="#news"><span class="nav-slim font-slim">Active Alumni</span><span class="nav-strong font-strong">&nbsp;News</span></a>
+    <a href="#alltime"><span class="nav-slim font-slim">Next-Level</span><span class="nav-strong font-strong">&nbsp;All-Time List</span></a>
+    <a href="#market"><span class="nav-slim font-slim">NIL &amp; YAT-A-BOY</span><span class="nav-strong font-strong">&nbsp;Marketplace</span></a>
+    <a href="#current"><span class="nav-slim font-slim">The</span><span class="nav-strong font-strong">&nbsp;Current Team</span></a>
+    <a href="#partners"><span class="nav-slim font-slim">PCDAction</span><span class="nav-strong font-strong">&nbsp;Partner Program</span></a>
   </nav>
 
-  <!-- right spacer just keeps grid 3-cols -->
-  <div></div>
+  <div class="h-right">
+    <img class="ystats-logo" src="https://i.postimg.cc/C5mwXpQy/35878-20250830-222027-0000.png" alt="YAT?STATS"/>
+  </div>
 </header>
 
 <!-- TAGLINE -->
 <div class="tagline-wrap">
   <div class="tagline">
-    <div>
-      <span class="tag-slim">WHERE THEY</span><span class="tag-strong"> YAT?</span>
+    <div class="tag-text">
+      <span class="tag-grey font-slim">WHERE THEY</span><span class="tag-strong font-strong tag-tight">&nbsp;YAT?</span>
       &nbsp;&nbsp;
-      <span class="tag-slim">SWIPE FOR</span><span class="tag-strong"> STATS!</span>
+      <span class="tag-grey font-slim">SWIPE FOR</span><span class="tag-strong font-strong tag-tight">&nbsp;STATS!</span>
     </div>
   </div>
 </div>
@@ -277,105 +341,106 @@ body.no-scroll{overflow:hidden}
 <!-- SCRIM -->
 <div class="scrim" id="scrim"></div>
 
-<!-- LEFT DRAWER (Nav + Player profile search) -->
-<aside class="drawer" id="drawerLeft" aria-hidden="true">
+<!-- LEFT DRAWER -->
+<aside class="drawer-left" id="drawerLeft" aria-hidden="true" role="navigation">
   <div class="drawer-header">
-    <div style="font-weight:900;letter-spacing:.14em;text-transform:uppercase;font-size:12px">Navigation</div>
-    <button class="closebtn" data-close="left" aria-label="Close">
+    <div class="left-title">Navigation</div>
+    <button class="closebtn" id="closeLeft" aria-label="Close">
       <svg viewBox="0 0 24 24"><path fill="currentColor" d="M6.225 4.811 4.811 6.225 10.586 12l-5.775 5.775 1.414 1.414L12 13.414l5.775 5.775 1.414-1.414L13.414 12l5.775-5.775-1.414-1.414L12 10.586 6.225 4.811z"/></svg>
     </button>
   </div>
-  <div class="drawer-content">
+  <div class="left-content">
+    <!-- Left NAV -->
     <div class="nav-left-list">
-      <a class="nav-left-link" href="#"><span class="gray">WHERE THEY</span><span class="black touching"> YAT?</span></a>
-      <a class="nav-left-link" href="#"><span class="gray">ACTIVE ALUMNI</span><span class="black touching"> NEWS</span></a>
-      <a class="nav-left-link" href="#"><span class="gray">NEXT-LEVEL</span><span class="black touching"> ALL-TIME LIST</span></a>
-      <a class="nav-left-link" href="#"><span class="gray">NIL &amp; YAT-A-BOY</span><span class="black touching"> MARKETPLACE</span></a>
-      <a class="nav-left-link" href="#"><span class="gray">THE</span><span class="black touching"> CURRENT TEAM</span></a>
-      <a class="nav-left-link" href="#"><span class="gray">PCD ACTION</span><span class="black touching"> PARTNER PROGRAM</span></a>
+      <a class="nav-left-link" href="#where"><span class="nav-slim font-slim">Where They</span><span class="nav-strong font-strong">&nbsp;YAT?</span></a>
+      <a class="nav-left-link" href="#news"><span class="nav-slim font-slim">Active Alumni</span><span class="nav-strong font-strong">&nbsp;News</span></a>
+      <a class="nav-left-link" href="#alltime"><span class="nav-slim font-slim">Next-Level</span><span class="nav-strong font-strong">&nbsp;All-Time List</span></a>
+      <a class="nav-left-link" href="#market"><span class="nav-slim font-slim">NIL &amp; YAT-A-BOY</span><span class="nav-strong font-strong">&nbsp;Marketplace</span></a>
+      <a class="nav-left-link" href="#current"><span class="nav-slim font-slim">The</span><span class="nav-strong font-strong">&nbsp;Current Team</span></a>
+      <a class="nav-left-link" href="#partners"><span class="nav-slim font-slim">PCDAction</span><span class="nav-strong font-strong">&nbsp;Partner Program</span></a>
+      <div class="nav-left-sep"></div>
     </div>
 
-    <details class="rail" open>
-      <summary>Player Profile Search</summary>
-      <div class="inner">
-        <input id="localSearch" type="text" class="ghost" placeholder="Type a player name…" autocomplete="off"/>
-        <ul id="localResults" style="list-style:none;padding:6px 0;margin:8px 0 0;display:grid;gap:6px"></ul>
-      </div>
-    </details>
+    <!-- Player profile search -->
+    <div class="left-search">
+      <div class="left-search-h">PLAYER PROFILE SEARCH</div>
+      <input id="localSearch" type="text" class="ghost" placeholder="Type a player name…" autocomplete="off"/>
+      <ul id="localResults" class="left-results"></ul>
 
-    <details class="rail" open>
-      <summary>Global YATSTATS Platform</summary>
-      <div class="inner" style="display:flex;flex-direction:column;gap:8px">
-        <a class="nav-left-link" href="https://www.yatstats.com" target="_blank" rel="noopener">
-          <span class="gray">🌎🔍 by</span><span class="black touching"> PLAYER</span>
-        </a>
-        <a class="nav-left-link" href="https://www.yatstats.com" target="_blank" rel="noopener">
-          <span class="gray">🌎🔍 by</span><span class="black touching"> TEAM</span>
-        </a>
+      <!-- Global Platform links ONLY (no search here) -->
+      <div class="global-line">
+        <svg class="mini-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M11 4a7 7 0 1 1 0 14 7 7 0 0 1 0-14zm9.7 15.3-3.4-3.4a9 9 0 1 0-1.4 1.4l3.4 3.4a1 1 0 0 0 1.4-1.4z"/></svg>
+        <strong>GLOBAL YATSTATS PLATFORM SEARCHES</strong>
+        <a href="https://www.yatstats.com" target="_blank" rel="noopener">🌎🔍 by PLAYER</a> |
+        <a href="https://www.yatstats.com" target="_blank" rel="noopener">🌎🔍 by TEAM</a>
       </div>
-    </details>
+    </div>
   </div>
 </aside>
 
 <!-- RIGHT DRAWER (Filters) -->
-<aside class="drawer right" id="drawerRight" aria-hidden="true">
+<aside class="drawer-right" id="drawerRight" aria-hidden="true" role="dialog" aria-modal="true">
   <div class="drawer-header">
-    <div style="font-weight:900;letter-spacing:.14em;text-transform:uppercase;font-size:12px">Filters</div>
-    <button class="closebtn" data-close="right" aria-label="Close">
+    <div class="right-title">Filters</div>
+    <button class="closebtn" id="closeRight" aria-label="Close">
       <svg viewBox="0 0 24 24"><path fill="currentColor" d="M6.225 4.811 4.811 6.225 10.586 12l-5.775 5.775 1.414 1.414L12 13.414l5.775 5.775 1.414-1.414L13.414 12l5.775-5.775-1.414-1.414L12 10.586 6.225 4.811z"/></svg>
     </button>
   </div>
-  <div class="drawer-content">
-    <details class="rail" open>
-      <summary>By Player</summary>
-      <div class="inner">
-        <input id="filterName" type="text" class="ghost" placeholder="Type name & press Enter"/>
-      </div>
-    </details>
+  <div class="drawer-body">
+    <div class="drawer-content">
+      <details class="rail" open>
+        <summary>By Player</summary>
+        <div class="inner">
+          <input id="filterName" type="text" class="ghost" placeholder="Type name & press Enter"/>
+          <div class="hint">Press <b>Enter</b> to apply and close.</div>
+        </div>
+      </details>
 
-    <details class="rail">
-      <summary>By Level</summary>
-      <div class="inner"><select id="lvl" class="ghost select-multi" multiple></select></div>
-    </details>
+      <details class="rail">
+        <summary>By Level</summary>
+        <div class="inner"><select id="lvl" class="ghost select-multi" multiple></select></div>
+      </details>
 
-    <details class="rail">
-      <summary>By Grad Class</summary>
-      <div class="inner"><select id="grad" class="ghost select-multi" multiple></select></div>
-    </details>
+      <details class="rail">
+        <summary>By Grad Class</summary>
+        <div class="inner"><select id="grad" class="ghost select-multi" multiple></select></div>
+      </details>
 
-    <details class="rail">
-      <summary>By Roster Year</summary>
-      <div class="inner"><select id="roster" class="ghost select-multi" multiple></select></div>
-    </details>
+      <details class="rail">
+        <summary>By Roster Year</summary>
+        <div class="inner"><select id="roster" class="ghost select-multi" multiple></select></div>
+      </details>
 
-    <details class="rail">
-      <summary>By Status</summary>
-      <div class="inner">
-        <select id="status" class="ghost select-multi" multiple>
-          <option value="ALL">(Select All)</option>
-          <option value="Active 2025">ACTIVE 2025</option>
-          <option value="Active 2024">ACTIVE 2024</option>
-          <option value="Retired">RETIRED</option>
-        </select>
-      </div>
-    </details>
+      <details class="rail">
+        <summary>By Status</summary>
+        <div class="inner">
+          <select id="status" class="ghost select-multi" multiple>
+            <option value="Active 2025">ACTIVE 2025</option>
+            <option value="Active 2024">ACTIVE 2024</option>
+            <option value="Free Agent">FREE AGENT</option>
+            <option value="Injured">INJURED</option>
+            <option value="Retired">RETIRED</option>
+          </select>
+        </div>
+      </details>
+    </div>
   </div>
 </aside>
 
-<!-- AUTH drawer (closed by default) -->
-<aside class="drawer right" id="drawerAuth" aria-hidden="true" style="right:0">
+<!-- AUTH DRAWER -->
+<aside class="drawer-auth" id="drawerAuth" aria-hidden="true" role="dialog" aria-modal="true">
   <div class="drawer-header">
-    <div style="font-weight:900;letter-spacing:.14em;text-transform:uppercase;font-size:12px">Sign Up | Login</div>
-    <button class="closebtn" data-close="auth" aria-label="Close">
+    <div class="auth-title">Sign Up | Login</div>
+    <button class="closebtn" id="closeAuth" aria-label="Close">
       <svg viewBox="0 0 24 24"><path fill="currentColor" d="M6.225 4.811 4.811 6.225 10.586 12l-5.775 5.775 1.414 1.414L12 13.414l5.775 5.775 1.414-1.414L13.414 12l5.775-5.775-1.414-1.414L12 10.586 6.225 4.811z"/></svg>
     </button>
   </div>
-  <div class="drawer-content">
+  <div class="auth-body">
     <label>Email</label>
-    <input class="ghost" type="email" placeholder="you@example.com"/>
+    <input class="input" type="email" placeholder="you@example.com"/>
     <label style="margin-top:10px">Password</label>
-    <input class="ghost" type="password" placeholder="••••••••"/>
-    <button class="iconbtn" style="width:100%;height:auto;padding:10px;border:1px solid #2a2f3a;border-radius:10px;background:#fff;color:#000;font-weight:800">Continue</button>
+    <input class="input" type="password" placeholder="••••••••"/>
+    <button class="btn-primary">Continue</button>
   </div>
 </aside>
 
@@ -384,266 +449,309 @@ body.no-scroll{overflow:hidden}
 </main>
 
 <footer class="footer">
-  <div class="build-pill">BUILD: ham-v4.6.1</div>
+  <img src="https://i.postimg.cc/v8LxKy54/no-errors-sample-banner.png" alt="Sponsor banner">
+  <div class="build-pill">BUILD: ham-v4.6.0</div>
 </footer>
 
-<!-- SPLASH -->
-<div id="splash" class="splash" aria-hidden="true">
-  <div class="splash-inner">
-    <div class="splash-top">
-      <div class="splash-brand" style="position:relative">
-        <img src="https://i.postimg.cc/C5mwXpQy/35878-20250830-222027-0000.png" alt="YAT?STATS"/>
-      </div>
-    </div>
-
-    <div class="splash-bottom">
-      <div class="sponsor-line">presented by</div>
-      <div class="sponsor-logo"><img src="https://i.postimg.cc/0y1k6p0m/primary-source-logo.png" alt="Primary Source"/></div>
-      <div class="splash-h"><img src="https://i.postimg.cc/2jwjVn8H/32900-20250830-222044-0000.png" alt="Hamilton H"/></div>
-    </div>
-  </div>
-</div>
-
 <script>
-/* ---------------- CONFIG / HELPERS ---------------- */
-const CFG = {
-  logos: {
-    yatstats: "https://i.postimg.cc/C5mwXpQy/35878-20250830-222027-0000.png",
-    hamiltonH: "https://i.postimg.cc/2jwjVn8H/32900-20250830-222044-0000.png",
-    sponsor:   "https://i.postimg.cc/0y1k6p0m/primary-source-logo.png" // replace with your sponsor
-  },
-  cody: {
-    galleryWide: "https://i.postimg.cc/YCHy0LPq/AISelect-20250830-142152-Photos-videos.jpg",
-    nilImage: "https://i.postimg.cc/BbfwF8vg/AISelect-20250901-144405-Gallery.jpg",
-    youtube: "https://www.youtube.com/embed/z0anHDZ8rz8?rel=0&modestbranding=1&playsinline=1"
+/* Splash init */
+function runSplash(){
+  const isSmall = window.matchMedia('(max-width: 1024px)').matches;
+  const splash = document.getElementById('splash');
+  if(!splash) return;
+  if(!isSmall){ splash.remove(); return; }
+  splash.classList.add('show');
+  const sfx = document.getElementById('splashSfx');
+  if (sfx && sfx.querySelector('source')){
+    sfx.play().catch(()=>{
+      const one=()=>{ sfx.play().finally(()=>{
+        window.removeEventListener('pointerdown',one,true);
+        window.removeEventListener('keydown',one,true);
+      })};
+      window.addEventListener('pointerdown',one,true);
+      window.addEventListener('keydown',one,true);
+    });
   }
+  setTimeout(()=>{ splash.classList.add('hide'); setTimeout(()=>splash.remove(),520); },1200);
+}
+
+/* helpers */
+const byId = id => document.getElementById(id);
+function lvlClass(l){return String(l||'').toLowerCase().replace(/\s+/g,'-').replace('aaa','triple-a').replace('aa','double-a')}
+function teamAndParent(p){ const raw=String(p.team||''); const parts=raw.split('—'); const team=(parts[0]||raw).trim(); let parent=(parts[1]||'').trim(); if((p.currentLevel||'').toUpperCase()==='MLB') parent=''; return {team,parent}; }
+function fmtLast3(g){ return `${g.date||'—'} • ${g.opp||'—'} — ${g.line||'—'}`; }
+function formatNextTwoLines(ng){ if(!ng) return ['—','—']; const ds=String(ng.date||'').trim(); const mmdd=(ds.match(/\b(\d{1,2}\/\d{1,2})\b/)||[, '—'])[1]; let time=(ds.match(/(\d{1,2}:\d{2}\s*[AP]M)/i)||[, '—'])[1].toUpperCase(); const tz=(ds.match(/\b(ET|CT|MT|PT|AZ)\b/i)||[, ''])[1]?.toUpperCase()||''; if(tz && !time.includes(tz)) time=`${time} ${tz}`; return [`${mmdd} - ${time}`.trim(), String(ng.opponent||'—').trim()||'—']; }
+
+/* data (sample — replace frontImg/highSchoolImg as you upload assets) */
+const playersRaw = [
+  { id:"cody-bellinger", name:"CODY BELLINGER", graduatingClass:2013, currentLevel:"MLB", status:"Active",
+    position:"CF/1B", team:"New York Yankees",
+    frontImg:"https://i.postimg.cc/9F19KG5h/new-york-yankees-outfielder-cody-bellinger.jpg",
+    highSchoolImg:"https://i.postimg.cc/Jhq690Lg/01-Bellinger-Front-page-00001.jpg",
+    batting:{avg:".284",obp:".345",slg:".520",ops:".865",hits:"150",runs:"95",hr:"35",rbi:"105"},
+    nextGame:{opponent:"@ BOSTON RED SOX", date:"7/15 5:10 PM AZ"},
+    last3:[{date:"7/12",opp:"@ BOS",line:"2-4, HR, 2 RBI"},{date:"7/11",opp:"@ BOS",line:"1-3, BB"},{date:"7/10",opp:"vs TOR",line:"0-4"}],
+    letterWinnerYears:[2012,2013],
+    tbcId:180827
+  },
+  { id:"patrick-murphy", name:"PATRICK MURPHY", graduatingClass:2013, currentLevel:"MLB", status:"Active",
+    position:"P", team:"KT Wiz Suwon — KBO",
+    frontImg:"https://i.postimg.cc/JnCXccvC/MURPH.avif",
+    highSchoolImg:"https://i.postimg.cc/pdxcG8gz/02-Murphy-Front-page-00001.jpg",
+    pitching:{era:"3.22",so:"71",whip:"1.09",oba:".224",kbb:"3.6",fip:"3.45",ip:"112.0",er:"40",hr:"8",qs:"10",w:"8",sv:"0"},
+    nextGame:{opponent:"vs KIA TIGERS", date:"8/29 2:30AM AZ"},
+    last3:[{date:"8/27",opp:"vs KIA",line:"6.0 IP, 1 ER, 7 K"},{date:"8/23",opp:"@ KIA",line:"5.2 IP, 2 ER, 5 K"},{date:"8/20",opp:"vs SSG",line:"7.0 IP, 0 ER, 8 K"}],
+    letterWinnerYears:[2012,2013]
+  },
+  { id:"dom-hamel", name:"DOM HAMEL", graduatingClass:2017, currentLevel:"Triple-A", status:"Active",
+    position:"P", team:"Syracuse Mets — New York Mets",
+    frontImg:"https://i.postimg.cc/rwYchfnt/20250804-151814.jpg",
+    highSchoolImg:"https://i.postimg.cc/VLC7zDwX/23-Hamel-Front-page-00001.jpg",
+    pitching:{era:"3.89",so:"93",whip:"1.18"},
+    nextGame:{date:"8/28 - 3:35 PM AZ", opponent:"@ SCRANTON/ WILKES BARRE"},
+    last3:[{date:"8/26",opp:"@ SWB",line:"1.0 IP, 1 ER, 1 K"},{date:"8/21",opp:"vs IND",line:"1.0 IP, 7 ER"},{date:"8/15",opp:"@ ROC",line:"1.0 IP, 1 ER"}],
+    letterWinnerYears:[2016,2017]
+  },
+  { id:"logan-boyer", name:"LOGAN BOYER", graduatingClass:2016, currentLevel:"Triple-A", status:"Active",
+    position:"P", team:"Oklahoma City — Los Angeles Dodgers",
+    frontImg:"https://i.postimg.cc/c1Kq8Dkv/Logan-Boyer.jpg",
+    highSchoolImg:"https://i.postimg.cc/gJtM27rH/11-Boyer-Front-page-00001.jpg",
+    letterWinnerYears:[2014,2015,2016]
+  },
+  { id:"drew-swift", name:"DREW SWIFT", graduatingClass:2017, currentLevel:"Triple-A", status:"Active",
+    position:"SS", team:"Las Vegas Aviators — Athletics",
+    frontImg:"https://i.postimg.cc/GmmSKFsV/AISelect-20250826-023939-Instagram.jpg",
+    highSchoolImg:"https://i.postimg.cc/0j6VMCwR/04-Swift-Front-page-00001.jpg",
+    batting:{avg:".271",obp:".335",slg:".414",ops:".749",hits:"114",runs:"68",hr:"10",rbi:"52",doubles:"24",triples:"3",sb:"18",bb:"41"},
+    nextGame:{ date:"8/28 - 5:05 PM AZ", opponent:"vs. IOWA" },
+    last3:[{date:"08/25",opp:"@ ABQ",line:"2-5, 2B, R"},{date:"08/24",opp:"@ ABQ",line:"1-3, BB, SB"},{date:"08/23",opp:"@ ABQ",line:"0-4"}],
+    letterWinnerYears:[2014,2015,2016,2017]
+  },
+  { id:"brock-selvidge", name:"BROCK SELVIDGE", graduatingClass:2021, currentLevel:"Double-A", status:"Active",
+    position:"P", team:"Somerset Patriots — New York Yankees",
+    frontImg:"https://i.postimg.cc/kgSyd4xs/AISelect-20250826-020305-Instagram.jpg",
+    highSchoolImg:"https://i.postimg.cc/vTp3W6r1/22-Selvidge-Front-page-00001.jpg",
+    letterWinnerYears:[2018,2019,2020,2021]
+  },
+  { id:"luke-thiele", name:"LUKE THIELE", graduatingClass:2021, currentLevel:"NCAA-D1", status:"Active",
+    position:"IF", team:"Washington State — Pac-12",
+    frontImg:"https://i.postimg.cc/593zLzmD/luke-theil.jpg",
+    highSchoolImg:"https://i.postimg.cc/LXYrnvvj/45-Thiele-Front-page-00001.jpg",
+    letterWinnerYears:[2020,2021]
+  },
+  { id:"tyler-wilson", name:"TYLER WILSON", graduatingClass:2021, currentLevel:"High-A", status:"Active",
+    position:"LF/RF", team:"Hudson Valley Renegades — New York Yankees",
+    frontImg:"https://i.postimg.cc/pXpZqkrg/1756201702161-1.jpg",
+    highSchoolImg:"https://i.postimg.cc/PxXbZQ0V/34-Wilson-Front-page-00001.jpg",
+    letterWinnerYears:[2018,2019,2020]
+  },
+  { id:"shane-anderson", name:"SHANE ANDERSON", graduatingClass:2020, currentLevel:"NAIA", status:"Active",
+    position:"P", team:"Georgia Gwinnett — Continental Athletic",
+    frontImg:"https://i.postimg.cc/J4j5XP4M/IMG-20250826-030341.jpg",
+    highSchoolImg:"https://i.postimg.cc/SNj7TkrQ/AISelect-20250826-031127-Gallery-1.jpg",
+    letterWinnerYears:[2020]
+  },
+  { id:"chaz-deluca", name:"CHAZ DELUCA", graduatingClass:2017, currentLevel:"High-A", status:"COACH",
+    position:"Player Development", team:"Aberdeen IronBirds — Baltimore Orioles",
+    frontImg:"https://i.postimg.cc/rp0T753Z/IMG-7630.jpg",
+    highSchoolImg:"https://i.postimg.cc/v8xHxwmx/AISelect-20250729-224953-System-UI.jpg",
+    letterWinnerYears:[2016,2017]
+  },
+  /* minimal extras for demo – add the rest of your athletes here ... */
+  {id:"cooper-brass",name:"COOPER BRASS",position:"IF",currentLevel:"NCAA",graduatingClass:2023,status:"Active"},
+  {id:"caden-burghardt",name:"CADEN BURGHARDT",position:"UT",currentLevel:"NCAA",graduatingClass:2025,status:"Active"},
+  {id:"carson-johnson",name:"CARSON JOHNSON",position:"P",currentLevel:"NCAA",graduatingClass:2025,status:"Active"},
+  {id:"drew-rogers",name:"DREW ROGERS",position:"C-IF",currentLevel:"NCAA",graduatingClass:2025,status:"Active"},
+  {id:"liam-wilson",name:"LIAM WILSON",position:"C-1B",currentLevel:"NCAA",graduatingClass:2025,status:"Active"},
+  {id:"dj-barrett",name:"DJ BARRETT",position:"P-OF",currentLevel:"JUCO",graduatingClass:2023,status:"Active"},
+  {id:"roch-cholowsky",name:"ROCH CHOLOWSKY",position:"IF",currentLevel:"NCAA",graduatingClass:2024,status:"Active"},
+  {id:"zachary-johnston",name:"ZACHARY JOHNSTON",position:"OF",currentLevel:"NAIA",graduatingClass:2024,status:"Active"},
+  {id:"ryan-kucherak",name:"RYAN KUCHERAK",position:"IF",currentLevel:"NCAA",graduatingClass:2024,status:"Active"},
+  {id:"rohan-lettow",name:"ROHAN LETTOW",position:"P",currentLevel:"NCAA",graduatingClass:2024,status:"Active"},
+  {id:"jeter-mauzey",name:"JETER MAUZEY",position:"OF",currentLevel:"JUCO",graduatingClass:2024,status:"Active"},
+  {id:"will-shelor",name:"WILL SHELOR",position:"P",currentLevel:"JUCO",graduatingClass:2024,status:"Active"},
+  {id:"zach-wadas",name:"ZACH WADAS",position:"UT",currentLevel:"NCAA",graduatingClass:2024,status:"Active"},
+  {id:"jeremy-jones",name:"JEREMY JONES",position:"P",currentLevel:"NCAA",graduatingClass:2023,status:"Active"},
+  {id:"kole-klecker",name:"KOLE KLECKER",position:"P",currentLevel:"NCAA",graduatingClass:2023,status:"Active"},
+  {id:"logan-saloman",name:"LOGAN SALOMAN",position:"P",currentLevel:"NCAA",graduatingClass:2023,status:"Active"},
+  {id:"luke-thiele-dup",name:"LUKE THIELE",position:"IF",currentLevel:"NCAA",graduatingClass:2021,status:"Active"},
+  {id:"josh-tiedemann",name:"JOSH TIEDEMANN",position:"H-P",currentLevel:"A",graduatingClass:2023,status:"Active"},
+  {id:"gavin-turley",name:"GAVIN TURLEY",position:"OF",currentLevel:"A",graduatingClass:2023,status:"Active"},
+  {id:"braden-watkins",name:"BRADEN WATKINS",position:"OF",currentLevel:"NCAA",graduatingClass:2023,status:"Active"},
+  {id:"alex-hernandez",name:"ALEX HERNANDEZ",position:"C",currentLevel:"NCAA",graduatingClass:2022,status:"Active"},
+];
+
+/* --- Normalize statuses to Active 2025 / Active 2024 buckets --- */
+const STATUS_FIX = {
+  // ACTIVE 2025
+  "shane-anderson":"Active 2025","dj-barrett":"Active 2025","cody-bellinger":"Active 2025","logan-boyer":"Active 2025",
+  "cooper-brass":"Active 2025","caden-burghardt":"Active 2025","roch-cholowsky":"Active 2025","aj-diaz":"Active 2025",
+  "dom-hamel":"Active 2025","alex-hernandez":"Active 2025","carson-johnson":"Active 2025","zachary-johnston":"Active 2025",
+  "jeremy-jones":"Active 2025","kole-klecker":"Active 2025","ryan-kucherak":"Active 2025","rohan-lettow":"Active 2025",
+  "jeter-mauzey":"Active 2025","patrick-murphy":"Active 2025","shane-murphy":"Active 2025","drew-rogers":"Active 2025",
+  "logan-saloman":"Active 2025","brock-selvidge":"Active 2025","will-shelor":"Active 2025","drew-swift":"Active 2025",
+  "luke-thiele":"Active 2025","josh-tiedemann":"Active 2025","gavin-turley":"Active 2025","zach-wadas":"Active 2025",
+  "braden-watkins":"Active 2025","liam-wilson":"Active 2025","tyler-wilson":"Active 2025",
+
+  // ACTIVE 2024
+  "dustin-bermudez":"Active 2024","michael-brueser":"Active 2024","prince-deboskie":"Active 2024","ryan-figueroa":"Active 2024",
+  "jorge-flores":"Active 2024","kent-hasler":"Active 2024","tanner-holland":"Active 2024","logan-krei":"Active 2024",
+  "jd-mclaughlin":"Active 2024","sean-rackoski":"Active 2024","jackson-smith":"Active 2024","jake-wong":"Active 2024",
+  "justin-wylie":"Active 2024"
 };
-
-const byId = (id)=>document.getElementById(id);
-function lvlClass(l){return String(l||'').toUpperCase().replace('AAA','TRIPLE-A').replace('AA','DOUBLE-A')}
-function teamAndParent(teamRaw){
-  const raw=String(teamRaw||''); const parts=raw.split('—'); 
-  const team=(parts[0]||raw).trim(); const parent=(parts[1]||'').trim();
-  return {team,parent};
-}
-function kv(k,v){ return `<div class="kv"><div class="k">${k}</div><div class="v">${v??'—'}</div></div>`; }
-function funTitleByStatus(status){
-  if(/^active 2025/i.test(status)) return '2025 SEASON STATS';
-  if(/^active 2024/i.test(status)) return '2024 SEASON STATS';
-  return 'CAREER STATS';
-}
-
-/* ---------------- DATA: Build players from your CSV ---------------- */
-const csv = `player,pos,ht,wt,ba,th,born,place,hilvl,mlb years,stat years
-Shane Anderson,ut,5-11,195,R,R, ,"Chandler,AZ",NCAA, ,2021-2025
-DJ Barrett,p-of,6-1,190,R,R, ,"Gilbert,AZ",JrCollege, ,2024-2025
-Cody Bellinger,cf-1b,6-4,203,L,L,1995-07-13,"Scottsdale,AZ",MLB,2017-2025,2013-2025
-Dustin Bermudez,ut-p,5-10,160,R,R,2001-06-05,"Chandler,AZ",NCAA, ,2020-2024
-Logan Boyer,p,6-3,215,R,R,1998-01-24,"Chandler,AZ",AAA, ,2017-2025
-Cooper Brass,if,5-10,180,R,R,2005-02-14,"Chandler,AZ",NCAA, ,2025-2025
-Caden Burghardt,ut,6-3,0,R,R, ,"Chandler,AZ",NCAA, ,2025-2025
-Roch Cholowsky,if,6-2,195,R,R,2005-04-05,"Chandler,AZ",NCAA, ,2024-2025
-Prince DeBoskie,of,6-0,180,R,R,2003-09-23,"Chandler,AZ",JrCollege, ,2023-2024
-AJ Diaz,ss, ,0,R,R, , ,JrCollege, ,2025-2025
-Ryan Figueroa,p,6-3,192,R,R, ,"Chandler,AZ",NCAA, ,2021-2024
-Jorge Flores,ss,5-5,160,R,R,1991-11-25,"Ensenada,MX",AAA, ,2012-2024
-Dom Hamel,p,6-2,206,R,R,1999-03-02,"Chandler,AZ",AAA, ,2018-2025
-Kent Hasler,p,5-10,205,R,R,1995-10-15,"Chandler,AZ",AAA, ,2015-2024
-Alex Hernandez,c,6-1,195,R,R, ,"Chandler,AZ",NCAA, ,2022-2025
-Carson Johnson,p,6-4,206,R,R,2005-02-02,"Torrance,CA",NCAA, ,2025-2025
-Zachary Johnston,of,6-3,0, , , ,"Chandler,AZ",NAIA, ,2024-2025
-Jeremy Jones,p,6-1,202,R,R,2004-05-31,"Chandler,AZ",NCAA, ,2023-2025
-Kole Klecker,p,6-2,205,R,R,2004-08-25,"Mesa,AZ",NCAA, ,2023-2025
-Logan Krei,of,5-11,165,R,R, ,"Defiance,MO",JrCollege, ,2024-2024
-Ryan Kucherak,if,6-1,195,R,R,2004-08-24,"Salt Lake City,UT",NCAA, ,2024-2025
-Rohan Lettow,p,6-2,180,R,R,2005-07-24,"Chandler,AZ",NCAA, ,2024-2025
-Jeter Mauzey,of,6-5,200,R,R, ,"Chandler,AZ",JrCollege, ,2024-2025
-J.D. McLaughlin,lf-cf,6-2,195,R,R,2000-12-28,"Mesa,AZ",AAA, ,2020-2024
-Patrick Murphy,p,6-5,211,R,R,1995-06-10,"Chandler,AZ",MLB,2020-2022,2014-2025
-Shane Murphy,p,6-5,210,L,L,2001-01-19,"Chandler,AZ",AAA, ,2020-2025
-Sean Rackoski,p,6-7,225,R,R,1995-05-12,"Mesa,AZ",AAA, ,2014-2024
-Drew Rogers,c-if,6-0,220,R,R,2005-07-15,"Minneapolis,MN",NCAA, ,2025-2025
-Logan Saloman,p,6-5,230,R,R,2004-05-10,"Chandler,AZ",NCAA, ,2023-2025
-Brock Selvidge,p,6-3,205,R,L,2002-08-28,"Carrolton,TX",AA, ,2021-2025
-Will Shelor,p,5-11,190,R,R, ,"Chandler,AZ",JrCollege, ,2024-2025
-Jackson Smith,p,6-1,235,L,L,2004-04-04,"Chandler,AZ",JrCollege, ,2023-2024
-Drew Swift,ss-2b,6-0,165,R,R,1999-02-15,"Chandler,AZ",AAA, ,2018-2025
-Luke Thiele,if,6-0,195,R,R,2002-12-19,"Chandler,AZ",NCAA, ,2023-2025
-Josh Tiedemann,h-p,6-0,165,R,R,2004-06-09,"Phoenix,AZ",A, ,2023-2025
-Gavin Turley,of,6-1,196,R,R,2003-11-12,"American Fork,UT",A, ,2023-2025
-Zach Wadas,ut,6-4,205,L,L,2004-08-25,"Chandler,AZ",NCAA, ,2024-2025
-Braden Watkins,of,6-0,160,L,R, ,"Chandler,AZ",NCAA, ,2023-2025
-Liam Wilson,c-1b,6-0,205,R,R, ,"Chandler,AZ",NCAA, ,2025-2025
-Tyler Wilson,lf-rf,6-2,210,B,R,2002-07-10,"Tainan,TW",A+, ,2021-2025
-Jake Wong,p,6-2,218,R,R,1996-09-03,"Chandler,AZ",MLB,2023-2023,2016-2024
-Justin Wylie,if-of,5-10,180,R,R,1996-08-26,"Lancaster,PA",Indy, ,2015-2024`;
-
-function parseCSV(text){
-  const lines=text.trim().split(/\r?\n/);
-  const headers=lines.shift().split(',').map(h=>h.trim());
-  return lines.map(line=>{
-    // rough CSV (no embedded commas in names beyond quoted place)
-    const parts=[]; let cur=''; let inQ=false;
-    for(const ch of line){
-      if(ch==='"' ){ inQ=!inQ; continue; }
-      if(ch===',' && !inQ){ parts.push(cur); cur=''; continue; }
-      cur+=ch;
-    }
-    parts.push(cur);
-    const obj={}; headers.forEach((h,i)=>obj[h]= (parts[i]||'').trim());
-    return obj;
-  });
-}
-
-const basePlayers = parseCSV(csv).map((r)=>{
-  // status from stat years
-  let status = /2025/.test(r['stat years']) ? 'Active 2025' : (/2024/.test(r['stat years']) ? 'Active 2024' : 'Retired');
-  if(/^Jorge Flores/i.test(r.player)) status='Retired';
-  return {
-    id: r.player.toLowerCase().replace(/\s+/g,'-'),
-    name: r.player.toUpperCase(),
-    graduatingClass: (r['stat years'].match(/\b(20\d{2})\b/g)||[])[0] ? Number((r['stat years'].match(/\b(20\d{2})\b/g)||[])[0]) : null, // earliest year shown
-    currentLevel: r.hilvl?.replace('JrCollege','JUCO')||'',
-    status,
-    position: (r.pos||'').toUpperCase(),
-    team:"", // you can fill per-player later
-    frontImg:"", highSchoolImg:"",
-    letterWinnerYears:[], // can be filled later
-    batting:null, pitching:null,
-    socials:{x:"",ig:""},
-    nextGame:{},
-    last3:[]
-  };
+playersRaw.forEach(p=>{
+  const key=(p.id||'').toLowerCase();
+  const fixed=STATUS_FIX[key] || STATUS_FIX[(p.name||'').toLowerCase().replace(/\s+/g,'-')];
+  if(fixed) p.status=fixed;
 });
 
-/* images we have (Cody + a few fallbacks) */
-function photoFor(p){
-  if(p.id==='cody-bellinger') return "https://i.postimg.cc/9F19KG5h/new-york-yankees-outfielder-cody-bellinger.jpg";
-  return "https://i.postimg.cc/3x7c5Qng/ham-placeholder-dark.jpg"; // general fallback
-}
-function hsFor(p){
-  if(p.id==='cody-bellinger') return "https://i.postimg.cc/Jhq690Lg/01-Bellinger-Front-page-00001.jpg";
-  return "https://i.postimg.cc/3x7c5Qng/ham-placeholder-dark.jpg";
-}
-basePlayers.forEach(p=>{ p.frontImg=photoFor(p); p.highSchoolImg=hsFor(p); });
+/* Build working list */
+const players = [...playersRaw].sort((a,b)=>(+a.graduatingClass||0)-(+b.graduatingClass||0));
 
-/* sort default: Active only (2025+2024), by grad class oldest->newest; Retired hidden initially */
-function defaultSort(a,b){
-  const ga=+a.graduatingClass||9999, gb=+b.graduatingClass||9999;
-  if(ga!==gb) return ga-gb;
-  return a.name.localeCompare(b.name);
-}
-
-/* produce level & year options */
-const LEVEL_ORDER = ["MLB","AAA","AA","A+","A","Indy","NCAA","NCAA-D1","NCAA-D2","NCAA-D3","NAIA","JUCO"];
-function yearsRange(start,end){const arr=[]; for(let y=start;y>=end;y--) arr.push(y); return arr;}
-
-/* ------------- CARD RENDER ------------- */
+/* render helpers */
 function letterDots(years){ if(!years||!years.length) return ''; const sorted=[...years].sort((a,b)=>b-a); return `<div class="letters">${sorted.slice(0,4).map(y=>`<span class="letter-dot" title="${y}">${String(y).slice(-2)}</span>`).join('')}</div>`;}
-
+function makeKV(k,v){ return `<div class="kv"><div class="k">${k}</div><div class="v">${v??'—'}</div></div>`; }
 function makeStats12(p){
-  // simple stat placeholders
-  const b=p.batting||{};
-  const x=p.pitching||{};
-  if(p.position.includes('P')){ // pitcher
-    return `${kv('ERA',x.era||'—')}${kv('WHIP',x.whip||'—')}${kv('OBA',x.oba||'—')}${kv('K/BB',x.kbb||'—')}
-            ${kv('FIP',x.fip||'—')}${kv('IP',x.ip||'—')}${kv('ER',x.er||'—')}${kv('K',x.so||'—')}
-            ${kv('QS',x.qs||'—')}${kv('HR',x.hr||'—')}${kv('W',x.w||'—')}${kv('SV',x.sv||'—')}`;
+  if(p.batting){
+    const b=p.batting;
+    return `${makeKV('AVG',b.avg)} ${makeKV('OBP',b.obp)} ${makeKV('SLG',b.slg)} ${makeKV('OPS',b.ops)}
+            ${makeKV('H',b.hits)} ${makeKV('R',b.runs)} ${makeKV('HR',b.hr)} ${makeKV('RBI',b.rbi)}
+            ${makeKV('2B',b.doubles||'—')} ${makeKV('3B',b.triples||'—')} ${makeKV('SB',b.sb||'—')} ${makeKV('BB',b.bb||'—')}`;
   }
-  return `${kv('AVG',b.avg||'—')}${kv('OBP',b.obp||'—')}${kv('SLG',b.slg||'—')}${kv('OPS',b.ops||'—')}
-          ${kv('H',b.hits||'—')}${kv('R',b.runs||'—')}${kv('HR',b.hr||'—')}${kv('RBI',b.rbi||'—')}
-          ${kv('2B',b.doubles||'—')}${kv('3B',b.triples||'—')}${kv('SB',b.sb||'—')}${kv('BB',b.bb||'—')}`;
+  const x=p.pitching||{};
+  return `${makeKV('ERA',x.era)} ${makeKV('WHIP',x.whip)} ${makeKV('OBA',x.oba||'—')} ${makeKV('K/BB',x.kbb||'—')}
+          ${makeKV('FIP',x.fip||'—')} ${makeKV('IP',x.ip||'—')} ${makeKV('ER',x.er||'—')} ${makeKV('K',x.so||x.ko||'—')}
+          ${makeKV('QS',x.qs||'—')} ${makeKV('HR',x.hr||'—')} ${makeKV('W',x.w||'—')} ${makeKV('SV',x.sv||'—')}`;
 }
 
+/* YouTube embed helper */
+function youTubeEmbed(url){
+  // Accepts full youtu.be or youtube.com URLs
+  const idMatch = url.match(/(?:youtu\.be\/|v=)([A-Za-z0-9_-]{6,})/);
+  const id = idMatch ? idMatch[1] : null;
+  if(!id) return '<div style="color:#6b7280">Video unavailable.</div>';
+  return `<div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:10px;background:#000">
+            <iframe src="https://www.youtube.com/embed/${id}?rel=0&modestbranding=1"
+              title="YouTube video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowfullscreen style="position:absolute;top:0;left:0;width:100%;height:100%"></iframe>
+          </div>`;
+}
+
+/* Build card */
 function makeCard(p){
-  const L = lvlClass(p.currentLevel);
-  const {team,parent}=teamAndParent(p.team||'');
-  const funTitle = funTitleByStatus(p.status||'');
-  const isCody = p.id==='cody-bellinger';
-  const profileBlock = `
-    <div class="profile-block">
-      <div class="profile-name">${p.name}</div>
-      <div class="profile-two">
-        ${(team||'').toUpperCase()}<br>${(parent||'').toUpperCase()}
-      </div>
-    </div>`;
+  const lvl = lvlClass(p.currentLevel);
+  const {team,parent} = teamAndParent(p);
+  const [ng1,ng2] = formatNextTwoLines(p.nextGame||{});
+  const profUrl = `profile.html?id=${encodeURIComponent(p.id)}`;
+
+  // panes content
+  const statsPane = `<div class="kv-wrap12">${makeStats12(p)}</div>`;
+  const newsPane  = `<div style="color:#6b7280">Latest headlines placeholder.</div>`;
+  const xPane     = `<div style="color:#6b7280">X/Twitter posts placeholder.</div>`;
+  const igPane    = `<div style="color:#6b7280">Instagram posts placeholder.</div>`;
+  const videoPane = youTubeEmbed("https://youtu.be/z0anHDZ8rz8?feature=shared"); /* your requested video */
+  const galleryPane=`<div style="color:#6b7280">Photo gallery placeholder.</div>`;
+  const nilPane   = `<div style="color:#111">NIL Points &amp; YAT-A-BOY! coming soon.</div>`;
 
   return `
-<article class="card flip-card front" tabindex="0" aria-label="${p.name}">
+<article class="card flip-card front" tabindex="0" aria-label="${(p.name||'').toUpperCase()}">
   <button class="hit left"  data-toggle="prev" aria-label="Flip previous"></button>
   <button class="hit right" data-toggle="next" aria-label="Flip next"></button>
   <div class="flip-inner">
     <section class="face front-face">
-      <img class="card-img" src="${p.frontImg}" alt="${p.name}">
+      <img class="card-img" src="${(p.frontImg||p.highSchoolImg||'')}" alt="${p.name}" onerror="this.onerror=null;this.style.display='none'">
       <div class="bottom-grad"></div>
       <div class="front-left">
-        <div class="name">${p.name}</div>
+        <div class="name">${(p.name||'').toUpperCase()}</div>
         <div class="team">${team||''}</div>
-        <div class="parent">${parent||'&nbsp;'}</div>
+        ${parent?`<div class="parent">${parent}</div>`:`<div class="parent">&nbsp;</div>`}
+        <div class="spacer-6"></div>
         <div class="stack">
-          ${p.currentLevel?`<span class="chip">${L}</span>`:''}
-          ${p.status?`<span class="chip">${p.status.toUpperCase()}</span>`:''}
-          ${p.graduatingClass?`<span class="chip chip class">CLASS OF ${p.graduatingClass}</span>`:''}
+          ${p.currentLevel?`<span class="chip level ${lvl}">${String(p.currentLevel).toUpperCase()}</span>`:''}
+          ${p.status?`<span class="chip status ${String(p.status).toLowerCase().includes('retired')?'retired':''}">${String(p.status).toUpperCase()}</span>`:''}
+          ${p.graduatingClass?`<span class="chip class">CLASS OF ${p.graduatingClass}</span>`:''}
         </div>
         ${letterDots(p.letterWinnerYears)}
       </div>
       <div class="front-right">
         <span class="next-chip">NEXT GAME</span>
-        <div class="right-line">—</div>
-        <div class="right-line">—</div>
+        <div class="right-line">${ng1}</div>
+        <div class="right-line">${ng2}</div>
         <div class="last3">
           <span class="last-chip">LAST 3 GAMES</span>
-          <div class="item">—</div><div class="item">—</div><div class="item">—</div>
+          <div class="item">${p.last3?.[0]?fmtLast3(p.last3[0]):'—'}</div>
+          <div class="item">${p.last3?.[1]?fmtLast3(p.last3[1]):'—'}</div>
+          <div class="item">${p.last3?.[2]?fmtLast3(p.last3[2]):'—'}</div>
         </div>
       </div>
     </section>
 
     <section class="face back-face">
       <div class="back-top">
-        ${profileBlock}
-        <div class="hs-box"><img src="${p.highSchoolImg}" alt="${p.name} HS"></div>
+        <div class="back-left">
+          <div class="stats-name">${(p.name||'').toUpperCase()}</div>
+          <div class="team-line">${team||''}</div>
+          <div class="parent-line">${parent||''}</div>
+
+          <!-- 3-line profile button (links to profile page) -->
+          <a class="profile-info" href="${profUrl}" data-noflip>
+            <div class="l1">${(p.name||'').toUpperCase()}</div>
+            <div class="l2">${team||''}</div>
+            <div class="l3">${parent||''}</div>
+          </a>
+        </div>
+
+        <div class="back-right">
+          <div class="hs-box" aria-hidden="true">
+            <img src="${(p.highSchoolImg||p.frontImg||'')}" alt="${(p.name||'HS')}" onerror="this.onerror=null;this.style.display='none'">
+          </div>
+        </div>
       </div>
-      <div class="funzone">
-        <div class="fun-title" data-title>${funTitle}</div>
 
-        <div class="fun-pane active" data-pane="stats"><div class="kv-wrap12">${makeStats12(p)}</div></div>
-        <div class="fun-pane" data-pane="news">
-          <div class="news-wrap" style="display:grid;gap:8px">
-            <div><b>Headline Placeholder:</b> ${p.name} recent update</div>
-            <p style="color:#374151;margin:0">We’ll keep news on-platform with headline + snippet. Add your aggregator endpoint when ready.</p>
-          </div>
-        </div>
-        <div class="fun-pane" data-pane="yatagift">
-          <div style="display:grid;gap:8px">
-            <b>YAT-A-BOY! Virtual Gifting</b>
-            <p style="margin:0;color:#374151">Coming soon — support your favorite players with safe, transparent gifting.</p>
-          </div>
-        </div>
-        <div class="fun-pane" data-pane="nil">
-          ${isCody ? `<img src="${CFG.cody.nilImage}" alt="NIL Score" style="width:100%;height:auto;border-radius:10px">` : `<p style="color:#374151;margin:0">NIL scoreboard coming soon.</p>`}
-        </div>
-        <div class="fun-pane" data-pane="x"><p style="color:#374151;margin:0">X feed placeholder.</p></div>
-        <div class="fun-pane" data-pane="ig"><p style="color:#374151;margin:0">Instagram feed placeholder.</p></div>
-        <div class="fun-pane" data-pane="video">
-          ${isCody?`<div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:10px;background:#000"><iframe src="${CFG.cody.youtube}" title="YouTube" allow="accelerometer;autoplay;encrypted-media;gyroscope;picture-in-picture" allowfullscreen style="position:absolute;inset:0;width:100%;height:100%;border:0"></iframe></div>`:`<p style="color:#374151;margin:0">Video coming soon.</p>`}
-        </div>
-        <div class="fun-pane" data-pane="gallery">
-          ${isCody?`<div style="overflow:auto;border-radius:10px;background:#000">
-              <img src="${CFG.cody.galleryWide}" alt="Gallery" style="display:block;height:260px;width:auto;object-fit:cover">
-            </div>`:`<p style="color:#374151;margin:0">Gallery coming soon.</p>`}
-        </div>
+      <div class="back-bottom" data-noflip>
+        <!-- FUN ZONE -->
+        <div class="pane pane-stats active" data-pane="stats">${statsPane}</div>
+        <div class="pane pane-news" data-pane="news">${newsPane}</div>
+        <div class="pane pane-x" data-pane="x">${xPane}</div>
+        <div class="pane pane-ig" data-pane="ig">${igPane}</div>
+        <div class="pane pane-video" data-pane="video">${videoPane}</div>
+        <div class="pane pane-gallery" data-pane="gallery">${galleryPane}</div>
+        <div class="pane pane-nil" data-pane="nil">${nilPane}</div>
 
-        <div class="iconbar" data-noflip>
-          <button class="i8 active" data-tab="stats" title="Stats">
+        <!-- Icon bar (8 icons L-R) -->
+        <div class="funbar" data-noflip>
+          <!-- SEASON/CAREER STATS -->
+          <button class="funbtn active" data-tab="stats" title="Stats">
             <svg viewBox="0 0 24 24"><path fill="currentColor" d="M5 3h2v18H5zM11 10h2v11h-2zM17 6h2v15h-2z"/></svg>
           </button>
-          <button class="i8" data-tab="news" title="News"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M4 5h16v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5zm2 2v12h12V7H6zm1 1h10v3H7V8z"/></svg></button>
-          <button class="i8" data-tab="yatagift" title="YAT-A-BOY"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-7h16zm0-2H4V7a2 2 0 0 1 2-2h3l3 3 3-3h3a2 2 0 0 1 2 2v3z"/></svg></button>
-          <button class="i8" data-tab="nil" title="NIL"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 1 3 5v6c0 5 3.8 9.7 9 12 5.2-2.3 9-7 9-12V5l-9-4z"/></svg></button>
-          <button class="i8" data-tab="x" title="X"><svg viewBox="0 0 1200 1227"><path fill="currentColor" d="M714 511 1160 0H996L689 356 420 0H0l463 607L0 1227h164l329-379 286 379h420zM327 120h154l646 873H973z"/></svg></button>
-          <button class="i8" data-tab="ig" title="Instagram"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5zm5 5a5 5 0 1 0 .001 10.001A5 5 0 0 0 12 7zm6-2.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z"/></svg></button>
-          <button class="i8" data-tab="video" title="Video"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M4 5h12a2 2 0 0 1 2 2v2l4-2v10l-4-2v2a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z"/></svg></button>
-          <button class="i8" data-tab="gallery" title="Gallery"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M21 19V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14h18zM5 5h14v9l-4-4-3 3-3-3-4 4V5z"/></svg></button>
+          <!-- NEWS -->
+          <button class="funbtn" data-tab="news" title="News">
+            <svg viewBox="0 0 24 24"><path fill="currentColor" d="M4 5h16v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5zm2 2v12h12V7H6zm1 1h10v3H7V8z"/></svg>
+          </button>
+          <!-- YAT-A-BOY! / NIL POINTS -->
+          <button class="funbtn" data-tab="nil" title="YAT-A-BOY! NIL">
+            <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 2l2.39 4.84L20 8l-4 3.9L17 18l-5-2.6L7 18l1-6.1L4 8l5.61-1.16L12 2z"/></svg>
+          </button>
+          <!-- X -->
+          <button class="funbtn" data-tab="x" title="X / Twitter">
+            <svg viewBox="0 0 1200 1227"><path fill="currentColor" d="M714 511 1160 0H996L689 356 420 0H0l463 607L0 1227h164l329-379 286 379h420zM327 120h154l646 873H973z"/></svg>
+          </button>
+          <!-- IG -->
+          <button class="funbtn" data-tab="ig" title="Instagram">
+            <svg viewBox="0 0 24 24"><path fill="currentColor" d="M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5zm5 5a5 5 0 1 0 .001 10.001A5 5 0 0 0 12 7zm6-2.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z"/></svg>
+          </button>
+          <!-- VIDEO -->
+          <button class="funbtn" data-tab="video" title="Video">
+            <svg viewBox="0 0 24 24"><path fill="currentColor" d="M3 5h14a2 2 0 0 1 2 2v2l4-2v10l-4-2v2a2 2 0 0 1-2 2H3z"/></svg>
+          </button>
+          <!-- GALLERY -->
+          <button class="funbtn" data-tab="gallery" title="Gallery">
+            <svg viewBox="0 0 24 24"><path fill="currentColor" d="M21 19V5a2 2 0 0 0-2-2H5c-1.1 0-2 .9-2 2v14h18zM8.5 13l2.5 3.01L14.5 12l4.5 6H5l3.5-5zM8 9a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"/></svg>
+          </button>
+          <!-- (Spacer for future) -->
+          <button class="funbtn" data-tab="stats" title="Back to Stats">
+            <svg viewBox="0 0 24 24"><path fill="currentColor" d="M10 17l5-5-5-5v10z"/></svg>
+          </button>
         </div>
       </div>
     </section>
@@ -651,163 +759,185 @@ function makeCard(p){
 </article>`;
 }
 
-/* render list */
-function render(list){
-  byId('grid').innerHTML = list.map(makeCard).join('');
-  attachInteractions();
-}
+function render(list){ byId('grid').innerHTML = list.map(makeCard).join(''); attachInteractions(); }
 
-/* ---------------- FILTERS ---------------- */
-function uniqueSortedGradYears(){
-  const years=new Set();
-  basePlayers.forEach(p=>{
-    if(p.graduatingClass) years.add(Number(p.graduatingClass));
-  });
-  const have=[...years]; const want=yearsRange(2025,2000);
-  return [...new Set([...want,...have])];
-}
-function uniqueRosterYears(){
-  const set=new Set(); basePlayers.forEach(p=>(p.letterWinnerYears||[]).forEach(y=>set.add(Number(y))));
-  const have=[...set]; const want=yearsRange(2025,2000);
-  return [...new Set([...want,...have])];
-}
+/* filters */
+const LEVEL_ORDER = ["MLB","TRIPLE-A","DOUBLE-A","HIGH-A","LOW-A","ROOKIE","INDY","NCAA","NCAA-D1","NCAA-D2","NCAA-D3","NAIA","JUCO"];
+function yearsRange(start,end){const arr=[]; for(let y=start;y>=end;y--) arr.push(y); return arr;}
+function uniqueSortedGradYears(){ const set=new Set(players.map(p=>p.graduatingClass).filter(Boolean)); const have=[...set].map(Number); const want=yearsRange(2025,2000); return [...new Set([...want,...have])]; }
+function uniqueRosterYears(){ const set=new Set(); players.forEach(p=>(p.letterWinnerYears||[]).forEach(y=>set.add(Number(y)))); const have=[...set]; const want=yearsRange(2025,2000); return [...new Set([...want,...have])]; }
 function populateFilters(){
-  const lSel=byId('lvl'); lSel.innerHTML='';
-  const lvls=['(Select All)',...LEVEL_ORDER];
-  lvls.forEach(L=>{const o=document.createElement('option');o.value=L==='(Select All)'?'ALL':L;o.textContent=L;lSel.appendChild(o);});
-  const gSel=byId('grad'); gSel.innerHTML='';
-  const grads=['(Select All)',...uniqueSortedGradYears()];
-  grads.forEach(v=>{const o=document.createElement('option');o.value=String(v==='(Select All)'?'ALL':v);o.textContent=v;o.selected=false;gSel.appendChild(o);});
-  const rSel=byId('roster'); rSel.innerHTML='';
-  const ry=['(Select All)',...uniqueRosterYears()];
-  ry.forEach(v=>{const o=document.createElement('option');o.value=String(v==='(Select All)'?'ALL':v);o.textContent=v;rSel.appendChild(o);});
+  const lSel=byId('lvl'); lSel.innerHTML=''; LEVEL_ORDER.forEach(L=>{const o=document.createElement('option');o.value=L;o.textContent=L;lSel.appendChild(o);});
+  const gSel=byId('grad'); gSel.innerHTML=''; uniqueSortedGradYears().forEach(y=>{const o=document.createElement('option');o.value=String(y);o.textContent=y;gSel.appendChild(o);});
+  const rSel=byId('roster'); rSel.innerHTML=''; uniqueRosterYears().forEach(y=>{const o=document.createElement('option');o.value=String(y);o.textContent=y;rSel.appendChild(o);});
 }
-
 function getMultiValues(id){
   const sel=byId(id); if(!sel) return [];
-  const vals=[...sel.options].filter(o=>o.selected).map(o=>o.value);
-  if(vals.includes('ALL')) return []; // treat ALL as no filter
-  return vals;
+  return [...sel.options].filter(o=>o.selected && o.value!=='__ALL__').map(o=>o.value);
 }
 
+/* default sort oldest → newest, ties by name */
+function sortByGradAsc(list){
+  return [...list].sort((a,b)=>{
+    const ga=Number(a.graduatingClass)||9999, gb=Number(b.graduatingClass)||9999;
+    if(ga!==gb) return ga-gb; return (a.name||'').localeCompare(b.name||'');
+  });
+}
+/* treat any "active..." as active */
+function isActive(p){ return /\bactive\b/i.test(String(p.status||'')); }
+const ACTIVE_BASE = players.filter(isActive);
+
+/* apply filters (active-only if no filter used) */
 function applyFilters(){
   const qLeft=(byId('localSearch')?.value||'').toLowerCase().trim();
   const qRight=(byId('filterName')?.value||'').toLowerCase().trim();
   const q=qRight||qLeft;
-
   const levels=getMultiValues('lvl').map(s=>s.toUpperCase());
   const grads=getMultiValues('grad');
   const years=getMultiValues('roster').map(Number);
-  const statuses=getMultiValues('status');
+  const stats=getMultiValues('status').map(s=>s.toLowerCase());
+  const usingAny=q||levels.length||grads.length||years.length||stats.length;
+  const base=usingAny?players:ACTIVE_BASE;
 
-  let out = basePlayers.filter(p=>{
-    // default view excludes Retired
-    if(!q && !levels.length && !grads.length && !years.length && !statuses.length){
-      if((p.status||'').toLowerCase()==='retired') return false;
+  const out=base.filter(p=>{
+    if(q && !(p.name||'').toLowerCase().includes(q)) return false;
+    if(levels.length){
+      const L=String(p.currentLevel||'').toUpperCase().replace('AAA','TRIPLE-A').replace('AA','DOUBLE-A');
+      if(!levels.includes(L)) return false;
     }
-    if(q && !p.name.toLowerCase().includes(q)) return false;
-    if(levels.length){ const L=lvlClass(p.currentLevel); if(!levels.includes(L)) return false; }
-    if(grads.length && (!p.graduatingClass || !grads.includes(String(p.graduatingClass)))) return false;
-    if(years.length){ const lw=(p.letterWinnerYears||[]).map(Number); if(!lw.some(y=>years.includes(y))) return false; }
-    if(statuses.length && !statuses.includes(p.status)) return false;
+    if(grads.length && !grads.includes(String(p.graduatingClass||''))) return false;
+    if(years.length){
+      const lw=(p.letterWinnerYears||[]).map(Number);
+      if(!lw.some(y=>years.includes(y))) return false;
+    }
+    if(stats.length){
+      if(!stats.includes(String(p.status||'').toLowerCase())) return false;
+    }
     return true;
-  }).sort(defaultSort);
+  });
 
-  render(out);
+  render(sortByGradAsc(out));
 }
 
-/* ---------------- INTERACTIONS ---------------- */
-const INTERACTIVE_SEL='[data-noflip], .i8, .iconbtn, a,button,input,select,textarea';
+/* reset → default active-only, oldest→newest */
+function resetAll(){
+  const ls=byId('localSearch'); if(ls) ls.value='';
+  const fn=byId('filterName'); if(fn) fn.value='';
+  ['lvl','grad','roster','status'].forEach(id=>{
+    const sel=byId(id); if(sel) [...sel.options].forEach(o=>o.selected=false);
+  });
+  render(sortByGradAsc(ACTIVE_BASE));
+}
 
-function toggle(card){ if(!card) return; card.classList.contains('front') ? card.classList.replace('front','back') : card.classList.replace('back','front'); }
+/* interactions */
+const INTERACTIVE_SEL='[data-noflip], .funbtn, .tabbtn, .action-chip, a,button,input,select,textarea';
+function toggle(card){ if(!card) return; card.classList.contains('front') ? (card.classList.remove('front'),card.classList.add('back')) : (card.classList.remove('back'),card.classList.add('front')); }
 
 function attachInteractions(){
-  // ensure state class exists
+  // Ensure state
   document.querySelectorAll('.card').forEach(c=>{ if(!c.classList.contains('front')&& !c.classList.contains('back')) c.classList.add('front'); });
 
-  // flip by edge buttons
+  // Flip edges
   document.querySelectorAll('.card .hit').forEach(hit=>{
     hit.addEventListener('click', e=>{ if(e.target.closest(INTERACTIVE_SEL)) return; toggle(hit.closest('.card')); });
   });
 
-  // swipe to flip
+  // Touch swipe to flip
+  let sx=0, swc=null;
   document.querySelectorAll('.card').forEach(card=>{
-    let sx=0, swc=null, sy=0;
-    card.addEventListener('touchstart', e=>{ if(e.target.closest(INTERACTIVE_SEL)) { swc=null; return; } swc=card; sx=e.touches[0].clientX; sy=e.touches[0].clientY; },{passive:true});
-    card.addEventListener('touchend', e=>{ if(!swc) return; const dx=e.changedTouches[0].clientX-sx; const dy=e.changedTouches[0].clientY-sy; if(Math.abs(dx)>42 && Math.abs(dx)>Math.abs(dy)) toggle(swc); swc=null; });
+    card.addEventListener('touchstart', e=>{
+      if(e.target.closest(INTERACTIVE_SEL)){ swc=null; return; }
+      swc=card; sx=e.touches[0].clientX;
+    },{passive:true});
+    card.addEventListener('touchend', e=>{
+      if(!swc) return; const dx=e.changedTouches[0].clientX-sx; if(Math.abs(dx)>40) toggle(swc); swc=null;
+    });
   });
 
-  // bottom 8 tabs
-  document.querySelectorAll('.iconbar').forEach(bar=>{
+  // Fun Zone icon switching
+  document.querySelectorAll('.funbar').forEach(bar=>{
     bar.addEventListener('click', (e)=>{
-      const btn=e.target.closest('.i8'); if(!btn) return;
-      const card=btn.closest('.card');
-      const pane=btn.dataset.tab;
-      card.querySelectorAll('.i8').forEach(b=>b.classList.toggle('active', b.dataset.tab===pane));
-      card.querySelectorAll('.fun-pane').forEach(p=>p.classList.toggle('active', p.dataset.pane===pane));
+      const btn=e.target.closest('.funbtn'); if(!btn) return;
+      e.stopPropagation();
+      const card=btn.closest('.card'); const pane=btn.dataset.tab||'stats';
+      // buttons state
+      bar.querySelectorAll('.funbtn').forEach(b=>b.classList.toggle('active', b===btn));
+      // panes state
+      card.querySelectorAll('.pane').forEach(p=>p.classList.toggle('active', p.dataset.pane===pane));
     }, true);
   });
 }
 
 /* drawers & header icons */
 const scrim=byId('scrim');
-const drawerLeft=byId('drawerLeft'), drawerRight=byId('drawerRight'), drawerAuth=byId('drawerAuth');
+const drawerLeft=byId('drawerLeft'); const drawerRight=byId('drawerRight'); const drawerAuth=byId('drawerAuth');
+const iconSearch=byId('iconSearch'); const iconFilter=byId('iconFilter'); const iconReset=byId('iconReset'); const iconProfile=byId('iconProfile');
+let lastFocus=null;
 function setActiveIcon(btn,a){ btn?.classList.toggle('active',!!a); }
-function openLeft(){ closeRight(false); closeAuth(false); drawerLeft.classList.add('open'); scrim.classList.add('open'); document.body.classList.add('no-scroll'); setActiveIcon(byId('iconSearch'),true); }
-function closeLeft(){ drawerLeft.classList.remove('open'); if(!drawerRight.classList.contains('open')&&!drawerAuth.classList.contains('open')){ scrim.classList.remove('open'); document.body.classList.remove('no-scroll'); } setActiveIcon(byId('iconSearch'),false); }
-function openRight(){ closeLeft(false); closeAuth(false); drawerRight.classList.add('open'); scrim.classList.add('open'); document.body.classList.add('no-scroll'); setActiveIcon(byId('iconFilter'),true); }
-function closeRight(){ drawerRight.classList.remove('open'); if(!drawerLeft.classList.contains('open')&&!drawerAuth.classList.contains('open')){ scrim.classList.remove('open'); document.body.classList.remove('no-scroll'); } setActiveIcon(byId('iconFilter'),false); }
-function openAuth(){ closeLeft(false); closeRight(false); drawerAuth.classList.add('open'); scrim.classList.add('open'); document.body.classList.add('no-scroll'); setActiveIcon(byId('iconProfile'),true); }
-function closeAuth(){ drawerAuth.classList.remove('open'); if(!drawerLeft.classList.contains('open')&&!drawerRight.classList.contains('open')){ scrim.classList.remove('open'); document.body.classList.remove('no-scroll'); } setActiveIcon(byId('iconProfile'),false); }
 
+function openLeft(){ closeRight(false); closeAuth(false); lastFocus=document.activeElement; drawerLeft.classList.add('open'); scrim.classList.add('open'); document.body.classList.add('no-scroll'); setActiveIcon(iconSearch,true); setActiveIcon(iconFilter,false); setActiveIcon(iconProfile,false); }
+function closeLeft(focus=true){ drawerLeft.classList.remove('open'); if(!drawerRight.classList.contains('open')&&!drawerAuth.classList.contains('open')){ scrim.classList.remove('open'); document.body.classList.remove('no-scroll'); } setActiveIcon(iconSearch,false); if(focus) lastFocus?.focus?.(); }
+
+function openRight(){ closeLeft(false); closeAuth(false); lastFocus=document.activeElement; drawerRight.classList.add('open'); scrim.classList.add('open'); document.body.classList.add('no-scroll'); setActiveIcon(iconFilter,true); setActiveIcon(iconSearch,false); setActiveIcon(iconProfile,false); }
+function closeRight(focus=true){ drawerRight.classList.remove('open'); if(!drawerLeft.classList.contains('open')&&!drawerAuth.classList.contains('open')){ scrim.classList.remove('open'); document.body.classList.remove('no-scroll'); } setActiveIcon(iconFilter,false); if(focus) lastFocus?.focus?.(); }
+
+function openAuth(){ closeLeft(false); closeRight(false); lastFocus=document.activeElement; drawerAuth.classList.add('open'); scrim.classList.add('open'); document.body.classList.add('no-scroll'); setActiveIcon(iconProfile,true); setActiveIcon(iconSearch,false); setActiveIcon(iconFilter,false); }
+function closeAuth(focus=true){ drawerAuth.classList.remove('open'); if(!drawerLeft.classList.contains('open')&&!drawerRight.classList.contains('open')){ scrim.classList.remove('open'); document.body.classList.remove('no-scroll'); } setActiveIcon(iconProfile,false); if(focus) lastFocus?.focus?.(); }
+
+function closeDrawers(){ closeLeft(false); closeRight(false); closeAuth(); }
+
+/* binds */
 byId('openLeft').addEventListener('click', openLeft);
-byId('iconSearch').addEventListener('click', openLeft);
-byId('iconFilter').addEventListener('click', openRight);
-byId('iconProfile').addEventListener('click', openAuth);
-byId('iconReset').addEventListener('click', ()=>{ resetAll(); });
+byId('closeLeft').addEventListener('click', ()=>closeLeft());
+byId('closeRight').addEventListener('click', ()=>closeRight());
+byId('closeAuth').addEventListener('click', ()=>closeAuth());
+iconSearch.addEventListener('click', openLeft);
+iconFilter.addEventListener('click', openRight);
+iconProfile.addEventListener('click', openAuth);
+iconReset.addEventListener('click', resetAll);
+scrim.addEventListener('click', closeDrawers);
 
-scrim.addEventListener('click', ()=>{ closeLeft(); closeRight(); closeAuth(); });
-document.querySelectorAll('[data-close]').forEach(b=>b.addEventListener('click', ()=>{ closeLeft(); closeRight(); closeAuth(); }));
+/* ENTER in right-drawer name closes drawer */
+document.addEventListener('DOMContentLoaded', ()=>{
+  const f = byId('filterName');
+  if (f) f.addEventListener('keydown', (e)=>{
+    if(e.key==='Enter'){ e.preventDefault(); applyFilters(); closeRight(); }
+  });
+});
 
-/* right drawer: By Player filter (Enter closes) */
-byId('filterName').addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ e.preventDefault(); applyFilters(); closeRight(); } });
-
-/* left drawer live search */
+/* Live left search with debounce */
 const localSearch=byId('localSearch'); const localResults=byId('localResults');
 function renderLocalResults(q){
   localResults.innerHTML=''; if(!q) return;
-  basePlayers.filter(p=>p.name.toLowerCase().includes(q.toLowerCase())).slice(0,50).forEach(p=>{
-    const li=document.createElement('li'); li.style.cursor='pointer'; li.textContent=p.name;
+  players.filter(p=>(p.name||'').toLowerCase().includes(q.toLowerCase())).slice(0,50).forEach(p=>{
+    const li=document.createElement('li'); const yr=p.graduatingClass?` (Class of ${p.graduatingClass})`:''; li.textContent=`${p.name}${yr}`;
     li.addEventListener('click', ()=>{ window.location.href=`profile.html?id=${encodeURIComponent(p.id)}`; closeLeft(); });
     localResults.appendChild(li);
   });
 }
-localSearch.addEventListener('input', (e)=>renderLocalResults(e.target.value));
-
-/* populate filters + initial render */
-function resetAll(){
-  const ls=byId('localSearch'); if(ls) ls.value='';
-  const fn=byId('filterName'); if(fn) fn.value='';
-  ['lvl','grad','roster','status'].forEach(id=>{const sel=byId(id); if(sel) [...sel.options].forEach(o=>o.selected=false);});
-  // default: Active 2025/2024 only
-  const startList = basePlayers.filter(p=>p.status!=='Retired').sort(defaultSort);
-  render(startList);
+if(localSearch){
+  localSearch.addEventListener('input', (e)=>{
+    clearTimeout(localSearch._t);
+    localSearch._t=setTimeout(()=>renderLocalResults(e.target.value), 90);
+  });
 }
-populateFilters();
-resetAll();
 
-/* ---------------- SPLASH ---------------- */
-(function runSplash(){
-  const splash=byId('splash'); if(!splash) return;
-  // update asset URLs if changed
-  splash.querySelector('.splash-brand img').src = CFG.logos.yatstats;
-  splash.querySelector('.splash-h img').src = CFG.logos.hamiltonH;
-  const sLogo = splash.querySelector('.sponsor-logo img'); if(sLogo) sLogo.src = CFG.logos.sponsor;
-  const dismiss=()=>{ splash.classList.add('hide'); setTimeout(()=>splash.remove(),520); };
-  // auto-hide after 1400ms, tap-to-dismiss
-  setTimeout(dismiss,1400);
-  splash.addEventListener('pointerdown', dismiss, {once:true});
-})();
+/* Right-drawer selects apply instantly */
+document.addEventListener('DOMContentLoaded', ()=>{
+  ['lvl','grad','roster','status'].forEach(id=>{
+    const el=byId(id); if(el) el.addEventListener('change', applyFilters);
+  });
+  const fName=byId('filterName');
+  if(fName) fName.addEventListener('input', ()=>{ clearTimeout(fName._t); fName._t=setTimeout(applyFilters,160); });
+});
+
+/* Boot */
+document.addEventListener('DOMContentLoaded', ()=>{
+  runSplash();
+  populateFilters();
+  // Default view: Active-only, oldest→newest (so Cody Bellinger first)
+  render(sortByGradAsc(ACTIVE_BASE));
+});
 </script>
 </body>
 </html>
