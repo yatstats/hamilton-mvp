@@ -9,7 +9,8 @@
 
 <style>
 :root{
-  --bg:#0b0d12; --ink:#f3f4f6; --muted:#9aa1ab; --ring:#1f2530; --ring2:#232a36;
+  --bg:#0b0d12; --ink:#f3f4f6; --muted:#A6ADB7; /* slightly brighter for contrast */
+  --ring:#1f2530; --ring2:#232a36;
   --headerH:135px;
   --drawer-min:300px; --drawer-max:520px; --drawer-mob:75vw;
   --accent:#ffffff; --chip:#0e1016;
@@ -22,20 +23,18 @@ a{color:inherit;text-decoration:none}
 button{font:inherit;color:inherit}
 img{max-width:100%;display:block}
 
+/* ---------- FOCUS VIZ ---------- */
+:focus-visible{outline:2px solid #fff; outline-offset:2px}
+.hdr-icon:focus-visible,.ibtn:focus-visible,.hambtn:focus-visible{outline:2px solid #fff}
+
 /* ---------- HEADER ---------- */
 .site-header{
   position:fixed;inset:0 0 auto 0;height:var(--headerH);z-index:60;background:#000;border-bottom:1px solid var(--ring);
   display:flex; flex-direction:column; gap:8px; padding:8px 10px 6px; position:relative;
 }
-.header-top, .header-bottom {
-  display:flex; width:100%; align-items:center;
-}
-.header-top {
-  justify-content:space-between;
-}
-.header-bottom {
-  justify-content:flex-start;
-}
+.header-top, .header-bottom { display:flex; width:100%; align-items:center; }
+.header-top { justify-content:space-between; }
+.header-bottom { justify-content:flex-start; }
 .top-row{display:flex;gap:2px;align-items:center;}
 .hambtn,.hdr-icon{width:38px;height:38px;border:0;background:transparent;border-radius:10px;display:grid;place-items:center;cursor:pointer}
 .hambtn svg,.hdr-icon svg{width:21px;height:21px;color:#fff}
@@ -46,11 +45,11 @@ img{max-width:100%;display:block}
 .ham-brand{display:flex;gap:4px;align-items:center;}
 .ham-logo{height:80px;width:auto}
 .ham-type{line-height:1;display:flex;flex-direction:column;gap:2px;}
-.ham-line1{font-family:"Roboto Condensed",sans-serif;font-weight:300;font-size:12px;letter-spacing:.02em}
+.ham-line1{font-family:"Roboto Condensed",sans-serif;font-weight:300;font-size:12px;letter-spacing:.02em;color:var(--muted)}
 .ham-line2{font-family:"Anton",sans-serif;font-size:17px;letter-spacing:.01em;margin-top:0;}
 .ham-line3{font-family:"Anton",sans-serif;font-size:19px;letter-spacing:.01em;margin-top:0;}
 
-/* center nav (desktop) - Positioned absolutely to not interfere with mobile layout */
+/* center nav (desktop) */
 .nav-desktop{
   position:absolute; top: 50%; left:50%; transform:translate(-50%,-50%);
   display:flex;gap:16px;align-self:center;justify-self:center;flex-wrap:wrap;
@@ -68,7 +67,7 @@ img{max-width:100%;display:block}
 /* ---------- TAGLINE ---------- */
 .tagline-wrap{position:sticky;top:var(--headerH);z-index:40;background:#000;border-bottom:1px solid var(--ring)}
 .tagline{display:flex;align-items:center;justify-content:space-between;padding:8px 10px}
-.tag-grey{color:#9aa1ab;font-family:"Roboto Condensed",sans-serif;font-weight:300;letter-spacing:-.01em;margin-right:-1px}
+.tag-grey{color:var(--muted);font-family:"Roboto Condensed",sans-serif;font-weight:300;letter-spacing:-.01em;margin-right:-1px}
 .tag-strong{color:#fff;font-family:"Anton",sans-serif;letter-spacing:.01em}
 
 /* ---------- GRID ---------- */
@@ -106,7 +105,15 @@ main{padding:calc(var(--headerH) + 44px) 0 86px}
 .right-line{font-size:12px;font-weight:800;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .last3 .item{font-size:12px;color:#e5e7eb;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:right;margin-top:2px}
 
-/* BACK (approved layout) */
+/* “flip” control button (visible & SR friendly) */
+.flip-toggle{
+  position:absolute; top:10px; right:10px; z-index:3;
+  background:rgba(0,0,0,.6); color:#fff; border:1px solid rgba(255,255,255,.25);
+  border-radius:999px; padding:6px 10px; cursor:pointer; font-weight:800; letter-spacing:.06em; font-size:11px;
+}
+.card.back .flip-toggle{ background:#111; }
+
+/* BACK */
 .back-face{transform:rotateY(180deg);background:#fff;color:#111;display:grid;grid-template-rows:auto 1fr}
 .back-top{display:grid;grid-template-columns:1fr 180px;gap:12px;padding:10px 12px 6px;align-items:start}
 @media (min-width:420px){ .back-top{grid-template-columns:1fr 210px} }
@@ -126,7 +133,7 @@ main{padding:calc(var(--headerH) + 44px) 0 86px}
 /* stats grid */
 .kv-wrap12{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
 .kv{background:#f3f4f6;border-radius:10px;text-align:center;padding:8px;display:flex;flex-direction:column;justify-content:center}
-.kv .k{font-size:11px;color:#6b7280}
+.kv .k{font-size:11px;color:#374151} /* darker for contrast */
 .kv .v{font-weight:800}
 
 /* 8-icon bar */
@@ -139,31 +146,20 @@ main{padding:calc(var(--headerH) + 44px) 0 86px}
 /* flip touch edges (front only) */
 .hit{position:absolute;top:0;bottom:0;width:var(--touchEdge);z-index:2;background:transparent;border:0}
 .hit.left{left:0}.hit.right{right:0}
-.card.back .hit{display:none} /* avoid blocking back actions */
+.card.back .hit{display:none}
+.hit[aria-hidden="true"]{pointer-events:auto} /* still clickable for mouse/touch */
 
 /* ---------- DRAWERS ---------- */
 .scrim{position:fixed;left:0;right:0;top:var(--headerH);bottom:0;background:rgba(0,0,0,.35);opacity:0;pointer-events:none;transition:opacity .25s ease;z-index:55}
 .scrim.open{opacity:1;pointer-events:auto}
 body.no-scroll{overflow:hidden}
 
-/* left drawer (nav + search) */
-.drawer-left{position:fixed;top:var(--headerH);bottom:0;left:0;width:clamp(var(--drawer-min),var(--drawer-mob),var(--drawer-max));background:#0b0f16;border-right:1px solid var(--ring2);transform:translateX(-100%);transition:transform .25s ease;z-index:56;display:flex;flex-direction:column}
+.drawer-left,.drawer-right,.drawer-auth{position:fixed;top:var(--headerH);bottom:0;right:0;width:clamp(var(--drawer-min),var(--drawer-mob),var(--drawer-max));background:#0b0f16;border-left:1px solid var(--ring2);transform:translateX(100%);transition:transform .25s ease;z-index:56;display:flex;flex-direction:column}
+.drawer-left{left:0;right:auto;border-left:0;border-right:1px solid var(--ring2);transform:translateX(-100%)}
 .drawer-left.open{transform:translateX(0)}
-.drawer-header{height:56px;border-bottom:1px solid var(--ring2);display:flex;align-items:center;justify-content:space-between;padding:0 12px}
-.left-content{padding:12px;min-height:0;overflow:auto}
-.nav-left-list{display:flex;flex-direction:column;gap:10px;margin-bottom:12px}
-.nav-left-link{color:#e6e8ec;text-transform:uppercase;line-height:1;padding:9px 6px 8px 4px;border-radius:6px}
-.nav-left-link:hover{background:#0e1420}
-.left-search-h{font-weight:900;letter-spacing:.12em;text-transform:uppercase;font-size:12px;color:#d5d9df;margin:2px 0 8px}
-.left-search .ghost{display:block;width:100%;background:#0e141f;border:1px solid #1b2330;border-radius:10px;padding:10px 12px;font-size:14px;outline:none;color:#fff}
-.left-results{margin-top:8px;list-style:none;padding:0}
-.left-results li{padding:8px 6px;border-radius:8px;cursor:pointer}
-.left-results li:hover{background:#0e1420}
-.global-line{margin-top:14px;font-size:12px;color:#c4c9d1;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-
-/* right + auth drawers share style */
-.drawer-right,.drawer-auth{position:fixed;top:var(--headerH);bottom:0;right:0;width:clamp(var(--drawer-min),var(--drawer-mob),var(--drawer-max));background:#0b0f16;border-left:1px solid var(--ring2);transform:translateX(100%);transition:transform .25s ease;z-index:56;display:flex;flex-direction:column}
 .drawer-right.open,.drawer-auth.open{transform:translateX(0)}
+
+.drawer-header{height:56px;border-bottom:1px solid var(--ring2);display:flex;align-items:center;justify-content:space-between;padding:0 12px}
 .right-title,.auth-title{font-weight:900;letter-spacing:.12em;text-transform:uppercase;font-size:12px;color:#d5d9df}
 .drawer-body{min-height:0;overflow:auto}
 .drawer-content{display:block;padding:12px 12px 18px}
@@ -203,24 +199,23 @@ body.no-scroll{overflow:hidden}
 /* utility */
 .hidden{display:none !important}
 
+/* ---------- REDUCED MOTION ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .flip-inner,.card,.splash,.splash-logo::after{transition:none !important;animation:none !important}
+}
+
 /* ---------- HEADER RESPONSIVENESS ---------- */
 @media (max-width: 640px) {
-  :root {
-    --headerH: 100px;
-  }
-  .ham-logo {
-    height: 50px;
-  }
-  .ystats-logo {
-    height: 30px;
-  }
+  :root { --headerH: 100px; }
+  .ham-logo { height: 50px; }
+  .ystats-logo { height: 30px; }
   .ham-line2 { font-size: 15px; }
   .ham-line3 { font-size: 16px; }
   .top-row { gap: 2px; }
 }
 
 @media (max-width: 420px) {
-    .ham-type { display: none; }
+  .ham-type { display: none; }
 }
 </style>
 </head>
@@ -230,19 +225,19 @@ body.no-scroll{overflow:hidden}
   <div class="header-top">
       <div class="top-row">
         <button class="hambtn" id="openLeft" aria-label="Open Navigation">
-          <svg viewBox="0 0 24 24"><path fill="currentColor" d="M3 6h18v2H3zM3 11h18v2H3zM3 16h18v2H3z"/></svg>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M3 6h18v2H3zM3 11h18v2H3zM3 16h18v2H3z"/></svg>
         </button>
         <button class="hdr-icon" id="iconProfile" aria-label="Account" title="Account">
-          <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm0 2c-4.2 0-8 2.1-8 5v1h16v-1c0-2.9-3.8-5-8-5z"/></svg>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm0 2c-4.2 0-8 2.1-8 5v1h16v-1c0-2.9-3.8-5-8-5z"/></svg>
         </button>
         <button class="hdr-icon" id="iconSearch" aria-label="Search" title="Search">
-          <svg viewBox="0 0 24 24"><path fill="currentColor" d="M11 4a7 7 0 1 1 0 14 7 7 0 0 1 0-14zm9.7 15.3-3.4-3.4a9 9 0 1 0-1.4 1.4l3.4 3.4a1 1 0 0 0 1.4-1.4z"/></svg>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M11 4a7 7 0 1 1 0 14 7 7 0 0 1 0-14zm9.7 15.3-3.4-3.4a9 9 0 1 0-1.4 1.4l3.4 3.4a1 1 0 0 0 1.4-1.4z"/></svg>
         </button>
         <button class="hdr-icon" id="iconFilter" aria-label="Filters" title="Filters">
-          <svg viewBox="0 0 24 24"><path fill="currentColor" d="M3 5h18l-6.5 7.5V20l-5-2v-5.5L3 5z"/></svg>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M3 5h18l-6.5 7.5V20l-5-2v-5.5L3 5z"/></svg>
         </button>
-        <button class="hdr-icon" id="iconReset" aria-label="Reset" title="Reset">
-          <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 5V2L8 6l4 4V7a5 5 0 1 1-5 5H5a7 7 0 1 0 7-7z"/></svg>
+        <button class="hdr-icon" id="iconReset" aria-label="Reset filters" title="Reset">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 5V2L8 6l4 4V7a5 5 0 1 1-5 5H5a7 7 0 1 0 7-7z"/></svg>
         </button>
       </div>
       <img class="ystats-logo" id="ystatsLogo" src="https://i.postimg.cc/C5mwXpQy/35878-20250830-222027-0000.png" alt="YAT?STATS"/>
@@ -280,16 +275,16 @@ body.no-scroll{overflow:hidden}
   </div>
 </div>
 
-<div class="scrim" id="scrim"></div>
+<div class="scrim" id="scrim" aria-hidden="true"></div> <!-- present & used -->
 
-<aside class="drawer-left" id="drawerLeft" aria-hidden="true" role="navigation">
+<aside class="drawer-left" id="drawerLeft" aria-hidden="true" role="navigation" tabindex="-1">
   <div class="drawer-header">
     <div class="right-title">Navigation</div>
     <button class="hdr-icon" id="closeLeft" aria-label="Close">
-      <svg viewBox="0 0 24 24"><path fill="currentColor" d="M6.225 4.811 4.811 6.225 10.586 12l-5.775 5.775 1.414 1.414L12 13.414l5.775 5.775 1.414-1.414L13.414 12l5.775-5.775-1.414-1.414L12 10.586 6.225 4.811z"/></svg>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M6.225 4.811 4.811 6.225 10.586 12l-5.775 5.775 1.414 1.414L12 13.414l5.775 5.775 1.414-1.414L13.414 12l5.775-5.775-1.414-1.414L12 10.586 6.225 4.811z"/></svg>
     </button>
   </div>
-  <div class="left-content">
+  <div class="left-content" id="drawerLeftContent">
     <div class="nav-left-list">
       <a class="nav-left-link" href="#"><span class="font-slim nav-slim">WHERE THEY</span><span class="font-strong nav-strong">YAT?</span></a>
       <a class="nav-left-link" href="#"><span class="font-slim nav-slim">ACTIVE ALUMNI</span><span class="font-strong nav-strong">NEWS</span></a>
@@ -302,7 +297,7 @@ body.no-scroll{overflow:hidden}
     <div class="left-search">
       <div class="left-search-h">PLAYER PROFILE SEARCH</div>
       <input id="localSearch" type="text" class="ghost" placeholder="Type a player name…" autocomplete="off"/>
-      <ul id="localResults" class="left-results"></ul>
+      <ul id="localResults" class="left-results" role="listbox" aria-label="Search results"></ul>
 
       <div class="global-line">
         <span>GLOBAL YATSTATS PLATFORM SEARCHES</span>
@@ -313,15 +308,15 @@ body.no-scroll{overflow:hidden}
   </div>
 </aside>
 
-<aside class="drawer-right" id="drawerRight" aria-hidden="true" role="dialog" aria-modal="true">
+<aside class="drawer-right" id="drawerRight" aria-hidden="true" role="dialog" aria-modal="true" tabindex="-1" aria-label="Filters">
   <div class="drawer-header">
     <div class="right-title">Filters</div>
     <button class="hdr-icon" id="closeRight" aria-label="Close">
-      <svg viewBox="0 0 24 24"><path fill="currentColor" d="M6.225 4.811 4.811 6.225 10.586 12l-5.775 5.775 1.414 1.414L12 13.414l5.775 5.775 1.414-1.414L13.414 12l5.775-5.775-1.414-1.414L12 10.586 6.225 4.811z"/></svg>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M6.225 4.811 4.811 6.225 10.586 12l-5.775 5.775 1.414 1.414L12 13.414l5.775 5.775 1.414-1.414L13.414 12l5.775-5.775-1.414-1.414L12 10.586 6.225 4.811z"/></svg>
     </button>
   </div>
   <div class="drawer-body">
-    <div class="drawer-content">
+    <div class="drawer-content" id="drawerRightContent">
       <details class="rail" open>
         <summary>By Player</summary>
         <div class="inner">
@@ -331,47 +326,47 @@ body.no-scroll{overflow:hidden}
 
       <details class="rail">
         <summary>By Level</summary>
-        <div class="inner"><select id="lvl" class="ghost select-multi" multiple></select></div>
+        <div class="inner"><select id="lvl" class="ghost select-multi" multiple aria-label="Filter by level"></select></div>
       </details>
 
       <details class="rail">
         <summary>By Grad Class</summary>
-        <div class="inner"><select id="grad" class="ghost select-multi" multiple></select></div>
+        <div class="inner"><select id="grad" class="ghost select-multi" multiple aria-label="Filter by grad class"></select></div>
       </details>
 
       <details class="rail">
         <summary>By Roster Year</summary>
-        <div class="inner"><select id="roster" class="ghost select-multi" multiple></select></div>
+        <div class="inner"><select id="roster" class="ghost select-multi" multiple aria-label="Filter by roster year"></select></div>
       </details>
 
       <details class="rail">
         <summary>By Status</summary>
         <div class="inner">
-          <select id="status" class="ghost select-multi" multiple></select>
+          <select id="status" class="ghost select-multi" multiple aria-label="Filter by status"></select>
         </div>
       </details>
     </div>
   </div>
 </aside>
 
-<aside class="drawer-auth" id="drawerAuth" aria-hidden="true" role="dialog" aria-modal="true">
+<aside class="drawer-auth" id="drawerAuth" aria-hidden="true" role="dialog" aria-modal="true" tabindex="-1" aria-label="Sign Up or Login">
   <div class="drawer-header">
     <div class="auth-title">Sign Up | Login</div>
     <button class="hdr-icon" id="closeAuth" aria-label="Close">
-      <svg viewBox="0 0 24 24"><path fill="currentColor" d="M6.225 4.811 4.811 6.225 10.586 12l-5.775 5.775 1.414 1.414L12 13.414l5.775 5.775 1.414-1.414L13.414 12l5.775-5.775-1.414-1.414L12 10.586 6.225 4.811z"/></svg>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M6.225 4.811 4.811 6.225 10.586 12l-5.775 5.775 1.414 1.414L12 13.414l5.775 5.775 1.414-1.414L13.414 12l5.775-5.775-1.414-1.414L12 10.586 6.225 4.811z"/></svg>
     </button>
   </div>
-  <div class="auth-body">
-    <label>Email</label>
-    <input class="input" type="email" placeholder="you@example.com"/>
-    <label style="margin-top:10px">Password</label>
-    <input class="input" type="password" placeholder="••••••••"/>
+  <div class="auth-body" id="drawerAuthContent">
+    <label for="emailInput">Email</label>
+    <input id="emailInput" class="input" type="email" placeholder="you@example.com"/>
+    <label for="pwInput" style="margin-top:10px">Password</label>
+    <input id="pwInput" class="input" type="password" placeholder="••••••••"/>
     <button class="btn-primary">Continue</button>
   </div>
 </aside>
 
 <main>
-  <section id="grid" class="grid"></section>
+  <section id="grid" class="grid" aria-live="polite"></section>
 </main>
 
 <footer class="footer">
@@ -391,7 +386,7 @@ body.no-scroll{overflow:hidden}
       </div>
       <div class="sponsor" id="sponsorBlock">
         presented by <strong>Primary Source</strong>
-        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -401,14 +396,25 @@ body.no-scroll{overflow:hidden}
 const byId = id => document.getElementById(id);
 const $ = (sel,root=document)=>root.querySelector(sel);
 const $$ = (sel,root=document)=>Array.from(root.querySelectorAll(sel));
+
 function lvlClass(l){return String(l||'').toLowerCase().replace(/\s+/g,'-').replace('aaa','triple-a').replace('aa','double-a')}
 function teamAndParent(p){ const raw=String(p.team||''); const parts=raw.split('—'); const team=(parts[0]||raw).trim(); let parent=(parts[1]||'').trim(); if((p.currentLevel||'').toUpperCase()==='MLB') parent=''; return {team,parent}; }
 function fmtLast3(g){ return `${g.date||'—'} • ${g.opp||'—'} — ${g.line||'—'}`; }
-function formatNextTwoLines(ng){ if(!ng) return ['—','—']; const ds=String(ng.date||'').trim(); const mmdd=(ds.match(/\b(\d{1,2}\/\d{1,2})\b/)||[, '—'])[1]; let time=(ds.match(/(\d{1,2}:\d{2}\s*[AP]M)/i)||[, '—'])[1].toUpperCase(); const tz=(ds.match(/\b(ET|CT|MT|PT|AZ)\b/i)||[, ''])[1].toUpperCase(); if(tz && !time.includes(tz)) time=`${time} ${tz}`; return [`${mmdd} - ${time}`.trim(), String(ng.opponent||'—').trim()||'—']; }
+function formatNextTwoLines(ng){
+  if(!ng) return ['—','—'];
+  const ds=String(ng.date||'').trim();
+  const mmdd=(ds.match(/\b(\d{1,2}\/\d{1,2})\b/)||[, '—'])[1];
+  let time=(ds.match(/(\d{1,2}:\d{2}\s*[AP]M)/i)||[, '—'])[1];
+  if(time) time=time.toUpperCase();
+  const tz=(ds.match(/\b(ET|CT|MT|PT|AZ)\b/i)||[, ''])[1];
+  const tzU=(tz||'').toUpperCase();
+  if(tzU && time && !time.includes(tzU)) time=`${time} ${tzU}`;
+  return [`${mmdd} - ${time}`.trim(), String(ng.opponent||'—').trim()||'—'];
+}
 function letterDots(years){ if(!years||!years.length) return ''; const sorted=[...years].sort((a,b)=>b-a); return `<div class="letters">${sorted.slice(0,4).map(y=>`<span class="letter-dot" title="${y}">${String(y).slice(-2)}</span>`).join('')}</div>`;}
 function makeKV(k,v){ return `<div class="kv"><div class="k">${k}</div><div class="v">${v??'—'}</div></div>`; }
 
-/* ------------------- data ------------------- */
+/* ------------------- data (unchanged seed) ------------------- */
 const playersSeed = [
   { id:"cody-bellinger", name:"CODY BELLINGER", graduatingClass:2013, currentLevel:"MLB", status:"Active 2025",
     position:"CF/1B", team:"New York Yankees",
@@ -483,40 +489,61 @@ const playersSeed = [
 
 /* ------------------- render ------------------- */
 function dynamicStatsTitle(p){
+  const hasBat = !!p.batting && Object.keys(p.batting).length>0;
+  const hasPit = !!p.pitching && Object.keys(p.pitching).length>0;
+  if(!hasBat && !hasPit) return 'NO STATS AVAILABLE';
   const s=String(p.status||'').toUpperCase();
   if(s.includes('ACTIVE 2025')) return '2025 SEASON STATS';
   if(s.includes('ACTIVE 2024')) return '2024 SEASON STATS';
   return 'CAREER STATS';
 }
 function makeStats12(p){
-  if(p.batting){
+  if(p.batting && Object.keys(p.batting).length){
     const b=p.batting;
     return `${makeKV('AVG',b.avg)} ${makeKV('OBP',b.obp)} ${makeKV('SLG',b.slg)} ${makeKV('OPS',b.ops)}
             ${makeKV('H',b.hits)} ${makeKV('R',b.runs)} ${makeKV('HR',b.hr)} ${makeKV('RBI',b.rbi)}
             ${makeKV('2B',b.doubles||'—')} ${makeKV('3B',b.triples||'—')} ${makeKV('SB',b.sb||'—')} ${makeKV('BB',b.bb||'—')}`;
   }
-  const x=p.pitching||{};
-  return `${makeKV('ERA',x.era)} ${makeKV('WHIP',x.whip)} ${makeKV('OBA',x.oba||'—')} ${makeKV('K/BB',x.kbb||'—')}
+  if(p.pitching && Object.keys(p.pitching).length){
+    const x=p.pitching||{};
+    return `${makeKV('ERA',x.era)} ${makeKV('WHIP',x.whip)} ${makeKV('OBA',x.oba||'—')} ${makeKV('K/BB',x.kbb||'—')}
             ${makeKV('FIP',x.fip||'—')} ${makeKV('IP',x.ip||'—')} ${makeKV('ER',x.er||'—')} ${makeKV('K',x.so||x.ko||'—')}
             ${makeKV('QS',x.qs||'—')} ${makeKV('HR',x.hr||'—')} ${makeKV('W',x.w||'—')} ${makeKV('SV',x.sv||'—')}`;
+  }
+  return `<div style="color:#374151;padding:8px">No stats yet.</div>`;
 }
 
 function makeCard(p){
   const lvl = lvlClass(p.currentLevel);
   const {team,parent} = teamAndParent(p);
   const [ng1,ng2] = formatNextTwoLines(p.nextGame||{});
-  const profUrl = `profile.html?id=${encodeURIComponent(p.id)}`;
   const statsTitle = dynamicStatsTitle(p);
-  const cardId = p.id || `player-${Math.random()}`;
+  const cardId = p.id || `player-${Math.random().toString(36).slice(2)}`;
+
+  // NEW/CHANGED: visible flip button + better aria
+  const flipBtn = `<button class="flip-toggle" data-action="flip" aria-label="Flip card">FLIP</button>`;
+
+  // panes ids for aria-controls
+  const paneIds = {
+    stats: `${cardId}-pane-stats`,
+    news: `${cardId}-pane-news`,
+    yat: `${cardId}-pane-yat`,
+    nil: `${cardId}-pane-nil`,
+    x: `${cardId}-pane-x`,
+    ig: `${cardId}-pane-ig`,
+    video: `${cardId}-pane-video`,
+    gallery: `${cardId}-pane-gallery`,
+  };
 
   return `
-<article class="card flip-card front" aria-label="${(p.name||'').toUpperCase()}">
-  <button class="hit left"  data-toggle="prev" aria-label="Flip previous"></button>
-  <button class="hit right" data-toggle="next" aria-label="Flip next"></button>
+<article class="card flip-card front" aria-label="${(p.name||'').toUpperCase()}" tabindex="0">
+  <button class="hit left" aria-hidden="true" data-toggle="prev"></button>
+  <button class="hit right" aria-hidden="true" data-toggle="next"></button>
 
   <div class="flip-inner">
-    <section class="face front-face">
-      <img class="card-img" src="${(p.frontImg||p.highSchoolImg||'')}" alt="${p.name}" onerror="this.onerror=null;this.style.display='none'">
+    <section class="face front-face" aria-label="Front of card">
+      ${flipBtn}
+      <img class="card-img" src="${(p.frontImg||p.highSchoolImg||'')}" alt="${p.name}" loading="lazy" onerror="this.onerror=null;this.style.display='none'">
       <div class="bottom-grad"></div>
       <div class="front-left">
         <div class="name">${(p.name||'').toUpperCase()}</div>
@@ -533,7 +560,7 @@ function makeCard(p){
         <span class="last-chip">NEXT GAME</span>
         <div class="right-line">${ng1}</div>
         <div class="right-line">${ng2}</div>
-        <div class="last3">
+        <div class="last3" aria-label="Last three games">
           <span class="last-chip">LAST 3 GAMES</span>
           <div class="item">${p.last3?.[0]?fmtLast3(p.last3[0]):'—'}</div>
           <div class="item">${p.last3?.[1]?fmtLast3(p.last3[1]):'—'}</div>
@@ -542,72 +569,69 @@ function makeCard(p){
       </div>
     </section>
 
-    <section class="face back-face">
+    <section class="face back-face" aria-label="Back of card">
+      ${flipBtn}
       <div class="back-top">
         <div class="profile-block">
-          <a class="profile-link" href="${profUrl}">
+          <a class="profile-link" href="#profile" data-profile="${p.id}">
             <div class="pn">${(p.name||'').toUpperCase()}</div>
             <div class="pt">${team||'&nbsp;'}<br>${parent||'&nbsp;'}</div>
           </a>
           <div class="fun-title" data-title>${statsTitle}</div>
         </div>
         <div class="hs-box" aria-hidden="true">
-          <img src="${(p.highSchoolImg||p.frontImg||'')}" alt="${(p.name||'HS')}" onerror="this.onerror=null;this.style.display='none'">
+          <img src="${(p.highSchoolImg||p.frontImg||'')}" alt="" loading="lazy" onerror="this.onerror=null;this.style.display='none'">
         </div>
       </div>
 
       <div class="back-bottom" data-noflip>
-        <div role="tabpanel" class="pane pane-stats active" data-pane="stats" aria-labelledby="tab-${cardId}-stats"><div class="kv-wrap12">${makeStats12(p)}</div></div>
-        <div role="tabpanel" class="pane pane-news" data-pane="news" aria-labelledby="tab-${cardId}-news"><div style="color:#374151;font-size:14px">
+        <div role="tabpanel" class="pane pane-stats active" id="${paneIds.stats}" data-pane="stats" aria-labelledby="tab-${cardId}-stats" aria-hidden="false"><div class="kv-wrap12">${makeStats12(p)}</div></div>
+        <div role="tabpanel" class="pane pane-news" id="${paneIds.news}" data-pane="news" aria-labelledby="tab-${cardId}-news" aria-hidden="true"><div style="color:#374151;font-size:14px">
           <div><strong>Latest:</strong> ${p.name} makes headlines — on-platform story rendering here.</div>
           <p style="margin:.4em 0 0">Short summary lives here. We’ll wire real feeds to this pane.</p>
         </div></div>
-        <div role="tabpanel" class="pane pane-yat" data-pane="yat" aria-labelledby="tab-${cardId}-yat"><div style="color:#111">YAT-A-BOY! virtual gifting — CTA placeholder.</div></div>
-        <div role="tabpanel" class="pane pane-nil" data-pane="nil" aria-labelledby="tab-${cardId}-nil">
-          ${p.nilImg?`<img src="${p.nilImg}" alt="NIL score" style="width:100%;height:auto;border-radius:10px">`:`<div style="color:#111">NIL points will appear here.</div>`}
+        <div role="tabpanel" class="pane pane-yat" id="${paneIds.yat}" data-pane="yat" aria-labelledby="tab-${cardId}-yat" aria-hidden="true"><div style="color:#111">YAT-A-BOY! virtual gifting — CTA placeholder.</div></div>
+        <div role="tabpanel" class="pane pane-nil" id="${paneIds.nil}" data-pane="nil" aria-labelledby="tab-${cardId}-nil" aria-hidden="true">
+          ${p.nilImg?`<img src="${p.nilImg}" alt="NIL score" style="width:100%;height:auto;border-radius:10px" loading="lazy">`:`<div style="color:#111">NIL points will appear here.</div>`}
         </div>
-        <div role="tabpanel" class="pane pane-x" data-pane="x" aria-labelledby="tab-${cardId}-x"><div style="color:#111">X/Twitter posts placeholder.</div></div>
-        <div role="tabpanel" class="pane pane-ig" data-pane="ig" aria-labelledby="tab-${cardId}-ig"><div style="color:#111">Instagram posts placeholder.</div></div>
-        <div role="tabpanel" class="pane pane-video" data-pane="video" aria-labelledby="tab-${cardId}-video">
-          ${p.video?`<iframe width="100%" height="220" src="${p.video}" title="Video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>`:`<div style="color:#111">Video will play here.</div>`}
+        <div role="tabpanel" class="pane pane-x" id="${paneIds.x}" data-pane="x" aria-labelledby="tab-${cardId}-x" aria-hidden="true"><div style="color:#111">X/Twitter posts placeholder.</div></div>
+        <div role="tabpanel" class="pane pane-ig" id="${paneIds.ig}" data-pane="ig" aria-labelledby="tab-${cardId}-ig" aria-hidden="true"><div style="color:#111">Instagram posts placeholder.</div></div>
+        <div role="tabpanel" class="pane pane-video" id="${paneIds.video}" data-pane="video" aria-labelledby="tab-${cardId}-video" aria-hidden="true">
+          ${p.video?`<iframe width="100%" height="220" src="${p.video}" title="Video" frameborder="0" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>`:`<div style="color:#111">Video will play here.</div>`}
         </div>
-        <div role="tabpanel" class="pane pane-gallery" data-pane="gallery" aria-labelledby="tab-${cardId}-gallery">
+        <div role="tabpanel" class="pane pane-gallery" id="${paneIds.gallery}" data-pane="gallery" aria-labelledby="tab-${cardId}-gallery" aria-hidden="true">
           ${p.gallery&&p.gallery.length?`
             <div style="overflow:auto;white-space:nowrap">
-              ${p.gallery.map(src=>`<img src="${src}" style="display:inline-block;height:220px;object-fit:cover;border-radius:10px;margin-right:8px">`).join('')}
+              ${p.gallery.map(src=>`<img src="${src}" loading="lazy" style="display:inline-block;height:220px;object-fit:cover;border-radius:10px;margin-right:8px" alt="Gallery image">`).join('')}
             </div>`:`<div style="color:#111">Gallery coming soon.</div>`}
         </div>
 
         <div class="iconbar" role="tablist" aria-label="Card details" data-noflip>
-          <button role="tab" class="ibtn active" data-tab="stats" title="Season/Career Stats" aria-selected="true" id="tab-${cardId}-stats">
-            <svg viewBox="0 0 24 24"><path fill="currentColor" d="M5 3h2v18H5zM11 10h2v11h-2zM17 6h2v15h-2z"/></svg>
-          </button>
-          <button role="tab" class="ibtn" data-tab="news" title="News" aria-selected="false" id="tab-${cardId}-news">
-            <svg viewBox="0 0 24 24"><path fill="currentColor" d="M4 5h16v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5zm2 2v12h12V7H6zm1 1h10v3H7V8z"/></svg>
-          </button>
-          <button role="tab" class="ibtn" data-tab="yat" title="YAT-A-BOY!" aria-selected="false" id="tab-${cardId}-yat">
-            <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 21.35 10.55 20.03C5.4 15.36 2 12.28 2 8.5A5.5 5.5 0 0 1 7.5 3C9.24 3 10.91 3.81 12 5.08 13.09 3.81 14.76 3 16.5 3 21 3 24 6.5 24 10.5c0 3.78-3.4 6.86-8.55 11.53L12 21.35z"/></svg>
-          </button>
-          <button role="tab" class="ibtn" data-tab="nil" title="NIL Score" aria-selected="false" id="tab-${cardId}-nil">
-            <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 1 3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 2.2L19 6v5c0 4.52-3.01 8.77-7 10-3.99-1.23-7-5.48-7-10V6l7-2.8zM11 7h2v6h3l-4 4-4-4h3z"/></svg>
-          </button>
-          <button role="tab" class="ibtn" data-tab="x" title="X Feed" aria-selected="false" id="tab-${cardId}-x">
-            <svg viewBox="0 0 1200 1227"><path fill="currentColor" d="M714 511 1160 0H996L689 356 420 0H0l463 607L0 1227h164l329-379 286 379h420zM327 120h154l646 873H973z"/></svg>
-          </button>
-          <button role="tab" class="ibtn" data-tab="ig" title="Instagram" aria-selected="false" id="tab-${cardId}-ig">
-            <svg viewBox="0 0 24 24"><path fill="currentColor" d="M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5zm5 5a5 5 0 1 0 .001 10.001A5 5 0 0 0 12 7zm6-2.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z"/></svg>
-          </button>
-          <button role="tab" class="ibtn" data-tab="video" title="Video" aria-selected="false" id="tab-${cardId}-video">
-            <svg viewBox="0 0 24 24"><path fill="currentColor" d="M8 5v14l11-7zM5 5h2v14H5z"/></svg>
-          </button>
-          <button role="tab" class="ibtn" data-tab="gallery" title="Photo Gallery" aria-selected="false" id="tab-${cardId}-gallery">
-            <svg viewBox="0 0 24 24"><path fill="currentColor" d="M21 19V5a2 2 0 0 0-2-2H5C3.9 3 3 3.9 3 5v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5zM8 8a2 2 0 1 1 4 0 2 2 0 0 1-4 0z"/></svg>
-          </button>
+          ${Object.keys(paneIds).map((k, idx)=>`
+          <button role="tab" class="ibtn ${k==='stats'?'active':''}" data-tab="${k}" title="${k.toUpperCase()}"
+            aria-selected="${k==='stats'?'true':'false'}" id="tab-${cardId}-${k}" aria-controls="${paneIds[k]}">
+            ${tabIcon(k)}
+          </button>`).join('')}
         </div>
       </div>
     </section>
   </div>
 </article>`;
+}
+
+// icons factory (unchanged glyphs)
+function tabIcon(k){
+  const map={
+    stats:'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M5 3h2v18H5zM11 10h2v11h-2zM17 6h2v15h-2z"/></svg>',
+    news:'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M4 5h16v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5zm2 2v12h12V7H6zm1 1h10v3H7V8z"/></svg>',
+    yat:'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 21.35 10.55 20.03C5.4 15.36 2 12.28 2 8.5A5.5 5.5 0 0 1 7.5 3C9.24 3 10.91 3.81 12 5.08 13.09 3.81 14.76 3 16.5 3 21 3 24 6.5 24 10.5c0 3.78-3.4 6.86-8.55 11.53L12 21.35z"/></svg>',
+    nil:'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 1 3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 2.2L19 6v5c0 4.52-3.01 8.77-7 10-3.99-1.23-7-5.48-7-10V6l7-2.8zM11 7h2v6h3l-4 4-4-4h3z"/></svg>',
+    x:'<svg viewBox="0 0 1200 1227"><path fill="currentColor" d="M714 511 1160 0H996L689 356 420 0H0l463 607L0 1227h164l329-379 286 379h420zM327 120h154l646 873H973z"/></svg>',
+    ig:'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5zm5 5a5 5 0 1 0 .001 10.001A5 5 0 0 0 12 7zm6-2.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z"/></svg>',
+    video:'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M8 5v14l11-7zM5 5h2v14H5z"/></svg>',
+    gallery:'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M21 19V5a2 2 0 0 0-2-2H5C3.9 3 3 3.9 3 5v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5zM8 8a2 2 0 1 1 4 0 2 2 0 0 1-4 0z"/></svg>'
+  };
+  return map[k]||map.stats;
 }
 
 function render(list){ byId('grid').innerHTML = list.map(makeCard).join(''); attachInteractions(); }
@@ -667,6 +691,7 @@ function resetAll(){
 const INTERACTIVE_SEL='[data-noflip], .tabbtn, .action-chip, .iconbar, .ibtn, a,button,input,select,textarea';
 function toggle(card){ if(!card) return; card.classList.contains('front') ? (card.classList.remove('front'),card.classList.add('back')) : (card.classList.remove('back'),card.classList.add('front')); }
 function attachInteractions(){
+  // Tabs: click
   $$('.iconbar').forEach(bar=>{
     bar.addEventListener('click', (e)=>{
       const btn=e.target.closest('.ibtn'); if(!btn) return;
@@ -674,35 +699,81 @@ function attachInteractions(){
       card.querySelectorAll('.ibtn[role="tab"]').forEach(b => {
           const isSelected = (b === btn);
           b.classList.toggle('active', isSelected);
-          b.setAttribute('aria-selected', isSelected);
+          b.setAttribute('aria-selected', String(isSelected));
+          const paneId = b.getAttribute('aria-controls');
+          const panel = paneId && byId(paneId);
+          if(panel){
+            panel.classList.toggle('active', isSelected);
+            panel.setAttribute('aria-hidden', String(!isSelected));
+          }
       });
+      // ensure only one active pane
       card.querySelectorAll('.pane').forEach(p=>p.classList.toggle('active', p.dataset.pane===pane));
     },true);
   });
 
+  // Flip via invisible hit zones + visible FLIP button
   $$('.card').forEach(card=>{
     if(!card.classList.contains('front')&& !card.classList.contains('back')) card.classList.add('front');
+
+    // visible flip button
+    $$('.flip-toggle', card).forEach(btn=>{
+      btn.addEventListener('click', ()=>toggle(card));
+    });
+
+    // mouse/touch on side gutters
     $$('.hit',card).forEach(hit=>{
       hit.addEventListener('click', e=>{ if(e.target.closest(INTERACTIVE_SEL)) return; toggle(card); });
     });
+
+    // swipe
     let sx=0,sy=0, active=false;
     card.addEventListener('touchstart', e=>{ if(e.target.closest(INTERACTIVE_SEL)) return; active=true; sx=e.touches[0].clientX; sy=e.touches[0].clientY; },{passive:true});
     card.addEventListener('touchend', e=>{ if(!active) return; const dx=e.changedTouches[0].clientX-sx; const dy=e.changedTouches[0].clientY-sy; if(Math.abs(dx)>40 && Math.abs(dx)>Math.abs(dy)) toggle(card); active=false; },{passive:true});
+
+    // keyboard: Enter/Space toggles; ArrowLeft/Right too
+    card.addEventListener('keydown', (e)=>{
+      const k=e.key;
+      if(k==='Enter' || k===' ' || k==='Spacebar'){ e.preventDefault(); toggle(card); }
+      if(k==='ArrowLeft' || k==='ArrowRight'){ e.preventDefault(); toggle(card); }
+    });
+  });
+
+  // profile links: keep in-page
+  $$('a.profile-link').forEach(a=>{
+    a.addEventListener('click', (e)=>{ e.preventDefault(); /* hook to router/modal here */ });
   });
 }
 
-/* drawers & header icons */
+/* drawers & header icons + focus trap */
 const scrim=byId('scrim');
 const drawerLeft=byId('drawerLeft'); const drawerRight=byId('drawerRight'); const drawerAuth=byId('drawerAuth');
 const iconSearch=byId('iconSearch'); const iconFilter=byId('iconFilter'); const iconReset=byId('iconReset'); const iconProfile=byId('iconProfile');
 let lastFocus=null;
+
 function setActiveIcon(btn,a){ btn?.classList.toggle('active',!!a); }
-function openLeft(){ closeRight(false); closeAuth(false); lastFocus=document.activeElement; drawerLeft.classList.add('open'); scrim.classList.add('open'); document.body.classList.add('no-scroll'); setActiveIcon(iconSearch,true); setActiveIcon(iconFilter,false); setActiveIcon(iconProfile,false); }
-function closeLeft(focus=true){ drawerLeft.classList.remove('open'); if(!drawerRight.classList.contains('open')&&!drawerAuth.classList.contains('open')){ scrim.classList.remove('open'); document.body.classList.remove('no-scroll'); } setActiveIcon(iconSearch,false); if(focus) lastFocus?.focus?.(); }
-function openRight(){ closeLeft(false); closeAuth(false); lastFocus=document.activeElement; drawerRight.classList.add('open'); scrim.classList.add('open'); document.body.classList.add('no-scroll'); setActiveIcon(iconFilter,true); setActiveIcon(iconSearch,false); setActiveIcon(iconProfile,false); }
-function closeRight(focus=true){ drawerRight.classList.remove('open'); if(!drawerLeft.classList.contains('open')&&!drawerAuth.classList.contains('open')){ scrim.classList.remove('open'); document.body.classList.remove('no-scroll'); } setActiveIcon(iconFilter,false); if(focus) lastFocus?.focus?.(); }
-function openAuth(){ closeLeft(false); closeRight(false); lastFocus=document.activeElement; drawerAuth.classList.add('open'); scrim.classList.add('open'); document.body.classList.add('no-scroll'); setActiveIcon(iconProfile,true); setActiveIcon(iconSearch,false); setActiveIcon(iconFilter,false); }
-function closeAuth(focus=true){ drawerAuth.classList.remove('open'); if(!drawerLeft.classList.contains('open')&&!drawerRight.classList.contains('open')){ scrim.classList.remove('open'); document.body.classList.remove('no-scroll'); } setActiveIcon(iconProfile,false); if(focus) lastFocus?.focus?.(); }
+
+function trapFocus(container){
+  const focusables = 'a[href],button:not([disabled]),input,select,textarea,[tabindex]:not([tabindex="-1"])';
+  const nodes = Array.from(container.querySelectorAll(focusables)).filter(el=>el.offsetParent!==null || el.getAttribute('aria-hidden')!=='true');
+  const first = nodes[0], last = nodes[nodes.length-1];
+  function onKey(e){
+    if(e.key!=='Tab') return;
+    if(nodes.length===0) return;
+    if(e.shiftKey && document.activeElement===first){ e.preventDefault(); last.focus(); }
+    else if(!e.shiftKey && document.activeElement===last){ e.preventDefault(); first.focus(); }
+  }
+  container.addEventListener('keydown', onKey);
+  return ()=>container.removeEventListener('keydown', onKey);
+}
+let untrap = ()=>{};
+
+function openLeft(){ closeRight(false); closeAuth(false); lastFocus=document.activeElement; drawerLeft.classList.add('open'); scrim.classList.add('open'); document.body.classList.add('no-scroll'); setActiveIcon(iconSearch,true); setActiveIcon(iconFilter,false); setActiveIcon(iconProfile,false); drawerLeft.setAttribute('aria-hidden','false'); drawerLeft.focus(); untrap=trapFocus(drawerLeft); }
+function closeLeft(focus=true){ drawerLeft.classList.remove('open'); drawerLeft.setAttribute('aria-hidden','true'); if(!drawerRight.classList.contains('open')&&!drawerAuth.classList.contains('open')){ scrim.classList.remove('open'); document.body.classList.remove('no-scroll'); } setActiveIcon(iconSearch,false); untrap(); if(focus) lastFocus?.focus?.(); }
+function openRight(){ closeLeft(false); closeAuth(false); lastFocus=document.activeElement; drawerRight.classList.add('open'); scrim.classList.add('open'); document.body.classList.add('no-scroll'); setActiveIcon(iconFilter,true); setActiveIcon(iconSearch,false); setActiveIcon(iconProfile,false); drawerRight.setAttribute('aria-hidden','false'); drawerRight.focus(); untrap=trapFocus(drawerRight); }
+function closeRight(focus=true){ drawerRight.classList.remove('open'); drawerRight.setAttribute('aria-hidden','true'); if(!drawerLeft.classList.contains('open')&&!drawerAuth.classList.contains('open')){ scrim.classList.remove('open'); document.body.classList.remove('no-scroll'); } setActiveIcon(iconFilter,false); untrap(); if(focus) lastFocus?.focus?.(); }
+function openAuth(){ closeLeft(false); closeRight(false); lastFocus=document.activeElement; drawerAuth.classList.add('open'); scrim.classList.add('open'); document.body.classList.add('no-scroll'); setActiveIcon(iconProfile,true); setActiveIcon(iconSearch,false); setActiveIcon(iconFilter,false); drawerAuth.setAttribute('aria-hidden','false'); drawerAuth.focus(); untrap=trapFocus(drawerAuth); }
+function closeAuth(focus=true){ drawerAuth.classList.remove('open'); drawerAuth.setAttribute('aria-hidden','true'); if(!drawerLeft.classList.contains('open')&&!drawerRight.classList.contains('open')){ scrim.classList.remove('open'); document.body.classList.remove('no-scroll'); } setActiveIcon(iconProfile,false); untrap(); if(focus) lastFocus?.focus?.(); }
 function closeDrawers(){ closeLeft(false); closeRight(false); closeAuth(); }
 
 byId('openLeft').addEventListener('click', openLeft);
@@ -715,14 +786,19 @@ iconProfile.addEventListener('click', openAuth);
 iconReset.addEventListener('click', resetAll);
 scrim.addEventListener('click', closeDrawers);
 
+// Escape closes drawers
+window.addEventListener('keydown', (e)=>{ if(e.key==='Escape'){ closeDrawers(); }});
+
 byId('filterName').addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ e.preventDefault(); applyFilters(); closeRight(); } });
 
 const localSearch=byId('localSearch'); const localResults=byId('localResults');
 function renderLocalResults(q){
   localResults.innerHTML=''; if(!q) return;
-  players.filter(p=>(p.name||'').toLowerCase().includes(q.toLowerCase())).slice(0,50).forEach(p=>{
+  players.filter(p=>(p.name||'').toLowerCase().includes(q.toLowerCase())).slice(0,50).forEach((p,i)=>{
     const li=document.createElement('li'); const yr=p.graduatingClass?` (Class of ${p.graduatingClass})`:''; li.textContent=`${p.name}${yr}`;
-    li.addEventListener('click', ()=>{ window.location.href=`profile.html?id=${encodeURIComponent(p.id)}`; closeLeft(); });
+    li.setAttribute('role','option'); li.tabIndex=0;
+    li.addEventListener('click', ()=>{ /* hook to router: window.location.hash=`#/profile/${p.id}` */ closeLeft(); });
+    li.addEventListener('keydown', (e)=>{ if(e.key==='Enter' || e.key===' '){ e.preventDefault(); li.click(); }});
     localResults.appendChild(li);
   });
 }
@@ -741,8 +817,30 @@ function runSplash(){
   const splash = byId('splash'); if(!splash) return;
   splash.classList.add('show');
   const hide = ()=>{ splash.classList.add('hide'); setTimeout(()=>splash.remove(),520); window.removeEventListener('pointerdown', hide, true); };
-  setTimeout(hide, 1400);
+  setTimeout(hide, 900); // slightly faster to content
   window.addEventListener('pointerdown', hide, true);
+}
+
+/* ------------------- LIGHT VIRTUAL RENDER ------------------- */
+// Render first 8 cards, then lazy-render rest when scrolled/idle
+function renderVirtually(list){
+  const first = list.slice(0,8);
+  const rest = list.slice(8);
+  render(first);
+  if(rest.length===0) return;
+  // sentinel to append later
+  const observer = new IntersectionObserver((entries)=>{
+    if(entries.some(e=>e.isIntersecting)){
+      byId('grid').insertAdjacentHTML('beforeend', rest.map(makeCard).join(''));
+      attachInteractions();
+      observer.disconnect();
+    }
+  });
+  // create sentinel
+  const sentinel = document.createElement('div');
+  sentinel.style.height='2px';
+  byId('grid').appendChild(sentinel);
+  observer.observe(sentinel);
 }
 
 /* ------------------- boot ------------------- */
@@ -756,13 +854,9 @@ document.addEventListener('DOMContentLoaded', ()=>{
       el.addEventListener('change', (event) => {
         const selectElement = event.currentTarget;
         const chosen = [...selectElement.selectedOptions].map(o => o.value);
-
         if (chosen.includes("__ALL__")) {
-          [...selectElement.options].forEach(o => {
-            o.selected = (o.value !== "__ALL__");
-          });
+          [...selectElement.options].forEach(o => { o.selected = (o.value !== "__ALL__"); });
         }
-        
         applyFilters();
       });
     }
@@ -770,7 +864,8 @@ document.addEventListener('DOMContentLoaded', ()=>{
   
   byId('filterName').addEventListener('input', applyFilters);
 
-  render(playersDefaultView());
+  // Initial render (virtual)
+  renderVirtually(playersDefaultView());
   runSplash();
 });
 </script>
