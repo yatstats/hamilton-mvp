@@ -1,73 +1,180 @@
-/* header.css — global header + drawers + tagline */
-:root{
-  --bg:#000; --ink:#f5f7fa; --muted:#aeb5bf;
-  --ring:#232833;
-  --headerH:108px;         /* total for 2 rows */
-  --bandH:48px;            /* tagline row */
-}
-:root[data-theme="light"]{
-  --bg:#0f1115; /* keep page dark; you can invert later */
-}
+<!-- header.html -->
+<link rel="stylesheet" href="header.css">
 
-*{box-sizing:border-box}
-img{max-width:100%;display:block}
-a{text-decoration:none;color:inherit}
-button{background:transparent;border:0;cursor:pointer;color:inherit}
-body.no-scroll{overflow:hidden}
+<header class="site-header" role="banner">
+  <!-- Row 1 -->
+  <div class="h-row1">
+    <div class="h-left">
+      <button class="icon hambtn" id="openLeft" aria-label="Open navigation">
+        <svg viewBox="0 0 24 24"><path fill="currentColor" d="M3 6h18v2H3zM3 11h18v2H3zM3 16h18v2H3z"/></svg>
+      </button>
+      <button class="icon" id="openAuth" aria-label="Account">
+        <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm0 2c-4.2 0-8 2.1-8 5v1h16v-1c0-2.9-3.8-5-8-5z"/></svg>
+      </button>
 
-/* --- sticky header rows --- */
-.site-header{
-  position:sticky; top:0; z-index:60; background:#000; border-bottom:1px solid var(--ring);
-  display:flex; flex-direction:column; gap:6px; padding:8px 10px 6px;
-}
-.h-row1, .h-row2{display:flex; align-items:center; width:100%}
+      <!-- Theme toggle belongs up here -->
+      <button class="icon" id="themeToggle" aria-label="Toggle theme">
+        <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 3a9 9 0 1 0 9 9c0-.5 0-1-.1-1.4A7.5 7.5 0 0 1 12 3z"/></svg>
+      </button>
+    </div>
 
-/* row1 */
-.h-row1{gap:8px}
-.h-left{display:flex; align-items:center; gap:8px}
-.icon{width:36px;height:36px;border-radius:10px;display:grid;place-items:center}
-.icon svg{width:20px;height:20px;color:#fff}
-.icon:hover{background:rgba(255,255,255,.08)}
+    <!-- Desktop nav centered on row1 (auto-hides on small viewports) -->
+    <nav class="nav-desktop" aria-label="Primary">
+      <a href="index.html"><span class="nav-slim">where they</span><span class="nav-strong">YAT?</span></a>
+      <a href="#"><span class="nav-slim">active alumni</span><span class="nav-strong">News</span></a>
+      <a href="#"><span class="nav-slim">next level</span><span class="nav-strong">All-Time List</span></a>
+      <a href="#"><span class="nav-slim">NIL &amp; YAT-A-BOY</span><span class="nav-strong">Marketplace</span></a>
+      <a href="#"><span class="nav-slim">the</span><span class="nav-strong">Current Team</span></a>
+      <a href="#"><span class="nav-slim">PCD Action</span><span class="nav-strong">Partner Program</span></a>
+    </nav>
 
-.nav-desktop{margin:0 auto; display:flex; gap:14px; align-items:center; white-space:nowrap}
-.nav-desktop a{font-family:"Roboto Condensed",system-ui,sans-serif; text-transform:uppercase; font-weight:700; letter-spacing:.02em; color:#b8c0ca}
-.nav-desktop a .nav-strong{color:#fff; font-family:"Anton",sans-serif; letter-spacing:.01em; margin-left:2px}
-@media (max-width:1200px){ .nav-desktop{display:none} }
+    <div class="h-right">
+      <img class="ystats" src="https://i.postimg.cc/C5mwXpQy/35878-20250830-222027-0000.png" alt="YAT?STATS">
+    </div>
+  </div>
 
-.h-right{margin-left:auto}
-.ystats{height:34px; width:auto; transform:scale(.9); transform-origin:right center}
+  <!-- Row 2 (Hamilton lovebirds) -->
+  <div class="h-row2">
+    <div class="brand">
+      <img class="school-logo" src="https://i.postimg.cc/pVm0vHdX/hamilton-logo-tight-transparent-background.png" alt="Hamilton H">
+      <div class="school-type">
+        <div class="school-l1">CHANDLER, AZ</div>
+        <div class="school-l2">HAMILTON HIGH SCHOOL</div>
+        <div class="school-l3">ACTIVE ALUMNI</div>
+      </div>
+    </div>
+  </div>
+</header>
 
-/* row2 (lovebirds) */
-.h-row2{justify-content:flex-start}
-.brand{display:flex; align-items:flex-end; gap:10px; padding-left:8px}
-.school-logo{height:54px;width:auto}
-.school-type{line-height:1}
-.school-l1{font:700 10px/1 "Roboto Condensed",sans-serif; color:#cbd5e1; letter-spacing:.06em}
-.school-l2{font:900 12px/1 "Anton",sans-serif; letter-spacing:.02em}
-.school-l3{font:900 14px/1 "Anton",sans-serif; letter-spacing:.02em}
+<!-- Tagline row (sticky) -->
+<div class="band" role="region" aria-label="Tagline">
+  <div class="band-inner">
+    <div class="band-left">
+      <span class="tag-grey">WHERE THEY</span><span class="tag-strong">YAT?</span>
+      &nbsp;&nbsp;
+      <span class="tag-grey">FLIP FOR</span><span class="tag-strong">STATS!</span>
+    </div>
+    <!-- Search/Filter/Reset live on tagline right -->
+    <div class="band-right">
+      <button class="icon" id="openSearch" aria-label="Search">
+        <svg viewBox="0 0 24 24"><path fill="currentColor" d="M11 4a7 7 0 1 1 0 14A7 7 0 0 1 11 4zm9.7 15.3-3.4-3.4a9 9 0 1 0-1.4 1.4l3.4 3.4a1 1 0 0 0 1.4-1.4z"/></svg>
+      </button>
+      <button class="icon" id="openFilter" aria-label="Open filters">
+        <svg viewBox="0 0 24 24"><path fill="currentColor" d="M3 5h18l-6.5 7.5V20l-5-2v-5.5L3 5z"/></svg>
+      </button>
+      <button class="icon" id="resetAll" aria-label="Reset filters">
+        <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 5V2L8 6l4 4V7a5 5 0 1 1-5 5H5a7 7 0 1 0 7-7z"/></svg>
+      </button>
+    </div>
+  </div>
+</div>
 
-/* tagline band */
-.band{position:sticky; top:var(--headerH); z-index:50; background:#000; border-bottom:1px solid var(--ring); height:var(--bandH)}
-.band-inner{height:100%; display:flex; align-items:center; justify-content:space-between; padding:0 10px}
-.tag-grey{color:#9aa1ab; font:700 12px/1 "Roboto Condensed",sans-serif}
-.tag-strong{color:#fff; font:900 14px/1 "Anton",sans-serif}
-.band-right{display:flex; gap:6px}
+<!-- SCRIM -->
+<div class="scrim" id="scrim" aria-hidden="true"></div>
 
-/* scrim + drawers start *below* header+band so they don't cover tagline */
-.scrim{position:fixed; left:0; right:0; top:calc(var(--headerH) + var(--bandH)); bottom:0; background:rgba(0,0,0,.35); opacity:0; pointer-events:none; transition:opacity .2s}
-.scrim.open{opacity:1; pointer-events:auto}
+<!-- LEFT DRAWER (Navigation + local profile search) -->
+<aside class="drawer left" id="drawerLeft" aria-hidden="true" role="dialog" aria-label="Player Profile Search" tabindex="-1">
+  <div class="drawer-h">
+    <div class="drawer-title">PLAYER PROFILE SEARCH</div>
+    <button class="icon" id="closeLeft" aria-label="Close">
+      <svg viewBox="0 0 24 24"><path fill="currentColor" d="M6.225 4.811 4.811 6.225 10.586 12l-5.775 5.775 1.414 1.414L12 13.414l5.775 5.775 1.414-1.414L13.414 12l5.775-5.775-1.414-1.414L12 10.586 6.225 4.811z"/></svg>
+    </button>
+  </div>
+  <div class="drawer-b">
+    <div class="drawer-pad">
+      <input id="localSearch" class="ghost" placeholder="Type a player name…" autocomplete="off" />
+      <ul id="localResults" class="left-results" role="listbox" aria-label="Search results"></ul>
+    </div>
 
-.drawer{position:fixed; top:calc(var(--headerH) + var(--bandH)); bottom:0; width:min(75vw,520px); background:#0b0f16; color:#fff; z-index:56; transform:translateX(100%); transition:transform .25s}
-.drawer.left{left:0; transform:translateX(-100%)}
-.drawer.open{transform:translateX(0)}
-.drawer-h{height:54px; border-bottom:1px solid #1e2430; display:flex; align-items:center; justify-content:space-between; padding:0 12px}
-.drawer-title{font:900 12px/1 "Anton"; letter-spacing:.14em; color:#d6d9df; text-transform:uppercase}
-.drawer-b{min-height:0; overflow:auto}
-.drawer-pad{padding:12px}
-.ghost{display:block; width:100%; background:#0e141f; border:1px solid #1b2330; border-radius:10px; padding:12px; color:#fff; margin-bottom:12px}
-.lbl{display:block; font:700 12px/1 "Roboto Condensed"; color:#9aa1ab; margin:8px 0 4px}
-.nav-list{display:flex; flex-direction:column; gap:16px; padding:12px}
-.nav-list a{font-family:"Roboto Condensed"; text-transform:uppercase}
-.nav-list .nav-slim{color:#9aa1ab; font-weight:700}
-.nav-list .nav-strong{color:#fff; font-weight:900; margin-left:4px; font-family:"Anton"}
-.cta{display:inline-block; margin-top:8px; background:#fff; color:#000; border-radius:10px; padding:10px 12px; font-weight:900}
+    <nav class="nav-list">
+      <a href="index.html"><span class="nav-slim">where they</span><span class="nav-strong">YAT?</span></a>
+      <a href="#"><span class="nav-slim">active alumni</span><span class="nav-strong">News</span></a>
+      <a href="#"><span class="nav-slim">next level</span><span class="nav-strong">All-Time List</span></a>
+      <a href="#"><span class="nav-slim">NIL &amp; YAT-A-BOY</span><span class="nav-strong">Marketplace</span></a>
+      <a href="#"><span class="nav-slim">the</span><span class="nav-strong">Current Team</span></a>
+      <a href="#"><span class="nav-slim">PCD Action</span><span class="nav-strong">Partner Program</span></a>
+    </nav>
+  </div>
+</aside>
+
+<!-- RIGHT DRAWER (Filters) -->
+<aside class="drawer right" id="drawerRight" aria-hidden="true" role="dialog" aria-label="Filters" tabindex="-1">
+  <div class="drawer-h">
+    <div class="drawer-title">Filters</div>
+    <button class="icon" id="closeRight" aria-label="Close">
+      <svg viewBox="0 0 24 24"><path fill="currentColor" d="M6.225 4.811 4.811 6.225 10.586 12l-5.775 5.775 1.414 1.414L12 13.414l5.775 5.775 1.414-1.414L13.414 12l5.775-5.775-1.414-1.414L12 10.586 6.225 4.811z"/></svg>
+    </button>
+  </div>
+  <div class="drawer-b">
+    <div class="drawer-pad">
+      <input id="filterName" class="ghost" placeholder="Filter by name…" />
+      <label class="lbl">Level</label>
+      <select id="lvl" class="ghost" multiple></select>
+
+      <label class="lbl">Grad Class</label>
+      <select id="grad" class="ghost" multiple></select>
+
+      <label class="lbl">Roster Year</label>
+      <select id="roster" class="ghost" multiple></select>
+
+      <label class="lbl">Status</label>
+      <select id="status" class="ghost" multiple></select>
+    </div>
+  </div>
+</aside>
+
+<!-- AUTH DRAWER -->
+<aside class="drawer right" id="drawerAuth" aria-hidden="true" role="dialog" aria-label="Sign up or login" tabindex="-1">
+  <div class="drawer-h">
+    <div class="drawer-title">Sign up | Login</div>
+    <button class="icon" id="closeAuth" aria-label="Close">
+      <svg viewBox="0 0 24 24"><path fill="currentColor" d="M6.225 4.811 4.811 6.225 10.586 12l-5.775 5.775 1.414 1.414L12 13.414l5.775 5.775 1.414-1.414L13.414 12l5.775-5.775-1.414-1.414L12 10.586 6.225 4.811z"/></svg>
+    </button>
+  </div>
+  <div class="drawer-b">
+    <div class="drawer-pad">
+      <label class="lbl" for="emailInput">Email</label>
+      <input id="emailInput" class="ghost" type="email" placeholder="you@example.com">
+      <label class="lbl" for="pwInput">Password</label>
+      <input id="pwInput" class="ghost" type="password" placeholder="••••••••">
+      <a class="cta" href="https://www.yatstats.com" target="_blank" rel="noopener">🔎 GLOBAL PLATFORM TEAM &amp; PLAYER SEARCH</a>
+    </div>
+  </div>
+</aside>
+
+<script>
+/* header logic — scoped to this fragment */
+(() => {
+  const $ = (s,root=document)=>root.querySelector(s);
+  const $$ = (s,root=document)=>Array.from(root.querySelectorAll(s));
+  const body = document.body;
+  const scrim = $('#scrim');
+
+  // theme
+  const themeBtn = $('#themeToggle');
+  const THEME_KEY = 'yst-theme';
+  const applyTheme = t => { document.documentElement.dataset.theme = t; localStorage.setItem(THEME_KEY,t); };
+  const initTheme = () => applyTheme(localStorage.getItem(THEME_KEY) || 'dark');
+  themeBtn?.addEventListener('click', ()=> applyTheme((document.documentElement.dataset.theme==='dark')?'light':'dark'));
+  initTheme();
+
+  // drawers
+  const left = $('#drawerLeft'), right = $('#drawerRight'), auth = $('#drawerAuth');
+  function open(el){ el?.classList.add('open'); scrim.classList.add('open'); body.classList.add('no-scroll'); }
+  function closeAll(){ [left,right,auth].forEach(d=>d?.classList.remove('open')); scrim.classList.remove('open'); body.classList.remove('no-scroll'); }
+
+  $('#openLeft')?.addEventListener('click', ()=>open(left));
+  $('#closeLeft')?.addEventListener('click', closeAll);
+  $('#openFilter')?.addEventListener('click', ()=>open(right));
+  $('#closeRight')?.addEventListener('click', closeAll);
+  $('#openAuth')?.addEventListener('click', ()=>open(auth));
+  $('#closeAuth')?.addEventListener('click', closeAll);
+  scrim?.addEventListener('click', closeAll);
+
+  // stub hooks (the page can bind real handlers)
+  $('#openSearch')?.addEventListener('click', ()=>document.dispatchEvent(new CustomEvent('yst:openSearch')));
+  $('#resetAll')?.addEventListener('click', ()=>document.dispatchEvent(new CustomEvent('yst:resetAll')));
+
+  // prevent drawers from covering the tagline: they start below header+band via CSS top vars.
+})();
+</script>
