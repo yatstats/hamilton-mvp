@@ -1,74 +1,89 @@
-<!-- header.html — ham-v4.8.5 -->
-<link href="https://fonts.googleapis.com/css2?family=Anton&family=Roboto+Condensed:wght@300;400;700;900&display=swap" rel="stylesheet">
+<!-- header.html — global two-row sticky header (ham-v4.8.6-header) -->
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Roboto+Condensed:wght@300;400;700&display=swap" rel="stylesheet">
 
 <style>
-:root{--bg:#000;--ink:#f5f7fa;--muted:#aeb5bf;--ring:#232833;--headerH:108px;--bandH:48px}
-*{box-sizing:border-box}img{max-width:100%;display:block}a{text-decoration:none;color:inherit}
-button{background:transparent;border:0;cursor:pointer;color:inherit}
-body.no-scroll{overflow:hidden}
+:root{
+  --headerH:112px;   /* total of row1+row2 */
+  --bandH:42px;      /* tagline row */
+  --drawerW:clamp(300px,75vw,520px);
+  --touchEdge:20%;
+  /* theme vars populate below for dark/light */
+}
 
-/* ===== BOOT-CLOSED GUARD ===== */
-html[data-boot="closed"] .drawer{transform:translateX(100%) !important}
-html[data-boot="closed"] .drawer.left{transform:translateX(-100%) !important}
-html[data-boot="closed"] #scrim{opacity:0 !important; pointer-events:none !important}
+/* ===== THEME (defaults to dark) ===== */
+html{color-scheme:dark}
+html[data-theme="dark"]{
+  --bg:#000; --ink:#f5f7fa; --ink-strong:#fff; --ink-weak:#d1d5db;
+  --muted:#9aa1ab; --ring:#232833; --iconHover:rgba(255,255,255,.08);
+}
+html[data-theme="light"]{
+  --bg:#f7f8fb; --ink:#0b0f14; --ink-strong:#111827; --ink-weak:#374151;
+  --muted:#6b7280; --ring:#e5e7eb; --iconHover:rgba(0,0,0,.06);
+}
 
-/* Header */
-.site-header{position:sticky;top:0;z-index:60;background:#000;border-bottom:1px solid var(--ring);
-  display:flex;flex-direction:column;gap:6px;padding:8px 10px 6px}
-.h-row1,.h-row2{display:flex;align-items:center;width:100%}
-.h-row1{gap:8px}.h-left{display:flex;align-items:center;gap:6px}
-.icon{width:34px;height:34px;border-radius:10px;display:grid;place-items:center}
-.icon svg{width:19px;height:19px;color:#fff}.icon:hover{background:rgba(255,255,255,.08)}
-.nav-desktop{margin:0 auto;display:flex;gap:14px;align-items:center;white-space:nowrap}
-.nav-desktop a{font-family:"Roboto Condensed",system-ui,sans-serif;text-transform:uppercase;font-weight:700;letter-spacing:.02em;color:#b8c0ca}
-.nav-desktop a .nav-strong{color:#fff;font-family:"Anton",sans-serif;letter-spacing:.01em;margin-left:2px}
-@media (max-width:1200px){.nav-desktop{display:none}}
-.h-right{margin-left:auto}.ystats{height:32px;width:auto;transform:scale(.9);transform-origin:right center}
+*{box-sizing:border-box}
+img{max-width:100%;display:block}
+a{color:inherit;text-decoration:none}
 
-/* Row 2 */
-.h-row2{justify-content:flex-start}
-.brand{display:flex;align-items:flex-end;gap:10px;padding-left:8px}
-.school-logo{height:54px;width:auto}
+/* ===== HEADER WRAPPER ===== */
+.site-header{position:sticky;top:0;z-index:60;background:var(--bg);color:var(--ink);border-bottom:1px solid var(--ring)}
+.h-row{display:flex;align-items:center;gap:10px;padding:8px 10px}
+
+/* Row 1 */
+.h-top{justify-content:space-between}
+.h-left{display:flex;align-items:center;gap:8px}
+.icon{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;cursor:pointer}
+.icon:hover{background:var(--iconHover)}
+.icon svg{width:18px;height:18px;color:var(--ink)}
+
+.h-right{display:flex;align-items:center;gap:12px}
+.ystats{height:36px;width:auto;transform:scale(.9);transform-origin:right center}
+
+/* Row 2 — Hamilton “lovebirds” */
+.h-bot{gap:12px;align-items:center}
+.school{display:grid;grid-template-columns:auto 1fr;align-items:center;column-gap:10px}
+.school img{height:52px;width:auto}
 .school-type{line-height:1}
-.school-l1{font:700 10px/1 "Roboto Condensed",sans-serif;color:#cbd5e1;letter-spacing:.06em}
-.school-l2{font:900 12px/1 "Anton",sans-serif;letter-spacing:.02em}
-.school-l3{font:900 14px/1 "Anton",sans-serif;letter-spacing:.02em}
+.school-l1{font:700 10px/1 "Roboto Condensed",sans-serif;letter-spacing:.06em;color:var(--ink-weak)}
+.school-l2{font:900 12px/1 "Roboto Condensed",sans-serif;letter-spacing:.02em;color:var(--ink-strong)}
+.school-l3{font:900 14px/1 "Anton",sans-serif;letter-spacing:.02em;color:var(--ink-strong)}
 
-/* Tagline */
-.band{position:sticky;top:var(--headerH);z-index:50;background:#000;border-bottom:1px solid var(--ring);height:var(--bandH)}
-.band-inner{height:100%;display:flex;align-items:center;justify-content:space-between;padding:0 10px}
-.tag-grey{color:#9aa1ab;font:700 12px/1 "Roboto Condensed",sans-serif}
-.tag-strong{color:#fff;font:900 14px/1 "Anton",sans-serif}
-.band-right{display:flex;gap:6px}
+/* Desktop nav in Row 1 center (auto hide under 1200px) */
+.nav-desktop{display:flex;gap:16px;white-space:nowrap;align-items:center}
+@media (max-width:1200px){ .nav-desktop{display:none} }
+.nav-desktop a{font:700 12px/1 "Roboto Condensed",sans-serif;color:var(--muted)}
+.nav-strong{font:900 12px/1 "Anton",sans-serif;color:var(--ink-strong);margin-left:-1px}
 
-/* Scrim & drawers (closed by default) */
-.scrim{position:fixed;left:0;right:0;top:calc(var(--headerH) + var(--bandH));bottom:0;background:rgba(0,0,0,.35);
-  opacity:0;pointer-events:none;transition:opacity .2s}
+/* Tagline band (sticky just under header) */
+.tag-band{position:sticky;top:var(--headerH);height:var(--bandH);z-index:50;background:var(--bg);border-bottom:1px solid var(--ring)}
+.tag-inner{height:100%;display:flex;align-items:center;justify-content:space-between;padding:0 10px}
+.tag-left{display:flex;gap:8px;align-items:baseline}
+.tag-grey{font:300 14px/1 "Roboto Condensed",sans-serif;color:var(--muted);letter-spacing:-.01em}
+.tag-strong{font:900 15px/1 "Anton",sans-serif;color:var(--ink-strong)}
+.tag-actions{display:flex;gap:8px}
+.tag-icon{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;cursor:pointer}
+.tag-icon:hover{background:var(--iconHover)}
+.tag-icon svg{width:18px;height:18px;color:var(--ink)}
+
+/* ===== DRAWERS (sit below header+band) ===== */
+.scrim{position:fixed;inset:calc(var(--headerH) + var(--bandH)) 0 0 0;background:rgba(0,0,0,.36);opacity:0;pointer-events:none;transition:.2s;z-index:59}
 .scrim.open{opacity:1;pointer-events:auto}
-.drawer{position:fixed;top:calc(var(--headerH) + var(--bandH));bottom:0;width:min(75vw,520px);background:#0b0f16;color:#fff;z-index:56;
-  transform:translateX(100%);transition:transform .25s}
-.drawer.left{left:0;transform:translateX(-100%)}
-.drawer.right{right:0}
+
+.drawer{position:fixed;top:calc(var(--headerH) + var(--bandH));bottom:0;width:var(--drawerW);background:#0e1117;color:#e5e7eb;border-left:1px solid var(--ring);transform:translateX(100%);transition:transform .25s ease;z-index:60;display:flex;flex-direction:column}
+.drawer.left{left:0;right:auto;border-left:0;border-right:1px solid var(--ring);transform:translateX(-100%)}
 .drawer.open{transform:translateX(0)}
-.drawer-h{height:54px;border-bottom:1px solid #1e2430;display:flex;align-items:center;justify-content:space-between;padding:0 12px}
-.drawer-title{font:900 12px/1 "Anton";letter-spacing:.14em;color:#d6d9df;text-transform:uppercase}
-.drawer-b{min-height:0;overflow:auto}.drawer-pad{padding:12px}
-.ghost{display:block;width:100%;background:#0e141f;border:1px solid #1b2330;border-radius:10px;padding:12px;color:#fff;margin-bottom:12px}
-.lbl{display:block;font:700 12px/1 "Roboto Condensed";color:#9aa1ab;margin:8px 0 4px}
-.nav-list{display:flex;flex-direction:column;gap:16px;padding:12px}
-.nav-list a{font-family:"Roboto Condensed";text-transform:uppercase}
-.nav-list .nav-slim{color:#9aa1ab;font-weight:700}.nav-list .nav-strong{color:#fff;font-weight:900;margin-left:4px;font-family:"Anton"}
-.cta{display:inline-block;margin-top:8px;background:#fff;color:#000;border-radius:10px;padding:10px 12px;font-weight:900}
+.d-head{height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 12px;border-bottom:1px solid var(--ring)}
+.d-title{font:900 12px/1 "Roboto Condensed",sans-serif;letter-spacing:.14em;color:#cbd5e1}
+.d-body{padding:12px;overflow:auto;min-height:0}
+.input{display:block;width:100%;background:#0b0f15;border:1px solid #273041;border-radius:10px;padding:12px;color:#fff}
 
-/* Breadcrumb slot */
-.breadcrumb{font:700 10px/1 "Roboto Condensed";color:#aab1bb;letter-spacing:.06em}
-
-/* small */
-@media (max-width:640px){.icon{width:32px;height:32px}.icon svg{width:18px;height:18px}.ystats{height:30px}.school-logo{height:50px}}
+/* ===== THEME-SAFE PATCH (requested) ===== */
+.site-header,.tag-band{background:var(--bg);color:var(--ink);border-color:var(--ring)}
 </style>
 
 <header class="site-header" role="banner">
-  <div class="h-row1">
+  <!-- Row 1 -->
+  <div class="h-row h-top">
     <div class="h-left">
       <button class="icon" id="openLeft" aria-label="Open navigation">
         <svg viewBox="0 0 24 24"><path fill="currentColor" d="M3 6h18v2H3zM3 11h18v2H3zM3 16h18v2H3z"/></svg>
@@ -77,17 +92,17 @@ html[data-boot="closed"] #scrim{opacity:0 !important; pointer-events:none !impor
         <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm0 2c-4.2 0-8 2.1-8 5v1h16v-1c0-2.9-3.8-5-8-5z"/></svg>
       </button>
       <button class="icon" id="themeToggle" aria-label="Toggle theme">
-        <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 3a9 9 0 1 0 9 9c0-.5 0-1-.1-1.4A7.5 7.5 0 0 1 12 3z"/></svg>
+        <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 3a9 9 0 1 0 9 9c0-4.97-4.03-9-9-9zm0 2v14a7 7 0 0 1 0-14z"/></svg>
       </button>
     </div>
 
     <nav class="nav-desktop" aria-label="Primary">
-      <a href="index.html"><span class="nav-slim">where they</span><span class="nav-strong">YAT?</span></a>
-      <a href="#"><span class="nav-slim">active alumni</span><span class="nav-strong">News</span></a>
-      <a href="#"><span class="nav-slim">next level</span><span class="nav-strong">All-Time List</span></a>
-      <a href="#"><span class="nav-slim">NIL &amp; YAT-A-BOY</span><span class="nav-strong">Marketplace</span></a>
-      <a href="#"><span class="nav-slim">the</span><span class="nav-strong">Current Team</span></a>
-      <a href="#"><span class="nav-slim">PCD Action</span><span class="nav-strong">Partner Program</span></a>
+      <a href="index.html"><span>where&nbsp;they</span><span class="nav-strong">YAT?</span></a>
+      <a href="#"><span>active&nbsp;alumni</span><span class="nav-strong">News</span></a>
+      <a href="#"><span>next&nbsp;level</span><span class="nav-strong">All-Time&nbsp;List</span></a>
+      <a href="#"><span>NIL&nbsp;&nbsp;YAT-A-BOY</span><span class="nav-strong">Marketplace</span></a>
+      <a href="#"><span>the&nbsp;</span><span class="nav-strong">Current Team</span></a>
+      <a href="#"><span>PCD&nbsp;Action</span><span class="nav-strong">Partner Program</span></a>
     </nav>
 
     <div class="h-right">
@@ -95,11 +110,12 @@ html[data-boot="closed"] #scrim{opacity:0 !important; pointer-events:none !impor
     </div>
   </div>
 
-  <div class="h-row2">
-    <div class="brand">
-      <img class="school-logo" src="https://i.postimg.cc/pVm0vHdX/hamilton-logo-tight-transparent-background.png" alt="Hamilton H">
+  <!-- Row 2 -->
+  <div class="h-row h-bot">
+    <div class="school">
+      <img src="https://i.postimg.cc/pVm0vHdX/hamilton-logo-tight-transparent-background.png" alt="Hamilton H">
       <div class="school-type">
-        <div class="school-l1 breadcrumb" id="breadcrumb-slot" aria-live="polite"></div>
+        <div class="school-l1">CHANDLER, AZ</div>
         <div class="school-l2">HAMILTON HIGH SCHOOL</div>
         <div class="school-l3">ACTIVE ALUMNI</div>
       </div>
@@ -107,137 +123,126 @@ html[data-boot="closed"] #scrim{opacity:0 !important; pointer-events:none !impor
   </div>
 </header>
 
-<div class="band" role="region" aria-label="Tagline">
-  <div class="band-inner">
-    <div class="band-left">
-      <span class="tag-grey">WHERE THEY</span><span class="tag-strong">YAT?</span>&nbsp;&nbsp;
+<!-- Tagline band -->
+<div class="tag-band">
+  <div class="tag-inner">
+    <div class="tag-left">
+      <span class="tag-grey">WHERE THEY</span><span class="tag-strong">YAT?</span>
+      <span style="width:12px"></span>
       <span class="tag-grey">FLIP FOR</span><span class="tag-strong">STATS!</span>
     </div>
-    <div class="band-right">
-      <button class="icon" id="openSearch" aria-label="Search">
-        <svg viewBox="0 0 24 24"><path fill="currentColor" d="M11 4a7 7 0 1 1 0 14A7 7 0 0 1 11 4zm9.7 15.3-3.4-3.4a9 9 0 1 0-1.4 1.4l3.4 3.4a1 1 0 0 0 1.4-1.4z"/></svg>
+    <div class="tag-actions">
+      <button class="tag-icon" id="openSearch" aria-label="Search">
+        <svg viewBox="0 0 24 24"><path fill="currentColor" d="M11 4a7 7 0 1 1 0 14 7 7 0 0 1 0-14zm9.7 15.3-3.4-3.4a9 9 0 1 0-1.4 1.4l3.4 3.4a1 1 0 0 0 1.4-1.4z"/></svg>
       </button>
-      <button class="icon" id="openFilter" aria-label="Open filters">
+      <button class="tag-icon" id="openRight" aria-label="Filters">
         <svg viewBox="0 0 24 24"><path fill="currentColor" d="M3 5h18l-6.5 7.5V20l-5-2v-5.5L3 5z"/></svg>
       </button>
-      <button class="icon" id="resetAll" aria-label="Reset filters">
+      <button class="tag-icon" id="resetBtn" aria-label="Reset">
         <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 5V2L8 6l4 4V7a5 5 0 1 1-5 5H5a7 7 0 1 0 7-7z"/></svg>
       </button>
     </div>
   </div>
 </div>
 
+<!-- SCRIM + DRAWERS -->
 <div class="scrim" id="scrim" aria-hidden="true"></div>
 
-<aside class="drawer left" id="drawerLeft" aria-hidden="true" role="dialog" aria-label="Player Profile Search" tabindex="-1">
-  <div class="drawer-h">
-    <div class="drawer-title">PLAYER PROFILE SEARCH</div>
-    <button class="icon" id="closeLeft" aria-label="Close">
-      <svg viewBox="0 0 24 24"><path fill="currentColor" d="M6.225 4.811 4.811 6.225 10.586 12l-5.775 5.775 1.414 1.414L12 13.414l5.775 5.775 1.414-1.414L13.414 12l5.775-5.775-1.414-1.414L12 10.586 6.225 4.811z"/></svg>
-    </button>
+<aside class="drawer left" id="drawerLeft" aria-hidden="true">
+  <div class="d-head">
+    <div class="d-title">PLAYER PROFILE SEARCH</div>
+    <button class="icon" id="closeLeft" aria-label="Close"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M6.225 4.811 4.811 6.225 10.586 12l-5.775 5.775 1.414 1.414L12 13.414l5.775 5.775 1.414-1.414L13.414 12l5.775-5.775-1.414-1.414L12 10.586z"/></svg></button>
   </div>
-  <div class="drawer-b">
-    <div class="drawer-pad">
-      <input id="localSearch" class="ghost" placeholder="Type a player name…" autocomplete="off" />
-      <ul id="localResults" class="left-results" role="listbox" aria-label="Search results"></ul>
-    </div>
-    <nav class="nav-list">
-      <a href="index.html"><span class="nav-slim">where they</span><span class="nav-strong">YAT?</span></a>
-      <a href="#"><span class="nav-slim">active alumni</span><span class="nav-strong">News</span></a>
-      <a href="#"><span class="nav-slim">next level</span><span class="nav-strong">All-Time List</span></a>
-      <a href="#"><span class="nav-slim">NIL &amp; YAT-A-BOY</span><span class="nav-strong">Marketplace</span></a>
-      <a href="#"><span class="nav-slim">the</span><span class="nav-strong">Current Team</span></a>
-      <a href="#"><span class="nav-slim">PCD Action</span><span class="nav-strong">Partner Program</span></a>
+  <div class="d-body">
+    <input id="leftSearch" class="input" placeholder="Type a player name…">
+    <div style="height:10px"></div>
+    <nav>
+      <a href="index.html"><span class="school-l1" style="color:#cbd5e1">WHERE THEY</span><span class="school-l3"> YAT?</span></a><br><br>
+      <a href="#"><span class="school-l1">ACTIVE ALUMNI</span><span class="school-l3"> NEWS</span></a><br><br>
+      <a href="#"><span class="school-l1">NEXT LEVEL</span><span class="school-l3"> ALL-TIME LIST</span></a><br><br>
+      <a href="#"><span class="school-l1">NIL & YAT-A-BOY</span><span class="school-l3"> MARKETPLACE</span></a><br><br>
+      <a href="#"><span class="school-l1">THE</span><span class="school-l3"> CURRENT TEAM</span></a><br><br>
+      <a href="#"><span class="school-l1">PCD ACTION</span><span class="school-l3"> PARTNER PROGRAM</span></a>
     </nav>
   </div>
 </aside>
 
-<aside class="drawer right" id="drawerRight" aria-hidden="true" role="dialog" aria-label="Filters" tabindex="-1">
-  <div class="drawer-h">
-    <div class="drawer-title">Filters</div>
-    <button class="icon" id="closeRight" aria-label="Close">
-      <svg viewBox="0 0 24 24"><path fill="currentColor" d="M6.225 4.811 4.811 6.225 10.586 12l-5.775 5.775 1.414 1.414L12 13.414l5.775 5.775 1.414-1.414L13.414 12l5.775-5.775-1.414-1.414L12 10.586 6.225 4.811z"/></svg>
-    </button>
+<aside class="drawer" id="drawerRight" aria-hidden="true">
+  <div class="d-head">
+    <div class="d-title">FILTERS</div>
+    <button class="icon" id="closeRight" aria-label="Close"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M6.225 4.811 4.811 6.225 10.586 12l-5.775 5.775 1.414 1.414L12 13.414l5.775 5.775 1.414-1.414L13.414 12l5.775-5.775-1.414-1.414L12 10.586z"/></svg></button>
   </div>
-  <div class="drawer-b">
-    <div class="drawer-pad">
-      <input id="filterName" class="ghost" placeholder="Filter by name…"/>
-      <label class="lbl">Level</label><select id="lvl" class="ghost" multiple></select>
-      <label class="lbl">Grad Class</label><select id="grad" class="ghost" multiple></select>
-      <label class="lbl">Roster Year</label><select id="roster" class="ghost" multiple></select>
-      <label class="lbl">Status</label><select id="status" class="ghost" multiple></select>
-    </div>
+  <div class="d-body">
+    <label>Filter by player</label>
+    <input id="filterName" class="input" placeholder="Start typing…">
+    <div style="height:14px"></div>
+    <label>By Level</label>
+    <select id="lvl" class="input" multiple size="6"></select>
+    <div style="height:10px"></div>
+    <label>By Grad Class</label>
+    <select id="grad" class="input" multiple size="8"></select>
+    <div style="height:10px"></div>
+    <label>By Status</label>
+    <select id="status" class="input" multiple size="5"></select>
   </div>
 </aside>
 
-<aside class="drawer right" id="drawerAuth" aria-hidden="true" role="dialog" aria-label="Sign up or login" tabindex="-1">
-  <div class="drawer-h">
-    <div class="drawer-title">Sign up | Login</div>
-    <button class="icon" id="closeAuth" aria-label="Close">
-      <svg viewBox="0 0 24 24"><path fill="currentColor" d="M6.225 4.811 4.811 6.225 10.586 12l-5.775 5.775 1.414 1.414L12 13.414l5.775 5.775 1.414-1.414L13.414 12l5.775-5.775-1.414-1.414L12 10.586 6.225 4.811z"/></svg>
-    </button>
+<aside class="drawer" id="drawerAuth" aria-hidden="true" style="right:0">
+  <div class="d-head">
+    <div class="d-title">SIGN UP | LOGIN</div>
+    <button class="icon" id="closeAuth" aria-label="Close"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M6.225 4.811 4.811 6.225 10.586 12l-5.775 5.775 1.414 1.414L12 13.414l5.775 5.775 1.414-1.414L13.414 12l5.775-5.775-1.414-1.414L12 10.586z"/></svg></button>
   </div>
-  <div class="drawer-b">
-    <div class="drawer-pad">
-      <label class="lbl" for="emailInput">Email</label>
-      <input id="emailInput" class="ghost" type="email" placeholder="you@example.com">
-      <label class="lbl" for="pwInput">Password</label>
-      <input id="pwInput" class="ghost" type="password" placeholder="••••••••">
-      <a class="cta" href="https://www.yatstats.com" target="_blank" rel="noopener">🔎 GLOBAL PLATFORM TEAM &amp; PLAYER SEARCH</a>
-    </div>
+  <div class="d-body">
+    <label>Email</label>
+    <input class="input" type="email" placeholder="you@example.com">
+    <div style="height:8px"></div>
+    <label>Password</label>
+    <input class="input" type="password" placeholder="••••••••">
+    <div style="height:12px"></div>
+    <a class="input" style="text-align:center;display:block" href="https://www.yatstats.com" target="_blank" rel="noopener">
+      🔎 GLOBAL PLATFORM TEAM &amp; PLAYER SEARCH
+    </a>
   </div>
 </aside>
 
 <script>
-(() => {
-  const $ = (s,root=document)=>root.querySelector(s);
-  const body = document.body;
-  const scrim = $('#scrim');
-  const drawers = ['#drawerLeft','#drawerRight','#drawerAuth'].map(s=>$(s));
+/* ===== header.js (inline) ===== */
+const $ = (s, r=document)=>r.querySelector(s);
+const $$ = (s, r=document)=>Array.from(r.querySelectorAll(s));
 
-  // Boot guard ON at parse time
-  document.documentElement.setAttribute('data-boot','closed');
+/* open/close drawers */
+const scrim = $('#scrim');
+function openDrawer(el){ el.classList.add('open'); scrim.classList.add('open'); }
+function closeAll(){ $$('.drawer').forEach(d=>d.classList.remove('open')); scrim.classList.remove('open'); }
 
-  function closeAll(){
-    drawers.forEach(d=>d && d.classList.remove('open'));
-    scrim.classList.remove('open');
-    body.classList.remove('no-scroll');
+$('#openLeft')?.addEventListener('click', ()=>openDrawer($('#drawerLeft')));
+$('#closeLeft')?.addEventListener('click', closeAll);
+$('#openRight')?.addEventListener('click', ()=>openDrawer($('#drawerRight')));
+$('#closeRight')?.addEventListener('click', closeAll);
+$('#openAuth')?.addEventListener('click', ()=>openDrawer($('#drawerAuth')));
+$('#closeAuth')?.addEventListener('click', closeAll);
+scrim?.addEventListener('click', closeAll);
+
+/* theme toggle */
+const THEME_KEY='ys-theme';
+const root=document.documentElement;
+function applyTheme(t){ root.setAttribute('data-theme', t); localStorage.setItem(THEME_KEY,t); }
+applyTheme(localStorage.getItem(THEME_KEY)||'dark');
+$('#themeToggle')?.addEventListener('click', ()=>{
+  applyTheme(root.getAttribute('data-theme')==='dark'?'light':'dark');
+});
+
+/* Expose a tiny API the pages can use */
+window.YSHeader = {
+  onReset: (fn)=> $('#resetBtn')?.addEventListener('click', fn),
+  onSearch: (fn)=> $('#openSearch')?.addEventListener('click', fn),
+  setFilterOptions: ({levels=[],grads=[],statuses=[]})=>{
+    const add=(sel,arr)=>{ const el=$(sel); if(!el) return; el.innerHTML=''; arr.forEach(v=>{const o=document.createElement('option');o.value=v;o.textContent=v; el.appendChild(o);}); };
+    add('#lvl',levels); add('#grad',grads); add('#status',statuses);
+  },
+  getFilterSelections: ()=>{
+    const pick=el=>Array.from(el?.selectedOptions||[]).map(o=>o.value);
+    return { levels: pick($('#lvl')), grads: pick($('#grad')), statuses: pick($('#status')), name: $('#filterName')?.value?.trim()||'' };
   }
-  function open(d){
-    closeAll();
-    if(d){ d.classList.add('open'); scrim.classList.add('open'); body.classList.add('no-scroll'); }
-  }
-
-  // First paint: force closed and drop the guard
-  requestAnimationFrame(() => {
-    closeAll();
-    document.documentElement.removeAttribute('data-boot');
-  });
-
-  // Buttons
-  $('#openLeft')?.addEventListener('click', ()=>open($('#drawerLeft')));
-  $('#closeLeft')?.addEventListener('click', closeAll);
-
-  $('#openFilter')?.addEventListener('click', ()=>open($('#drawerRight')));
-  $('#closeRight')?.addEventListener('click', closeAll);
-
-  $('#openAuth')?.addEventListener('click', ()=>open($('#drawerAuth')));
-  $('#closeAuth')?.addEventListener('click', closeAll);
-
-  scrim?.addEventListener('click', closeAll);
-  window.addEventListener('keydown', e=>{ if(e.key==='Escape') closeAll(); });
-
-  // Theme
-  const KEY='yst-theme'; const apply=t=>{document.documentElement.dataset.theme=t;localStorage.setItem(KEY,t)};
-  apply(localStorage.getItem(KEY)||'dark');
-  $('#themeToggle')?.addEventListener('click', ()=>apply((document.documentElement.dataset.theme==='dark')?'light':'dark'));
-
-  // Tagline actions -> raise custom events for pages
-  $('#openSearch')?.addEventListener('click', ()=>document.dispatchEvent(new CustomEvent('yst:openSearch')));
-  $('#resetAll')?.addEventListener('click', ()=>document.dispatchEvent(new CustomEvent('yst:resetAll')));
-
-  // Breadcrumb slot (optional)
-  const crumb = window.__breadcrumb || "";
-  if(crumb) $('#breadcrumb-slot').textContent = crumb;
-})();
+};
 </script>
