@@ -1,17 +1,11 @@
-<!-- header.html (self-contained) -->
-<!-- Google fonts -->
+<!-- header.html (self-contained global header) -->
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Roboto+Condensed:wght@300;400;700;900&display=swap" rel="stylesheet">
 
 <style>
-/* ====== GLOBAL HEADER + DRAWERS + TAGLINE ====== */
 :root{
   --bg:#000; --ink:#f5f7fa; --muted:#aeb5bf; --ring:#232833;
-  --headerH:108px;    /* two header rows combined */
-  --bandH:48px;       /* tagline row */
-}
-:root[data-theme="light"]{
-  /* keep site dark for now; swap if you want a real light theme */
-  --bg:#000;
+  --headerH:108px;      /* two header rows combined */
+  --bandH:48px;         /* tagline row */
 }
 *{box-sizing:border-box}
 img{max-width:100%;display:block}
@@ -28,9 +22,9 @@ body.no-scroll{overflow:hidden}
 
 /* Row 1 */
 .h-row1{gap:8px}
-.h-left{display:flex; align-items:center; gap:8px}
-.icon{width:36px;height:36px;border-radius:10px;display:grid;place-items:center}
-.icon svg{width:20px;height:20px;color:#fff}
+.h-left{display:flex; align-items:center; gap:6px}
+.icon{width:34px;height:34px;border-radius:10px;display:grid;place-items:center}
+.icon svg{width:19px;height:19px;color:#fff}
 .icon:hover{background:rgba(255,255,255,.08)}
 
 .nav-desktop{margin:0 auto; display:flex; gap:14px; align-items:center; white-space:nowrap}
@@ -39,9 +33,9 @@ body.no-scroll{overflow:hidden}
 @media (max-width:1200px){ .nav-desktop{display:none} }
 
 .h-right{margin-left:auto}
-.ystats{height:34px;width:auto;transform:scale(.9);transform-origin:right center}
+.ystats{height:32px;width:auto;transform:scale(.9);transform-origin:right center} /* ~90% */
 
-/* Row 2 (Hamilton lovebirds) */
+/* Row 2 (Hamilton lockup) */
 .h-row2{justify-content:flex-start}
 .brand{display:flex; align-items:flex-end; gap:10px; padding-left:8px}
 .school-logo{height:54px;width:auto}
@@ -50,7 +44,7 @@ body.no-scroll{overflow:hidden}
 .school-l2{font:900 12px/1 "Anton",sans-serif; letter-spacing:.02em}
 .school-l3{font:900 14px/1 "Anton",sans-serif; letter-spacing:.02em}
 
-/* Tagline band (sticky below header) */
+/* Tagline band (sticky under header) */
 .band{position:sticky; top:var(--headerH); z-index:50; background:#000; border-bottom:1px solid var(--ring); height:var(--bandH)}
 .band-inner{height:100%; display:flex; align-items:center; justify-content:space-between; padding:0 10px}
 .tag-grey{color:#9aa1ab; font:700 12px/1 "Roboto Condensed",sans-serif}
@@ -76,8 +70,16 @@ body.no-scroll{overflow:hidden}
 .nav-list .nav-strong{color:#fff; font-weight:900; margin-left:4px; font-family:"Anton"}
 .cta{display:inline-block; margin-top:8px; background:#fff; color:#000; border-radius:10px; padding:10px 12px; font-weight:900}
 
-/* Optional helper: if your page wants to rely on these vars for spacing */
-html,body{background:var(--bg);color:var(--ink)}
+/* tiny breadcrumb helper if a page wants it */
+.breadcrumb{font:700 10px/1 "Roboto Condensed"; color:#aab1bb; letter-spacing:.06em}
+
+/* small screens */
+@media (max-width:640px){
+  .icon{width:32px;height:32px}
+  .icon svg{width:18px;height:18px}
+  .ystats{height:30px}
+  .school-logo{height:50px}
+}
 </style>
 
 <header class="site-header" role="banner">
@@ -116,7 +118,7 @@ html,body{background:var(--bg);color:var(--ink)}
     <div class="brand">
       <img class="school-logo" src="https://i.postimg.cc/pVm0vHdX/hamilton-logo-tight-transparent-background.png" alt="Hamilton H">
       <div class="school-type">
-        <div class="school-l1">CHANDLER, AZ</div>
+        <div class="school-l1 breadcrumb" id="breadcrumb-slot" aria-live="polite"></div>
         <div class="school-l2">HAMILTON HIGH SCHOOL</div>
         <div class="school-l3">ACTIVE ALUMNI</div>
       </div>
@@ -213,14 +215,13 @@ html,body{background:var(--bg);color:var(--ink)}
   </div>
 </aside>
 
-<!-- Header behavior -->
 <script>
 (() => {
   const $ = (s,root=document)=>root.querySelector(s);
   const body = document.body;
   const scrim = $('#scrim');
 
-  // Theme
+  // Theme (dark/light hook ready)
   const themeBtn = $('#themeToggle');
   const THEME_KEY = 'yst-theme';
   const applyTheme = t => { document.documentElement.dataset.theme = t; localStorage.setItem(THEME_KEY,t); };
@@ -243,5 +244,9 @@ html,body{background:var(--bg);color:var(--ink)}
   // Events back to page
   $('#openSearch')?.addEventListener('click', ()=>document.dispatchEvent(new CustomEvent('yst:openSearch')));
   $('#resetAll')?.addEventListener('click', ()=>document.dispatchEvent(new CustomEvent('yst:resetAll')));
+
+  // Breadcrumb support (optional): pages can set window.__breadcrumb
+  const crumb = window.__breadcrumb || "";
+  if(crumb) $('#breadcrumb-slot').textContent = crumb;
 })();
 </script>
