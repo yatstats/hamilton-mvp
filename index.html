@@ -84,7 +84,7 @@ html[data-theme="light"] :focus-visible{outline-color:#000}
 .tag-grey{color:#9aa1ab;font-family:"Roboto Condensed",sans-serif;font-weight:300;letter-spacing:-.01em;margin-right:-1px}
 .tag-strong{color:#fff;font-family:"Anton",sans-serif;letter-spacing:.01em}
 
-/* tagline right controls (moved icons) */
+/* tagline right controls (ONLY search/filter/reset) */
 .tag-actions{display:flex;align-items:center;gap:8px}
 .tag-actions .hdr-icon{width:32px;height:32px;border-radius:8px}
 
@@ -241,9 +241,14 @@ body.no-scroll{overflow:hidden}
         <button class="hambtn" id="openLeft" aria-label="Open Navigation">
           <svg viewBox="0 0 24 24"><path fill="currentColor" d="M3 6h18v2H3zM3 11h18v2H3zM3 16h18v2H3z"/></svg>
         </button>
-        <!-- keep Account on row 1 -->
         <button class="hdr-icon" id="iconProfile" aria-label="Account" title="Account">
           <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm0 2c-4.2 0-8 2.1-8 5v1h16v-1c0-2.9-3.8-5-8-5z"/></svg>
+        </button>
+        <!-- Theme toggle belongs up top -->
+        <button class="hdr-icon" id="iconTheme" aria-label="Toggle theme" title="Toggle theme">
+          <svg id="themeIcon" viewBox="0 0 24 24" aria-hidden="true">
+            <path fill="currentColor" d="M12 4a1 1 0 0 1 1 1v1a1 1 0 1 1-2 0V5a1 1 0 0 1 1-1zm0 13a5 5 0 1 0 0-10 5 5 0 0 0 0 10z"/>
+          </svg>
         </button>
       </div>
 
@@ -274,7 +279,7 @@ body.no-scroll{overflow:hidden}
   </div>
 </header>
 
-<!-- Tagline (now also carries the moved controls, right aligned) -->
+<!-- Tagline (search, filter, reset anchored right) -->
 <div class="tagline-wrap">
   <div class="tagline">
     <div class="tag-left">
@@ -292,12 +297,6 @@ body.no-scroll{overflow:hidden}
       </button>
       <button class="hdr-icon" id="iconReset" aria-label="Reset filters" title="Reset">
         <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 5V2L8 6l4 4V7a5 5 0 1 1-5 5H5a7 7 0 1 0 7-7z"/></svg>
-      </button>
-      <!-- Theme toggle moved here -->
-      <button class="hdr-icon" id="iconTheme" aria-label="Toggle theme" title="Toggle theme">
-        <svg id="themeIcon" viewBox="0 0 24 24" aria-hidden="true">
-          <path fill="currentColor" d="M12 4a1 1 0 0 1 1 1v1a1 1 0 1 1-2 0V5a1 1 0 0 1 1-1zm0 13a5 5 0 1 0 0-10 5 5 0 0 0 0 10z"/>
-        </svg>
       </button>
     </div>
   </div>
@@ -411,7 +410,7 @@ body.no-scroll{overflow:hidden}
 </main>
 
 <footer class="footer">
-  <div class="build-pill">BUILD: ham-v4.7.5</div>
+  <div class="build-pill">BUILD: ham-v4.7.6</div>
 </footer>
 
 <!-- Splash -->
@@ -444,7 +443,7 @@ function formatNextTwoLines(ng){ if(!ng) return ['—','—']; const ds=String(n
 function letterDots(years){ if(!years||!years.length) return ''; const sorted=[...years].sort((a,b)=>b-a); return `<div class="letters">${sorted.slice(0,4).map(y=>`<span class="letter-dot" title="${y}">${String(y).slice(-2)}</span>`).join('')}</div>`;}
 function makeKV(k,v){ return `<div class="kv"><div class="k">${k}</div><div class="v">${v??'—'}</div></div>`; }
 
-/* ------------------- data (minimal demo) ------------------- */
+/* ------------------- data (demo subset) ------------------- */
 const COMMON_VIDEO = "https://www.youtube.com/embed/ZSoRzk-z35w?rel=0&modestbranding=1&playsinline=1";
 
 const playersSeed = [
@@ -495,13 +494,6 @@ const playersSeed = [
     letterWinnerYears:[2014,2015,2016,2017],
     video:COMMON_VIDEO
   },
-  { id:"brock-selvidge", name:"BROCK SELVIDGE", graduatingClass:2021, currentLevel:"Double-A", status:"Active 2025",
-    position:"P", team:"Somerset Patriots — New York Yankees",
-    frontImg:"https://i.postimg.cc/kgSyd4xs/AISelect-20250826-020305-Instagram.jpg",
-    highSchoolImg:"https://i.postimg.cc/vTp3W6r1/22-Selvidge-Front-page-00001.jpg",
-    letterWinnerYears:[2018,2019,2020,2021],
-    video:COMMON_VIDEO
-  },
   { id:"luke-thiele", name:"LUKE THIELE", graduatingClass:2021, currentLevel:"NCAA-D1", status:"Active 2025",
     position:"IF", team:"Washington State — Pac-12",
     frontImg:"https://i.postimg.cc/593zLzmD/luke-theil.jpg",
@@ -542,7 +534,6 @@ function makeCard(p){
   const {team,parent} = teamAndParent(p);
   const [ng1,ng2] = formatNextTwoLines(p.nextGame||{});
   const title = statsTitleFor(p);
-  const panes = ['stats','news','yat','nil','x','ig','video','gallery'];
 
   return `
 <article class="card flip-card front" aria-label="${(p.name||'').toUpperCase()}" tabindex="0">
@@ -780,7 +771,7 @@ function renderLocalResults(q){
 }
 localSearch.addEventListener('input', (e)=>renderLocalResults(e.target.value));
 
-/* Theme toggle */
+/* Theme toggle (stays in top row) */
 (function(){
   const THEME_KEY = 'yst-theme';
   const prefersLight = window.matchMedia('(prefers-color-scheme: light)').matches;
