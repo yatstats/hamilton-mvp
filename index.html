@@ -1,91 +1,60 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en">
 <head>
 <meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>hamilton.yatstats.com — WHERE THEY YAT?</title>
-<link href="https://fonts.googleapis.com/css2?family=Anton&family=Roboto+Condensed:wght@300;400;700;900&display=swap" rel="stylesheet">
-<link rel="preload" href="header.css" as="style">
+<meta name="theme-color" content="#000000">
 <style>
-/* Page-specific minimal styles (cards) */
-:root{ --cardRatio:5/7; }
-html,body{margin:0;padding:0;background:#000;color:#fff;font:15px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial}
-main{padding:calc(var(--headerH) + var(--bandH) + 12px) 10px 84px}
-.grid{max-width:1400px;margin:0 auto;display:grid;gap:12px;grid-template-columns:repeat(1,1fr)}
-@media(min-width:560px){.grid{grid-template-columns:repeat(2,1fr)}}
-@media(min-width:900px){.grid{grid-template-columns:repeat(3,1fr)}}
-@media(min-width:1200px){.grid{grid-template-columns:repeat(4,1fr)}}
-
-.card{position:relative;border-radius:14px;overflow:hidden;background:#000;aspect-ratio:var(--cardRatio);box-shadow:0 2px 10px rgba(0,0,0,.6)}
-.card img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-.grad{position:absolute;left:0;right:0;bottom:0;height:60%;background:linear-gradient(to top,rgba(0,0,0,.98),rgba(0,0,0,.1))}
-.front-left{position:absolute;left:12px;bottom:12px;z-index:2}
-.front-right{position:absolute;right:12px;bottom:12px;text-align:right;z-index:2}
-.name{font:900 18px/1 "Anton",sans-serif; letter-spacing:.02em}
-.team{font:400 13px/1.2 "Roboto Condensed",sans-serif}
-.pill{display:inline-block;background:rgba(0,0,0,.7);border:1px solid rgba(255,255,255,.28);color:#fff;border-radius:999px;padding:3px 8px;font:900 10px/1 "Roboto Condensed";letter-spacing:.08em;margin-top:6px}
-.footer{position:fixed;left:0;right:0;bottom:0;height:64px;background:#000;border-top:1px solid #232833;display:flex;align-items:center;justify-content:center;color:#fff}
-.build{position:absolute;left:10px;bottom:10px;background:rgba(255,255,255,.12);padding:6px 10px;border-radius:12px;font-size:12px}
+/* Page-only styles (header is injected) */
+main{padding:calc(108px + 48px + 10px) 10px 90px} /* headerH + bandH + padding */
+.hero{color:#e5e7eb;font:16px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial}
+.card-demo{margin:18px 0; padding:16px; border:1px dashed #374151; border-radius:12px; color:#cbd5e1}
+.footer{position:fixed;left:0;right:0;bottom:0;height:64px;background:#000;color:#fff;display:flex;align-items:center;justify-content:center;z-index:10;border-top:1px solid #232833}
+.build-pill{position:absolute;left:10px;bottom:10px;background:rgba(255,255,255,.12);color:#fff;font-size:12px;padding:6px 10px;border-radius:12px}
 </style>
 </head>
 <body>
 
 <!-- Global header include -->
 <div id="site-header"></div>
+<script>
+  // Breadcrumb text for this page (optional)
+  window.__breadcrumb = "CHANDLER, AZ";
+  fetch("header.html").then(r=>r.text()).then(h=>{ document.getElementById("site-header").innerHTML = h; });
+</script>
 
 <main>
-  <section id="grid" class="grid" aria-live="polite"></section>
+  <section class="hero">
+    <h1 style="margin:8px 0 4px;font-family:Anton,system-ui,sans-serif;letter-spacing:.01em">Hamilton Active Alumni</h1>
+    <p style="margin:0 0 12px;color:#aeb5bf">This page is a minimal proof that the global header is loading identically across pages. Your full grid can be re-added after you confirm the header behaviour.</p>
+
+    <div class="card-demo">
+      <strong>Header checks:</strong>
+      <ul style="margin:8px 0 0 18px">
+        <li>Two-row header is sticky.</li>
+        <li>Tagline band is sticky and drawers open <em>below</em> it (not covering it).</li>
+        <li>Desktop nav is in Row 1 center, hides under 1200px.</li>
+        <li>Hamilton “lovebirds” (H + 3 lines) in Row 2 with correct spacing.</li>
+        <li>Search/Filter/Reset buttons live in tagline (right-aligned).</li>
+      </ul>
+    </div>
+  </section>
 </main>
 
 <footer class="footer">
-  <div class="build">BUILD: ham-v4.8.0</div>
+  <div class="build-pill">BUILD: ham-v4.8.3</div>
+  <div>YAT?STATS</div>
 </footer>
 
+<!-- Page listeners for header events (optional wiring) -->
 <script>
-/* load shared header */
-fetch('header.html').then(r=>r.text()).then(h=>{ document.getElementById('site-header').innerHTML=h; });
-
-/* sample data (you can paste your full 47 back later) */
-const playersSeed = [
-  { id:"180827", name:"CODY BELLINGER", graduatingClass:2013, currentLevel:"MLB", status:"Active 2025",
-    position:"CF/1B", team:"New York Yankees",
-    frontImg:"https://i.postimg.cc/9F19KG5h/new-york-yankees-outfielder-cody-bellinger.jpg",
-    last3:[{date:"7/12",opp:"@ BOS",line:"2-4, HR, 2 RBI"}]
-  },
-  { id:"patrick-murphy", name:"PATRICK MURPHY", graduatingClass:2013, currentLevel:"KBO", status:"Active 2025",
-    position:"P", team:"KT Wiz Suwon — KBO",
-    frontImg:"https://i.postimg.cc/JnCXccvC/MURPH.avif"
-  },
-  { id:"drew-swift", name:"DREW SWIFT", graduatingClass:2017, currentLevel:"Triple-A", status:"Active 2025",
-    position:"SS", team:"Las Vegas Aviators — Athletics",
-    frontImg:"https://i.postimg.cc/GmmSKFsV/AISelect-20250826-023939-Instagram.jpg"
-  }
-];
-
-/* render */
-const grid = document.getElementById('grid');
-function card(p){
-  const ng = p.last3?.[0] ? `${p.last3[0].date} • ${p.last3[0].opp}` : '';
-  return `
-  <article class="card" tabindex="0" aria-label="${p.name}">
-    <img src="${p.frontImg||''}" alt="">
-    <div class="grad"></div>
-    <div class="front-left">
-      <div class="name">${p.name}</div>
-      <div class="team">${p.team||''}</div>
-      <a class="pill" href="profile.html?id=${encodeURIComponent(p.id)}">PROFILE</a>
-    </div>
-    <div class="front-right">
-      <div class="pill">${(p.currentLevel||'').toUpperCase()}</div>
-      <div class="pill">${(p.status||'').toUpperCase()}</div>
-      <div class="pill">CLASS OF ${p.graduatingClass||'—'}</div>
-    </div>
-  </article>`;
-}
-grid.innerHTML = playersSeed.map(card).join('');
-
-/* listen to header events */
-document.addEventListener('yst:resetAll', ()=>location.reload());
+  document.addEventListener('yst:openSearch', ()=> {
+    alert('Search triggered (wire to your page search)');
+  });
+  document.addEventListener('yst:resetAll', ()=> {
+    alert('Reset triggered (wire to your filter reset)');
+  });
 </script>
 </body>
 </html>
