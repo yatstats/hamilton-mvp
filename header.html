@@ -1,4 +1,4 @@
-<!-- header.html (ham-v4.8.4) -->
+<!-- header.html — ham-v4.8.5 -->
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Roboto+Condensed:wght@300;400;700;900&display=swap" rel="stylesheet">
 
 <style>
@@ -6,6 +6,11 @@
 *{box-sizing:border-box}img{max-width:100%;display:block}a{text-decoration:none;color:inherit}
 button{background:transparent;border:0;cursor:pointer;color:inherit}
 body.no-scroll{overflow:hidden}
+
+/* ===== BOOT-CLOSED GUARD ===== */
+html[data-boot="closed"] .drawer{transform:translateX(100%) !important}
+html[data-boot="closed"] .drawer.left{transform:translateX(-100%) !important}
+html[data-boot="closed"] #scrim{opacity:0 !important; pointer-events:none !important}
 
 /* Header */
 .site-header{position:sticky;top:0;z-index:60;background:#000;border-bottom:1px solid var(--ring);
@@ -19,6 +24,7 @@ body.no-scroll{overflow:hidden}
 .nav-desktop a .nav-strong{color:#fff;font-family:"Anton",sans-serif;letter-spacing:.01em;margin-left:2px}
 @media (max-width:1200px){.nav-desktop{display:none}}
 .h-right{margin-left:auto}.ystats{height:32px;width:auto;transform:scale(.9);transform-origin:right center}
+
 /* Row 2 */
 .h-row2{justify-content:flex-start}
 .brand{display:flex;align-items:flex-end;gap:10px;padding-left:8px}
@@ -27,19 +33,22 @@ body.no-scroll{overflow:hidden}
 .school-l1{font:700 10px/1 "Roboto Condensed",sans-serif;color:#cbd5e1;letter-spacing:.06em}
 .school-l2{font:900 12px/1 "Anton",sans-serif;letter-spacing:.02em}
 .school-l3{font:900 14px/1 "Anton",sans-serif;letter-spacing:.02em}
+
 /* Tagline */
 .band{position:sticky;top:var(--headerH);z-index:50;background:#000;border-bottom:1px solid var(--ring);height:var(--bandH)}
 .band-inner{height:100%;display:flex;align-items:center;justify-content:space-between;padding:0 10px}
 .tag-grey{color:#9aa1ab;font:700 12px/1 "Roboto Condensed",sans-serif}
 .tag-strong{color:#fff;font:900 14px/1 "Anton",sans-serif}
 .band-right{display:flex;gap:6px}
-/* Scrim & drawers (start CLOSED below tagline) */
+
+/* Scrim & drawers (closed by default) */
 .scrim{position:fixed;left:0;right:0;top:calc(var(--headerH) + var(--bandH));bottom:0;background:rgba(0,0,0,.35);
   opacity:0;pointer-events:none;transition:opacity .2s}
 .scrim.open{opacity:1;pointer-events:auto}
 .drawer{position:fixed;top:calc(var(--headerH) + var(--bandH));bottom:0;width:min(75vw,520px);background:#0b0f16;color:#fff;z-index:56;
   transform:translateX(100%);transition:transform .25s}
 .drawer.left{left:0;transform:translateX(-100%)}
+.drawer.right{right:0}
 .drawer.open{transform:translateX(0)}
 .drawer-h{height:54px;border-bottom:1px solid #1e2430;display:flex;align-items:center;justify-content:space-between;padding:0 12px}
 .drawer-title{font:900 12px/1 "Anton";letter-spacing:.14em;color:#d6d9df;text-transform:uppercase}
@@ -50,8 +59,10 @@ body.no-scroll{overflow:hidden}
 .nav-list a{font-family:"Roboto Condensed";text-transform:uppercase}
 .nav-list .nav-slim{color:#9aa1ab;font-weight:700}.nav-list .nav-strong{color:#fff;font-weight:900;margin-left:4px;font-family:"Anton"}
 .cta{display:inline-block;margin-top:8px;background:#fff;color:#000;border-radius:10px;padding:10px 12px;font-weight:900}
+
 /* Breadcrumb slot */
 .breadcrumb{font:700 10px/1 "Roboto Condensed";color:#aab1bb;letter-spacing:.06em}
+
 /* small */
 @media (max-width:640px){.icon{width:32px;height:32px}.icon svg{width:18px;height:18px}.ystats{height:30px}.school-logo{height:50px}}
 </style>
@@ -69,6 +80,7 @@ body.no-scroll{overflow:hidden}
         <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 3a9 9 0 1 0 9 9c0-.5 0-1-.1-1.4A7.5 7.5 0 0 1 12 3z"/></svg>
       </button>
     </div>
+
     <nav class="nav-desktop" aria-label="Primary">
       <a href="index.html"><span class="nav-slim">where they</span><span class="nav-strong">YAT?</span></a>
       <a href="#"><span class="nav-slim">active alumni</span><span class="nav-strong">News</span></a>
@@ -77,6 +89,7 @@ body.no-scroll{overflow:hidden}
       <a href="#"><span class="nav-slim">the</span><span class="nav-strong">Current Team</span></a>
       <a href="#"><span class="nav-slim">PCD Action</span><span class="nav-strong">Partner Program</span></a>
     </nav>
+
     <div class="h-right">
       <img class="ystats" src="https://i.postimg.cc/C5mwXpQy/35878-20250830-222027-0000.png" alt="YAT?STATS">
     </div>
@@ -180,36 +193,50 @@ body.no-scroll{overflow:hidden}
   const $ = (s,root=document)=>root.querySelector(s);
   const body = document.body;
   const scrim = $('#scrim');
-
-  // Always start CLOSED on load
   const drawers = ['#drawerLeft','#drawerRight','#drawerAuth'].map(s=>$(s));
-  function closeAll(){ drawers.forEach(d=>d?.classList.remove('open')); scrim.classList.remove('open'); body.classList.remove('no-scroll'); }
-  function open(d){ closeAll(); d?.classList.add('open'); scrim.classList.add('open'); body.classList.add('no-scroll'); }
 
-  // Close immediately on first paint (prevents “open by default”)
-  requestAnimationFrame(closeAll);
+  // Boot guard ON at parse time
+  document.documentElement.setAttribute('data-boot','closed');
+
+  function closeAll(){
+    drawers.forEach(d=>d && d.classList.remove('open'));
+    scrim.classList.remove('open');
+    body.classList.remove('no-scroll');
+  }
+  function open(d){
+    closeAll();
+    if(d){ d.classList.add('open'); scrim.classList.add('open'); body.classList.add('no-scroll'); }
+  }
+
+  // First paint: force closed and drop the guard
+  requestAnimationFrame(() => {
+    closeAll();
+    document.documentElement.removeAttribute('data-boot');
+  });
 
   // Buttons
   $('#openLeft')?.addEventListener('click', ()=>open($('#drawerLeft')));
   $('#closeLeft')?.addEventListener('click', closeAll);
+
   $('#openFilter')?.addEventListener('click', ()=>open($('#drawerRight')));
   $('#closeRight')?.addEventListener('click', closeAll);
+
   $('#openAuth')?.addEventListener('click', ()=>open($('#drawerAuth')));
   $('#closeAuth')?.addEventListener('click', closeAll);
+
   scrim?.addEventListener('click', closeAll);
   window.addEventListener('keydown', e=>{ if(e.key==='Escape') closeAll(); });
 
   // Theme
-  const themeBtn = $('#themeToggle'); const KEY='yst-theme';
-  const apply = t=>{document.documentElement.dataset.theme=t;localStorage.setItem(KEY,t)};
+  const KEY='yst-theme'; const apply=t=>{document.documentElement.dataset.theme=t;localStorage.setItem(KEY,t)};
   apply(localStorage.getItem(KEY)||'dark');
-  themeBtn?.addEventListener('click', ()=>apply((document.documentElement.dataset.theme==='dark')?'light':'dark'));
+  $('#themeToggle')?.addEventListener('click', ()=>apply((document.documentElement.dataset.theme==='dark')?'light':'dark'));
 
-  // Band actions -> page events
+  // Tagline actions -> raise custom events for pages
   $('#openSearch')?.addEventListener('click', ()=>document.dispatchEvent(new CustomEvent('yst:openSearch')));
   $('#resetAll')?.addEventListener('click', ()=>document.dispatchEvent(new CustomEvent('yst:resetAll')));
 
-  // Breadcrumb (optional)
+  // Breadcrumb slot (optional)
   const crumb = window.__breadcrumb || "";
   if(crumb) $('#breadcrumb-slot').textContent = crumb;
 })();
