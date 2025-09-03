@@ -3,58 +3,126 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>hamilton.yatstats.com — WHERE THEY YAT?</title>
-<meta name="theme-color" content="#000000">
+<title>Hamilton Active Alumni — WHERE THEY YAT?</title>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Roboto+Condensed:wght@300;400;700&display=swap" rel="stylesheet">
+
 <style>
-/* Page-only styles (header is injected) */
-main{padding:calc(108px + 48px + 10px) 10px 90px} /* headerH + bandH + padding */
-.hero{color:#e5e7eb;font:16px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial}
-.card-demo{margin:18px 0; padding:16px; border:1px dashed #374151; border-radius:12px; color:#cbd5e1}
-.footer{position:fixed;left:0;right:0;bottom:0;height:64px;background:#000;color:#fff;display:flex;align-items:center;justify-content:center;z-index:10;border-top:1px solid #232833}
-.build-pill{position:absolute;left:10px;bottom:10px;background:rgba(255,255,255,.12);color:#fff;font-size:12px;padding:6px 10px;border-radius:12px}
+:root{ --cardRatio:5/7; --gap:14px; }
+
+html,body{margin:0;padding:0;background:var(--bg,#000);color:var(--ink,#fff);font:15px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial}
+a{text-decoration:none;color:inherit}
+main{padding:calc(var(--headerH,112px) + var(--bandH,42px) + 12px) 10px 90px}
+
+/* grid */
+.grid{display:grid;gap:var(--gap);margin:0 auto;max-width:1400px}
+@media (min-width:560px){ .grid{grid-template-columns:repeat(2,1fr)} }
+@media (min-width:900px){ .grid{grid-template-columns:repeat(3,1fr)} }
+@media (min-width:1200px){ .grid{grid-template-columns:repeat(4,1fr)} }
+
+/* card */
+.card{position:relative;background:#000;border-radius:16px;overflow:hidden;aspect-ratio:var(--cardRatio);box-shadow:0 2px 10px rgba(0,0,0,.55)}
+.card img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.grad{position:absolute;left:0;right:0;bottom:0;padding:14px;background:linear-gradient(to top,rgba(0,0,0,.95),rgba(0,0,0,.1));color:#fff}
+.name{font:900 20px/1.1 "Anton",sans-serif;letter-spacing:.02em}
+.team{margin-top:4px;color:#e5e7eb}
+.pills{margin-top:10px;display:flex;gap:8px;flex-wrap:wrap}
+.pill{font:800 10px/1 "Roboto Condensed",sans-serif;letter-spacing:.1em;border:1px solid rgba(255,255,255,.3);border-radius:999px;padding:4px 8px;background:rgba(0,0,0,.55)}
+.btn-profile{position:absolute;top:10px;left:10px;background:rgba(0,0,0,.75);border:1px solid rgba(255,255,255,.3);color:#fff;border-radius:10px;padding:6px 8px;font:900 11px/1 "Anton",sans-serif}
+.build{position:fixed;left:10px;bottom:10px;background:rgba(255,255,255,.12);color:#fff;font-size:12px;padding:6px 10px;border-radius:12px;border:1px solid rgba(255,255,255,.15)}
 </style>
 </head>
 <body>
 
-<!-- Global header include -->
+<!-- Global header loader -->
 <div id="site-header"></div>
 <script>
-  // Breadcrumb text for this page (optional)
-  window.__breadcrumb = "CHANDLER, AZ";
-  fetch("header.html").then(r=>r.text()).then(h=>{ document.getElementById("site-header").innerHTML = h; });
+fetch('header.html').then(r=>r.text()).then(h=>{document.getElementById('site-header').innerHTML=h;});
 </script>
 
 <main>
-  <section class="hero">
-    <h1 style="margin:8px 0 4px;font-family:Anton,system-ui,sans-serif;letter-spacing:.01em">Hamilton Active Alumni</h1>
-    <p style="margin:0 0 12px;color:#aeb5bf">This page is a minimal proof that the global header is loading identically across pages. Your full grid can be re-added after you confirm the header behaviour.</p>
-
-    <div class="card-demo">
-      <strong>Header checks:</strong>
-      <ul style="margin:8px 0 0 18px">
-        <li>Two-row header is sticky.</li>
-        <li>Tagline band is sticky and drawers open <em>below</em> it (not covering it).</li>
-        <li>Desktop nav is in Row 1 center, hides under 1200px.</li>
-        <li>Hamilton “lovebirds” (H + 3 lines) in Row 2 with correct spacing.</li>
-        <li>Search/Filter/Reset buttons live in tagline (right-aligned).</li>
-      </ul>
-    </div>
-  </section>
+  <section id="grid" class="grid" aria-live="polite"></section>
 </main>
 
-<footer class="footer">
-  <div class="build-pill">BUILD: ham-v4.8.3</div>
-  <div>YAT?STATS</div>
-</footer>
+<div class="build">BUILD: ham-v4.8.6</div>
 
-<!-- Page listeners for header events (optional wiring) -->
 <script>
-  document.addEventListener('yst:openSearch', ()=> {
-    alert('Search triggered (wire to your page search)');
-  });
-  document.addEventListener('yst:resetAll', ()=> {
-    alert('Reset triggered (wire to your filter reset)');
-  });
+/* ===== minimal data (sample) ===== */
+const players = [
+  {
+    id:"180827",            // Cody Bellinger — TBC ID
+    name:"CODY BELLINGER",
+    team:"New York Yankees",
+    level:"MLB",
+    status:"Active 2025",
+    class:2013,
+    img:"https://i.postimg.cc/9F19KG5h/new-york-yankees-outfielder-cody-bellinger.jpg",
+  },
+  {
+    id:"patrick-murphy",
+    name:"PATRICK MURPHY",
+    team:"KT Wiz Suwon — KBO",
+    level:"KBO",
+    status:"Active 2025",
+    class:2013,
+    img:"https://i.postimg.cc/JnCXccvC/MURPH.avif"
+  },
+  {
+    id:"drew-swift",
+    name:"DREW SWIFT",
+    team:"Las Vegas Aviators — Athletics",
+    level:"Triple-A",
+    status:"Active 2025",
+    class:2017,
+    img:"https://i.postimg.cc/GmmSKFsV/AISelect-20250826-023939-Instagram.jpg"
+  },
+  {
+    id:"brock-selvidge",
+    name:"BROCK SELVIDGE",
+    team:"Somerset Patriots — New York Yankees",
+    level:"Double-A",
+    status:"Active 2025",
+    class:2021,
+    img:"https://i.postimg.cc/kgSyd4xs/AISelect-20250826-020305-Instagram.jpg"
+  }
+];
+
+/* default sort: Active 2025+Injured (none in demo), then Active 2024+FA, both by grad year oldest->youngest. */
+function defaultSort(a,b){ return (a.class||9999) - (b.class||9999); }
+
+/* render */
+function pill(t){ return `<span class="pill">${t}</span>`; }
+function card(p){
+  const profileLink = `profile.html?id=${encodeURIComponent(p.id)}`;
+  return `
+  <article class="card">
+    <a class="btn-profile" href="${profileLink}">PROFILE →</a>
+    <img src="${p.img}" alt="${p.name}">
+    <div class="grad">
+      <div class="name">${p.name}</div>
+      <div class="team">${p.team||''}</div>
+      <div class="pills">
+        ${pill((p.level||'').toUpperCase())}
+        ${pill((p.status||'').toUpperCase())}
+        ${pill(`CLASS OF ${p.class||'—'}`)}
+      </div>
+    </div>
+  </article>`;
+}
+function render(){ document.getElementById('grid').innerHTML = players.sort(defaultSort).map(card).join(''); }
+render();
+
+/* hook header controls (reset just re-renders) */
+window.addEventListener('load', ()=>{
+  if(window.YSHeader){
+    YSHeader.onReset(()=>render());
+    YSHeader.onSearch(()=>document.querySelector('#leftSearch')?.focus());
+    YSHeader.setFilterOptions({
+      levels:["MLB","TRIPLE-A","DOUBLE-A","HIGH-A","KBO","NCAA","JUCO"],
+      grads:[2010,2013,2016,2017,2021,2024,2025],
+      statuses:["Active 2025","Active 2024","Retired","Free Agent","Injured"]
+    });
+  }
+});
 </script>
 </body>
 </html>
