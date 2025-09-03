@@ -1,104 +1,45 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en">
 <head>
 <meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Player Profile — YAT?STATS</title>
-<link href="https://fonts.googleapis.com/css2?family=Anton&family=Roboto+Condensed:wght@300;400;700;900&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Player Profile — YATSTATS</title>
+<meta name="theme-color" content="#000000">
 <style>
-html,body{margin:0;padding:0;background:#000;color:#fff;font:15px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial}
-main{padding:calc(var(--headerH) + var(--bandH) + 10px) 10px 84px}
-.hero{max-width:1200px;margin:0 auto}
-.breadcrumb{font:700 10px/1 "Roboto Condensed";color:#9aa1ab;margin:0 0 8px 4px;letter-spacing:.06em}
-.band-title{display:grid;grid-template-columns:1fr auto;align-items:end;background:#0b0f16;border:1px solid #1e2430;border-radius:10px;padding:8px}
-.band-name{font:900 clamp(18px,3.4vw,32px)/1 "Anton";letter-spacing:.02em}
-.band-class{font:900 clamp(12px,2.4vw,16px)/1 "Anton";letter-spacing:.08em;color:#cbd5e1}
-.mini-wrap{width:clamp(120px,22vw,180px); aspect-ratio:5/7; justify-self:end; border-radius:10px; overflow:hidden; border:2px solid #2a2f3a; background:#0e1117}
-.mini-wrap img{width:100%;height:100%;object-fit:cover}
-
-/* info blocks */
-.info{max-width:1200px;margin:10px auto 0;display:grid;gap:10px}
-.panel{background:#0b0f16;border:1px solid #1e2430;border-radius:12px;padding:12px}
-.footer{position:fixed;left:0;right:0;bottom:0;height:64px;background:#000;border-top:1px solid #232833;display:flex;align-items:center;justify-content:center}
-.build{position:absolute;left:10px;bottom:10px;background:rgba(255,255,255,.12);padding:6px 10px;border-radius:12px;font-size:12px}
-.tabs{display:flex;gap:18px;justify-content:center;max-width:1200px;margin:12px auto 0}
-.tab{font:900 12px/1 "Anton";letter-spacing:.12em;color:#cbd5e1}
-.sep{opacity:.25}
+/* Page-only styles; header is injected */
+main{padding:calc(108px + 48px + 10px) 12px 90px; max-width:1200px; margin:0 auto}
+.section{color:#e5e7eb}
+.footer{position:fixed;left:0;right:0;bottom:0;height:64px;background:#000;color:#fff;display:flex;align-items:center;justify-content:center;z-index:10;border-top:1px solid #232833}
+.build-pill{position:absolute;left:10px;bottom:10px;background:rgba(255,255,255,.12);color:#fff;font-size:12px;padding:6px 10px;border-radius:12px}
 </style>
-<link rel="stylesheet" href="header.css">
 </head>
 <body>
 
 <!-- Global header include -->
 <div id="site-header"></div>
+<script>
+  // Breadcrumb for profile page (can dynamically set per player if desired)
+  window.__breadcrumb = "CHANDLER, AZ";
+  fetch("header.html").then(r=>r.text()).then(h=>{ document.getElementById("site-header").innerHTML = h; });
+</script>
 
 <main>
-  <div class="hero">
-    <div id="crumb" class="breadcrumb">WHERE THEY YAT? / <span>PLAYER</span></div>
-
-    <div class="band-title">
-      <div>
-        <div class="band-name" id="pName">PLAYER NAME</div>
-        <div class="band-class" id="pClass">CLASS OF —</div>
-      </div>
-      <div class="mini-wrap"><img id="mini" alt=""></div>
-    </div>
-  </div>
-
-  <section class="info">
-    <div class="panel" id="pTeam">Team / Org</div>
-    <div class="panel">Official stats partner: <a href="https://www.thebaseballcube.com" target="_blank" rel="noopener" style="font-weight:900;color:#fff">The Baseball Cube</a><br><br>
-      <a id="tbcLink" href="#" target="_blank" rel="noopener" style="display:inline-block;background:#fff;color:#000;border-radius:10px;padding:10px 12px;font-weight:900">View on TBC →</a>
-    </div>
+  <section class="section">
+    <h1 style="margin:8px 0 4px;font-family:Anton,system-ui,sans-serif;letter-spacing:.01em">Player Profile</h1>
+    <p style="margin:0 0 12px;color:#aeb5bf">This page now uses the exact same global header as <code>index.html</code>.</p>
+    <p style="margin:0 0 4px">Query param <strong>id</strong>: <code id="pid"></code></p>
   </section>
-
-  <nav class="tabs" aria-label="Profile sections">
-    <span class="tab">BIO</span><span class="sep">|</span>
-    <span class="tab">NEWS</span><span class="sep">|</span>
-    <span class="tab">STATS</span><span class="sep">|</span>
-    <span class="tab">SOCIAL</span><span class="sep">|</span>
-    <span class="tab">NIL SCORE</span><span class="sep">|</span>
-    <span class="tab">VIDEO</span><span class="sep">|</span>
-    <span class="tab">PICS</span>
-  </nav>
 </main>
 
 <footer class="footer">
-  <div class="build">PROFILE BUILD: profile-v1.4</div>
+  <div class="build-pill">BUILD: ham-v4.8.3</div>
+  <div>YAT?STATS</div>
 </footer>
 
 <script>
-/* load header */
-fetch('header.html').then(r=>r.text()).then(h=>{ document.getElementById('site-header').innerHTML=h; });
-
-/* tiny demo data (id uses TBC scheme; Cody = 180827) */
-const PLAYERS = {
-  "180827": {
-    name:"CODY BELLINGER", class:2013,
-    team:"New York Yankees", mini:"https://i.postimg.cc/Jhq690Lg/01-Bellinger-Front-page-00001.jpg"
-  },
-  "brock-selvidge": {
-    name:"BROCK SELVIDGE", class:2021,
-    team:"Somerset Patriots — New York Yankees", mini:"https://i.postimg.cc/vTp3W6r1/22-Selvidge-Front-page-00001.jpg"
-  }
-};
-
-function init(){
-  const id = new URLSearchParams(location.search).get('id') || '180827';
-  const p = PLAYERS[id] || Object.values(PLAYERS)[0];
-
-  document.getElementById('crumb').lastElementChild.textContent = p.name;
-  document.getElementById('pName').textContent = p.name;
-  document.getElementById('pClass').textContent = `CLASS OF ${p.class||'—'}`;
-  document.getElementById('pTeam').textContent  = p.team || '—';
-  const mini = document.getElementById('mini'); mini.src = p.mini || ''; mini.alt = p.name;
-
-  // TBC link
-  const tbc = document.getElementById('tbcLink');
-  const tbcId = /^\d+$/.test(id) ? id : '180827';
-  tbc.href = `https://www.thebaseballcube.com/content/player.asp?ID=${tbcId}`;
-}
-init();
+  document.getElementById('pid').textContent = new URLSearchParams(location.search).get('id') || '(none)';
+  document.addEventListener('yst:openSearch', ()=> alert('Search (profile)'));
+  document.addEventListener('yst:resetAll', ()=> alert('Reset (profile)'));
 </script>
 </body>
 </html>
