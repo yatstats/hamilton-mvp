@@ -3,407 +3,385 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Player Profile — YATSTATS</title>
+<title>Player Profile — YAT?STATS</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Roboto+Condensed:wght@300;400;700&display=swap" rel="stylesheet">
+
 <style>
+/* ===== THEME TOKENS ===== */
 :root{
-  --maroon:#7A0019; --ring:#2b2f36; --bg:#0b0d12; --panel:#10141b; --ink:#f8fafc; --muted:#9aa1ab;
-  --ink2:#d6d8dd; --headerH:112px;
+  --bg:#0b0d12; --ink:#f5f7fb; --muted:#A6ADB7;
+  --ring:#1f2530; --panel:#0f131a; --panel2:#11161e;
+  --accent:#ffffff; --accent-ink:#000;
+  --heroH:74px;         /* hero strip height (name + class) */
+  --headerH:135px;      /* matches index top two rows */
+  --headerH-sm:100px;   /* small screens header */
+  --tabsH:54px;         /* bottom tab bar */
+}
+html[data-theme="light"]{
+  --bg:#f7f7fb; --ink:#0c1117; --muted:#546072;
+  --ring:#e5e7eb; --panel:#ffffff; --panel2:#ffffff;
+  --accent:#000; --accent-ink:#fff;
 }
 *{box-sizing:border-box}
 html,body{margin:0;padding:0}
-body{background:var(--bg);font:15px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;color:var(--ink)}
-a{text-decoration:none;color:inherit}
+body{background:var(--bg);color:var(--ink);font:15px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial}
+a{color:inherit;text-decoration:none}
 button{font:inherit;color:inherit}
+img{max-width:100%;display:block}
+:focus-visible{outline:2px solid #fff; outline-offset:2px}
+html[data-theme="light"] :focus-visible{outline-color:#000}
 
-/* HEADER (same as index) */
+/* ===== HEADER (same visual language as index) ===== */
 .site-header{
-  position:fixed; inset:0 0 auto 0; height:var(--headerH); z-index:60;
-  background:#0e1117; border-bottom:1px solid var(--ring);
-  display:grid; grid-template-rows:auto auto; gap:6px; padding:8px 10px 6px;
+  position:sticky; top:0; z-index:60;
+  background:#000; border-bottom:1px solid var(--ring);
+  display:flex; flex-direction:column; gap:8px; padding:8px 10px 6px;
 }
-.h-top{display:flex; align-items:center; gap:10px}
-.hambtn{width:36px;height:36px;border:0;background:transparent;display:grid;place-items:center;cursor:pointer}
-.hdr-icons{display:flex;gap:8px;align-items:center}
-.hdr-icon{width:40px;height:40px;padding:0;border:0;background:transparent;border-radius:8px;display:grid;place-items:center;cursor:pointer}
-.hdr-icon svg{width:20px;height:20px;color:var(--ink)}
-.hdr-icon:hover{background:rgba(255,255,255,.06)}
-.hdr-icon:focus-visible{outline:2px solid #fff;outline-offset:2px;border-radius:8px}
-.hdr-icon.active{background:#fff}
-.hdr-icon.active svg{color:#000}
+.header-top,.header-bottom{display:flex; align-items:center; width:100%}
+.header-top{justify-content:space-between; gap:8px}
 
-.h-bot{display:grid; grid-template-columns:auto 1fr auto; align-items:center}
-.brand-left{display:flex; align-items:flex-end; gap:10px; min-width:0}
-.school-block{display:flex; align-items:flex-end; gap:10px; min-width:0}
-.school-icon{height:42px;width:auto;display:block; filter:drop-shadow(0 0 10px rgba(255,255,255,.06))}
-.school-type{display:flex; flex-direction:column; line-height:1}
-.school-line1{font-size:10px; letter-spacing:.06em; color:#cbd5e1; font-weight:600; margin-bottom:0; font-stretch:condensed; font-variation-settings:"wdth" 80}
-.school-line2{font-size:12px; font-weight:900; letter-spacing:.02em}
-.school-line3{font-size:14px; font-weight:900; letter-spacing:.02em}
-.ystats-wrap{justify-self:end}
-.ystats-logo{height:36px; width:auto; max-width:min(40vw, 260px); display:block}
+/* left cluster */
+.top-row{display:flex; align-items:center; gap:6px}
+.hbtn,.hdr{width:34px;height:34px;border:0;background:transparent;border-radius:10px;display:grid;place-items:center;cursor:pointer}
+.hbtn svg,.hdr svg{width:19px;height:19px;color:#fff}
+.hdr:hover{background:rgba(255,255,255,.08)}
+.hdr.active{background:#fff}.hdr.active svg{color:#000}
 
-.nav-desktop{display:flex; gap:16px; align-items:center; justify-content:center; padding:6px 0 0; grid-column:1 / -1;}
-@media (max-width:1160px){ .nav-desktop{display:none} }
-.nav-link{display:inline-flex; align-items:baseline; white-space:nowrap}
-.nav-grey{color:#9aa1ab; font-weight:700; letter-spacing:.02em; font-stretch:condensed; font-variation-settings:"wdth" 80}
-.nav-black{color:#fff; font-weight:900; letter-spacing:.01em; margin-left:-1px}
+/* desktop nav centered */
+.nav-desktop{
+  position:absolute; left:50%; top:16px; transform:translateX(-50%);
+  display:flex; gap:16px; white-space:nowrap; align-items:center;
+}
+@media (max-width:1400px){ .nav-desktop{display:none} }
+.font-slim{font-family:"Roboto Condensed",sans-serif;font-weight:300}
+.font-strong{font-family:"Anton",sans-serif}
+.nav-desktop a{font-size:12px;text-transform:uppercase}
+.nav-slim{color:#9aa1ab;letter-spacing:-.01em;margin-right:-1px}
+.nav-strong{color:#fff;letter-spacing:.01em}
 
-/* MAIN LAYOUT */
-main{padding:calc(var(--headerH) + 20px) 12px 80px; max-width:1200px; margin:0 auto}
-.breadcrumb{font-size:12px; color:#9aa1ab; margin:6px 0 12px}
-.breadcrumb a{color:#d1d5db}
-.profile-grid{display:grid; grid-template-columns:1.1fr 1.4fr; gap:16px}
-@media (max-width:980px){ .profile-grid{grid-template-columns:1fr; } }
+/* right logo */
+.ystats-logo{height:clamp(22px,4vw,32px); width:auto; object-fit:contain}
 
-/* LEFT: HERO CARD */
+/* row 2 (Hamilton lovebirds) */
+.header-bottom{justify-content:flex-start; padding-left:6px}
+.brand{display:grid; grid-template-columns:auto 1fr; column-gap:6px; align-items:center}
+.ham-logo{--hamH:60px;height:var(--hamH); width:auto}
+.ham-type{display:flex; flex-direction:column; justify-content:space-between; height:var(--hamH)}
+.ham-1{font-family:"Roboto Condensed",sans-serif;font-weight:300;font-size:12px;color:#A6ADB7}
+.ham-2{font-family:"Anton",sans-serif;font-size:16px;letter-spacing:.01em}
+.ham-3{font-family:"Anton",sans-serif;font-size:18px;letter-spacing:.01em}
+
+/* ===== HERO STRIP ===== */
 .hero{
-  background:#0f131a; border:1px solid #202735; border-radius:16px; overflow:hidden;
+  position:sticky; top:calc(var(--headerH)); z-index:40;
+  height:var(--heroH); display:flex; align-items:center;
+  background:#000; border-bottom:1px solid var(--ring); padding:6px 10px;
 }
-.hero-top{position:relative; padding:12px; display:grid; grid-template-columns:1.2fr 1fr; gap:12px}
-@media (max-width:720px){ .hero-top{grid-template-columns:1fr} }
-.hero-photo{position:relative; aspect-ratio:4/5; border-radius:12px; overflow:hidden; background:#0b0f15; border:1px solid #273041}
-.hero-photo img{position:absolute; inset:0; width:100%; height:100%; object-fit:cover}
-.hero-meta{display:flex; flex-direction:column; gap:6px}
-.p-name{font-size:28px; font-weight:900; letter-spacing:.01em}
-.p-team{font-size:14px; color:#cbd5e1}
-.p-parent{font-size:12px; color:#94a3b8}
-.badges{display:flex; flex-wrap:wrap; gap:6px; margin-top:6px}
-.chip{display:inline-flex; align-items:center; gap:6px; background:#0b0f15; color:#e5e7eb; border:1px solid #273041; border-radius:999px; padding:4px 10px; font-weight:800; font-size:11px; letter-spacing:.06em}
-.chip.mlb{background:#7A0019;border-color:#7A0019}
-.chip.triple-a{background:#2563eb;border-color:#2563eb}
-.chip.double-a{background:#3b82f6;border-color:#3b82f6}
-.chip.high-a{background:#4338ca;border-color:#4338ca}
-.chip.low-a{background:#3730a3;border-color:#3730a3}
-.chip.ncaa{background:#166534;border-color:#166534}
-.chip.naia{background:#9333ea;border-color:#9333ea}
-.chip.juco{background:#0d9488;border-color:#0d9488}
-.letters{display:flex;gap:6px;align-items:center;margin-top:6px}
-.letter-dot{width:22px;height:22px;border-radius:50%;background:#fff;color:#7A0019;display:grid;place-items:center;font-weight:900;font-size:12px;border:1px solid rgba(0,0,0,.15)}
+.hero-name{
+  font-family:"Anton",sans-serif; font-size:22px; letter-spacing:.01em;
+  line-height:1; color:#fff; text-transform:uppercase;
+}
+.hero-class{
+  font-family:"Roboto Condensed",sans-serif; font-weight:900; color:#fff; letter-spacing:.12em; margin-top:4px
+}
+.hero-left{flex:1 1 auto}
+.hero-right{flex:0 0 auto; width:120px; display:flex; justify-content:flex-end}
+.hs-mini{width:96px; aspect-ratio:5/7; border-radius:8px; overflow:hidden; background:#1c2533; border:1px solid #2b3546}
 
-.hero-stats{border-top:1px solid #202735; padding:10px 12px}
-.kv-wrap{display:grid; grid-template-columns:repeat(4,1fr); gap:8px}
-@media (max-width:640px){ .kv-wrap{grid-template-columns:repeat(2,1fr)} }
-.kv{background:#0b0f15;border:1px solid #273041;border-radius:12px;text-align:center;padding:10px}
-.kv .k{font-size:11px;color:#9aa1ab}
-.kv .v{font-weight:900; color:#fff}
-
-/* RIGHT: TABS */
+/* ===== MAIN ===== */
+main{
+  padding:calc(var(--headerH) + var(--heroH) + 12px) 10px calc(var(--tabsH) + 18px);
+  max-width:980px; margin:0 auto;
+}
 .panel{
-  background:#0f131a; border:1px solid #202735; border-radius:16px; overflow:hidden; min-height:420px;
-  display:flex; flex-direction:column;
+  background:var(--panel); border:1px solid var(--ring);
+  border-radius:14px; overflow:hidden; min-height:58vh;
 }
-.tabs{display:flex; gap:6px; padding:8px; border-bottom:1px solid #202735}
-.tab{border:1px solid #273041; background:#0b0f15; color:#e5e7eb; border-radius:10px; padding:8px 10px; font-weight:800; font-size:12px; cursor:pointer}
-.tab.active{background:#000; border-color:#000; color:#fff}
-.tab-body{flex:1 1 auto; padding:12px; overflow:auto}
-.section{display:none}
+.section{display:none; padding:14px}
 .section.active{display:block}
 
-/* news list */
-.news-item{padding:8px 10px; border:1px solid #273041; border-radius:10px; background:#0b0f15; margin-bottom:8px}
-.news-item a{color:#fff; font-weight:800}
-.meta{font-size:11px; color:#9aa1ab; margin-top:4px}
+/* simple blocks */
+.block{background:var(--panel2); border:1px solid var(--ring); border-radius:12px; padding:12px; margin-bottom:12px}
+.kv-wrap{display:grid; grid-template-columns:repeat(4,1fr); gap:10px}
+@media (max-width:680px){ .kv-wrap{grid-template-columns:repeat(2,1fr)} }
+.kv{background:#0b0f15; border:1px solid #273041; border-radius:12px; text-align:center; padding:10px}
+html[data-theme="light"] .kv{background:#f3f5f9; border-color:#e5e7eb}
+.kv .k{font-size:11px; color:#9aa1ab}
+.kv .v{font-weight:900}
 
-/* FOOTER */
-.footer{position:fixed;left:0;right:0;bottom:0;height:64px;background:#0e1117;color:#fff;display:flex;align-items:center;justify-content:center;z-index:10}
-.footer img{max-height:56px;width:auto}
-.build-pill{position:absolute;left:10px;bottom:10px;background:rgba(255,255,255,.08);color:#fff;font-size:12px;padding:6px 10px;border-radius:12px;border:1px solid rgba(255,255,255,.12)}
+/* ===== BOTTOM FIXED TAB BAR ===== */
+.tabs{
+  position:fixed; left:0; right:0; bottom:0; height:var(--tabsH);
+  background:#000; border-top:1px solid var(--ring); z-index:50;
+  display:flex; align-items:center; justify-content:center; gap:14px; padding:0 10px; white-space:nowrap;
+}
+.tab{
+  color:#dbe1ea; text-transform:uppercase; font-weight:900;
+  font-family:"Roboto Condensed",sans-serif; letter-spacing:.14em;
+  font-size:13px; background:transparent; border:0; padding:6px 4px; cursor:pointer;
+}
+.tab.active{color:#fff; border-bottom:2px solid #fff}
+html[data-theme="light"] .tabs{background:#fff}
+html[data-theme="light"] .tab{color:#111}
+html[data-theme="light"] .tab.active{color:#000; border-bottom:2px solid #000}
+
+/* Footer build pill */
+.build{position:fixed; left:10px; bottom:var(--tabsH); transform:translateY(-10px);
+  background:rgba(255,255,255,.12); color:#fff; padding:6px 10px; border-radius:12px; font-size:12px}
+html[data-theme="light"] .build{background:rgba(0,0,0,.08); color:#000}
+
+/* Small screens: shorter header */
+@media (max-width:640px){
+  :root{ --headerH: var(--headerH-sm); }
+  .ham-logo{ --hamH: 50px; }
+}
 </style>
 </head>
 <body>
 
 <header class="site-header">
-  <div class="h-top">
-    <button class="hambtn" id="goHome" aria-label="Back to gallery" title="Back">
-      <svg viewBox="0 0 24 24" width="22" height="22"><path fill="currentColor" d="M15.41 7.41 14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
-    </button>
-    <div class="hdr-icons">
-      <button class="hdr-icon" id="openSearch" aria-label="Search" title="Search">
-        <svg viewBox="0 0 24 24"><path fill="currentColor" d="M11 4a7 7 0 1 1 0 14 7 7 0 0 1 0-14zm9.7 15.3-3.4-3.4a9 9 0 1 0-1.4 1.4l3.4 3.4a1 1 0 0 0 1.4-1.4z"/></svg>
+  <div class="header-top">
+    <div class="top-row">
+      <button class="hbtn" id="goHome" aria-label="Back">
+        <svg viewBox="0 0 24 24"><path fill="currentColor" d="M15.41 7.41 14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
       </button>
-      <button class="hdr-icon" id="openAuth" aria-label="Account" title="Account">
+      <button class="hdr" id="iconAccount" aria-label="Account">
         <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm0 2c-4.2 0-8 2.1-8 5v1h16v-1c0-2.9-3.8-5-8-5z"/></svg>
       </button>
+      <!-- Theme toggle stays in top row -->
+      <button class="hdr" id="iconTheme" aria-label="Toggle theme" title="Toggle theme">
+        <svg id="themeIcon" viewBox="0 0 24 24"><path fill="currentColor" d="M21.64 13A9 9 0 1111 2.36 7 7 0 0021.64 13z"/></svg>
+      </button>
     </div>
-  </div>
-  <div class="h-bot">
-    <div class="brand-left">
-      <div class="school-block">
-        <img class="school-icon" src="https://i.postimg.cc/2jwjVn8H/32900-20250830-222044-0000.png" alt="Hamilton HS"/>
-        <div class="school-type">
-          <div class="school-line1">CHANDLER, AZ</div>
-          <div class="school-line2">HAMILTON HIGH SCHOOL</div>
-          <div class="school-line3">ACTIVE ALUMNI</div>
-        </div>
-      </div>
-    </div>
-    <nav class="nav-desktop">
-      <a href="index.html" class="nav-link"><span class="nav-grey">where&nbsp;they</span><span class="nav-black">YAT?</span></a>
-      <a href="#" class="nav-link"><span class="nav-grey">active&nbsp;alumni</span><span class="nav-black">News</span></a>
-      <a href="#" class="nav-link"><span class="nav-grey">next&nbsp;level&nbsp;</span><span class="nav-black">All-Time&nbsp;List</span></a>
-      <a href="#" class="nav-link"><span class="nav-grey">NIL&nbsp;&nbsp;YAT-A-BOY</span><span class="nav-black">Marketplace</span></a>
-      <a href="#" class="nav-link"><span class="nav-grey">the&nbsp;</span><span class="nav-black">Current&nbsp;Team</span></a>
-      <a href="#" class="nav-link"><span class="nav-grey">PCD&nbsp;Action&nbsp;</span><span class="nav-black">Partner&nbsp;Program</span></a>
+
+    <!-- Desktop center nav (displayed on wide) -->
+    <nav class="nav-desktop" aria-label="Primary">
+      <a href="index.html" class="font-slim nav-slim">WHERE THEY</a><a href="index.html" class="font-strong nav-strong">YAT?</a>
+      <a href="#" class="font-slim nav-slim">ACTIVE ALUMNI</a><a href="#" class="font-strong nav-strong">NEWS</a>
+      <a href="#" class="font-slim nav-slim">NEXT LEVEL</a><a href="#" class="font-strong nav-strong">ALL-TIME LIST</a>
     </nav>
-    <div class="ystats-wrap">
-      <img class="ystats-logo" src="https://i.postimg.cc/C5mwXpQy/35878-20250830-222027-0000.png" alt="YAT?STATS"/>
+
+    <img class="ystats-logo" src="https://i.postimg.cc/C5mwXpQy/35878-20250830-222027-0000.png" alt="YAT?STATS"/>
+  </div>
+
+  <div class="header-bottom">
+    <div class="brand">
+      <img class="ham-logo" src="https://i.postimg.cc/pVm0vHdX/hamilton-logo-tight-transparent-background.png" alt="Hamilton HS"/>
+      <div class="ham-type">
+        <div class="ham-1">CHANDLER, AZ</div>
+        <div class="ham-2">HAMILTON HIGH SCHOOL</div>
+        <div class="ham-3">ACTIVE ALUMNI</div>
+      </div>
     </div>
   </div>
 </header>
 
+<!-- HERO STRIP -->
+<section class="hero" id="hero">
+  <div class="hero-left">
+    <div class="hero-name" id="heroName">PLAYER NAME</div>
+    <div class="hero-class" id="heroClass">CLASS OF —</div>
+  </div>
+  <div class="hero-right">
+    <div class="hs-mini"><img id="heroHS" alt="" style="width:100%;height:100%;object-fit:cover"></div>
+  </div>
+</section>
+
 <main>
-  <div class="breadcrumb"><a href="index.html">WHERE THEY YAT?</a> &nbsp;/&nbsp; <span id="crumbName">Player</span></div>
-
-  <section class="profile-grid" id="profile">
-    <!-- left: hero -->
-    <div class="hero">
-      <div class="hero-top">
-        <div class="hero-photo"><img id="pPhoto" alt=""></div>
-        <div class="hero-meta">
-          <div class="p-name" id="pName">PLAYER NAME</div>
-          <div class="p-team" id="pTeam">Team • League</div>
-          <div class="p-parent" id="pParent">Organization / Conference</div>
-
-          <div class="badges" id="pBadges"></div>
-          <div class="letters" id="pLetters"></div>
-        </div>
+  <div class="panel">
+    <section class="section active" id="pane-bio">
+      <div class="block">
+        <div id="bioLine">Position, B/T, Height/Weight, Hometown.</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:6px">More biography will live here.</div>
       </div>
-      <div class="hero-stats" id="pHeroStats"></div>
-    </div>
+    </section>
 
-    <!-- right: tabs -->
-    <div class="panel">
-      <div class="tabs" id="tabs">
-        <button class="tab active" data-pane="overview">Overview</button>
-        <button class="tab" data-pane="season">Season Stats</button>
-        <button class="tab" data-pane="career">Career Stats</button>
-        <button class="tab" data-pane="bio">Bio</button>
-        <button class="tab" data-pane="news">News</button>
-        <button class="tab" data-pane="social">Social</button>
+    <section class="section" id="pane-news">
+      <div id="newsList" class="block">
+        Latest links for this player will appear here (Google/ESPN/MLB/MiLB).
       </div>
-      <div class="tab-body">
-        <div class="section active" id="pane-overview">
-          <div class="news-item">
-            <div id="ov-lines">Position, B/T, Height/Weight, Age, Hometown</div>
-            <div class="meta" id="ov-extra">Draft/College info could go here.</div>
-          </div>
-        </div>
+    </section>
 
-        <div class="section" id="pane-season">
-          <div id="seasonGrid" class="kv-wrap"></div>
-        </div>
-
-        <div class="section" id="pane-career">
-          <div class="news-item">Career summary coming soon (CSV/TBC feed).</div>
-        </div>
-
-        <div class="section" id="pane-bio">
-          <div class="news-item" id="bioText">Short bio coming soon.</div>
-        </div>
-
-        <div class="section" id="pane-news">
-          <div id="newsList">
-            <!-- Links created via helper URLs to avoid CORS -->
-          </div>
-        </div>
-
-        <div class="section" id="pane-social">
-          <div class="news-item">Connect X/IG handles via CMS (coming soon).</div>
-        </div>
+    <section class="section" id="pane-stats">
+      <div class="block">
+        <div class="kv-wrap" id="statsGrid"></div>
       </div>
-    </div>
-  </section>
+    </section>
+
+    <section class="section" id="pane-social">
+      <div class="block">Social embeds (X/IG) coming soon.</div>
+    </section>
+
+    <section class="section" id="pane-nil">
+      <div class="block" id="nilBlock">NIL Power Point Score coming soon.</div>
+    </section>
+
+    <section class="section" id="pane-video">
+      <div class="block">
+        <iframe id="videoFrame" width="100%" height="260" src="" title="Highlights" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+      </div>
+    </section>
+
+    <section class="section" id="pane-pics">
+      <div class="block" id="picsBlock">Fan-tastic pics gallery coming soon.</div>
+    </section>
+  </div>
 </main>
 
-<footer class="footer">
-  <img src="https://i.postimg.cc/v8LxKy54/no-errors-sample-banner.png" alt="Sponsor banner">
-  <div class="build-pill">PROFILE BUILD</div>
-</footer>
+<!-- BOTTOM TABS -->
+<nav class="tabs" aria-label="Profile sections">
+  <button class="tab active" data-pane="bio">BIO</button>
+  <span style="color:#6b7280">|</span>
+  <button class="tab" data-pane="news">NEWS</button>
+  <span style="color:#6b7280">|</span>
+  <button class="tab" data-pane="stats">STATS</button>
+  <span style="color:#6b7280">|</span>
+  <button class="tab" data-pane="social">SOCIAL</button>
+  <span style="color:#6b7280">|</span>
+  <button class="tab" data-pane="nil">NIL SCORE</button>
+  <span style="color:#6b7280">|</span>
+  <button class="tab" data-pane="video">VIDEO</button>
+  <span style="color:#6b7280">|</span>
+  <button class="tab" data-pane="pics">PICS</button>
+</nav>
+
+<div class="build">PROFILE BUILD: profile-v1.2</div>
 
 <script>
-/* ===== Tiny util ===== */
+/* ===== utilities ===== */
 const byId = (id)=>document.getElementById(id);
-const FALLBACK_IMG = "https://i.postimg.cc/2jwjVn8H/32900-20250830-222044-0000.png";
-function imgOnError(el){ if(!el) return; el.onerror=null; el.src=FALLBACK_IMG; }
-function lvlClass(l){return String(l||'').toLowerCase().replace(/\s+/g,'-').replace('aaa','triple-a').replace('aa','double-a')}
+const $$ = (sel,root=document)=>Array.from(root.querySelectorAll(sel));
 function toId(name){ return String(name||'').trim().toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,''); }
+function kv(k,v){ return `<div class="kv"><div class="k">${k}</div><div class="v">${v??'—'}</div></div>`; }
+function statsTitle(status){
+  const s=String(status||'').toUpperCase();
+  if(s.includes('ACTIVE 2025')) return '2025 SEASON STATS';
+  if(s.includes('ACTIVE 2024')) return '2024 SEASON STATS';
+  return 'CAREER STATS';
+}
 
-/* ===== Same 31-player CSV used on index ===== */
-const CSV = `player,pos,ht,wt,ba,th,born,place,hilvl,mlb years,stat years
-Shane Anderson,ut,5-11,195,R,R, ,"Chandler,AZ",NCAA, ,2021-2025
-DJ Barrett,p-of,6-1,190,R,R, ,"Gilbert,AZ",JrCollege, ,2024-2025
-Cody Bellinger,cf-1b,6-4,203,L,L,1995-07-13,"Scottsdale,AZ",MLB,2017-2025,2013-2025
-Dustin Bermudez,ut-p,5-10,160,R,R,2001-06-05,"Chandler,AZ",NCAA, ,2020-2024
-Logan Boyer,p,6-3,215,R,R,1998-01-24,"Chandler,AZ",AAA, ,2017-2025
-Cooper Brass,if,5-10,180,R,R,2005-02-14,"Chandler,AZ",NCAA, ,2025-2025
-Michael Brueser,of,6-1,190,R,R,2001-11-08,"Chandler,AZ",NCAA, ,2021-2024
-Caden Burghardt,ut,6-3,0,R,R, ,"Chandler,AZ",NCAA, ,2025-2025
-Roch Cholowsky,if,6-2,195,R,R,2005-04-05,"Chandler,AZ",NCAA, ,2024-2025
-Prince DeBoskie,of,6-0,180,R,R,2003-09-23,"Chandler,AZ",JrCollege, ,2023-2024
-AJ Diaz,ss, ,0,R,R, , ,JrCollege, ,2025-2025
-Ryan Figueroa,p,6-3,192,R,R, ,"Chandler,AZ",NCAA, ,2021-2024
-Jorge Flores,ss,5-5,160,R,R,1991-11-25,"Ensenada,MX",AAA, ,2012-2024
-Dom Hamel,p,6-2,206,R,R,1999-03-02,"Chandler,AZ",AAA, ,2018-2025
-Kent Hasler,p,5-10,205,R,R,1995-10-15,"Chandler,AZ",AAA, ,2015-2024
-Alex Hernandez,c,6-1,195,R,R, ,"Chandler,AZ",NCAA, ,2022-2025
-Tanner Holland,of,6-0,185,R,R,2003-06-07,"Chandler,AZ",JrCollege, ,2024-2024
-Carson Johnson,p,6-4,206,R,R,2005-02-02,"Torrance,CA",NCAA, ,2025-2025
-Zachary Johnston,of,6-3,0, , , ,"Chandler,AZ",NAIA, ,2024-2025
-Jeremy Jones,p,6-1,202,R,R,2004-05-31,"Chandler,AZ",NCAA, ,2023-2025
-Kole Klecker,p,6-2,205,R,R,2004-08-25,"Mesa,AZ",NCAA, ,2023-2025
-Logan Krei,of,5-11,165,R,R, ,"Defiance,MO",JrCollege, ,2024-2024
-Ryan Kucherak,if,6-1,195,R,R,2004-08-24,"Salt Lake City,UT",NCAA, ,2024-2025
-Rohan Lettow,p,6-2,180,R,R,2005-07-24,"Chandler,AZ",NCAA, ,2024-2025
-Jeter Mauzey,of,6-5,200,R,R, ,"Chandler,AZ",JrCollege, ,2024-2025
-J.D. McLaughlin,lf-cf,6-2,195,R,R,2000-12-28,"Mesa,AZ",AAA, ,2020-2024
-Patrick Murphy,p,6-5,211,R,R,1995-06-10,"Chandler,AZ",MLB,2020-2022,2014-2025
-Shane Murphy,p,6-5,210,L,L,2001-01-19,"Chandler,AZ",AAA, ,2020-2025
-Sean Rackoski,p,6-7,225,R,R,1995-05-12,"Mesa,AZ",AAA, ,2014-2024
-Drew Rogers,c-if,6-0,220,R,R,2005-07-15,"Minneapolis,MN",NCAA, ,2025-2025
-Logan Saloman,p,6-5,230,R,R,2004-05-10,"Chandler,AZ",NCAA, ,2023-2025
-Brock Selvidge,p,6-3,205,R,L,2002-08-28,"Carrolton,TX",AA, ,2021-2025
-Will Shelor,p,5-11,190,R,R, ,"Chandler,AZ",JrCollege, ,2024-2025
-Jackson Smith,p,6-1,235,L,L,2004-04-04,"Chandler,AZ",JrCollege, ,2023-2024
-Drew Swift,ss-2b,6-0,165,R,R,1999-02-15,"Chandler,AZ",AAA, ,2018-2025
-Luke Thiele,if,6-0,195,R,R,2002-12-19,"Chandler,AZ",NCAA, ,2023-2025
-Josh Tiedemann,h-p,6-0,165,R,R,2004-06-09,"Phoenix,AZ",A, ,2023-2025
-Gavin Turley,of,6-1,196,R,R,2003-11-12,"American Fork,UT",A, ,2023-2025
-Zach Wadas,ut,6-4,205,L,L,2004-08-25,"Chandler,AZ",NCAA, ,2024-2025
-Braden Watkins,of,6-0,160,L,R, ,"Chandler,AZ",NCAA, ,2023-2025
-Liam Wilson,c-1b,6-0,205,R,R, ,"Chandler,AZ",NCAA, ,2025-2025
-Tyler Wilson,lf-rf,6-2,210,B,R,2002-07-10,"Tainan,TW",A+, ,2021-2025
-Jake Wong,p,6-2,218,R,R,1996-09-03,"Chandler,AZ",MLB,2023-2023,2016-2024
-Justin Wylie,if-of,5-10,180,R,R,1996-08-26,"Lancaster,PA",Indy, ,2015-2024`;
-
-/* Minimal enrich so photos/teams show where we have them */
-const enrich = {
-  "cody-bellinger": {
-    team:"New York Yankees",
-    parent:"",
+/* ===== minimal dataset (kept in sync with index) ===== */
+const COMMON_VIDEO = "https://www.youtube.com/embed/ZSoRzk-z35w?rel=0&modestbranding=1&playsinline=1";
+const players = [
+  { id:"180827", name:"CODY BELLINGER", graduatingClass:2013, currentLevel:"MLB", status:"Active 2025",
+    position:"CF/1B", team:"New York Yankees", parent:"",
     frontImg:"https://i.postimg.cc/9F19KG5h/new-york-yankees-outfielder-cody-bellinger.jpg",
     highSchoolImg:"https://i.postimg.cc/Jhq690Lg/01-Bellinger-Front-page-00001.jpg",
     batting:{avg:".284",obp:".345",slg:".520",ops:".865",hits:"150",runs:"95",hr:"35",rbi:"105"},
-    letterWinnerYears:[2012,2013], position:"CF/1B", ba:"L", th:"L", ht:"6-4", wt:"203"
+    place:"Scottsdale, AZ", ba:"L", th:"L",
+    video:COMMON_VIDEO
   },
-  "dom-hamel":{
-    team:"Syracuse Mets — New York Mets",
-    parent:"",
-    frontImg:"https://i.postimg.cc/rwYchfnt/20250804-151814.jpg",
-    highSchoolImg:"https://i.postimg.cc/VLC7zDwX/23-Hamel-Front-page-00001.jpg",
-    pitching:{era:"3.89",so:"93",whip:"1.18"},
-    letterWinnerYears:[2016,2017], position:"P", ba:"R", th:"R", ht:"6-2", wt:"206"
+  { id:"patrick-murphy", name:"PATRICK MURPHY", graduatingClass:2013, currentLevel:"KBO", status:"Active 2025",
+    position:"P", team:"KT Wiz Suwon — KBO",
+    frontImg:"https://i.postimg.cc/JnCXccvC/MURPH.avif",
+    highSchoolImg:"https://i.postimg.cc/pdxcG8gz/02-Murphy-Front-page-00001.jpg",
+    pitching:{era:"3.22",so:"71",whip:"1.09",oba:".224",kbb:"3.6",fip:"3.45",ip:"112.0",er:"40",hr:"8",qs:"10",w:"8",sv:"0"},
+    place:"Chandler, AZ", ba:"R", th:"R",
+    video:COMMON_VIDEO
   },
-  "drew-swift":{
-    team:"Las Vegas Aviators — Athletics",
-    parent:"",
+  { id:"drew-swift", name:"DREW SWIFT", graduatingClass:2017, currentLevel:"Triple-A", status:"Active 2025",
+    position:"SS", team:"Las Vegas Aviators — Athletics",
     frontImg:"https://i.postimg.cc/GmmSKFsV/AISelect-20250826-023939-Instagram.jpg",
     highSchoolImg:"https://i.postimg.cc/0j6VMCwR/04-Swift-Front-page-00001.jpg",
     batting:{avg:".271",obp:".335",slg:".414",ops:".749",hits:"114",runs:"68",hr:"10",rbi:"52"},
-    letterWinnerYears:[2014,2015,2016,2017], position:"SS/2B", ba:"R", th:"R", ht:"6-0", wt:"165"
+    place:"Chandler, AZ", ba:"R", th:"R",
+    video:COMMON_VIDEO
+  },
+  { id:"brock-selvidge", name:"BROCK SELVIDGE", graduatingClass:2021, currentLevel:"AA", status:"Active 2025",
+    position:"P", team:"Somerset Patriots — New York Yankees",
+    frontImg:"https://i.postimg.cc/kgSyd4xs/AISelect-20250826-020305-Instagram.jpg",
+    highSchoolImg:"https://i.postimg.cc/vTp3W6r1/22-Selvidge-Front-page-00001.jpg",
+    place:"Carrolton, TX", ba:"L", th:"L",
+    video:COMMON_VIDEO
+  },
+  { id:"tyler-wilson", name:"TYLER WILSON", graduatingClass:2021, currentLevel:"High-A", status:"Active 2025",
+    position:"LF/RF", team:"Hudson Valley Renegades — New York Yankees",
+    frontImg:"https://i.postimg.cc/pXpZqkrg/1756201702161-1.jpg",
+    highSchoolImg:"https://i.postimg.cc/tCVcHV5g/34-Wilson-Front-page-00001-1.jpg",
+    place:"Tainan, TW", ba:"B", th:"R",
+    video:COMMON_VIDEO
   }
-};
+];
 
-/* Parse CSV */
-function parseCSV(csv){
-  const lines = csv.trim().split(/\r?\n/);
-  const hdr = lines.shift().split(',');
-  return lines.map(row=>{
-    const cells=[]; let cur='', inQ=false;
-    for(let i=0;i<row.length;i++){
-      const ch=row[i];
-      if(ch==='\"'){ inQ=!inQ; continue; }
-      if(ch===',' && !inQ){ cells.push(cur); cur=''; continue; }
-      cur+=ch;
-    }
-    cells.push(cur);
-    const m=new Map(); hdr.forEach((h,idx)=>m.set(h.trim(), (cells[idx]||'').trim()));
-    const name=m.get('player'); const id=toId(name);
-    return {
-      id, name: (name||'').toUpperCase(),
-      position: m.get('pos')||'',
-      ht: m.get('ht')||'', wt: m.get('wt')||'',
-      ba: m.get('ba')||'', th: m.get('th')||'',
-      place: m.get('place')||'',
-      currentLevel: (m.get('hilvl')||'').toUpperCase(),
-      graduatingClass: (m.get('stat years')?.split('-')?.[1]) ? Number(m.get('stat years').split('-')[1]) : undefined,
-      frontImg:'', highSchoolImg:'', team:'', parent:'',
-      letterWinnerYears:[]
-    };
+/* ===== hydrate page ===== */
+function fill(player){
+  // hero
+  byId('heroName').textContent = player.name || 'PLAYER';
+  byId('heroClass').textContent = player.graduatingClass ? `CLASS OF ${player.graduatingClass}` : 'CLASS OF —';
+  const hs = byId('heroHS'); hs.src = player.highSchoolImg || player.frontImg || ''; hs.alt = `${player.name} HS`;
+
+  // BIO
+  byId('bioLine').textContent =
+    `${player.position||'—'} • B/T ${player.ba||'—'}/${player.th||'—'} • ${player.place||'—'}`;
+
+  // STATS
+  const grid = byId('statsGrid'); grid.innerHTML = '';
+  let title = statsTitle(player.status);
+  let html = '';
+  if(player.batting){
+    const b = player.batting;
+    html = [
+      kv('AVG',b.avg), kv('OBP',b.obp), kv('SLG',b.slg), kv('OPS',b.ops),
+      kv('H',b.hits), kv('R',b.runs), kv('HR',b.hr), kv('RBI',b.rbi)
+    ].join('');
+  }else if(player.pitching){
+    const x = player.pitching;
+    html = [
+      kv('ERA',x.era), kv('WHIP',x.whip), kv('OBA',x.oba||'—'), kv('K/BB',x.kbb||'—'),
+      kv('IP',x.ip||'—'), kv('ER',x.er||'—'), kv('K',x.so||'—'), kv('HR',x.hr||'—')
+    ].join('');
+  }else{
+    html = '<div>No stats yet.</div>';
+  }
+  grid.insertAdjacentHTML('beforeend', html);
+
+  // NIL
+  byId('nilBlock').textContent = 'NIL Power Point Score coming soon.';
+
+  // VIDEO
+  byId('videoFrame').src = player.video || COMMON_VIDEO;
+}
+
+/* ===== tabs ===== */
+function attachTabs(){
+  const tabs = $$('.tab');
+  tabs.forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      tabs.forEach(b=>b.classList.toggle('active', b===btn));
+      const pane = btn.dataset.pane;
+      $$('.section').forEach(s=>s.classList.toggle('active', s.id===`pane-${pane}`));
+      // scroll to top of content on switch
+      window.scrollTo({top:0,behavior:'smooth'});
+    });
   });
 }
-const basePlayers = parseCSV(CSV).map(p=> ({...p, ...(enrich[p.id]||{})}));
 
-/* Helpers */
-function levelPretty(l){
-  const s=String(l||'').toUpperCase();
-  if(s==='MLB') return 'MLB';
-  if(s==='AAA') return 'Triple-A';
-  if(s==='AA') return 'Double-A';
-  if(s==='A+') return 'High-A';
-  if(s==='A') return 'Low-A';
-  if(s.includes('NCAA')) return 'NCAA';
-  if(s.includes('JR')) return 'JUCO';
-  if(s==='NAIA') return 'NAIA';
-  return l||'';
-}
-function letterDots(years){ if(!years||!years.length) return ''; const sorted=[...years].sort((a,b)=>b-a); return sorted.slice(0,6).map(y=>`<span class="letter-dot" title="${y}">${String(y).slice(-2)}</span>`).join(''); }
-function kv(k,v){ return `<div class="kv"><div class="k">${k}</div><div class="v">${v??'—'}</div></div>`; }
+/* ===== theme toggle ===== */
+(function themeInit(){
+  const KEY='yst-theme';
+  const prefersLight = matchMedia('(prefers-color-scheme: light)').matches;
+  const start = localStorage.getItem(KEY) || (prefersLight?'light':'dark');
+  const html=document.documentElement, icon=byId('themeIcon');
+  const set=(t)=>{ html.setAttribute('data-theme',t); localStorage.setItem(KEY,t);
+    icon.innerHTML = (t==='light')
+      ? '<path fill="currentColor" d="M6.76 4.84l-1.8-1.79-1.41 1.41 1.79 1.8 1.42-1.42zM1 13h3v-2H1v2zm10 10h2v-3h-2v3zm9.66-4.95l1.41-1.41-1.79-1.8-1.41 1.42 1.79 1.79zM20 11h3v2h-3v-2zM6.76 19.16l-1.42 1.42-1.79-1.79 1.41-1.41 1.8 1.78zM12 6a6 6 0 106 6 6 6 0 00-6-6z"/>'
+      : '<path fill="currentColor" d="M21.64 13A9 9 0 1111 2.36 7 7 0 0021.64 13z"/>'; };
+  set(start);
+  byId('iconTheme').addEventListener('click',()=>set(html.getAttribute('data-theme')==='light'?'dark':'light'));
+})();
 
-/* News helper links */
-function urlNews(name){ return `https://news.google.com/search?q=${encodeURIComponent(name)}&hl=en-US&gl=US&ceid=US:en`; }
-function urlEspn(name){ return `https://www.espn.com/search/results?q=${encodeURIComponent(name)}`; }
-function urlMlb(name){ return `https://www.mlb.com/search?q=${encodeURIComponent(name)}&type=news`; }
-function urlMilb(name){ return `https://www.milb.com/search?q=${encodeURIComponent(name)}&type=news`; }
-
-/* Boot */
-function init(){
-  // back/home
+/* ===== boot ===== */
+document.addEventListener('DOMContentLoaded', ()=>{
   byId('goHome').addEventListener('click', ()=>{ window.location.href='index.html'; });
 
   const params = new URLSearchParams(location.search);
   const pid = params.get('id') || '';
-  const player = basePlayers.find(p=>p.id===pid) || basePlayers[0];
+  const player = players.find(p=>p.id===pid) || players[0];
 
-  // crumb + name
-  byId('crumbName').textContent = player.name;
-  byId('pName').textContent = player.name;
-
-  // team/org lines
-  byId('pTeam').textContent = player.team || '—';
-  byId('pParent').textContent = player.parent || '';
-
-  // photo
-  const img = byId('pPhoto');
-  img.src = player.frontImg || player.highSchoolImg || FALLBACK_IMG;
-  img.alt = player.name;
-  img.onerror = ()=>imgOnError(img);
-
-  // badges
-  const level = levelPretty(player.currentLevel);
-  const badges = [];
-  if(level) badges.push(`<span class="chip ${lvlClass(level)}">${level.toUpperCase()}</span>`);
-  if(player.graduatingClass) badges.push(`<span class="chip">CLASS OF ${player.graduatingClass}</span>`);
-  byId('pBadges').innerHTML = badges.join('');
-  byId('pLetters').innerHTML = letterDots(player.letterWinnerYears);
-
-  // hero stats (top line quick hits)
-  const hero = [];
-  hero.push(kv('POS', player.position||'—'));
-  hero.push(kv('B/T', `${player.ba||'—'}/${player.th||'—'}`));
-  hero.push(kv('HT/WT', `${player.ht||'—'}/${player.wt||'—'}`));
-  hero.push(kv('HOMETOWN', player.place||'—'));
-  byId('pHeroStats').innerHTML = `<div class="kv-wrap">${hero.join('')}</div>`;
-
-  // overview line
-  byId('ov-lines').textContent =
-    `${player.position||'—'} • B/T ${player.ba||'—'}/${player.th||'—'} • ${player.ht||'—'}/${player.wt||'—'} • ${player.place||'—'}`;
-
-  // season stats (from enrich if present)
-  const season = [];
-  if(player.batting){
-    const b=player.batting;
-    season.push(kv('AVG',b.avg)); season.push(kv('OBP',b.obp)); season.push(kv('SLG',b.slg)); season.push(kv('OPS',b.ops));
-    season.push(kv('H',b.hits)); season.push(kv('R',b.runs)); season.push(kv('HR',b.hr)); season.push(kv('RBI',b.rbi));
-  }else if(player.pitching){
-    const x=player.pitching;
-    season.push(kv('ERA',x.era)); season.push(kv('WHIP',x.whip)); season.push(kv('K',x.so||x.ko)); season.push(kv('FIP
+  fill(player);
+  attachTabs();
+});
+</script>
+</body>
+</html>
