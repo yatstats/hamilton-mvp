@@ -50,7 +50,12 @@ img{max-width:100%;display:block}
   align-items:center;
   column-gap:6px;
 }
-.ham-logo{--hamH:80px;height:var(--hamH);width:auto}
+.ham-logo{
+  --hamH:80px;
+  height:var(--hamH); width:auto;
+  /* slight negative nudge in case the source PNG has transparent padding */
+  margin-left:clamp(-12px,-1.5vw,-2px);
+}
 .ham-type{
   display:flex; flex-direction:column; justify-content:space-between; align-items:flex-start;
   height:var(--hamH); padding-block:1px; min-width:0;
@@ -172,9 +177,9 @@ main{padding:10px 0 86px}
   grid-template-columns:repeat(8,1fr);
   gap:8px; margin-top:8px;
 }
-.card.back .iconbar-external{ display:grid; }
+.card.back + .iconbar-external{ display:grid; } /* show when previous sibling card has .back */
 
-/* floating buttons; only active state "boxed" */
+/* floating buttons; only active state boxed */
 .ibtn{height:34px;border-radius:9px;border:1px solid transparent;background:transparent;display:grid;place-items:center;cursor:pointer}
 .ibtn svg{width:16px;height:16px;color:#111}
 .ibtn.active{background:#111;border-color:#111}
@@ -200,7 +205,7 @@ body.no-scroll{overflow:hidden}
 .drawer-body{min-height:0;overflow:auto}
 .drawer-content{display:block;padding:12px 12px 18px}
 .rail{border:1px solid #1e2533;border-radius:10px;margin-bottom:10px;overflow:hidden;background:#0e141f}
-.rail summary{list-style:none;cursor:pointer;padding:10px 12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;font-size:12px;color:#d5d9df;border-bottom:1px solid #1e2533}
+.rail summary{list-style:none;cursor:pointer;padding:10px 12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;font-size:12px;color:#d2d8e1;border-bottom:1px solid #1e2533}
 .rail summary::-webkit-details-marker{display:none}
 .rail .inner{padding:8px 10px;max-height:42vh;overflow:auto}
 .ghost{display:block;width:100%;background:#0e141f;border:1px solid #1b2330;border-radius:10px;padding:10px;font-size:13px;color:#fff;outline:none}
@@ -243,6 +248,7 @@ body.no-scroll{overflow:hidden}
   .ham-type { height: var(--hamH); }
   .hambtn,.hdr-icon{width:34px;height:34px}
   .hambtn svg,.hdr-icon svg{width:19px;height:19px}
+  .ham-brand{column-gap:4px}
 }
 </style>
 </head>
@@ -326,7 +332,7 @@ body.no-scroll{overflow:hidden}
     </div>
 
     <div class="left-search">
-      <div class="left-search-h">PLAYER PROFILE SEARCH</div>
+      <div class="left-search-h" style="font-weight:900;letter-spacing:.12em;text-transform:uppercase;font-size:12px;color:#d5d9df;margin:2px 0 8px">PLAYER PROFILE SEARCH</div>
       <input id="localSearch" type="text" class="ghost" placeholder="Type a player name…" autocomplete="off"/>
       <ul id="localResults" class="left-results" role="listbox" aria-label="Search results" style="list-style:none;padding:0;margin:8px 0 0"></ul>
 
@@ -403,7 +409,7 @@ body.no-scroll{overflow:hidden}
 </main>
 
 <footer class="footer">
-  <div class="build-pill">BUILD: ham-v4.6.10</div>
+  <div class="build-pill">BUILD: ham-v4.6.11</div>
 </footer>
 
 <!-- Splash -->
@@ -639,16 +645,15 @@ function makeCard(p){
 
       <div class="back-bottom" data-noflip>
         <div role="tabpanel" class="pane pane-stats active" id="${paneIds.stats}" data-pane="stats" aria-labelledby="tab-${cardId}-stats" aria-hidden="false"><div class="kv-wrap12">${makeStats12(p)}</div></div>
-        <div role="tabpanel" class="pane pane-news" id="${paneIds.news}" data-pane="news" aria-labelledby="tab-${cardId}-news" aria-hidden="true"><div style="color:#374151;font-size:14px">
+        <div role="tabpanel" class="pane pane-news" id="${paneIds.news}" data-pane="news" aria-labelledby="tab-${cardId}-news" aria-hidden="true"><div style="color:#374151;font-size:14px;height:100%;display:flex;align-items:center;justify-content:center">
           <div><strong>Latest:</strong> ${p.name} makes headlines — on-platform story rendering here.</div>
-          <p style="margin:.4em 0 0">Short summary lives here. We’ll wire real feeds to this pane.</p>
         </div></div>
-        <div role="tabpanel" class="pane pane-yat" id="${paneIds.yat}" data-pane="yat" aria-labelledby="tab-${cardId}-yat" aria-hidden="true"><div style="color:#111">YAT-A-BOY! virtual gifting — CTA placeholder.</div></div>
+        <div role="tabpanel" class="pane pane-yat" id="${paneIds.yat}" data-pane="yat" aria-labelledby="tab-${cardId}-yat" aria-hidden="true"><div style="color:#111;display:flex;align-items:center;justify-content:center;height:100%">YAT-A-BOY! virtual gifting — CTA placeholder.</div></div>
         <div role="tabpanel" class="pane pane-nil" id="${paneIds.nil}" data-pane="nil" aria-labelledby="tab-${cardId}-nil" aria-hidden="true">
           ${p.nilImg?`<img src="${p.nilImg}" alt="NIL score" style="width:100%;height:100%;object-fit:cover;border-radius:10px">`:`<div style="color:#111;display:flex;align-items:center;justify-content:center;height:100%">NIL points will appear here.</div>`}
         </div>
-        <div role="tabpanel" class="pane pane-x" id="${paneIds.x}" data-pane="x" aria-labelledby="tab-${cardId}-x" aria-hidden="true"><div style="color:#111">X/Twitter posts placeholder.</div></div>
-        <div role="tabpanel" class="pane pane-ig" id="${paneIds.ig}" data-pane="ig" aria-labelledby="tab-${cardId}-ig" aria-hidden="true"><div style="color:#111">Instagram posts placeholder.</div></div>
+        <div role="tabpanel" class="pane pane-x" id="${paneIds.x}" data-pane="x" aria-labelledby="tab-${cardId}-x" aria-hidden="true"><div style="color:#111;display:flex;align-items:center;justify-content:center;height:100%">X/Twitter posts placeholder.</div></div>
+        <div role="tabpanel" class="pane pane-ig" id="${paneIds.ig}" data-pane="ig" aria-labelledby="tab-${cardId}-ig" aria-hidden="true"><div style="color:#111;display:flex;align-items:center;justify-content:center;height:100%">Instagram posts placeholder.</div></div>
         <div role="tabpanel" class="pane pane-video" id="${paneIds.video}" data-pane="video" aria-labelledby="tab-${cardId}-video" aria-hidden="true">
           <iframe width="100%" height="100%" src="${p.video||COMMON_VIDEO}" title="Video" frameborder="0" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
         </div>
@@ -662,29 +667,27 @@ function makeCard(p){
     </section>
   </div>
 
-  <!-- External iconbar (floats visually) -->
+  <!-- External iconbar (floats visually below the card) -->
   <div class="iconbar-external" role="tablist" aria-label="Card details">
-    ${Object.entries(paneIds).map(([k,id], idx)=>`
-      <button role="tab" class="ibtn ${k==='stats'?'active':''}" data-tab="${k}" title="${k.toUpperCase()}"
-        aria-selected="${k==='stats'?'true':'false'}" id="tab-${cardId}-${k}" aria-controls="${id}">
-        ${tabIcon(k)}
-      </button>`).join('')}
+    ${(() => {
+      const icons = {
+        stats:'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M5 3h2v18H5zM11 10h2v11h-2zM17 6h2v15h-2z"/></svg>',
+        news:'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M4 5h16v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5zm2 2v12h12V7H6zm1 1h10v3H7V8z"/></svg>',
+        yat:'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 21.35 10.55 20.03C5.4 15.36 2 12.28 2 8.5A5.5 5.5 0 0 1 7.5 3C9.24 3 10.91 3.81 12 5.08 13.09 3.81 14.76 3 16.5 3 21 3 24 6.5 24 10.5c0 3.78-3.4 6.86-8.55 11.53L12 21.35z"/></svg>',
+        nil:'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 1 3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 2.2L19 6v5c0 4.52-3.01 8.77-7 10-3.99-1.23-7-5.48-7-10V6l7-2.8zM11 7h2v6h3l-4 4-4-4h3z"/></svg>',
+        x:'<svg viewBox="0 0 1200 1227"><path fill="currentColor" d="M714 511 1160 0H996L689 356 420 0H0l463 607L0 1227h164l329-379 286 379h420zM327 120h154l646 873H973z"/></svg>',
+        ig:'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5zm5 5a5 5 0 1 0 .001 10.001A5 5 0 0 0 12 7zm6-2.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z"/></svg>',
+        video:'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M8 5v14l11-7zM5 5h2v14H5z"/></svg>',
+        gallery:'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M21 19V5a2 2 0 0 0-2-2H5C3.9 3 3 3.9 3 5v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5zM8 8a2 2 0 1 1 4 0 2 2 0 0 1-4 0z"/></svg>',
+      };
+      return Object.entries(paneIds).map(([k,id])=>`
+        <button role="tab" class="ibtn ${k==='stats'?'active':''}" data-tab="${k}"
+          aria-selected="${k==='stats'?'true':'false'}" aria-controls="${id}">
+          ${icons[k]}
+        </button>`).join('');
+    })()}
   </div>
 </article>`;
-}
-
-function tabIcon(k){
-  const map={
-    stats:'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M5 3h2v18H5zM11 10h2v11h-2zM17 6h2v15h-2z"/></svg>',
-    news:'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M4 5h16v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5zm2 2v12h12V7H6zm1 1h10v3H7V8z"/></svg>',
-    yat:'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 21.35 10.55 20.03C5.4 15.36 2 12.28 2 8.5A5.5 5.5 0 0 1 7.5 3C9.24 3 10.91 3.81 12 5.08 13.09 3.81 14.76 3 16.5 3 21 3 24 6.5 24 10.5c0 3.78-3.4 6.86-8.55 11.53L12 21.35z"/></svg>',
-    nil:'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 1 3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 2.2L19 6v5c0 4.52-3.01 8.77-7 10-3.99-1.23-7-5.48-7-10V6l7-2.8zM11 7h2v6h3l-4 4-4-4h3z"/></svg>',
-    x:'<svg viewBox="0 0 1200 1227"><path fill="currentColor" d="M714 511 1160 0H996L689 356 420 0H0l463 607L0 1227h164l329-379 286 379h420zM327 120h154l646 873H973z"/></svg>',
-    ig:'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5zm5 5a5 5 0 1 0 .001 10.001A5 5 0 0 0 12 7zm6-2.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z"/></svg>',
-    video:'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M8 5v14l11-7zM5 5h2v14H5z"/></svg>',
-    gallery:'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M21 19V5a2 2 0 0 0-2-2H5C3.9 3 3 3.9 3 5v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5zM8 8a2 2 0 1 1 4 0 2 2 0 0 1-4 0z"/></svg>'
-  };
-  return map[k]||map.stats;
 }
 
 function render(list){ byId('grid').innerHTML = list.map(makeCard).join(''); attachInteractions(); }
@@ -741,7 +744,7 @@ function resetAll(){
 }
 
 /* ------------------- interactions ------------------- */
-const INTERACTIVE_SEL='[data-noflip], .tabbtn, .action-chip, .iconbar, .ibtn, a,button,input,select,textarea';
+const INTERACTIVE_SEL='[data-noflip], .tabbtn, .action-chip, .iconbar-external, .ibtn, a,button,input,select,textarea';
 function toggle(card){ if(!card) return; card.classList.contains('front') ? (card.classList.remove('front'),card.classList.add('back')) : (card.classList.remove('back'),card.classList.add('front')); }
 
 function attachInteractions(){
@@ -750,8 +753,8 @@ function attachInteractions(){
     bar.addEventListener('click', (e)=>{
       const btn = e.target.closest('.ibtn'); 
       if (!btn) return;
-      const card = bar.closest('.card');
-      if (!card) return;
+      const card = bar.previousElementSibling; // the .card just above this bar
+      if (!card || !card.classList.contains('card')) return;
 
       // Flip to back if needed
       if (card.classList.contains('front')) {
