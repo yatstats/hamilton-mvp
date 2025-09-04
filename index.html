@@ -5,7 +5,81 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>YAT?STATS</title>
   <style>
-    /* (your existing CSS goes here — omitted for brevity, unchanged except build tag bump) */
+    :root{
+      --bg:#000;
+      --ink:#111;
+      --gutter:14px;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0}
+    body{background:#000;color:#111;font:15px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial}
+    a{text-decoration:none;color:inherit}
+    button{font:inherit}
+
+    /* ===== HEADER ===== */
+    .site-header{
+      position:sticky;top:0;z-index:50;background:#000;color:#fff;
+      display:grid;grid-template-rows:auto auto;border-bottom:1px solid #222
+    }
+    .h-top{display:flex;align-items:center;justify-content:space-between;padding:6px var(--gutter)}
+    .hambtn{width:36px;height:36px;border:0;background:transparent;cursor:pointer;display:grid;place-items:center}
+    .hdr-icons{display:flex;gap:8px}
+    .hdr-icon{width:36px;height:36px;border:0;background:transparent;cursor:pointer;display:grid;place-items:center;border-radius:6px}
+    .ystats-wrap img{height:34px;width:auto}
+
+    .h-bot{display:flex;align-items:center;padding:6px var(--gutter);gap:12px}
+    .school-block{display:flex;align-items:center;gap:8px}
+    .ham-logo{height:42px;width:auto;display:block}
+    .school-type{line-height:1.1}
+    .school-line1{font-size:11px;color:#ccc;font-weight:600}
+    .school-line2{font-size:13px;font-weight:900;color:#fff}
+    .school-line3{font-size:13px;font-weight:900;color:#fff}
+
+    /* ===== TAGLINE ===== */
+    .tagline{background:#111;color:#fff;text-align:center;font-size:14px;padding:6px;letter-spacing:.05em}
+    .tagline strong{font-weight:900}
+
+    /* ===== CARDS ===== */
+    .card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;padding:16px}
+    .card{position:relative;aspect-ratio:5/7;perspective:2000px}
+    .inner{position:absolute;inset:0;transition:transform .6s;transform-style:preserve-3d}
+    .card.front .inner{transform:rotateY(0deg)}
+    .card.back .inner{transform:rotateY(180deg)}
+    .face{position:absolute;inset:0;backface-visibility:hidden;border:1px solid #333;border-radius:10px;overflow:hidden;display:flex;flex-direction:column}
+    .front-face{background:#fff}
+    .back-face{background:#fff;transform:rotateY(180deg);display:flex;flex-direction:column}
+
+    /* front chips */
+    .chips{display:flex;gap:6px;padding:6px;flex-wrap:wrap}
+    .chip{background:#111;color:#fff;font-size:11px;padding:3px 8px;border-radius:999px;font-weight:700;white-space:nowrap}
+
+    /* back layout */
+    .back-top{display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:6px}
+    .profile-link{background:#000;color:#fff;padding:6px;border-radius:6px;text-align:center;display:block}
+    .profile-link .pn{font-weight:900;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .profile-link .pt{font-size:12px;color:#ddd}
+    .hs-img{aspect-ratio:5/7;background:#111;border-radius:6px;overflow:hidden}
+    .hs-img img{width:100%;height:100%;object-fit:cover}
+
+    .back-bottom{border-top:1px solid #ccc;display:grid;grid-template-rows:auto minmax(0,1fr) auto;min-height:0;padding:6px}
+    .zone-title{font-family:"Anton",sans-serif;letter-spacing:.1em;font-size:13px;font-weight:900;margin:0 0 6px}
+    .pane{display:none;min-height:0;overflow:auto}
+    .pane.active{display:block}
+    .kv-wrap12{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+    .kv{background:#f1f1f1;border-radius:8px;text-align:center;padding:6px}
+    .kv .k{font-size:11px;color:#555}
+    .kv .v{font-weight:900;color:#000}
+
+    /* icon bar */
+    .iconbar{display:grid;grid-template-columns:repeat(8,1fr);gap:4px;margin-top:6px}
+    .ibtn{height:26px;border-radius:6px;border:1px solid transparent;background:transparent;display:grid;place-items:center;cursor:pointer}
+    .ibtn svg{width:14px;height:14px;color:#111}
+    .ibtn.active{background:#111;border-color:#111}
+    .ibtn.active svg{color:#fff}
+
+    /* ===== FOOTER ===== */
+    .footer{background:#000;color:#fff;text-align:center;padding:10px;font-size:12px}
+    .build-pill{display:inline-block;background:rgba(255,255,255,.1);padding:4px 10px;border-radius:12px}
   </style>
 </head>
 <body>
@@ -24,8 +98,8 @@
   </div>
   <div class="h-bot">
     <div class="school-block">
-      <img class="ham-logo" id="hamLogo"
-        src="https://i.postimg.cc/pVm0vHdX/hamilton-logo-with-room.png?v=ham-v4.7.3"
+      <img class="ham-logo" id="hamLogo" 
+        src="https://i.postimg.cc/pVm0vHdX/hamilton-logo-with-room.png?v=ham-v4.7.3" 
         alt="Hamilton H"/>
       <div class="school-type">
         <div class="school-line1">CHANDLER, AZ</div>
@@ -36,11 +110,9 @@
   </div>
 </header>
 
-<main>
-  <!-- your tagline -->
-  <div class="tagline">WHERE THEY <strong>YAT?</strong> FLIP FOR <strong>STATS!</strong></div>
+<div class="tagline">WHERE THEY <strong>YAT?</strong> FLIP FOR <strong>STATS!</strong></div>
 
-  <!-- card grid -->
+<main>
   <section id="cardGrid" class="card-grid"></section>
 </main>
 
@@ -49,8 +121,108 @@
 </footer>
 
 <script>
-  /* your existing JavaScript goes here (unchanged except any fixes we applied earlier).
-     This includes makeCard(), fun zone panes, icon bar rendering, filtering logic, etc. */
+/* ===== Sample dataset ===== */
+const PLAYERS = [
+  {
+    id:"cody-bellinger",
+    name:"CODY BELLINGER",
+    team:"New York Yankees",
+    status:"Active 2025",
+    grad:2013,
+    chips:["MLB","Active 2025","Class of 2013"],
+    batting:{avg:".284",obp:".345",slg:".520",ops:".865",hits:"150",runs:"95",hr:"35",rbi:"105",doubles:"20",triples:"3",sb:"5",bb:"41"},
+    frontImg:"https://i.postimg.cc/9F19KG5h/new-york-yankees-outfielder-cody-bellinger.jpg",
+    hsImg:"https://i.postimg.cc/Jhq690Lg/01-Bellinger-Front-page-00001.jpg"
+  },
+  {
+    id:"patrick-murphy",
+    name:"PATRICK MURPHY",
+    team:"KT Wiz Suwon KBO",
+    status:"Active 2025",
+    grad:2013,
+    chips:["KBO","Active 2025","Class of 2013"],
+    pitching:{era:"3.22",whip:"1.09",oba:".224","kbb":"3.6",fip:"3.45",ip:"112.0",er:"40",so:"71",qs:"10",hr:"8",w:"8",sv:"0"},
+    frontImg:"https://i.postimg.cc/JnCXccvC/MURPH.avif",
+    hsImg:"https://i.postimg.cc/Jhq690Lg/01-Bellinger-Front-page-00001.jpg"
+  }
+];
+
+/* ===== Helpers ===== */
+function makeKV(k,v){return `<div class="kv"><div class="k">${k}</div><div class="v">${v??"—"}</div></div>`}
+function dynamicStatsTitle(p){
+  const s=(p.status||"").toUpperCase();
+  if(s.includes("2025")) return "2025 SEASON STATS";
+  if(s.includes("2024")) return "2024 SEASON STATS";
+  if(s.includes("RETIRE")) return "CAREER STATS";
+  return "SEASON STATS";
+}
+function makeStats12(p){
+  if(p.batting){
+    const b=p.batting;
+    return `${makeKV("AVG",b.avg)} ${makeKV("OBP",b.obp)} ${makeKV("SLG",b.slg)} ${makeKV("OPS",b.ops)}
+            ${makeKV("H",b.hits)} ${makeKV("R",b.runs)} ${makeKV("HR",b.hr)} ${makeKV("RBI",b.rbi)}
+            ${makeKV("2B",b.doubles)} ${makeKV("3B",b.triples)} ${makeKV("SB",b.sb)} ${makeKV("BB",b.bb)}`;
+  }
+  if(p.pitching){
+    const x=p.pitching;
+    return `${makeKV("ERA",x.era)} ${makeKV("WHIP",x.whip)} ${makeKV("OBA",x.oba)} ${makeKV("K/BB",x.kbb)}
+            ${makeKV("FIP",x.fip)} ${makeKV("IP",x.ip)} ${makeKV("ER",x.er)} ${makeKV("K",x.so)}
+            ${makeKV("QS",x.qs)} ${makeKV("HR",x.hr)} ${makeKV("W",x.w)} ${makeKV("SV",x.sv)}`;
+  }
+  return "";
+}
+
+/* ===== Card builder ===== */
+function makeCard(p){
+  return `<article class="card front" id="${p.id}">
+    <div class="inner">
+      <div class="face front-face">
+        <img src="${p.frontImg}" alt="${p.name}" style="width:100%;height:auto;flex:1"/>
+        <div class="chips">${p.chips.map(c=>`<span class="chip">${c}</span>`).join("")}</div>
+      </div>
+      <div class="face back-face">
+        <div class="back-top">
+          <a class="profile-link" href="profile.html?id=${p.id}">
+            <div class="pn">${p.name}</div>
+            <div class="pt">${p.team}</div>
+          </a>
+          <div class="hs-img"><img src="${p.hsImg}" alt=""></div>
+        </div>
+        <div class="back-bottom">
+          <div class="zone-title">${dynamicStatsTitle(p)}</div>
+          <div class="pane active" data-pane="stats">
+            <div class="kv-wrap12">${makeStats12(p)}</div>
+          </div>
+          <div class="iconbar">
+            <button class="ibtn active" data-tab="stats"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg></button>
+            <button class="ibtn" data-tab="news"><svg viewBox="0 0 24 24"><path d="M4 4h16v16H4z"/></svg></button>
+            <button class="ibtn" data-tab="yboy"><svg viewBox="0 0 24 24"><path d="M12 2L2 22h20z"/></svg></button>
+            <button class="ibtn" data-tab="nil"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg></button>
+            <button class="ibtn" data-tab="x"><svg viewBox="0 0 24 24"><path d="M4 20 20 4m0 16L4 4"/></svg></button>
+            <button class="ibtn" data-tab="ig"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16"/></svg></button>
+            <button class="ibtn" data-tab="vid"><svg viewBox="0 0 24 24"><polygon points="8,5 19,12 8,19"/></svg></button>
+            <button class="ibtn" data-tab="fan"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg></button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </article>`;
+}
+
+/* ===== Render & Sort ===== */
+function render(){
+  const grid=document.getElementById("cardGrid");
+  // filter active only
+  const active=PLAYERS.filter(p=>/2025|2024|INJURED|FREE AGENT/i.test(p.status));
+  const sorted=active.sort((a,b)=>{
+    const orderA=a.status.includes("2025")||a.status.includes("INJURED")?0:1;
+    const orderB=b.status.includes("2025")||b.status.includes("INJURED")?0:1;
+    if(orderA!==orderB) return orderA-orderB;
+    return a.grad-b.grad;
+  });
+  grid.innerHTML=sorted.map(makeCard).join("");
+}
+render();
 </script>
 </body>
 </html>
