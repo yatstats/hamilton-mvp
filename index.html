@@ -403,7 +403,7 @@ body.no-scroll{overflow:hidden}
 </main>
 
 <footer class="footer">
-  <div class="build-pill">BUILD: ham-v4.6.9</div>
+  <div class="build-pill">BUILD: ham-v4.6.10</div>
 </footer>
 
 <!-- Splash -->
@@ -745,25 +745,7 @@ const INTERACTIVE_SEL='[data-noflip], .tabbtn, .action-chip, .iconbar, .ibtn, a,
 function toggle(card){ if(!card) return; card.classList.contains('front') ? (card.classList.remove('front'),card.classList.add('back')) : (card.classList.remove('back'),card.classList.add('front')); }
 
 function attachInteractions(){
-  // internal (back-face) tabbars if present (kept for safety)
-  $$('.iconbar').forEach(bar=>{
-    bar.addEventListener('click', (e)=>{
-      const btn=e.target.closest('.ibtn'); if(!btn) return;
-      const card=btn.closest('.card'); const pane=btn.dataset.tab||'stats';
-      card.querySelectorAll('.ibtn[role="tab"]').forEach(b => {
-          const isSelected = (b === btn);
-          b.classList.toggle('active', isSelected);
-          b.setAttribute('aria-selected', String(isSelected));
-      });
-      card.querySelectorAll('.pane').forEach(p=>{
-        const active = p.dataset.pane===pane;
-        p.classList.toggle('active', active);
-        p.setAttribute('aria-hidden', String(!active));
-      });
-    },true);
-  });
-
-  // External iconbar under card
+  // external iconbar under card
   $$('.iconbar-external').forEach(bar=>{
     bar.addEventListener('click', (e)=>{
       const btn = e.target.closest('.ibtn'); 
@@ -848,7 +830,7 @@ function renderLocalResults(q){
 }
 localSearch.addEventListener('input', (e)=>renderLocalResults(e.target.value));
 
-/* ------------------- default view: Active only, oldest class first ------------------- */
+/* ------------------- default view: Active + Retired, oldest class first ------------------- */
 const players = [...playersSeed];
 function playersDefaultView(){
   return players
