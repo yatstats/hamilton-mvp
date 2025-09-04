@@ -11,8 +11,8 @@
 :root{
   --bg:#0b0d12; --ink:#f3f4f6; --muted:#A6ADB7;
   --ring:#1f2530; --ring2:#232a36;
-  --headerH:135px;            /* desktop */
-  --headerH-sm:100px;         /* mobile */
+  --headerH:135px;  /* desktop */
+  --headerH-sm:100px; /* mobile */
   --drawer-min:300px; --drawer-max:520px; --drawer-mob:75vw;
   --accent:#ffffff; --chip:#0e1016;
   --touchEdge:18%;
@@ -53,8 +53,7 @@ img{max-width:100%;display:block}
 .ham-logo{
   --hamH:80px;
   height:var(--hamH); width:auto;
-  /* slight negative nudge in case the source PNG has transparent padding */
-  margin-left:clamp(-12px,-1.5vw,-2px);
+  margin-left:clamp(-12px,-1.5vw,-2px); /* eat transparent padding if any */
 }
 .ham-type{
   display:flex; flex-direction:column; justify-content:space-between; align-items:flex-start;
@@ -66,7 +65,7 @@ img{max-width:100%;display:block}
 
 /* center nav (desktop only, never wrap; hide when tight) */
 .nav-desktop{
-  position:absolute; top: 50%; left:50%; transform:translate(-50%,-50%);
+  position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
   display:flex;gap:16px;white-space:nowrap;
 }
 @media (max-width:1400px){ .nav-desktop{display:none} }
@@ -134,33 +133,32 @@ main{padding:10px 0 86px}
 .right-line{font-size:12px;font-weight:800;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .last3 .item{font-size:12px;color:#e5e7eb;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:right;margin-top:2px}
 
-/* BACK (layout locked to card; no internal scroll) */
+/* BACK (layout locked to card; no inner scroll; icons under funzone) */
 .back-face{
   transform:rotateY(180deg);
   background:#fff;color:#111;display:grid;
   grid-template-rows:50% 50%;
 }
 
-/* top half: two columns (left meta, right HS image) */
+/* top half: two equal columns (left meta, right HS image) */
 .back-top{
-  display:grid; grid-template-columns: 1fr 1fr; gap:12px;
+  display:grid; grid-template-columns:1fr 1fr; gap:12px;
   padding:10px 12px 6px; align-items:start;
 }
 .profile-block{display:flex;flex-direction:column;gap:10px}
 .profile-link{display:block;border:1px solid #111;border-radius:10px;padding:10px 12px;background:#111;color:#fff}
 .profile-link .pn{font-weight:900;font-size:16px;letter-spacing:.02em}
 .profile-link .pt{font-size:12px;opacity:.95;margin-top:2px;line-height:1.15}
-
 .fun-title{font-family:"Anton",sans-serif;font-size:13px;letter-spacing:.12em;margin:6px 0 0 2px}
 
 .hs-box{width:100%;height:100%;border-radius:10px;overflow:hidden;background:#d2d6db}
 .hs-box img{width:100%;height:100%;object-fit:cover;}
 
-/* bottom half: panes (no scroll inside), grid fills area */
+/* bottom half: panes (fill) then iconbar (auto height) */
 .back-bottom{
   border-top:1px solid #e5e7eb;
-  display:flex; flex-direction:column; min-height:0;
-  padding:8px 10px 10px;
+  display:grid; grid-template-rows: 1fr auto;
+  min-height:0; padding:8px 10px 10px;
 }
 .pane{display:none;min-height:0;height:100%;overflow:hidden}
 .pane.active{display:block}
@@ -171,15 +169,11 @@ main{padding:10px 0 86px}
 .kv .k{font-size:11px;color:#374151}
 .kv .v{font-weight:800}
 
-/* 8-icon bar OUTSIDE the flipping surface, under each card */
-.iconbar-external{
-  display:none;   /* appears when card is flipped */
-  grid-template-columns:repeat(8,1fr);
+/* 8-icon bar INSIDE the back-bottom (always visible on the back) */
+.iconbar{
+  display:grid; grid-template-columns:repeat(8,1fr);
   gap:8px; margin-top:8px;
 }
-.card.back + .iconbar-external{ display:grid; } /* show when previous sibling card has .back */
-
-/* floating buttons; only active state boxed */
 .ibtn{height:34px;border-radius:9px;border:1px solid transparent;background:transparent;display:grid;place-items:center;cursor:pointer}
 .ibtn svg{width:16px;height:16px;color:#111}
 .ibtn.active{background:#111;border-color:#111}
@@ -409,7 +403,7 @@ body.no-scroll{overflow:hidden}
 </main>
 
 <footer class="footer">
-  <div class="build-pill">BUILD: ham-v4.6.11</div>
+  <div class="build-pill">BUILD: ham-v4.6.13</div>
 </footer>
 
 <!-- Splash -->
@@ -596,6 +590,17 @@ function makeCard(p){
     gallery: `${cardId}-pane-gallery`,
   };
 
+  const icons = {
+    stats:'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M5 3h2v18H5zM11 10h2v11h-2zM17 6h2v15h-2z"/></svg>',
+    news:'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M4 5h16v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5zm2 2v12h12V7H6zm1 1h10v3H7V8z"/></svg>',
+    yat:'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 21.35 10.55 20.03C5.4 15.36 2 12.28 2 8.5A5.5 5.5 0 0 1 7.5 3C9.24 3 10.91 3.81 12 5.08 13.09 3.81 14.76 3 16.5 3 21 3 24 6.5 24 10.5c0 3.78-3.4 6.86-8.55 11.53L12 21.35z"/></svg>',
+    nil:'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 1 3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 2.2L19 6v5c0 4.52-3.01 8.77-7 10-3.99-1.23-7-5.48-7-10V6l7-2.8zM11 7h2v6h3l-4 4-4-4h3z"/></svg>',
+    x:'<svg viewBox="0 0 1200 1227"><path fill="currentColor" d="M714 511 1160 0H996L689 356 420 0H0l463 607L0 1227h164l329-379 286 379h420zM327 120h154l646 873H973z"/></svg>',
+    ig:'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5zm5 5a5 5 0 1 0 .001 10.001A5 5 0 0 0 12 7zm6-2.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z"/></svg>',
+    video:'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M8 5v14l11-7zM5 5h2v14H5z"/></svg>',
+    gallery:'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M21 19V5a2 2 0 0 0-2-2H5C3.9 3 3 3.9 3 5v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5zM8 8a2 2 0 1 1 4 0 2 2 0 0 1-4 0z"/></svg>',
+  };
+
   return `
 <article class="card flip-card front" aria-label="${(p.name||'').toUpperCase()}" tabindex="0">
   <button class="hit left" aria-hidden="true" data-toggle="prev"></button>
@@ -644,6 +649,7 @@ function makeCard(p){
       </div>
 
       <div class="back-bottom" data-noflip>
+        <!-- FUNZONE (panes) -->
         <div role="tabpanel" class="pane pane-stats active" id="${paneIds.stats}" data-pane="stats" aria-labelledby="tab-${cardId}-stats" aria-hidden="false"><div class="kv-wrap12">${makeStats12(p)}</div></div>
         <div role="tabpanel" class="pane pane-news" id="${paneIds.news}" data-pane="news" aria-labelledby="tab-${cardId}-news" aria-hidden="true"><div style="color:#374151;font-size:14px;height:100%;display:flex;align-items:center;justify-content:center">
           <div><strong>Latest:</strong> ${p.name} makes headlines — on-platform story rendering here.</div>
@@ -663,29 +669,17 @@ function makeCard(p){
               ${p.gallery.map(src=>`<img src="${src}" loading="lazy" style="display:inline-block;height:100%;object-fit:cover;border-radius:10px;margin-right:8px" alt="Gallery image">`).join('')}
             </div>`:`<div style="color:#111;display:flex;align-items:center;justify-content:center;height:100%">Gallery coming soon.</div>`}
         </div>
+
+        <!-- 8 ICON TRIGGERS (inside the back, under funzone) -->
+        <div class="iconbar" role="tablist" aria-label="Card details">
+          ${Object.entries(paneIds).map(([k,id])=>`
+            <button role="tab" class="ibtn ${k==='stats'?'active':''}" data-tab="${k}"
+              aria-selected="${k==='stats'?'true':'false'}" aria-controls="${id}">
+              ${icons[k]}
+            </button>`).join('')}
+        </div>
       </div>
     </section>
-  </div>
-
-  <!-- External iconbar (floats visually below the card) -->
-  <div class="iconbar-external" role="tablist" aria-label="Card details">
-    ${(() => {
-      const icons = {
-        stats:'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M5 3h2v18H5zM11 10h2v11h-2zM17 6h2v15h-2z"/></svg>',
-        news:'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M4 5h16v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5zm2 2v12h12V7H6zm1 1h10v3H7V8z"/></svg>',
-        yat:'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 21.35 10.55 20.03C5.4 15.36 2 12.28 2 8.5A5.5 5.5 0 0 1 7.5 3C9.24 3 10.91 3.81 12 5.08 13.09 3.81 14.76 3 16.5 3 21 3 24 6.5 24 10.5c0 3.78-3.4 6.86-8.55 11.53L12 21.35z"/></svg>',
-        nil:'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 1 3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 2.2L19 6v5c0 4.52-3.01 8.77-7 10-3.99-1.23-7-5.48-7-10V6l7-2.8zM11 7h2v6h3l-4 4-4-4h3z"/></svg>',
-        x:'<svg viewBox="0 0 1200 1227"><path fill="currentColor" d="M714 511 1160 0H996L689 356 420 0H0l463 607L0 1227h164l329-379 286 379h420zM327 120h154l646 873H973z"/></svg>',
-        ig:'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5zm5 5a5 5 0 1 0 .001 10.001A5 5 0 0 0 12 7zm6-2.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z"/></svg>',
-        video:'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M8 5v14l11-7zM5 5h2v14H5z"/></svg>',
-        gallery:'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M21 19V5a2 2 0 0 0-2-2H5C3.9 3 3 3.9 3 5v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5zM8 8a2 2 0 1 1 4 0 2 2 0 0 1-4 0z"/></svg>',
-      };
-      return Object.entries(paneIds).map(([k,id])=>`
-        <button role="tab" class="ibtn ${k==='stats'?'active':''}" data-tab="${k}"
-          aria-selected="${k==='stats'?'true':'false'}" aria-controls="${id}">
-          ${icons[k]}
-        </button>`).join('');
-    })()}
   </div>
 </article>`;
 }
@@ -709,7 +703,13 @@ function populateFilters(players){
   const lSel=byId('lvl'); lSel.innerHTML=''; LEVEL_ORDER.forEach(L=>{const o=document.createElement('option');o.value=L;o.textContent=L;lSel.appendChild(o);}); addSelectAll(lSel);
   const gSel=byId('grad'); gSel.innerHTML=''; uniqueSortedGradYears(players).forEach(y=>{const o=document.createElement('option');o.value=String(y);o.textContent=y;gSel.appendChild(o);}); addSelectAll(gSel);
   const rSel=byId('roster'); rSel.innerHTML=''; uniqueRosterYears(players).forEach(y=>{const o=document.createElement('option');o.value=String(y);o.textContent=y;rSel.appendChild(o);}); addSelectAll(rSel);
-  const sSel=byId('status'); sSel.innerHTML=''; ["Active 2025","Active 2024","Retired"].forEach(s=>{const o=document.createElement('option');o.value=s;o.textContent=s.toUpperCase();sSel.appendChild(o);}); addSelectAll(sSel);
+
+  /* include all known statuses, including Injured + Free Agent */
+  const sSel=byId('status'); sSel.innerHTML='';
+  ["Active 2025","Injured","Active 2024","Free Agent","Retired"].forEach(s=>{
+    const o=document.createElement('option');o.value=s;o.textContent=s.toUpperCase();sSel.appendChild(o);
+  });
+  addSelectAll(sSel);
 }
 
 function getMultiValues(id){const sel=byId(id);return sel?[...sel.options].filter(o=>o.selected).map(o=>o.value):[]}
@@ -732,8 +732,22 @@ function applyFilters(){
     if(years.length){ const lw=(p.letterWinnerYears||[]).map(Number); if(!lw.some(y=>years.includes(y))) return false; }
     if(statsSel.length){ if(!statsSel.includes(String(p.status||''))) return false; }
     return true;
-  }).sort((a,b)=>(+a.graduatingClass||9999)-(+b.graduatingClass||9999));
+  }).sort(customActiveSort);
   render(out);
+}
+
+/* custom sort: Active 2025 & Injured (oldest->youngest) then Active 2024 & Free Agent (oldest->youngest) */
+const STATUS_ORDER = ["ACTIVE 2025","INJURED","ACTIVE 2024","FREE AGENT"]; // caps for compare
+function statusBucket(p){
+  const s = String(p.status||'').toUpperCase();
+  const idx = STATUS_ORDER.indexOf(s);
+  return idx === -1 ? 999 : idx;
+}
+function customActiveSort(a,b){
+  const A = statusBucket(a), B = statusBucket(b);
+  if (A !== B) return A - B;
+  const ag = +a.graduatingClass||9999, bg = +b.graduatingClass||9999;
+  return ag - bg; // oldest first
 }
 
 function resetAll(){
@@ -744,23 +758,17 @@ function resetAll(){
 }
 
 /* ------------------- interactions ------------------- */
-const INTERACTIVE_SEL='[data-noflip], .tabbtn, .action-chip, .iconbar-external, .ibtn, a,button,input,select,textarea';
+const INTERACTIVE_SEL='[data-noflip], .tabbtn, .action-chip, .iconbar, .ibtn, a,button,input,select,textarea';
 function toggle(card){ if(!card) return; card.classList.contains('front') ? (card.classList.remove('front'),card.classList.add('back')) : (card.classList.remove('back'),card.classList.add('front')); }
 
 function attachInteractions(){
-  // external iconbar under card
-  $$('.iconbar-external').forEach(bar=>{
+  // iconbar (on the back; does NOT flip card)
+  $$('.iconbar').forEach(bar=>{
     bar.addEventListener('click', (e)=>{
       const btn = e.target.closest('.ibtn'); 
       if (!btn) return;
-      const card = bar.previousElementSibling; // the .card just above this bar
-      if (!card || !card.classList.contains('card')) return;
-
-      // Flip to back if needed
-      if (card.classList.contains('front')) {
-        card.classList.remove('front');
-        card.classList.add('back');
-      }
+      const card = bar.closest('.card');
+      if (!card) return;
 
       // Button state
       bar.querySelectorAll('.ibtn').forEach(b=>{
@@ -769,7 +777,7 @@ function attachInteractions(){
         b.setAttribute('aria-selected', String(isSel));
       });
 
-      // Swap panes
+      // Swap panes within this card
       const pane = btn.dataset.tab || 'stats';
       const back = card.querySelector('.back-face');
       if (!back) return;
@@ -781,7 +789,7 @@ function attachInteractions(){
     }, true);
   });
 
-  // flip gestures
+  // flip gestures (front only)
   $$('.card').forEach(card=>{
     if(!card.classList.contains('front')&& !card.classList.contains('back')) card.classList.add('front');
     $$('.hit',card).forEach(hit=>{
@@ -833,12 +841,18 @@ function renderLocalResults(q){
 }
 localSearch.addEventListener('input', (e)=>renderLocalResults(e.target.value));
 
-/* ------------------- default view: Active + Retired, oldest class first ------------------- */
+/* ------------------- default view: ACTIVE ONLY with custom order ------------------- */
 const players = [...playersSeed];
+
+function isActiveOnly(p){
+  const s = String(p.status||'').toUpperCase();
+  return s === 'ACTIVE 2025' || s === 'INJURED' || s === 'ACTIVE 2024' || s === 'FREE AGENT';
+}
+
 function playersDefaultView(){
   return players
-    .filter(p => String(p.status||'').startsWith('Active') || String(p.status||'').startsWith('Retired'))
-    .sort((a,b)=>(+a.graduatingClass||9999)-(+b.graduatingClass||9999));
+    .filter(isActiveOnly)
+    .sort(customActiveSort);
 }
 
 /* ------------------- splash ------------------- */
