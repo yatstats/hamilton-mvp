@@ -3,52 +3,72 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Player Profile — YATSTATS</title>
+<title>Player Profile — WHERE THEY YAT?</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Roboto+Condensed:wght@300;400;700&display=swap" rel="stylesheet" />
 <style>
-  /* (your existing CSS, unchanged except fallback + logo updates) */
+  :root{ --bg:#0b0d12; --ink:#f3f4f6; --ring:#1f2530; --headerH:135px }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{background:#000;color:var(--ink);font:15px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial}
+  main{padding:calc(var(--headerH) + 20px) 10px 80px}
+  .profile-wrap{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1.2fr .8fr;gap:16px}
+  @media (max-width:920px){ .profile-wrap{grid-template-columns:1fr} }
+  .hero{background:#000;border:1px solid var(--ring);border-radius:14px;overflow:hidden}
+  .hero img{width:100%;height:380px;object-fit:cover}
+  .card-spot{min-height:400px}
+  .meta{background:#0d1117;border:1px solid #1f2530;border-radius:14px;padding:12px}
+  .title{font-family:"Anton",sans-serif;letter-spacing:.02em;font-size:22px}
+  .crumb{color:#9aa1ab;margin-bottom:8px}
+  .kv{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px}
+  .kv .box{background:#0e141f;border:1px solid #1b2330;border-radius:10px;padding:10px;text-align:center}
+  .kv .k{font-size:11px;color:#cbd5e1}
+  .kv .v{font-weight:800;color:#fff}
+  .back-link{display:inline-flex;align-items:center;gap:8px;margin:10px 0 0}
+  .back-link svg{width:16px;height:16px}
+  @media (max-width: 640px) { :root { --headerH: 100px; } }
 </style>
 </head>
 <body>
 
-<header class="site-header">
-  <div class="h-top">
-    <button class="hambtn" id="goHome" aria-label="Back to gallery" title="Back">
-      <svg viewBox="0 0 24 24" width="22" height="22"><path fill="currentColor" d="M15.41 7.41 14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
-    </button>
-    <div class="hdr-icons">
-      <button class="hdr-icon" id="openSearch" aria-label="Search" title="Search">
-        <svg viewBox="0 0 24 24"><path fill="currentColor" d="M11 4a7 7 0 1 1 0 14 7 7 0 0 1 0-14zm9.7 15.3-3.4-3.4a9 9 0 1 0-1.4 1.4l3.4 3.4a1 1 0 0 0 1.4-1.4z"/></svg>
-      </button>
-    </div>
-  </div>
-  <div class="h-bot">
-    <div class="school-block">
-      <img class="school-icon"
-        src="https://i.postimg.cc/pVm0vHdX/hamilton-logo-with-room.png?v=ham-v4.7.3"
-        alt="Hamilton HS"/>
-      <div class="school-type">
-        <div class="school-line1">CHANDLER, AZ</div>
-        <div class="school-line2">HAMILTON HIGH SCHOOL</div>
-        <div class="school-line3">ACTIVE ALUMNI</div>
-      </div>
-    </div>
-    <div class="ystats-wrap">
-      <img class="ystats-logo" src="https://i.postimg.cc/C5mwXpQy/35878-20250830-222027-0000.png" alt="YAT?STATS"/>
-    </div>
-  </div>
-</header>
+<div data-include="header.html" id="headerMount"></div>
 
 <main>
-  <!-- breadcrumb + profile grid, unchanged -->
+  <div id="profileRoot" class="profile-wrap" aria-live="polite"></div>
 </main>
 
-<footer class="footer">
-  <div class="build-pill">PROFILE BUILD: ham-v4.7.3</div>
+<footer class="footer" style="position:fixed;left:0;right:0;bottom:0;height:72px;background:#000;display:grid;place-items:center">
+  <div class="build-pill" style="background:rgba(255,255,255,.12);color:#fff;font-size:12px;padding:6px 10px;border-radius:12px">BUILD: ham-v4.7.0</div>
 </footer>
 
 <script>
-  const FALLBACK_IMG = "https://i.postimg.cc/pVm0vHdX/hamilton-logo-with-room.png?v=ham-v4.7.3";
-  /* rest of your profile.js logic unchanged */
+async function includeHTML(el){
+  const url = el.getAttribute('data-include');
+  if(!url) return;
+  const html = await (await fetch(url, {cache:'no-cache'})).text();
+  el.innerHTML = html;
+  const scripts = Array.from(el.querySelectorAll('script'));
+  for(const s of scripts){
+    const t=document.createElement('script');
+    if(s.type) t.type=s.type;
+    if(s.src){ t.src=s.src; t.defer=s.defer; t.async=s.async; } else { t.textContent=s.textContent; }
+    s.replaceWith(t);
+  }
+}
+function getParam(name){ const u=new URL(location.href); return u.searchParams.get(name); }
+
+document.addEventListener('DOMContentLoaded', async ()=>{
+  await includeHTML(document.getElementById('headerMount'));
+  const cardsHost = document.createElement('div');
+  cardsHost.setAttribute('data-include','cards.html');
+  document.body.appendChild(cardsHost);
+  await includeHTML(cardsHost);
+
+  const id = getParam('id');
+  if(!window.YAT){ console.error('YAT not loaded'); return; }
+  const p = YAT.players.find(x=>x.id===id) || YAT.players[0];
+  YAT.renderProfile(document.getElementById('profileRoot'), p);
+});
 </script>
 </body>
 </html>
