@@ -1,7 +1,6 @@
-<!-- cards.html (uses ONLY your Google Sheet via gviz; no .json files) -->
+<!-- cards.html -->
 <style>
-  .card{background:#000;border-radius:14px;overflow:hidden;position:relative;aspect-ratio:5/7;min-height:320px;
-    box-shadow:0 8px 28px rgba(0,0,0,.35)}
+  .card{background:#000;border-radius:14px;overflow:hidden;position:relative;aspect-ratio:5/7;min-height:320px;box-shadow:0 8px 28px rgba(0,0,0,.35)}
   .card img.bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:brightness(.9)}
   .grad{position:absolute;left:0;right:0;bottom:0;height:64%;background:linear-gradient(to top,rgba(0,0,0,.98),rgba(0,0,0,.05))}
   .front{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:flex-end;color:#fff;padding:12px}
@@ -25,28 +24,29 @@
 
 <script>
 (function(){
-  // === Your Google Sheet (gviz JSON) ===
+  /* ===== Google Sheet → gviz JSON =====
+     Make sure the Sheet is shared: Anyone with the link → Viewer
+  */
   const SHEET_ID = '1TA0IZU7Ch2OSIxOQZR4xCUyu0KhKKUwe_Pwg8knGwMU';
   const GVIZ = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json`;
 
-  const $ = s=>document.querySelector(s);
-
-  // Fetch the sheet and turn it into an array of objects
   async function fetchSheet(){
-    const res = await fetch(GVIZ, {cache:'no-cache'});
-    if(!res.ok) throw new Error('Sheet fetch failed: '+res.status);
+    const res = await fetch(GVIZ,{cache:'no-cache'});
+    if(!res.ok) throw new Error(`Sheet fetch failed (${res.status})`);
     const text = await res.text();
-    // gviz wraps JSON in a function call; strip it
-    const json = JSON.parse(text.slice(text.indexOf('{'), text.lastIndexOf('}')+1));
-    const cols = json.table.cols.map(c=> (c.label||c.id||'').toString().trim());
-    const rows = json.table.rows.map(r=> r.c.map(c=> c?.v ?? ''));
-    // If the first row looks like user headers, use it
-    const firstRowIsHeader = rows.length && rows[0].every(v => typeof v === 'string' && v && v.length < 60);
-    const headers = firstRowIsHeader ? rows.shift().map(h=>String(h)) : cols;
-    return rows.map(r => Object.fromEntries(r.map((v,i)=>[headers[i]||`col${i}`, v])));
+    try{
+      const json = JSON.parse(text.slice(text.indexOf('{'), text.lastIndexOf('}')+1));
+      const cols = json.table.cols.map(c=> (c.label||c.id||'').toString().trim());
+      const rows = json.table.rows.map(r=> r.c.map(c=> c?.v ?? ''));
+      const firstRowIsHeader = rows.length && rows[0].every(v => typeof v === 'string' && v && v.length < 60);
+      const headers = firstRowIsHeader ? rows.shift().map(h=>String(h)) : cols;
+      return rows.map(r => Object.fromEntries(r.map((v,i)=>[headers[i]||`col${i}`, v])));
+    }catch(err){
+      throw new Error('Sheet is not publicly readable or returned unexpected content. Share as "Anyone with the link → Viewer".');
+    }
   }
 
-  // Normalize a bunch of possible header names into consistent keys
+  /* ---------- Normalize headers -> fields ---------- */
   function normKey(s){
     return String(s||'').toLowerCase().trim()
       .replace(/\s+/g,'_').replace(/[^\w_]+/g,'')
@@ -110,7 +110,7 @@
     };
   }
 
-  // ---------- Renderers ----------
+  /* ---------- Renderers ---------- */
   function el(h){ const d=document.createElement('div'); d.innerHTML=h.trim(); return d.firstElementChild; }
 
   function makeCard(p){
@@ -144,7 +144,6 @@
   }
 
   function makeKV(k,v){ return `<div class="kv"><div class="k">${k}</div><div class="v">${v??'—'}</div></div>`; }
-
   function renderProfile(root,p){
     const img=p.highSchoolImg||p.frontImg;
     const stat12 = p.batting ? `
@@ -173,23 +172,30 @@
       </section>`;
   }
 
-  // Filters API exposed globally for header buttons
+  /* ---------- Public API for pages ---------- */
   let players=[];
-  function playersDefaultView(){ return players.filter(p=>String(p.status||'').includes('ACTIVE')).sort((a,b)=>(+a.graduatingClass||9999)-(+b.graduatingClass||9999)); }
+  function playersDefaultView(){ return players
+    .filter(p=>String(p.status||'').includes('ACTIVE'))
+    .sort((a,b)=>(+a.graduatingClass||9999)-(+b.graduatingClass||9999)); }
   function applyFilters({level='',class:klass=''}={}){ const root=document.getElementById('grid'); let list=[...players]; if(level)list=list.filter(p=>(p.currentLevel||'').toUpperCase()===level.toUpperCase()); if(klass)list=list.filter(p=>String(p.graduatingClass)===String(klass)); renderCards(root,list); }
   function resetAll(){ document.getElementById('fltLevel')?.value=''; document.getElementById('fltClass')?.value=''; const root=document.getElementById('grid'); renderCards(root,playersDefaultView()); }
 
   document.addEventListener('DOMContentLoaded', async ()=>{
+    const grid=document.getElementById('grid');
     try{
-      const raw = await fetchSheet();
-      players = raw.map(mapRow).filter(p=>p.id && p.name);
-    }catch(e){
-      console.error(e);
-      players = [];
+      const raw=await fetchSheet();
+      players=raw.map(mapRow).filter(p=>p.id && p.name);
+      window.YAT=Object.assign(window.YAT||{}, {players,playersDefaultView,renderCards,renderProfile,applyFilters,resetAll});
+      if(grid) renderCards(grid, playersDefaultView());
+    }catch(err){
+      console.error(err);
+      if(grid){
+        grid.innerHTML=`<div style="background:#111;border:1px solid #2a3346;padding:14px;border-radius:12px">
+          <div style="color:#e11d48;font-weight:800;margin-bottom:6px">Couldn’t load players</div>
+          <div style="color:#cbd5e1">Make sure the Google Sheet is shared as <b>Anyone with the link → Viewer</b> and try again.</div>
+        </div>`;
+      }
     }
-    window.YAT = Object.assign(window.YAT||{}, {players,playersDefaultView,renderCards,renderProfile,applyFilters,resetAll});
-    const grid = document.getElementById('grid');
-    if(grid) renderCards(grid, playersDefaultView());
   });
 })();
 </script>
