@@ -4,71 +4,42 @@
 <style>
   :root{
     --edge-x:14px;
-    --header-top-h:54px;    /* top row (icons + nav + wordmark) */
-    --header-brand-h:78px;  /* second row (Hamilton block) */
+    --header-top-h:54px;
+    --header-brand-h:78px;
     --ring:#1f2530;
   }
 
   html,body{margin:0;background:#000}
   body{padding-top: calc(var(--header-top-h) + var(--header-brand-h));}
 
-  .site-header{
-    position:fixed; left:0; right:0; top:0; z-index:60;
-    background:#000; color:#fff; border-bottom:1px solid var(--ring);
-  }
+  .site-header{position:fixed;left:0;right:0;top:0;z-index:60;background:#000;color:#fff;border-bottom:1px solid var(--ring)}
 
   /* ROW 1 — icons (L) + center nav + wordmark (R) */
-  .row-top{
-    height:var(--header-top-h);
-    display:grid; grid-template-columns:auto 1fr auto; align-items:center;
-    padding:0 var(--edge-x);
-    gap:10px;
-  }
-
-  .icons-left{display:flex; align-items:center; gap:8px}
-  .btn{width:38px; height:38px; border:0; background:transparent; border-radius:10px; display:grid; place-items:center; cursor:pointer}
+  .row-top{height:var(--header-top-h);display:grid;grid-template-columns:auto 1fr auto;align-items:center;padding:0 var(--edge-x);gap:10px}
+  .icons-left{display:flex;align-items:center;gap:8px}
+  .btn{width:38px;height:38px;border:0;background:transparent;border-radius:10px;display:grid;place-items:center;cursor:pointer}
   .btn:hover{background:rgba(255,255,255,.08)}
-  .btn svg{width:21px; height:21px; color:#fff}
-  /* sleek crescent */
-  #themeToggle svg path{ d:path("M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"); }
+  .btn svg{width:21px;height:21px;color:#fff}
+  #themeToggle svg path{ d:path("M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"); } /* sleek crescent */
 
-  /* CENTER NAV (tight pairs: grey condensed + bold; no spacing between) */
-  .nav-top{
-    display:none; justify-content:center; align-items:center; overflow:hidden;
-    white-space:nowrap;
-  }
+  .nav-top{display:none;justify-content:center;align-items:center;white-space:nowrap}
   @media (min-width:980px){ .nav-top{display:flex} }
+  .pair{display:inline-flex;align-items:baseline}
+  .slim{font:400 14px/1 "Oswald",system-ui;color:#cbd5e1;letter-spacing:0;margin-right:6px}
+  .strong{font:400 18px/1 "Anton",system-ui;color:#fff;letter-spacing:0;margin-right:14px;text-shadow:none;-webkit-font-smoothing:antialiased}
 
-  .pair{display:inline-flex; align-items:baseline; /* no gap */ }
-  .slim{font:400 14px/1 "Oswald",system-ui; color:#cbd5e1; letter-spacing:0; margin-right:6px}
-  .strong{font:400 18px/1 "Anton",system-ui; color:#fff; letter-spacing:0; margin-right:14px}
-  /* remove any glow/blur everywhere */
-  .strong, .slim { text-shadow:none; -webkit-font-smoothing:antialiased; }
+  .wordmark{height:34px;width:auto;justify-self:end}
 
-  .wordmark{height:34px; width:auto; justify-self:end}
+  /* ROW 2 — Hamilton block */
+  .row-brand{height:var(--header-brand-h);border-top:1px solid var(--ring);display:flex;align-items:center;gap:10px;padding:0 var(--edge-x)}
+  .h-logo{height:60px;width:auto}
+  .h-type{display:flex;flex-direction:column;gap:2px}
+  .ham-l1{font:300 13px/1.1 "Oswald";color:#cbd5e1;letter-spacing:.02em}
+  .ham-l2{font:400 20px/1 "Anton";color:#fff}
+  .ham-l3{font:700 20px/1 "Anton";color:#fff}
+  @media (max-width:640px){ .wordmark{height:30px}.h-logo{height:52px}.ham-l2,.ham-l3{font-size:18px} }
 
-  /* ROW 2 — Hamilton block (logo + three lines) */
-  .row-brand{
-    height:var(--header-brand-h);
-    border-top:1px solid var(--ring);
-    display:flex; align-items:center; gap:10px;
-    padding:0 var(--edge-x);
-  }
-  .h-logo{height:60px; width:auto}
-  .h-type{display:flex; flex-direction:column; gap:2px}
-  .ham-l1{font:300 13px/1.1 "Oswald",system-ui; color:#cbd5e1; letter-spacing:.02em}
-  .ham-l2{font:400 20px/1 "Anton",system-ui; color:#fff; letter-spacing:0}
-  .ham-l3{font:700 20px/1 "Anton",system-ui; color:#fff; letter-spacing:0}
-  .ham-l2,.ham-l3 { text-shadow:none; }
-
-  @media (max-width:640px){
-    .wordmark{height:30px}
-    .h-logo{height:52px}
-    .ham-l2{font-size:18px}
-    .ham-l3{font-size:18px}
-  }
-
-  /* Drawers (same behavior as before) */
+  /* Drawers */
   .scrim{position:fixed;left:0;right:0;top:calc(var(--header-top-h) + var(--header-brand-h));bottom:0;background:rgba(0,0,0,.35);opacity:0;pointer-events:none;transition:opacity .25s;z-index:55}
   .scrim.open{opacity:1;pointer-events:auto}
   body.no-scroll{overflow:hidden}
@@ -77,27 +48,35 @@
   .drawer.open{transform:translateX(0)}
   .drawer-h{height:56px;border-bottom:1px solid #232a36;display:flex;align-items:center;justify-content:space-between;padding:0 12px;color:#d5d9df;font-weight:900;letter-spacing:.12em;text-transform:uppercase;font-size:12px}
   .drawer-body{padding:12px;overflow:auto}
+  .field{display:flex;flex-direction:column;margin:10px 0}
+  .label{font:400 12px/1 "Oswald";color:#9aa1ab;margin-bottom:6px;letter-spacing:.02em}
+  .input,.select{width:100%;background:#0e141f;border:1px solid #1b2330;border-radius:10px;padding:10px;color:#fff}
+  .actions{display:flex;gap:8px;margin-top:12px}
+  .btn-solid{background:#fff;color:#000;border:0;border-radius:10px;padding:10px 12px;font-weight:800;cursor:pointer}
+  .btn-ghost{background:transparent;color:#fff;border:1px solid #384152;border-radius:10px;padding:10px 12px;font-weight:800;cursor:pointer}
+
+  /* Left drawer navigation list */
+  .nav-list{margin-top:16px;border-top:1px solid #232a36;padding-top:12px}
+  .nav-title{font:700 12px/1 "Oswald";color:#cbd5e1;letter-spacing:.12em;margin-bottom:8px}
+  .nav-item{display:block;color:#e5e7eb;text-decoration:none;padding:8px 8px;border-radius:8px}
+  .nav-item:hover{background:#111827}
 </style>
 
 <header class="site-header" role="banner" aria-label="Sticky site header">
-  <!-- ROW 1 -->
+  <!-- Row 1 -->
   <div class="row-top">
     <div class="icons-left">
-      <!-- left hamburger -->
       <button class="btn" id="openLeft" aria-label="Open navigation/search">
         <svg viewBox="0 0 24 24"><path fill="currentColor" d="M3 6h18v2H3zM3 11h18v2H3zM3 16h18v2H3z"/></svg>
       </button>
-      <!-- account -->
       <button class="btn" id="iconProfile" aria-label="Account">
         <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm0 2c-4.2 0-8 2.1-8 5v1h16v-1c0-2.9-3.8-5-8-5z"/></svg>
       </button>
-      <!-- theme -->
       <button class="btn" id="themeToggle" aria-label="Toggle theme">
         <svg viewBox="0 0 24 24"><path fill="currentColor"/></svg>
       </button>
     </div>
 
-    <!-- CENTER NAV (tight pairs; grey butts against bold) -->
     <nav class="nav-top" aria-label="Primary">
       <span class="pair"><a class="slim" href="#">WHERE THEY</a><a class="strong" href="#">YAT?</a></span>
       <span class="pair"><a class="slim" href="#">ACTIVE ALUMNI</a><a class="strong" href="#">NEWS</a></span>
@@ -107,11 +86,10 @@
       <span class="pair"><a class="slim" href="#">PCDACTION</a><a class="strong" href="#">PARTNER PROGRAM</a></span>
     </nav>
 
-    <!-- right wordmark -->
     <img class="wordmark" src="https://i.postimg.cc/C5mwXpQy/35878-20250830-222027-0000.png" alt="YAT?STATS">
   </div>
 
-  <!-- ROW 2 -->
+  <!-- Row 2 -->
   <div class="row-brand">
     <img class="h-logo" src="https://i.postimg.cc/pVm0vHdX/hamilton-logo-tight-transparent-background.png" alt="Hamilton H">
     <div class="h-type">
@@ -125,71 +103,114 @@
 <!-- Scrim + Drawers -->
 <div class="scrim" id="scrim" hidden></div>
 
-<aside class="drawer" id="drawerLeft" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Search & Nav">
-  <div class="drawer-h">Search
-    <button class="btn" id="closeLeft" aria-label="Close"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M6.225 4.811 4.811 6.225 10.586 12l-5.775 5.775 1.414 1.414L12 13.414l5.775 5.775 1.414-1.414L13.414 12l5.775-5.775-1.414-1.414L12 10.586z"/></svg></button>
+<!-- LEFT: Player profile search + Navigation list -->
+<aside class="drawer" id="drawerLeft" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Search & Navigation">
+  <div class="drawer-h">Player Profile Search
+    <button class="btn" id="closeLeft" aria-label="Close">
+      <svg viewBox="0 0 24 24"><path fill="currentColor" d="M6.225 4.811 4.811 6.225 10.586 12l-5.775 5.775 1.414 1.414L12 13.414l5.775 5.775 1.414-1.414L13.414 12l5.775-5.775-1.414-1.414L12 10.586z"/></svg>
+    </button>
   </div>
   <div class="drawer-body">
-    <input id="localSearch" type="text" placeholder="Type a player name…" style="width:100%;background:#0e141f;border:1px solid #1b2330;border-radius:10px;padding:10px;color:#fff"/>
+    <input id="localSearch" type="text" placeholder="Type a player name…" class="input" />
     <ul id="localResults" style="list-style:none;margin:10px 0 0;padding:0"></ul>
+
+    <div class="nav-list">
+      <div class="nav-title">Navigation</div>
+      <a class="nav-item" href="#">WHERE THEY YAT?</a>
+      <a class="nav-item" href="#">NEWS</a>
+      <a class="nav-item" href="#">ALL-TIME LIST</a>
+      <a class="nav-item" href="#">YAT-A-BOY (NIL)</a>
+      <a class="nav-item" href="#">CURRENT TEAM</a>
+      <a class="nav-item" href="#">PARTNER PROGRAM</a>
+      <a class="nav-item" href="#">MARKETPLACE</a>
+    </div>
   </div>
 </aside>
 
+<!-- RIGHT: Filters (Name, Level, Grad Class, Roster Year, Status) -->
 <aside class="drawer right" id="drawerRight" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Filters">
   <div class="drawer-h">Filters
-    <button class="btn" id="closeRight" aria-label="Close"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M6.225 4.811 4.811 6.225 10.586 12l-5.775 5.775 1.414 1.414L12 13.414l5.775 5.775 1.414-1.414L13.414 12l5.775-5.775-1.414-1.414L12 10.586z"/></svg></button>
+    <button class="btn" id="closeRight" aria-label="Close">
+      <svg viewBox="0 0 24 24"><path fill="currentColor" d="M6.225 4.811 4.811 6.225 10.586 12l-5.775 5.775 1.414 1.414L12 13.414l5.775 5.775 1.414-1.414L13.414 12l5.775-5.775-1.414-1.414L12 10.586z"/></svg>
+    </button>
   </div>
   <div class="drawer-body" style="color:#cbd5e1">
-    <label>Level</label>
-    <select id="fltLevel" style="width:100%;background:#0e141f;border:1px solid #1b2330;border-radius:10px;padding:10px;color:#fff">
-      <option value="">All</option>
-      <option>MLB</option><option>TRIPLE-A</option><option>DOUBLE-A</option><option>NCAA-D1</option><option>KBO</option>
-    </select>
-    <label style="margin-top:12px">Grad Class</label>
-    <select id="fltClass" style="width:100%;background:#0e141f;border:1px solid #1b2330;border-radius:10px;padding:10px;color:#fff">
-      <option value="">All</option>
-    </select>
-    <button id="btnApply" style="margin-top:12px;background:#fff;color:#000;border:0;border-radius:10px;padding:10px 12px;cursor:pointer;font-weight:700">Apply</button>
+    <div class="field">
+      <label class="label" for="fltName">Player Name</label>
+      <input id="fltName" class="input" type="text" placeholder="e.g., Cody Bellinger">
+    </div>
+
+    <div class="field">
+      <label class="label" for="fltLevel">Level</label>
+      <select id="fltLevel" class="select">
+        <option value="">All</option>
+        <option>MLB</option><option>TRIPLE-A</option><option>DOUBLE-A</option><option>NCAA-D1</option><option>KBO</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label class="label" for="fltClass">Grad Class</label>
+      <select id="fltClass" class="select"><option value="">All</option></select>
+    </div>
+
+    <div class="field">
+      <label class="label" for="fltRoster">Roster Year</label>
+      <select id="fltRoster" class="select"><option value="">All</option></select>
+    </div>
+
+    <div class="field">
+      <label class="label" for="fltStatus">Status</label>
+      <select id="fltStatus" class="select"><option value="">All</option></select>
+    </div>
+
+    <div class="actions">
+      <button id="btnApply" class="btn-solid">Apply</button>
+      <button id="btnReset" class="btn-ghost">Reset</button>
+    </div>
   </div>
 </aside>
 
+<!-- RIGHT: Auth -->
 <aside class="drawer right" id="drawerAuth" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Sign Up | Login">
   <div class="drawer-h">Sign Up | Login
-    <button class="btn" id="closeAuth" aria-label="Close"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M6.225 4.811 4.811 6.225 10.586 12l-5.775 5.775 1.414 1.414L12 13.414l5.775 5.775 1.414-1.414L13.414 12l5.775-5.775-1.414-1.414L12 10.586z"/></svg></button>
+    <button class="btn" id="closeAuth" aria-label="Close">
+      <svg viewBox="0 0 24 24"><path fill="currentColor" d="M6.225 4.811 4.811 6.225 10.586 12l-5.775 5.775 1.414 1.414L12 13.414l5.775 5.775 1.414-1.414L13.414 12l5.775-5.775-1.414-1.414L12 10.586z"/></svg>
+    </button>
   </div>
   <div class="drawer-body">
-    <label>Email</label>
-    <input type="email" placeholder="you@example.com" style="display:block;width:100%;background:#0e141f;border:1px solid #1b2330;border-radius:10px;padding:10px;color:#fff"/>
-    <label style="margin-top:10px">Password</label>
-    <input type="password" placeholder="••••••••" style="display:block;width:100%;background:#0e141f;border:1px solid #1b2330;border-radius:10px;padding:10px;color:#fff"/>
+    <label class="label">Email</label>
+    <input type="email" class="input" placeholder="you@example.com">
+    <label class="label" style="margin-top:10px">Password</label>
+    <input type="password" class="input" placeholder="••••••••">
   </div>
 </aside>
 
 <script>
-/* Drawer wiring + theme + search suggestions (no hero buttons here) */
+/* Drawers + theme + search + filters hook-ups */
 (function(){
-  const byId=id=>document.getElementById(id);
+  const $=s=>document.querySelector(s), byId=id=>document.getElementById(id);
   const scrim=byId('scrim'), L=byId('drawerLeft'), R=byId('drawerRight'), A=byId('drawerAuth');
   let lastFocus=null;
+
   function open(d){[L,R,A].forEach(x=>x.classList.remove('open'));lastFocus=document.activeElement;d.classList.add('open');scrim.classList.add('open');scrim.hidden=false;document.body.classList.add('no-scroll');}
   function close(d){d.classList.remove('open');if(!L.classList.contains('open')&&!R.classList.contains('open')&&!A.classList.contains('open')){scrim.classList.remove('open');scrim.hidden=true;document.body.classList.remove('no-scroll');}}
   function closeAll(){[L,R,A].forEach(x=>x.classList.remove('open'));scrim.classList.remove('open');scrim.hidden=true;document.body.classList.remove('no-scroll');lastFocus?.focus?.();}
 
-  byId('openLeft')?.addEventListener('click',()=>open(L));     // hamburger → left drawer
+  byId('openLeft')?.addEventListener('click',()=>open(L));
   byId('closeLeft')?.addEventListener('click',()=>close(L));
-  byId('iconProfile')?.addEventListener('click',()=>open(A));  // account → auth drawer (right)
+  byId('iconProfile')?.addEventListener('click',()=>open(A));
   byId('closeAuth')?.addEventListener('click',()=>close(A));
   byId('closeRight')?.addEventListener('click',()=>close(R));
   scrim?.addEventListener('click',closeAll);
 
-  // Theme
+  // Theme persistence
   (function(){
     const k='theme', get=()=>localStorage.getItem(k)||'dark',
           set=t=>{document.documentElement.setAttribute('data-theme',t);localStorage.setItem(k,t);};
     set(get()); byId('themeToggle')?.addEventListener('click',()=>set(get()==='dark'?'light':'dark'));
   })();
 
-  // Name search list (from YAT.players)
+  // Player name search (left drawer)
   const input=byId('localSearch'), list=byId('localResults');
   input?.addEventListener('input', e=>{
     const q=e.target.value.toLowerCase(); list.innerHTML='';
@@ -202,10 +223,49 @@
     });
   });
 
-  // Filters Apply (hero owns buttons; drawer owns form)
+  // Populate dynamic selects from loaded players (when available)
+  function populateOptions(){
+    const players = window.YAT?.players || [];
+    const unique = k => [...new Set(players.map(p=>p[k]).filter(Boolean))].sort((a,b)=>String(a).localeCompare(String(b)));
+    const add = (sel,vals)=>{ const el=byId(sel); if(!el) return; el.querySelectorAll('option:not([value=""])').forEach(o=>o.remove()); vals.forEach(v=>{const o=document.createElement('option'); o.value=o.textContent=v; el.appendChild(o);}); };
+
+    add('fltClass', unique('graduatingClass'));
+    // try to infer rosterYear from status like "Active 2025" OR provide fallbacks
+    const rosterYears = [...new Set(players.map(p=>{
+      const s=String(p.status||''); const m=s.match(/(\d{4})/); return m?m[1]:null;
+    }).filter(Boolean))].sort();
+    add('fltRoster', rosterYears);
+    add('fltStatus', unique('status'));
+  }
+  // run once on load and also if cards engine announces players later
+  if (window.YAT?.players) populateOptions();
+  document.addEventListener('yat:players-ready', populateOptions);
+
+  // Apply & Reset filters (uses cards.html API)
   byId('btnApply')?.addEventListener('click',()=>{
-    const lvl=byId('fltLevel')?.value||'', cls=byId('fltClass')?.value||'';
-    window.YAT?.applyFilters?.({level:lvl,class:cls}); close(R);
+    const name = byId('fltName')?.value.trim().toLowerCase();
+    const level= byId('fltLevel')?.value || '';
+    const klass= byId('fltClass')?.value || '';
+    const roster=byId('fltRoster')?.value || '';
+    const status=byId('fltStatus')?.value || '';
+
+    const root=document.getElementById('grid');
+    let list=[...(window.YAT?.players||[])];
+
+    if(name)  list=list.filter(p=>(p.name||'').toLowerCase().includes(name));
+    if(level) list=list.filter(p=>(p.currentLevel||'').toUpperCase()===level.toUpperCase());
+    if(klass) list=list.filter(p=>String(p.graduatingClass)===String(klass));
+    if(roster)list=list.filter(p=>/\d{4}/.test(String(p.status||'')) && String(p.status).includes(roster));
+    if(status)list=list.filter(p=>String(p.status||'').toUpperCase()===status.toUpperCase());
+
+    window.YAT?.renderCards?.(root,list);
+    close(R);
+  });
+
+  byId('btnReset')?.addEventListener('click',()=>{
+    ['fltName','fltLevel','fltClass','fltRoster','fltStatus'].forEach(id=>{const el=byId(id); if(!el) return; if(el.tagName==='SELECT') el.value=''; else el.value='';});
+    window.YAT?.resetAll?.();
+    close(R);
   });
 })();
 </script>
