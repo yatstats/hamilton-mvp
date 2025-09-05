@@ -1,61 +1,59 @@
 <!-- header.html -->
-<link href="https://fonts.googleapis.com/css2?family=Anton:wght@400&family=Oswald:wght@300;400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@300;400;600&display=swap" rel="stylesheet">
 
 <style>
   :root{
-    --edge-x:14px;
-    --header-top-h:54px;
-    --header-brand-h:78px;
-    --ring:#1f2530;
+    --edge:14px;
+    --topH:54px;         /* row 1 */
+    --brandH:78px;       /* row 2 */
+    --bg:#000; --fg:#fff; --muted:#cbd5e1; --ring:#1f2530;
   }
+  [data-theme="light"]{ --bg:#fff; --fg:#000; --muted:#374151; --ring:#d1d5db; }
+  body{padding-top: calc(var(--topH) + var(--brandH));}
+  .site-header{position:fixed;left:0;right:0;top:0;z-index:60;background:var(--bg);color:var(--fg);border-bottom:1px solid var(--ring)}
 
-  html,body{margin:0;background:#000}
-  body{padding-top: calc(var(--header-top-h) + var(--header-brand-h));}
-
-  .site-header{position:fixed;left:0;right:0;top:0;z-index:60;background:#000;color:#fff;border-bottom:1px solid var(--ring)}
-
-  /* ROW 1 — icons (L) + center nav + wordmark (R) */
-  .row-top{height:var(--header-top-h);display:grid;grid-template-columns:auto 1fr auto;align-items:center;padding:0 var(--edge-x);gap:10px}
-  .icons-left{display:flex;align-items:center;gap:8px}
-  .btn{width:38px;height:38px;border:0;background:transparent;border-radius:10px;display:grid;place-items:center;cursor:pointer}
+  /* Row 1 */
+  .row-top{height:var(--topH);display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:10px;padding:0 var(--edge)}
+  .icons-left{display:flex;gap:8px}
+  .btn{width:38px;height:38px;border-radius:10px;border:1px solid var(--ring);background:transparent;color:var(--fg);display:grid;place-items:center;cursor:pointer}
   .btn:hover{background:rgba(255,255,255,.08)}
-  .btn svg{width:21px;height:21px;color:#fff}
-  #themeToggle svg path{ d:path("M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"); } /* sleek crescent */
+  .btn svg{width:21px;height:21px}
+  #themeToggle svg path{ d:path("M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"); }
 
   .nav-top{display:none;justify-content:center;align-items:center;white-space:nowrap}
   @media (min-width:980px){ .nav-top{display:flex} }
   .pair{display:inline-flex;align-items:baseline}
-  .slim{font:400 14px/1 "Oswald",system-ui;color:#cbd5e1;letter-spacing:0;margin-right:6px}
-  .strong{font:400 18px/1 "Anton",system-ui;color:#fff;letter-spacing:0;margin-right:14px;text-shadow:none;-webkit-font-smoothing:antialiased}
-
+  .slim{font:400 14px/1 "Oswald";color:var(--muted);margin-right:6px}
+  .strong{font:400 18px/1 "Bebas Neue";color:var(--fg);margin-right:14px}
   .wordmark{height:34px;width:auto;justify-self:end}
 
-  /* ROW 2 — Hamilton block */
-  .row-brand{height:var(--header-brand-h);border-top:1px solid var(--ring);display:flex;align-items:center;gap:10px;padding:0 var(--edge-x)}
+  /* Row 2 */
+  .row-brand{height:var(--brandH);border-top:1px solid var(--ring);display:flex;align-items:center;gap:10px;padding:0 var(--edge)}
   .h-logo{height:60px;width:auto}
   .h-type{display:flex;flex-direction:column;gap:2px}
-  .ham-l1{font:300 13px/1.1 "Oswald";color:#cbd5e1;letter-spacing:.02em}
-  .ham-l2{font:400 20px/1 "Anton";color:#fff}
-  .ham-l3{font:700 20px/1 "Anton";color:#fff}
+  .ham-l1{font:300 13px/1.1 "Oswald";color:var(--muted);letter-spacing:.02em}
+  .ham-l2{font:400 20px/1 "Bebas Neue";color:var(--fg)}
+  .ham-l3{font:700 20px/1 "Bebas Neue";color:var(--fg)}
   @media (max-width:640px){ .wordmark{height:30px}.h-logo{height:52px}.ham-l2,.ham-l3{font-size:18px} }
 
   /* Drawers */
-  .scrim{position:fixed;left:0;right:0;top:calc(var(--header-top-h) + var(--header-brand-h));bottom:0;background:rgba(0,0,0,.35);opacity:0;pointer-events:none;transition:opacity .25s;z-index:55}
+  .scrim{position:fixed;left:0;right:0;top:calc(var(--topH) + var(--brandH));bottom:0;background:rgba(0,0,0,.35);opacity:0;pointer-events:none;transition:opacity .25s;z-index:55}
   .scrim.open{opacity:1;pointer-events:auto}
   body.no-scroll{overflow:hidden}
-  .drawer{position:fixed;top:calc(var(--header-top-h) + var(--header-brand-h));bottom:0;width:clamp(300px,75vw,520px);background:#0b0f16;z-index:56;display:flex;flex-direction:column;transform:translateX(-100%);border-right:1px solid #232a36}
+  .drawer{position:fixed;top:calc(var(--topH) + var(--brandH));bottom:0;width:clamp(300px,75vw,520px);background:#0b0f16;color:#e5e7eb;z-index:56;display:flex;flex-direction:column;transform:translateX(-100%);border-right:1px solid #232a36}
   .drawer.right{left:auto;right:0;border-right:none;border-left:1px solid #232a36;transform:translateX(100%)}
   .drawer.open{transform:translateX(0)}
-  .drawer-h{height:56px;border-bottom:1px solid #232a36;display:flex;align-items:center;justify-content:space-between;padding:0 12px;color:#d5d9df;font-weight:900;letter-spacing:.12em;text-transform:uppercase;font-size:12px}
+  .drawer-h{height:56px;border-bottom:1px solid #232a36;display:flex;align-items:center;justify-content:space-between;padding:0 12px;color:#d5d9df;font:700 12px/1 "Oswald";letter-spacing:.12em;text-transform:uppercase}
   .drawer-body{padding:12px;overflow:auto}
-  .field{display:flex;flex-direction:column;margin:10px 0}
-  .label{font:400 12px/1 "Oswald";color:#9aa1ab;margin-bottom:6px;letter-spacing:.02em}
-  .input,.select{width:100%;background:#0e141f;border:1px solid #1b2330;border-radius:10px;padding:10px;color:#fff}
+  .field{margin:10px 0}
+  .text{width:100%;background:#0e141f;border:1px solid #1b2330;border-radius:10px;padding:10px;color:#fff}
+  .cbgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+  .cb{display:flex;align-items:center;gap:6px;background:#0e141f;border:1px solid #1b2330;border-radius:10px;padding:8px}
+  .cb input{accent-color:#fff}
   .actions{display:flex;gap:8px;margin-top:12px}
   .btn-solid{background:#fff;color:#000;border:0;border-radius:10px;padding:10px 12px;font-weight:800;cursor:pointer}
   .btn-ghost{background:transparent;color:#fff;border:1px solid #384152;border-radius:10px;padding:10px 12px;font-weight:800;cursor:pointer}
 
-  /* Left drawer navigation list */
   .nav-list{margin-top:16px;border-top:1px solid #232a36;padding-top:12px}
   .nav-title{font:700 12px/1 "Oswald";color:#cbd5e1;letter-spacing:.12em;margin-bottom:8px}
   .nav-item{display:block;color:#e5e7eb;text-decoration:none;padding:8px 8px;border-radius:8px}
@@ -80,10 +78,11 @@
     <nav class="nav-top" aria-label="Primary">
       <span class="pair"><a class="slim" href="#">WHERE THEY</a><a class="strong" href="#">YAT?</a></span>
       <span class="pair"><a class="slim" href="#">ACTIVE ALUMNI</a><a class="strong" href="#">NEWS</a></span>
-      <span class="pair"><a class="slim" href="#">NEXT LEVEL</a><a class="strong" href="#">ALL-TIME LIST</a></span>
-      <span class="pair"><a class="slim" href="#">NIL &amp;</a><a class="strong" href="#">YAT-A-BOY</a></span>
+      <span class="pair"><a class="slim" href="#">NEXT-LEVEL</a><a class="strong" href="#">ALL-TIME LIST</a></span>
+      <span class="pair"><a class="slim" href="#">NIL &amp; YAT-A-BOY</a><a class="strong" href="#">MARKETPLACE</a></span>
       <span class="pair"><a class="slim" href="#">THE</a><a class="strong" href="#">CURRENT TEAM</a></span>
-      <span class="pair"><a class="slim" href="#">PCDACTION</a><a class="strong" href="#">PARTNER PROGRAM</a></span>
+      <span class="pair"><a class="slim" href="#">PCD ACTION</a><a class="strong" href="#">PARTNER PROGRAM</a></span>
+      <span class="pair"><a class="slim" href="#faq"> </a><a class="strong" href="#">FAQ’s</a></span>
     </nav>
 
     <img class="wordmark" src="https://i.postimg.cc/C5mwXpQy/35878-20250830-222027-0000.png" alt="YAT?STATS">
@@ -100,10 +99,10 @@
   </div>
 </header>
 
-<!-- Scrim + Drawers -->
+<!-- Shared Scrim + Drawers -->
 <div class="scrim" id="scrim" hidden></div>
 
-<!-- LEFT: Player profile search + Navigation list -->
+<!-- LEFT drawer -->
 <aside class="drawer" id="drawerLeft" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Search & Navigation">
   <div class="drawer-h">Player Profile Search
     <button class="btn" id="closeLeft" aria-label="Close">
@@ -111,66 +110,65 @@
     </button>
   </div>
   <div class="drawer-body">
-    <input id="localSearch" type="text" placeholder="Type a player name…" class="input" />
+    <input id="localSearch" class="text" type="text" placeholder="Type a player name…"/>
     <ul id="localResults" style="list-style:none;margin:10px 0 0;padding:0"></ul>
 
     <div class="nav-list">
       <div class="nav-title">Navigation</div>
-      <a class="nav-item" href="#">WHERE THEY YAT?</a>
-      <a class="nav-item" href="#">NEWS</a>
-      <a class="nav-item" href="#">ALL-TIME LIST</a>
-      <a class="nav-item" href="#">YAT-A-BOY (NIL)</a>
-      <a class="nav-item" href="#">CURRENT TEAM</a>
-      <a class="nav-item" href="#">PARTNER PROGRAM</a>
-      <a class="nav-item" href="#">MARKETPLACE</a>
+      <a class="nav-item" href="index.html">WHERE THEY <b>YAT?</b></a>
+      <a class="nav-item" href="#">ACTIVE ALUMNI <b>NEWS</b></a>
+      <a class="nav-item" href="#">NEXT-LEVEL <b>ALL-TIME LIST</b></a>
+      <a class="nav-item" href="#">NIL &amp; YAT-A-BOY <b>MARKETPLACE</b></a>
+      <a class="nav-item" href="#">THE <b>CURRENT TEAM</b></a>
+      <a class="nav-item" href="#">PCD ACTION <b>PARTNER PROGRAM</b></a>
+      <a class="nav-item" href="#faq"><b>FAQ’s</b></a>
     </div>
   </div>
 </aside>
 
-<!-- RIGHT: Filters (Name, Level, Grad Class, Roster Year, Status) -->
+<!-- RIGHT drawer — Filters -->
 <aside class="drawer right" id="drawerRight" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Filters">
   <div class="drawer-h">Filters
     <button class="btn" id="closeRight" aria-label="Close">
       <svg viewBox="0 0 24 24"><path fill="currentColor" d="M6.225 4.811 4.811 6.225 10.586 12l-5.775 5.775 1.414 1.414L12 13.414l5.775 5.775 1.414-1.414L13.414 12l5.775-5.775-1.414-1.414L12 10.586z"/></svg>
     </button>
   </div>
-  <div class="drawer-body" style="color:#cbd5e1">
+  <div class="drawer-body">
     <div class="field">
-      <label class="label" for="fltName">Player Name</label>
-      <input id="fltName" class="input" type="text" placeholder="e.g., Cody Bellinger">
+      <label class="nav-title" for="fltName">By Player Name</label>
+      <input id="fltName" class="text" type="text" placeholder="e.g., Cody Bellinger">
     </div>
 
     <div class="field">
-      <label class="label" for="fltLevel">Level</label>
-      <select id="fltLevel" class="select">
-        <option value="">All</option>
-        <option>MLB</option><option>TRIPLE-A</option><option>DOUBLE-A</option><option>NCAA-D1</option><option>KBO</option>
-      </select>
+      <div class="nav-title">By Level</div>
+      <div class="cbgrid" id="lvGrid"></div>
     </div>
 
     <div class="field">
-      <label class="label" for="fltClass">Grad Class</label>
-      <select id="fltClass" class="select"><option value="">All</option></select>
+      <div class="nav-title">By Grad Class</div>
+      <div class="cbgrid" id="gcGrid"></div>
     </div>
 
     <div class="field">
-      <label class="label" for="fltRoster">Roster Year</label>
-      <select id="fltRoster" class="select"><option value="">All</option></select>
+      <div class="nav-title">By Roster Year</div>
+      <div class="cbgrid" id="ryGrid"></div>
     </div>
 
     <div class="field">
-      <label class="label" for="fltStatus">Status</label>
-      <select id="fltStatus" class="select"><option value="">All</option></select>
+      <div class="nav-title">By Status</div>
+      <div class="cbgrid" id="stGrid"></div>
     </div>
 
     <div class="actions">
       <button id="btnApply" class="btn-solid">Apply</button>
       <button id="btnReset" class="btn-ghost">Reset</button>
+      <!-- helper for hero to trigger -->
+      <button id="openFiltersFromHero" style="display:none"></button>
     </div>
   </div>
 </aside>
 
-<!-- RIGHT: Auth -->
+<!-- RIGHT drawer — Auth -->
 <aside class="drawer right" id="drawerAuth" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Sign Up | Login">
   <div class="drawer-h">Sign Up | Login
     <button class="btn" id="closeAuth" aria-label="Close">
@@ -178,20 +176,23 @@
     </button>
   </div>
   <div class="drawer-body">
-    <label class="label">Email</label>
-    <input type="email" class="input" placeholder="you@example.com">
-    <label class="label" style="margin-top:10px">Password</label>
-    <input type="password" class="input" placeholder="••••••••">
+    <label class="nav-title">Email</label>
+    <input type="email" class="text" placeholder="you@example.com">
+    <label class="nav-title" style="margin-top:10px">Password</label>
+    <input type="password" class="text" placeholder="••••••••">
+    <div class="nav-list">
+      <div class="nav-title">Global Platform Searches</div>
+      <a class="nav-item" href="https://www.yatstats.com" target="_blank" rel="noopener">by <b>School Name</b></a>
+      <a class="nav-item" href="https://www.yatstats.com" target="_blank" rel="noopener">by <b>Active Player</b></a>
+    </div>
   </div>
 </aside>
 
 <script>
-/* Drawers + theme + search + filters hook-ups */
 (function(){
   const $=s=>document.querySelector(s), byId=id=>document.getElementById(id);
   const scrim=byId('scrim'), L=byId('drawerLeft'), R=byId('drawerRight'), A=byId('drawerAuth');
   let lastFocus=null;
-
   function open(d){[L,R,A].forEach(x=>x.classList.remove('open'));lastFocus=document.activeElement;d.classList.add('open');scrim.classList.add('open');scrim.hidden=false;document.body.classList.add('no-scroll');}
   function close(d){d.classList.remove('open');if(!L.classList.contains('open')&&!R.classList.contains('open')&&!A.classList.contains('open')){scrim.classList.remove('open');scrim.hidden=true;document.body.classList.remove('no-scroll');}}
   function closeAll(){[L,R,A].forEach(x=>x.classList.remove('open'));scrim.classList.remove('open');scrim.hidden=true;document.body.classList.remove('no-scroll');lastFocus?.focus?.();}
@@ -201,71 +202,88 @@
   byId('iconProfile')?.addEventListener('click',()=>open(A));
   byId('closeAuth')?.addEventListener('click',()=>close(A));
   byId('closeRight')?.addEventListener('click',()=>close(R));
+  byId('openFiltersFromHero')?.addEventListener('click',()=>open(R));
   scrim?.addEventListener('click',closeAll);
 
-  // Theme persistence
+  // Theme
   (function(){
     const k='theme', get=()=>localStorage.getItem(k)||'dark',
           set=t=>{document.documentElement.setAttribute('data-theme',t);localStorage.setItem(k,t);};
-    set(get()); byId('themeToggle')?.addEventListener('click',()=>set(get()==='dark'?'light':'dark'));
+    set(get());
+    byId('themeToggle')?.addEventListener('click',()=>set(get()==='dark'?'light':'dark'));
   })();
 
-  // Player name search (left drawer)
+  // Local name search (left drawer)
   const input=byId('localSearch'), list=byId('localResults');
-  input?.addEventListener('input', e=>{
-    const q=e.target.value.toLowerCase(); list.innerHTML='';
-    if(!q) return;
-    (window.YAT?.players||[]).filter(p=>(p.name||'').toLowerCase().includes(q)).slice(0,80).forEach(p=>{
-      const li=document.createElement('li'); li.textContent=`${p.name}${p.graduatingClass?` (Class of ${p.graduatingClass})`:''}`;
-      li.style.cssText='padding:8px 6px;border-radius:8px;cursor:pointer';
-      li.addEventListener('click',()=>{location.href=`profile.html?id=${encodeURIComponent(p.id)}`;closeAll();});
-      list.appendChild(li);
-    });
-  });
-
-  // Populate dynamic selects from loaded players (when available)
-  function populateOptions(){
+  function bindLiveSearch(){
     const players = window.YAT?.players || [];
-    const unique = k => [...new Set(players.map(p=>p[k]).filter(Boolean))].sort((a,b)=>String(a).localeCompare(String(b)));
-    const add = (sel,vals)=>{ const el=byId(sel); if(!el) return; el.querySelectorAll('option:not([value=""])').forEach(o=>o.remove()); vals.forEach(v=>{const o=document.createElement('option'); o.value=o.textContent=v; el.appendChild(o);}); };
-
-    add('fltClass', unique('graduatingClass'));
-    // try to infer rosterYear from status like "Active 2025" OR provide fallbacks
-    const rosterYears = [...new Set(players.map(p=>{
-      const s=String(p.status||''); const m=s.match(/(\d{4})/); return m?m[1]:null;
-    }).filter(Boolean))].sort();
-    add('fltRoster', rosterYears);
-    add('fltStatus', unique('status'));
+    input?.addEventListener('input', e=>{
+      const q=e.target.value.toLowerCase(); list.innerHTML='';
+      if(!q) return;
+      players.filter(p=>(p.name||'').toLowerCase().includes(q)).slice(0,80).forEach(p=>{
+        const li=document.createElement('li');
+        li.textContent=`${p.name}${p.graduatingClass?` (Class of ${p.graduatingClass})`:''}`;
+        li.style.cssText='padding:8px 6px;border-radius:8px;cursor:pointer';
+        li.addEventListener('click',()=>{location.href=`profile.html?id=${encodeURIComponent(p.id)}`;closeAll();});
+        list.appendChild(li);
+      });
+    });
   }
-  // run once on load and also if cards engine announces players later
-  if (window.YAT?.players) populateOptions();
-  document.addEventListener('yat:players-ready', populateOptions);
 
-  // Apply & Reset filters (uses cards.html API)
-  byId('btnApply')?.addEventListener('click',()=>{
-    const name = byId('fltName')?.value.trim().toLowerCase();
-    const level= byId('fltLevel')?.value || '';
-    const klass= byId('fltClass')?.value || '';
-    const roster=byId('fltRoster')?.value || '';
-    const status=byId('fltStatus')?.value || '';
+  // Filters: static lists
+  const LEVELS = ["MLB","TRIPLE-A","DOUBLE-A","HIGH-A","LOW-A","ROOKIE","INDY","INTERNATIONAL","NCAA-D1","NCAA-D2","NCAA-D3","NAIA","JUCO"];
+  const STATUSES = ["ACTIVE 2025","FREE AGENT","INJURED","ACTIVE 2024","RETIRED","SPONSOR"];
+  const YEARS = Array.from({length:2025-1999+1},(_,i)=>2025-i);
+
+  function mkCB(idBase, values, mount){
+    mount.innerHTML='';
+    values.forEach((v,i)=>{
+      const id=`${idBase}_${i}`;
+      const el=document.createElement('label'); el.className='cb';
+      el.innerHTML=`<input type="checkbox" id="${id}" value="${v}"><span>${v}</span>`;
+      mount.appendChild(el);
+    });
+  }
+  mkCB('lv', LEVELS, byId('lvGrid'));
+  mkCB('st', STATUSES, byId('stGrid'));
+  mkCB('gc', YEARS, byId('gcGrid'));
+  mkCB('ry', YEARS, byId('ryGrid'));
+
+  function getChecked(mount){ return Array.from(mount.querySelectorAll('input:checked')).map(i=>i.value); }
+
+  // Apply & Reset
+  function apply(){
+    const name = byId('fltName').value.trim().toLowerCase();
+    const levels = getChecked(byId('lvGrid'));
+    const classes = getChecked(byId('gcGrid')).map(String);
+    const roster  = getChecked(byId('ryGrid')).map(String);
+    const statuses= getChecked(byId('stGrid'));
 
     const root=document.getElementById('grid');
     let list=[...(window.YAT?.players||[])];
 
-    if(name)  list=list.filter(p=>(p.name||'').toLowerCase().includes(name));
-    if(level) list=list.filter(p=>(p.currentLevel||'').toUpperCase()===level.toUpperCase());
-    if(klass) list=list.filter(p=>String(p.graduatingClass)===String(klass));
-    if(roster)list=list.filter(p=>/\d{4}/.test(String(p.status||'')) && String(p.status).includes(roster));
-    if(status)list=list.filter(p=>String(p.status||'').toUpperCase()===status.toUpperCase());
+    if(name) list=list.filter(p=>(p.name||'').toLowerCase().includes(name));
+    if(levels.length) list=list.filter(p=>levels.includes((p.currentLevel||'').toUpperCase()));
+    if(classes.length) list=list.filter(p=>classes.includes(String(p.graduatingClass)));
+    if(roster.length) list=list.filter(p=> (p.letterWinnerYears||[]).some(y=>roster.includes(String(y))));
+    if(statuses.length) list=list.filter(p=> statuses.includes(String(p.status || '').toUpperCase()));
 
-    window.YAT?.renderCards?.(root,list);
+    // keep the default grouping/sorting rules even after filters
+    list = window.YAT?.sortPlayersDefault?.(list) || list;
+
+    window.YAT?.renderCards?.(root, list);
     close(R);
+  }
+  byId('btnApply')?.addEventListener('click', apply);
+  byId('fltName')?.addEventListener('keydown', e=>{ if(e.key==='Enter'){ e.preventDefault(); apply(); }});
+  byId('btnReset')?.addEventListener('click', ()=>{ 
+    ['lvGrid','gcGrid','ryGrid','stGrid'].forEach(id=>document.getElementById(id).querySelectorAll('input:checked').forEach(c=>c.checked=false));
+    byId('fltName').value='';
+    window.YAT?.resetAll?.(); close(R);
   });
 
-  byId('btnReset')?.addEventListener('click',()=>{
-    ['fltName','fltLevel','fltClass','fltRoster','fltStatus'].forEach(id=>{const el=byId(id); if(!el) return; if(el.tagName==='SELECT') el.value=''; else el.value='';});
-    window.YAT?.resetAll?.();
-    close(R);
-  });
+  // When cards engine finishes, wire live search
+  document.addEventListener('yat:players-ready', bindLiveSearch);
+  if (window.YAT?.players) bindLiveSearch();
 })();
 </script>
