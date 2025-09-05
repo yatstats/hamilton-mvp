@@ -1,118 +1,99 @@
 <!doctype html>
 <html lang="en" data-theme="dark">
 <head>
-  <meta charset="utf-8" />
-  <title>YAT?STATS — Hamilton Active Alumni</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+  <title>YAT?STATS — WHERE THEY YAT?</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@300;400;600&display=swap" rel="stylesheet">
   <style>
-    html,body{margin:0;background:#0b0b0b;color:#e5e7eb;font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial}
-    main{max-width:1200px;margin:0 auto;padding:14px 12px 46px}
-    #grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px}
-
-    /* HERO (under header) — tightened text */
-    .hero{background:#000;border-top:1px solid #1f2530;border-bottom:1px solid #1f2530;display:grid;grid-template-columns:1fr auto;align-items:center;padding:8px 10px}
-    .tag-left{display:flex;align-items:center;gap:8px}
-    .tag-grey,.tag-strong{font-family:"Anton",system-ui;line-height:1}
-    .tag-grey{color:#9aa1ab;font-weight:400;letter-spacing:0}
-    .tag-strong{color:#fff;font-weight:900;letter-spacing:0}
-    .tag-right{display:flex;align-items:center;gap:6px}
-    .hbtn{width:38px;height:38px;border:0;background:transparent;border-radius:10px;display:grid;place-items:center;cursor:pointer}
-    .hbtn:hover{background:rgba(255,255,255,.08)} .hbtn svg{width:21px;height:21px;color:#fff}
-
-    /* Splash with wordmark image */
-    .splash{position:fixed;inset:0;z-index:9999;background:#000;color:#fff;display:grid;grid-template-rows:auto 1fr auto;opacity:1;transition:opacity .6s}
-    .splash.hide{opacity:0;pointer-events:none}
-    .s-top{display:flex;gap:10px;padding:10px 12px 0}
-    .s-btn{width:36px;height:36px;border:0;background:transparent;display:grid;place-items:center;border-radius:10px;cursor:pointer}
-    .s-mid{display:grid;place-items:center;text-align:center}
-    .s-mid img{width:min(72vw,520px);height:auto}
-    .s-bot{display:grid;place-items:center;padding:18px 12px 26px;gap:10px}
-    .s-logos{display:grid;grid-auto-flow:column;align-items:center;gap:16px}
-    .s-logos img{height:clamp(46px,10vw,90px);width:auto;object-fit:contain}
-    .s-div{width:2px;height:clamp(40px,9vw,78px);background:#bbb;opacity:.7}
-
-    .build{position:fixed;left:12px;bottom:12px;background:#111;color:#cbd5e1;border:1px solid #1f2937;border-radius:12px;font-size:13px;padding:8px 10px;opacity:.9}
+    :root{
+      --bg: #000; --fg:#fff; --muted:#cbd5e1; --ring:#1f2530;
+      --heroH:76px; --crumbH:26px; --edge:14px;
+    }
+    [data-theme="light"]{ --bg:#fff; --fg:#000; --muted:#374151; --ring:#d1d5db; }
+    html,body{margin:0;background:var(--bg);color:var(--fg);font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial}
+    /* --- HERO (separate from header) --- */
+    .hero{position:sticky;top:calc(54px + 78px);z-index:50;background:var(--bg);border-bottom:1px solid var(--ring)}
+    .hero-inner{display:grid;grid-template-columns:1fr auto;align-items:center;gap:10px;height:var(--heroH);padding:0 var(--edge)}
+    .pair{display:inline-flex;align-items:baseline}
+    .slim{font:400 22px/1 "Oswald",sans-serif;color:var(--muted);margin-right:6px}
+    .strong{font:400 28px/1 "Bebas Neue",sans-serif;color:var(--fg)}
+    .actions{display:flex;align-items:center;gap:8px}
+    .hbtn{width:38px;height:38px;border-radius:10px;border:1px solid var(--ring);background:transparent;color:var(--fg);display:grid;place-items:center;cursor:pointer}
+    .hbtn:hover{background:rgba(255,255,255,.08)}
+    .hbtn svg{width:21px;height:21px}
+    .crumbs{height:var(--crumbH);display:flex;align-items:center;padding:0 var(--edge);color:var(--muted);font:300 12px/1 "Oswald",sans-serif;letter-spacing:.02em}
+    /* --- GRID --- */
+    .wrap{padding:16px var(--edge) 40px}
+    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
+    /* mount points */
+    #headerMount{position:relative;z-index:60}
+    /* helpful for phones with bottom bars */
+    .bottom-pad{height:20px}
   </style>
 </head>
 <body>
+
+  <!-- Global header gets injected here -->
   <div id="headerMount"></div>
 
-  <!-- HERO (tight text; same height words) -->
-  <div class="hero">
-    <div class="tag-left">
-      <span class="tag-grey">WHERE THEY</span><span class="tag-strong">YAT?</span>
-      <span class="tag-grey" style="margin-left:10px">FLIP FOR</span><span class="tag-strong">STATS!</span>
-    </div>
-    <div class="tag-right">
-      <button id="tlSearch" class="hbtn" aria-label="Search"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M11 4a7 7 0 1 1 0 14 7 7 0 0 1 0-14zm9.7 15.3-3.4-3.4a9 9 0 1 0-1.4 1.4l3.4 3.4a1 1 0 0 0 1.4-1.4z"/></svg></button>
-      <button id="tlFilter" class="hbtn" aria-label="Filters"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M3 5h18l-6.5 7.5V20l-5-2v-5.5L3 5z"/></svg></button>
-      <button id="tlReset" class="hbtn" aria-label="Reset"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 5V2L8 6l4 4V7a5 5 0 1 1-5 5H5a7 7 0 1 0 7-7z"/></svg></button>
-    </div>
-  </div>
-
-  <!-- SPLASH -->
-  <div id="splash" class="splash" role="dialog" aria-modal="true" aria-label="Intro screen">
-    <div class="s-top">
-      <button class="s-btn" id="splashAccount" aria-label="Account"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm0 2c-4.2 0-8 2.1-8 5v1h16v-1c0-2.9-3.8-5-8-5z"/></svg></button>
-      <button class="s-btn" id="splashTheme" aria-label="Toggle theme"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></button>
-    </div>
-    <div class="s-mid">
-      <img src="https://i.postimg.cc/C5mwXpQy/35878-20250830-222027-0000.png" alt="YAT?STATS">
-    </div>
-    <div class="s-bot">
-      <div class="s-logos">
-        <img src="https://i.postimg.cc/pVm0vHdX/hamilton-logo-tight-transparent-background.png" alt="Hamilton H">
-        <div class="s-div" aria-hidden="true"></div>
-        <img src="https://i.postimg.cc/R0GsT1Mg/sponsor-logo.png" alt="USA BMX">
+  <!-- HERO: tagline on left + search/filter/reset on right, crumbs on second line -->
+  <section class="hero" aria-label="Hero row">
+    <div class="hero-inner">
+      <div class="tagline">
+        <span class="pair"><span class="slim">WHERE THEY</span><span class="strong">YAT?</span></span>
+        <span class="pair" style="margin-left:18px"><span class="slim">FLIP FOR</span><span class="strong">STATS!</span></span>
       </div>
-      <div style="font:300 14px/1.2 'Oswald',system-ui;color:#cbd5e1">presented by USA BMX</div>
+      <div class="actions">
+        <button class="hbtn" id="heroSearch" aria-label="Search">
+          <svg viewBox="0 0 24 24"><path fill="currentColor" d="M10 2a8 8 0 105.293 14.293l4.707 4.707 1.414-1.414-4.707-4.707A8 8 0 0010 2zm0 2a6 6 0 110 12A6 6 0 0110 4z"/></svg>
+        </button>
+        <button class="hbtn" id="heroFilter" aria-label="Filters">
+          <svg viewBox="0 0 24 24"><path fill="currentColor" d="M3 5h18v2H3zm4 6h10v2H7zm3 6h4v2h-4z"/></svg>
+        </button>
+        <button class="hbtn" id="heroReset" aria-label="Reset">
+          <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 5V2L8 6l4 4V7a5 5 0 11-5 5H5a7 7 0 107-7z"/></svg>
+        </button>
+      </div>
     </div>
-  </div>
+    <div class="crumbs" id="breadcrumbs">Home ▸ Where They YAT?</div>
+  </section>
 
-  <main><div id="grid" aria-live="polite"></div></main>
-  <div class="build">BUILD: ham-v4.8.0</div>
+  <!-- Cards grid -->
+  <main class="wrap">
+    <div id="grid" class="grid" aria-live="polite"></div>
+  </main>
+
+  <div class="bottom-pad"></div>
 
   <script>
-  // inject + RUN scripts (fixes “icons don’t work”)
-  async function injectAndRun(url, mount){
-    const html = await (await fetch(url,{cache:'no-cache'})).text();
-    const tmp = document.createElement('div'); tmp.innerHTML = html;
-    // move styles/links
-    tmp.querySelectorAll('style,link[rel="stylesheet"]').forEach(el=>document.head.appendChild(el.cloneNode(true)));
-    // append non-script DOM
-    tmp.querySelectorAll('script').forEach(s=>s.remove());
-    mount.append(...tmp.childNodes);
-    // now execute scripts
-    const sTmp = document.createElement('div'); sTmp.innerHTML = html;
-    sTmp.querySelectorAll('script').forEach(s=>{
-      const ns=document.createElement('script'); if(s.src){ns.src=s.src; ns.defer=false;} else {ns.textContent=s.textContent;}
-      document.body.appendChild(ns);
-    });
-  }
-
-  (async function(){
-    // header
-    await injectAndRun('header.html', document.getElementById('headerMount'));
-
-    // splash dismiss
-    const splash=document.getElementById('splash');
-    const hide=()=>{splash.classList.add('hide');setTimeout(()=>splash.remove(),650);}
-    let t=setTimeout(hide,1500); splash.addEventListener('click',()=>{clearTimeout(t);hide();});
-    document.getElementById('splashAccount')?.addEventListener('click',e=>{e.stopPropagation();document.getElementById('iconProfile')?.click();hide();});
-    document.getElementById('splashTheme')?.addEventListener('click',e=>{e.stopPropagation();document.getElementById('themeToggle')?.click();});
-
-    // cards/renderers
-    await injectAndRun('cards.html', document.body);
-    const grid=document.getElementById('grid');
-    if(window.YAT?.renderCards){
-      // fill class filter
-      const clsSel=document.getElementById('fltClass');
-      if(clsSel && YAT.players){[...new Set(YAT.players.map(p=>p.graduatingClass).filter(Boolean))].sort().forEach(c=>{const o=document.createElement('option');o.value=o.textContent=c;clsSel.appendChild(o);});}
-      YAT.renderCards(grid, (YAT.playersDefaultView&&YAT.playersDefaultView())||YAT.players||[]);
-    }else{
-      grid.textContent='cards engine not loaded';
+    // --- mount helper to load partial HTMLs (header & cards) and execute their scripts ---
+    async function mountPartial(url, mountSelector){
+      const html = await fetch(url, {cache:'no-cache'}).then(r=>r.text());
+      const mount = document.querySelector(mountSelector);
+      mount.innerHTML = html;
+      // re-execute inline scripts
+      mount.querySelectorAll('script').forEach(old=>{
+        const s=document.createElement('script');
+        if(old.type) s.type=old.type;
+        s.textContent = old.textContent;
+        document.body.appendChild(s);
+        old.remove();
+      });
     }
-  })();
+
+    // Load header then wire hero buttons
+    (async function(){
+      await mountPartial('header.html','#headerMount');
+      // Load cards engine (data + renderers)
+      await mountPartial('cards.html', document.body.appendChild(document.createElement('div')).appendChild(document.createElement('div')).parentNode); // temporary mount
+
+      // Hook hero buttons to drawers / grid actions
+      const q = sel => document.querySelector(sel);
+      q('#heroSearch')?.addEventListener('click', ()=> document.getElementById('openLeft')?.click());
+      q('#heroFilter')?.addEventListener('click', ()=> document.getElementById('openFiltersFromHero')?.click());
+      q('#heroReset') ?.addEventListener('click', ()=> window.YAT?.resetAll?.());
+    })();
   </script>
 </body>
 </html>
