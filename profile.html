@@ -8,8 +8,8 @@
     html,body{margin:0;background:#0b0b0b;color:#e5e7eb;font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial}
     main{max-width:980px;margin:0 auto;padding:14px 12px 46px}
     .hero{background:#000;border-top:1px solid #1f2530;border-bottom:1px solid #1f2530;display:grid;grid-template-columns:1fr auto;align-items:center;padding:8px 10px}
-    .pname{font:900 22px/1.1 "Anton",system-ui;letter-spacing:.02em}
-    .psub{font:300 13px/1.2 "Roboto Condensed",system-ui;color:#9aa1ab}
+    .pname{font:900 22px/1 "Anton";letter-spacing:.02em}
+    .psub{font:300 13px/1 "Oswald";color:#9aa1ab}
     .right{display:flex;align-items:center;gap:6px}
     .hbtn{width:38px;height:38px;border:0;background:transparent;border-radius:10px;display:grid;place-items:center;cursor:pointer}
     .hbtn:hover{background:rgba(255,255,255,.08)} .hbtn svg{width:21px;height:21px;color:#fff}
@@ -33,15 +33,21 @@
   <main><div id="profileRoot"></div></main>
 
   <script>
+  async function injectAndRun(url, mount){
+    const html = await (await fetch(url,{cache:'no-cache'})).text();
+    const tmp = document.createElement('div'); tmp.innerHTML = html;
+    tmp.querySelectorAll('style,link[rel="stylesheet"]').forEach(el=>document.head.appendChild(el.cloneNode(true)));
+    tmp.querySelectorAll('script').forEach(s=>s.remove());
+    mount.append(...tmp.childNodes);
+    const sTmp=document.createElement('div'); sTmp.innerHTML=html;
+    sTmp.querySelectorAll('script').forEach(s=>{const ns=document.createElement('script'); if(s.src){ns.src=s.src;} else {ns.textContent=s.textContent;} document.body.appendChild(ns);});
+  }
   (async function(){
-    async function inject(url, mount){ const r=await fetch(url,{cache:'no-cache'}); mount.innerHTML=await r.text(); }
-    await inject('header.html', document.getElementById('headerMount'));
+    await injectAndRun('header.html', document.getElementById('headerMount'));
+    await injectAndRun('cards.html', document.body);
 
-    // load shared players/renderers
-    const txt=await (await fetch('cards.html',{cache:'no-cache'})).text(); const tmp=document.createElement('div'); tmp.innerHTML=txt;
-    tmp.querySelectorAll('style').forEach(s=>document.head.appendChild(s)); for(const s of tmp.querySelectorAll('script')){const ns=document.createElement('script');ns.textContent=s.textContent;document.body.appendChild(ns);}
-
-    const id=new URLSearchParams(location.search).get('id'); const p=(window.YAT?.players||[]).find(x=>String(x.id)===String(id));
+    const id=new URLSearchParams(location.search).get('id');
+    const p=(window.YAT?.players||[]).find(x=>String(x.id)===String(id));
     if(p){ document.getElementById('pName').textContent=p.name||'—'; document.getElementById('pSub').textContent=p.graduatingClass?`CLASS OF ${p.graduatingClass}`:''; window.YAT?.renderProfile?.(document.getElementById('profileRoot'),p); }
     else{ document.getElementById('profileRoot').innerHTML='<p style="color:#e11d48">Player not found.</p>'; }
   })();
