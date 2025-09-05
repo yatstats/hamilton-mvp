@@ -1,70 +1,91 @@
-<!-- header.html (drop-in replacement) -->
+<!-- header.html — layout corrected exactly per requirements -->
 <style>
-  :root { --headerH: 120px; --ring:#1f2530; }
+  :root{
+    --headerH: 132px;   /* total height of fixed header (top + bottom rows) */
+    --ring:#1f2530;
+  }
 
+  /* fixed header shell */
   .site-header{
-    position:fixed; left:0; right:0; top:0; z-index:60;
+    position:fixed; inset:0 0 auto 0; z-index:60;
     background:#000; border-bottom:1px solid var(--ring);
-    display:grid; grid-template-rows:auto auto; /* top row + bottom row */
+    display:grid; grid-template-rows:auto auto; /* top + tagline rows */
   }
 
-  /* TOP ROW: brand left, icons right */
+  /* TOP ROW: hamburger + Hamilton pack (left) … YAT?STATS wordmark (right) */
   .hdr-top{
-    display:grid; grid-template-columns:auto 1fr auto;
-    align-items:center; gap:10px; padding:8px 10px 6px;
-    min-height:64px;
+    display:grid; grid-template-columns:1fr auto; align-items:center;
+    padding:8px 10px 6px; gap:10px;
+    min-height:72px;
   }
 
-  /* Left group (hamburger + logo + 3 lines) */
+  /* left brand pack */
   .brand-left{ display:flex; align-items:center; gap:10px; min-width:0; }
-  .hambtn{ width:38px; height:38px; border:0; background:transparent; border-radius:10px; display:grid; place-items:center; cursor:pointer; }
-  .hambtn svg{ width:22px; height:22px; color:#fff; }
+  .hambtn{ width:38px; height:38px; border:0; background:transparent; border-radius:10px; display:grid; place-items:center; cursor:pointer }
+  .hambtn svg{ width:22px; height:22px; color:#fff }
 
-  .ham-pack{ display:flex; align-items:center; gap:8px; min-width:0; }
-  .ham-logo{ height:56px; width:auto; flex:0 0 auto; }
-  .ham-type{ display:flex; flex-direction:column; gap:2px; min-width:0; }
+  .ham-pack{ display:flex; align-items:center; gap:8px; min-width:0 }
+  .ham-logo{ height:56px; width:auto; flex:0 0 auto }
+  .ham-type{ display:flex; flex-direction:column; gap:2px; min-width:0 }
   .ham-line1{ font-family:"Roboto Condensed",sans-serif; font-weight:300; font-size:12px; color:#cbd5e1; letter-spacing:.02em }
   .ham-line2{ font-family:"Anton",sans-serif; font-size:17px; color:#fff; letter-spacing:.01em; line-height:1 }
   .ham-line3{ font-family:"Anton",sans-serif; font-size:19px; color:#fff; letter-spacing:.01em; line-height:1 }
 
-  /* Right group (icons) */
-  .hdr-icons{ display:flex; align-items:center; gap:6px; justify-self:end; }
-  .hdr-icon{ width:38px; height:38px; border:0; background:transparent; border-radius:10px; display:grid; place-items:center; cursor:pointer; }
+  /* right wordmark */
+  .ystats-logo{ height:34px; width:auto; object-fit:contain; justify-self:end }
+
+  /* BOTTOM ROW: tagline left (locked), icons right */
+  .hdr-bottom{
+    border-top:1px solid var(--ring);
+    display:grid; grid-template-columns:1fr auto; align-items:center;
+    padding:6px 10px;
+    min-height:48px;
+  }
+  .tagline{
+    display:flex; align-items:center; gap:8px;
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  }
+  .tag-left-grey{ color:#9aa1ab; font-family:"Roboto Condensed",sans-serif; font-weight:300; letter-spacing:0 }
+  .tag-left-strong{ color:#fff; font-family:"Anton",sans-serif; letter-spacing:.01em }
+  /* prevent weird spacing/justification changes */
+  .tagline * { display:inline; word-spacing:0; letter-spacing:0 }
+
+  .hdr-icons{ display:flex; align-items:center; gap:6px; justify-self:end }
+  .hdr-icon{ width:38px; height:38px; border:0; background:transparent; border-radius:10px; display:grid; place-items:center; cursor:pointer }
   .hdr-icon:hover{ background:rgba(255,255,255,.08) }
   .hdr-icon svg{ width:21px; height:21px; color:#fff }
 
-  /* BOTTOM ROW: thin tagline bar under the header */
-  .hdr-bottom{ border-top:1px solid var(--ring); padding:6px 10px; }
-  .tagline{ display:flex; gap:8px; align-items:center; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-  .tag-grey{ color:#9aa1ab; font-family:"Roboto Condensed",sans-serif; font-weight:300; letter-spacing:-.01em }
-  .tag-strong{ color:#fff; font-family:"Anton",sans-serif; letter-spacing:.01em }
-
-  /* Make room for fixed header on pages */
-  @media (min-width:0){
-    body{ padding-top:var(--headerH); }
-  }
+  /* page padding to clear fixed header */
+  body{ padding-top:var(--headerH); }
 
   /* MOBILE TUNING */
-  @media (max-width: 640px){
-    :root{ --headerH: 100px; }
-    .ham-logo{ height:44px; }
+  @media (max-width:640px){
+    :root{ --headerH: 112px; }
+    .ham-logo{ height:44px }
+    .ham-line1{ display:none }             /* hide city line to avoid wraps */
     .ham-line2{ font-size:15px }
     .ham-line3{ font-size:16px }
-    /* If it still feels tight on very small phones, hide the city line */
-    .ham-line1{ display:none }
+    .ystats-logo{ height:30px }
   }
-
-  @media (max-width:420px){
-    /* On tiny screens, prevent wrap and collisions */
-    .ham-type{ gap:0 }
+  @media (max-width:400px){
     .ham-line2{ font-size:14px }
     .ham-line3{ font-size:15px }
   }
+
+  /* drawers/scrim basic */
+  .scrim{position:fixed;left:0;right:0;top:var(--headerH);bottom:0;background:rgba(0,0,0,.35);opacity:0;pointer-events:none;transition:opacity .25s ease;z-index:55}
+  .scrim.open{opacity:1;pointer-events:auto}
+  body.no-scroll{overflow:hidden}
+  .drawer{position:fixed;top:var(--headerH);bottom:0;width:clamp(300px,75vw,520px);background:#0b0f16;z-index:56;display:flex;flex-direction:column;transform:translateX(-100%);border-right:1px solid #232a36}
+  .drawer.right{left:auto;right:0;border-right:none;border-left:1px solid #232a36;transform:translateX(100%)}
+  .drawer.open{transform:translateX(0)}
+  .drawer-h{height:56px;border-bottom:1px solid #232a36;display:flex;align-items:center;justify-content:space-between;padding:0 12px;color:#d5d9df;font-weight:900;letter-spacing:.12em;text-transform:uppercase;font-size:12px}
+  .drawer-body{padding:12px;overflow:auto}
 </style>
 
 <header class="site-header" role="banner" aria-label="Site header">
+  <!-- TOP: hamburger + Hamilton pack (left) | YAT?STATS (right) -->
   <div class="hdr-top">
-    <!-- LEFT: hamburger + logo + 3 lines snug together -->
     <div class="brand-left">
       <button class="hambtn" id="openLeft" aria-label="Open navigation menu">
         <svg viewBox="0 0 24 24"><path fill="currentColor" d="M3 6h18v2H3zM3 11h18v2H3zM3 16h18v2H3z"/></svg>
@@ -80,36 +101,121 @@
       </div>
     </div>
 
-    <!-- (center column intentionally empty to balance layout) -->
-    <div></div>
+    <img class="ystats-logo" src="https://i.postimg.cc/C5mwXpQy/35878-20250830-222027-0000.png" alt="YAT?STATS">
+  </div>
 
-    <!-- RIGHT: account, search, filter, reset -->
+  <!-- BOTTOM: tagline (left, locked) | icons (right) -->
+  <div class="hdr-bottom">
+    <div class="tagline" aria-label="Site tagline">
+      <span class="tag-left-grey">WHERE THEY</span>
+      <span class="tag-left-strong">YAT?</span>
+      <span style="width:16px;"></span>
+      <span class="tag-left-grey">FLIP FOR</span>
+      <span class="tag-left-strong">STATS!</span>
+    </div>
+
     <div class="hdr-icons">
-      <button class="hdr-icon" id="iconProfile" aria-label="Open account panel">
+      <button class="hdr-icon" id="iconProfile" aria-label="Open account panel" title="Account">
         <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm0 2c-4.2 0-8 2.1-8 5v1h16v-1c0-2.9-3.8-5-8-5z"/></svg>
       </button>
-      <button class="hdr-icon" id="iconSearch" aria-label="Open player search">
+      <button class="hdr-icon" id="iconSearch" aria-label="Open player search" title="Search">
         <svg viewBox="0 0 24 24"><path fill="currentColor" d="M11 4a7 7 0 1 1 0 14 7 7 0 0 1 0-14zm9.7 15.3-3.4-3.4a9 9 0 1 0-1.4 1.4l3.4 3.4a1 1 0 0 0 1.4-1.4z"/></svg>
       </button>
-      <button class="hdr-icon" id="iconFilter" aria-label="Open filters">
+      <button class="hdr-icon" id="iconFilter" aria-label="Open filters" title="Filters">
         <svg viewBox="0 0 24 24"><path fill="currentColor" d="M3 5h18l-6.5 7.5V20l-5-2v-5.5L3 5z"/></svg>
       </button>
-      <button class="hdr-icon" id="iconReset" aria-label="Reset filters">
+      <button class="hdr-icon" id="iconReset" aria-label="Reset filters" title="Reset">
         <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 5V2L8 6l4 4V7a5 5 0 1 1-5 5H5a7 7 0 1 0 7-7z"/></svg>
       </button>
     </div>
   </div>
-
-  <!-- BOTTOM: the thin tagline under the header -->
-  <div class="hdr-bottom">
-    <div class="tagline">
-      <span class="tag-grey">WHERE THEY</span><span class="tag-strong">YAT?</span>
-      &nbsp;&nbsp;
-      <span class="tag-grey">SWIPE FOR</span><span class="tag-strong">STATS!</span>
-    </div>
-  </div>
 </header>
 
-<!-- (Optional) drawers & scripts from your previous header can be kept as-is below.
-     The button IDs (openLeft, iconSearch, iconFilter, iconProfile, iconReset) are unchanged
-     so your existing JS wiring will still work. -->
+<!-- scrim + minimalist drawers so the buttons still work -->
+<div class="scrim" id="scrim" hidden></div>
+
+<aside class="drawer" id="drawerLeft" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Navigation & Search">
+  <div class="drawer-h">Navigation
+    <button class="hdr-icon" id="closeLeft" aria-label="Close navigation"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M6.225 4.811 4.811 6.225 10.586 12l-5.775 5.775 1.414 1.414L12 13.414l5.775 5.775 1.414-1.414L13.414 12l5.775-5.775-1.414-1.414L12 10.586z"/></svg></button>
+  </div>
+  <div class="drawer-body">
+    <input id="localSearch" type="text" class="ghost" placeholder="Type a player name…" style="width:100%;background:#0e141f;border:1px solid #1b2330;border-radius:10px;padding:10px;color:#fff"/>
+    <ul id="localResults" style="list-style:none;margin:10px 0 0;padding:0"></ul>
+  </div>
+</aside>
+
+<aside class="drawer right" id="drawerRight" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Filters">
+  <div class="drawer-h">Filters
+    <button class="hdr-icon" id="closeRight" aria-label="Close filters"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M6.225 4.811 4.811 6.225 10.586 12l-5.775 5.775 1.414 1.414L12 13.414l5.775 5.775 1.414-1.414L13.414 12l5.775-5.775-1.414-1.414L12 10.586z"/></svg></button>
+  </div>
+  <div class="drawer-body">
+    <!-- your filter controls live elsewhere; this is a placeholder -->
+    <div style="color:#cbd5e1">Use the filter controls on the page.</div>
+  </div>
+</aside>
+
+<aside class="drawer right" id="drawerAuth" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Account">
+  <div class="drawer-h">Sign Up | Login
+    <button class="hdr-icon" id="closeAuth" aria-label="Close account"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M6.225 4.811 4.811 6.225 10.586 12l-5.775 5.775 1.414 1.414L12 13.414l5.775 5.775 1.414-1.414L13.414 12l5.775-5.775-1.414-1.414L12 10.586z"/></svg></button>
+  </div>
+  <div class="drawer-body">
+    <label>Email</label>
+    <input class="ghost" type="email" placeholder="you@example.com" style="display:block;width:100%;background:#0e141f;border:1px solid #1b2330;border-radius:10px;padding:10px;color:#fff"/>
+    <label style="margin-top:10px">Password</label>
+    <input class="ghost" type="password" placeholder="••••••••" style="display:block;width:100%;background:#0e141f;border:1px solid #1b2330;border-radius:10px;padding:10px;color:#fff"/>
+  </div>
+</aside>
+
+<script>
+/* header interactions: open/close drawers, route search, reset */
+(function(){
+  const byId = id => document.getElementById(id);
+  const $$ = (sel,root=document)=>Array.from(root.querySelectorAll(sel));
+
+  const scrim=byId('scrim');
+  const drawerLeft=byId('drawerLeft');
+  const drawerRight=byId('drawerRight');
+  const drawerAuth=byId('drawerAuth');
+  const iconSearch=byId('iconSearch');
+  const iconFilter=byId('iconFilter');
+  const iconProfile=byId('iconProfile');
+  const iconReset=byId('iconReset');
+  const localSearch=byId('localSearch');
+  const localResults=byId('localResults');
+
+  let lastFocus=null;
+  function openDrawer(d){ closeAll(false); lastFocus=document.activeElement; d.classList.add('open'); scrim.classList.add('open'); scrim.hidden=false; document.body.classList.add('no-scroll'); }
+  function closeDrawer(d){ d.classList.remove('open'); if(!drawerLeft.classList.contains('open') && !drawerRight.classList.contains('open') && !drawerAuth.classList.contains('open')){ scrim.classList.remove('open'); scrim.hidden=true; document.body.classList.remove('no-scroll'); } }
+  function closeAll(restore=true){ [drawerLeft,drawerRight,drawerAuth].forEach(d=>d.classList.remove('open')); scrim.classList.remove('open'); scrim.hidden=true; document.body.classList.remove('no-scroll'); if(restore) lastFocus?.focus?.(); }
+
+  byId('openLeft')?.addEventListener('click', ()=>openDrawer(drawerLeft));
+  byId('closeLeft')?.addEventListener('click', ()=>closeDrawer(drawerLeft));
+  byId('closeRight')?.addEventListener('click', ()=>closeDrawer(drawerRight));
+  byId('closeAuth')?.addEventListener('click', ()=>closeDrawer(drawerAuth));
+  scrim?.addEventListener('click', ()=>closeAll());
+
+  iconSearch?.addEventListener('click', ()=>openDrawer(drawerLeft));
+  iconFilter?.addEventListener('click', ()=>openDrawer(drawerRight));
+  iconProfile?.addEventListener('click', ()=>openDrawer(drawerAuth));
+  iconReset?.addEventListener('click', ()=>{ window.YAT?.resetAll?.(); });
+
+  // local search -> profile.html
+  function renderLocalResults(q){
+    if(!localResults) return;
+    localResults.innerHTML='';
+    if(!q) return;
+    (window.YAT?.players || [])
+      .filter(p=>(p.name||'').toLowerCase().includes(q.toLowerCase()))
+      .slice(0,50)
+      .forEach(p=>{
+        const li=document.createElement('li');
+        const yr=p.graduatingClass?` (Class of ${p.graduatingClass})`:'';
+        li.textContent=`${p.name}${yr}`;
+        li.style.cssText='padding:8px 6px;border-radius:8px;cursor:pointer';
+        li.addEventListener('click', ()=>{ window.location.href=`profile.html?id=${encodeURIComponent(p.id)}`; closeAll(); });
+        localResults.appendChild(li);
+      });
+  }
+  localSearch?.addEventListener('input', e=>renderLocalResults(e.target.value));
+})();
+</script>
