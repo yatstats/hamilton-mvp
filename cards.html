@@ -40,4 +40,156 @@
     const json = JSON.parse(text.slice(text.indexOf('{'), text.lastIndexOf('}')+1));
     const cols = json.table.cols.map(c=> (c.label||c.id||'').toString().trim());
     const rows = json.table.rows.map(r=> r.c.map(c=> c?.v ?? ''));
-    // If the first row looks like user headers, use
+    // If the first row looks like user headers, use it
+    const firstRowIsHeader = rows.length && rows[0].every(v => typeof v === 'string' && v && v.length < 60);
+    const headers = firstRowIsHeader ? rows.shift().map(h=>String(h)) : cols;
+    return rows.map(r => Object.fromEntries(r.map((v,i)=>[headers[i]||`col${i}`, v])));
+  }
+
+  // Normalize a bunch of possible header names into consistent keys
+  function normKey(s){
+    return String(s||'').toLowerCase().trim()
+      .replace(/\s+/g,'_').replace(/[^\w_]+/g,'')
+      .replace(/class_of|gradclass|graduatingclass|class/,'grad_class')
+      .replace(/level|currentlevel/,'level')
+      .replace(/^id$|player_id|vendor_player_id/,'player_id')
+      .replace(/team_parent|org|org_team|organization/,'org_team')
+      .replace(/team_affiliate|affiliate|affiliate_team/,'affiliate_team')
+      .replace(/frontimg|image|img|front_img_url/,'front_img')
+      .replace(/hsimg|hs_image|highschoolimg|hs_photo/,'hs_img')
+      .replace(/next_game_opponent|nextopp/,'next_game_opp')
+      .replace(/next_game_date|nextdate/,'next_game_date')
+      .replace(/letters_won|letters/,'letters');
+  }
+
+  function mapRow(r){
+    const m={}; for(const [k,v] of Object.entries(r)) m[normKey(k)]=v;
+    const up=x=>x==null?'':String(x); const upper=x=>up(x).toUpperCase();
+
+    const id = up(m.slug||m.player_id||m.id);
+    const aff = up(m.affiliate_team), org = up(m.org_team);
+    const team = aff ? `${aff} — ${org}` : org || aff;
+
+    const batting = (m.avg||m.obp||m.slg||m.ops) ? {
+      avg:up(m.avg),obp:up(m.obp),slg:up(m.slg),ops:up(m.ops),
+      hits:m.h||m.hits,runs:m.r||m.runs,hr:m.hr,rbi:m.rbi,
+      doubles:m.doubles,triples:m.triples,sb:m.sb,bb:m.bb
+    } : undefined;
+
+    const pitching = (!batting && (m.era||m.whip||m.so||m.ip)) ? {
+      era:up(m.era),whip:up(m.whip),so:m.so,ip:m.ip,
+      oba:m.oba,kbb:m.kbb,fip:m.fip,er:m.er,hr:m.hr,qs:m.qs,w:m.w,sv:m.sv
+    } : undefined;
+
+    const mk3=(s)=>{const parts=String(s||'').split(/\s*[-–—]\s*|,\s*/).filter(Boolean);
+      let date=parts[0]||'',opp=parts[1]||'',line=parts.slice(2).join(', ');
+      if(!line&&parts.length===3)line=parts[2];
+      return {date:date||'—',opp:opp||'—',line:line||'—'};
+    };
+    const last3=[m.last3_1||m.last_1,m.last3_2||m.last_2,m.last3_3||m.last_3].filter(Boolean).map(mk3);
+
+    const nextGame=(m.next_game_date||m.next_game_opp)?{
+      date:up(m.next_game_date),opponent:up(m.next_game_opp),tz:up(m.next_game_tz)
+    }:undefined;
+
+    const letters=up(m.letters).replace(/,/g,'|').split('|').map(x=>parseInt(x.trim(),10)).filter(n=>!isNaN(n));
+
+    return {
+      id,
+      name:upper(m.name||m.full_name||''),
+      graduatingClass: m.grad_class||m.grad,
+      currentLevel: upper((m.level||'').replace('AAA','TRIPLE-A').replace('AA','DOUBLE-A')),
+      status: upper(m.status||'Active 2025'),
+      position: up(m.position),
+      team,
+      frontImg: up(m.front_img),
+      highSchoolImg: up(m.hs_img||m.front_img),
+      batting, pitching,
+      letterWinnerYears: letters,
+      last3, nextGame
+    };
+  }
+
+  // ---------- Renderers ----------
+  function el(h){ const d=document.createElement('div'); d.innerHTML=h.trim(); return d.firstElementChild; }
+
+  function makeCard(p){
+    const img=p.frontImg||'https://images.unsplash.com/photo-1518600506278-4e8ef466b810?q=80&w=1200&auto=format&fit=crop';
+    const chips=[]; if(p.currentLevel)chips.push(`<span class="chip">${p.currentLevel}</span>`); if(p.status)chips.push(`<span class="chip">${p.status}</span>`);
+    const right=[];
+    if(p.nextGame?.date||p.nextGame?.opponent){
+      right.push('<div class="rb">NEXT GAME</div>');
+      const t=`${p.nextGame.date||''} ${p.nextGame.tz||''}`.trim(); if(t) right.push(`<div class="rb">${t}</div>`);
+      if(p.nextGame.opponent) right.push(`<div class="rb">@ ${p.nextGame.opponent}</div>`);
+    }
+    if(p.last3?.length) right.push('<div class="rb">LAST 3 GAMES</div>');
+
+    const node=el(`<article class="card" tabindex="0">
+      <img class="bg" src="${img}" alt="${p.name}"><div class="grad"></div>
+      <div class="front">
+        <div class="chips">${chips.join('')}</div>
+        <div><div class="name">${p.name}</div><div class="team">${p.team||''}</div></div>
+      </div>
+      <div class="right-badges">${right.join('')}</div>
+    </article>`);
+    node.addEventListener('click',()=>location.href=`profile.html?id=${encodeURIComponent(p.id)}`);
+    node.addEventListener('keyup',e=>{if(e.key==='Enter'||e.key===' ')node.click();});
+    return node;
+  }
+
+  function renderCards(root,list){
+    root.innerHTML='';
+    if(!list.length){ root.innerHTML='<p style="color:#e11d48">No players found.</p>'; return; }
+    list.forEach(p=>root.appendChild(makeCard(p)));
+  }
+
+  function makeKV(k,v){ return `<div class="kv"><div class="k">${k}</div><div class="v">${v??'—'}</div></div>`; }
+
+  function renderProfile(root,p){
+    const img=p.highSchoolImg||p.frontImg;
+    const stat12 = p.batting ? `
+      ${makeKV('AVG',p.batting.avg)} ${makeKV('OBP',p.batting.obp)} ${makeKV('SLG',p.batting.slg)} ${makeKV('OPS',p.batting.ops)}
+      ${makeKV('H',p.batting.hits||'—')} ${makeKV('R',p.batting.runs||'—')} ${makeKV('HR',p.batting.hr||'—')} ${makeKV('RBI',p.batting.rbi||'—')}
+      ${makeKV('2B',p.batting.doubles||'—')} ${makeKV('3B',p.batting.triples||'—')} ${makeKV('SB',p.batting.sb||'—')} ${makeKV('BB',p.batting.bb||'—')}
+    ` : `
+      ${makeKV('ERA',p.pitching?.era)} ${makeKV('WHIP',p.pitching?.whip)} ${makeKV('SO',p.pitching?.so)} ${makeKV('IP',p.pitching?.ip)}
+      ${makeKV('OBA',p.pitching?.oba||'—')} ${makeKV('K/BB',p.pitching?.kbb||'—')} ${makeKV('FIP',p.pitching?.fip||'—')} ${makeKV('W',p.pitching?.w||'—')}
+      ${makeKV('ER',p.pitching?.er||'—')} ${makeKV('HR',p.pitching?.hr||'—')} ${makeKV('QS',p.pitching?.qs||'—')} ${makeKV('SV',p.pitching?.sv||'—')}
+    `;
+    root.innerHTML=`
+      <section class="profile">
+        <div class="grid">
+          <div>
+            <div class="photo"><img src="${img}" alt="${p.name}"></div>
+            <div class="kv12">${stat12}</div>
+          </div>
+          <div>
+            <div class="kv">${makeKV('LEVEL',p.currentLevel||'—')}</div>
+            <div class="kv" style="margin-top:8px">${makeKV('TEAM',p.team||'—')}</div>
+            <div class="kv" style="margin-top:8px">${makeKV('POSITION',p.position||'—')}</div>
+            <div class="kv" style="margin-top:8px">${makeKV('STATUS',p.status||'—')}</div>
+          </div>
+        </div>
+      </section>`;
+  }
+
+  // Filters API exposed globally for header buttons
+  let players=[];
+  function playersDefaultView(){ return players.filter(p=>String(p.status||'').includes('ACTIVE')).sort((a,b)=>(+a.graduatingClass||9999)-(+b.graduatingClass||9999)); }
+  function applyFilters({level='',class:klass=''}={}){ const root=document.getElementById('grid'); let list=[...players]; if(level)list=list.filter(p=>(p.currentLevel||'').toUpperCase()===level.toUpperCase()); if(klass)list=list.filter(p=>String(p.graduatingClass)===String(klass)); renderCards(root,list); }
+  function resetAll(){ document.getElementById('fltLevel')?.value=''; document.getElementById('fltClass')?.value=''; const root=document.getElementById('grid'); renderCards(root,playersDefaultView()); }
+
+  document.addEventListener('DOMContentLoaded', async ()=>{
+    try{
+      const raw = await fetchSheet();
+      players = raw.map(mapRow).filter(p=>p.id && p.name);
+    }catch(e){
+      console.error(e);
+      players = [];
+    }
+    window.YAT = Object.assign(window.YAT||{}, {players,playersDefaultView,renderCards,renderProfile,applyFilters,resetAll});
+    const grid = document.getElementById('grid');
+    if(grid) renderCards(grid, playersDefaultView());
+  });
+})();
+</script>
