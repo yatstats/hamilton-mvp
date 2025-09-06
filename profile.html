@@ -1,186 +1,158 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Player Profile • Hamilton HS Active Alumni</title>
-
-<!-- Fonts -->
-<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400&family=Bebas+Neue&display=swap" rel="stylesheet">
-<style>
-:root{
-  --bg:#0b0b0b; --fg:#f6f7f9; --muted:#c7ccd1; --line:#1f2326;
-  --hamSmall:13px; --hamBig:20px; --hamBigger:24px;
-  --headerTopH:44px; --headerMidH:78px; --padX:16px; --icon:22px;
-}
-@font-face{ font-family:"Indigo"; src:url("assets/fonts/Indigo.otf") format("opentype"); font-display:swap }
-
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--fg);font-family:Oswald,system-ui}
-
-.header{position:sticky;top:0;z-index:50;background:var(--bg)}
-.row-top{height:var(--headerTopH);display:grid;grid-template-columns:1fr auto auto;align-items:center;padding:0 var(--padX);border-bottom:1px solid var(--line)}
-.left-icons{display:flex;gap:10px;align-items:center}
-.iconbtn{width:38px;height:30px;border:1px solid var(--line);border-radius:9px;display:grid;place-items:center;cursor:pointer;background:transparent}
-.iconbtn svg{width:var(--icon);height:var(--icon);color:var(--fg)}
-
-.nav-center{display:flex;gap:18px;justify-content:center;align-items:center;font:300 var(--hamSmall)/1 Oswald;color:var(--muted);white-space:nowrap}
-.nav-item{display:inline-flex;gap:6px;align-items:baseline}
-.nav-item .bold{font:400 calc(var(--hamSmall)*1.1)/1 "Indigo","Bebas Neue";letter-spacing:.01em;color:var(--fg)}
-@media(max-width:980px){ .nav-center{display:none} }
-
-.right-wordmark{justify-self:end}
-.wordmark{height:28px;display:block}
-
-.row-mid{height:var(--headerMidH);display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:14px;padding:0 var(--padX);border-bottom:1px solid var(--line)}
-.ham-logo{height:56px}
-.schoolblock{line-height:1}
-.small{font:300 var(--hamSmall)/1 Oswald;letter-spacing:.02em;color:var(--muted)}
-.big{font:400 var(--hamBig)/.95 "Bebas Neue"}
-.bigger{font:400 var(--hamBigger)/.95 "Bebas Neue";margin-top:-6px}
-.crumbs{font:300 calc(var(--hamSmall)*.5)/1 Oswald;letter-spacing:.02em;color:var(--muted);text-transform:uppercase;justify-self:end;white-space:nowrap}
-
-/* Player hero */
-.player-hero{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:12px;padding:8px var(--padX);border-bottom:1px solid var(--line)}
-.player-search .iconbtn{height:36px;width:42px}
-.player-id{justify-self:end;text-align:right}
-.player-name{font:400 28px/1 "Indigo","Bebas Neue";letter-spacing:.01em}
-.player-class{font:300 12px/1 Oswald;color:var(--muted);margin-top:2px}
-.player-hs{height:100px;width:auto;border-radius:10px;border:1px solid #2a2f34;object-fit:cover}
-
-/* Content */
-.wrap{padding:18px var(--padX) 80px}
-.card-like{background:#0e0f12;border:1px solid #1c1f23;border-radius:14px;padding:14px}
-
-/* Drawers */
-.drawer{position:fixed;top:0;bottom:0;width:320px;background:#111;border-left:1px solid var(--line);box-shadow:0 6px 24px rgba(0,0,0,.35);z-index:70;transform:translateX(100%);transition:transform .22s ease}
-.drawer.left{left:0;width:340px;border-left:none;border-right:1px solid var(--line);transform:translateX(-100%)}
-.drawer.open.left{transform:translateX(0)}
-.drawer.open.right{transform:translateX(0)}
-.drawer .hd{padding:14px var(--padX);font:400 22px "Bebas Neue";border-bottom:1px solid var(--line)}
-.drawer .body{padding:12px var(--padX);display:grid;gap:12px}
-.field{display:grid;gap:6px}
-.field label{font:600 12px Oswald;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
-.field input{background:#0f1113;color:var(--fg);border:1px solid #2a2f34;border-radius:10px;padding:10px 12px;font:400 14px system-ui}
-.actions{display:flex;gap:8px}
-.btn{padding:10px 12px;border-radius:10px;border:1px solid #2a2f34;background:#181b1f;color:#fff;cursor:pointer}
-.btn.primary{background:#fff;color:#000;border-color:#fff}
-</style>
+<meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Player — Hamilton</title>
+<link rel="stylesheet" href="styles.css"/>
+<link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet"/>
 </head>
 <body>
 
-<!-- ===== HEADER ===== -->
 <header class="header">
-  <div class="row-top">
+  <div class="container topbar">
     <div class="left-icons">
-      <button class="iconbtn" id="btnMenu" title="Menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 6h18M3 12h18M3 18h18" stroke-width="2" stroke-linecap="round"/></svg></button>
-      <button class="iconbtn" id="btnAccount" title="Account"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5Zm7 9a7 7 0 0 0-14 0" stroke-width="2" stroke-linecap="round"/></svg></button>
-      <button class="iconbtn" id="btnTheme" title="Theme"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" stroke-width="2" stroke-linecap="round"/></svg></button>
+      <button class="icon-btn" id="hamburger"><i class="ri-menu-line"></i></button>
+      <button class="icon-btn" id="account"><i class="ri-user-3-line"></i></button>
+      <button class="icon-btn" id="theme"><i class="ri-moon-line"></i></button>
     </div>
-    <nav class="nav-center">
-      <a class="nav-item" href="index.html"><span>WHERE THEY</span><span class="bold">YAT?</span></a>
-      <a class="nav-item" href="#"><span>ACTIVE ALUMNI</span><span class="bold">NEWS</span></a>
-      <a class="nav-item" href="#"><span>NEXT-LEVEL</span><span class="bold">ALL-TIME LIST</span></a>
-      <a class="nav-item" href="#"><span>NIL & YAT-A-BOY</span><span class="bold">MARKETPLACE</span></a>
-      <a class="nav-item" href="#"><span>THE</span><span class="bold">CURRENT TEAM</span></a>
-      <a class="nav-item" href="#"><span>PCD ACTION</span><span class="bold">PARTNER PROGRAM</span></a>
-      <a class="nav-item" href="#"><span></span><span class="bold">FAQ’S</span></a>
+    <nav class="topnav hide-sm">
+      <span class="nav-pair"><span class="thin">WHERE THEY</span><span class="bold">YAT?</span></span>
+      <span class="nav-pair"><span class="thin">ACTIVE ALUMNI</span><span class="bold">NEWS</span></span>
+      <span class="nav-pair"><span class="thin">NEXT-LEVEL</span><span class="bold">ALL-TIME LIST</span></span>
+      <span class="nav-pair"><span class="thin">NIL & YAT-A-BOY</span><span class="bold">MARKETPLACE</span></span>
+      <span class="nav-pair"><span class="thin">THE</span><span class="bold">CURRENT TEAM</span></span>
+      <span class="nav-pair"><span class="thin">PCD ACTION</span><span class="bold">PARTNER PROGRAM</span></span>
+      <span class="nav-pair"><span class="thin"></span><span class="bold">FAQ’S</span></span>
     </nav>
-    <div class="right-wordmark"><img class="wordmark" src="assets/img/yatstats-logo.png" alt="YAT?STATS"></div>
+    <div class="wordmark">YAT?STATS</div>
   </div>
-  <div class="row-mid">
-    <img class="ham-logo" src="assets/img/hamilton-logo.png" alt="Hamilton H">
-    <div class="schoolblock">
+
+  <div class="hr"></div>
+
+  <div class="container schoolrow">
+    <img src="assets/img/hamilton-logo.png" alt="Hamilton H" onerror="this.style.opacity=.2">
+    <div class="schooltext">
       <div class="small">CHANDLER, AZ</div>
-      <div class="big">HAMILTON HIGH SCHOOL</div>
-      <div class="bigger">ACTIVE ALUMNI</div>
+      <div class="big1">HAMILTON HIGH SCHOOL</div>
+      <div class="big2">ACTIVE ALUMNI</div>
     </div>
-    <div class="crumbs">HOME ▸ PLAYER PROFILE</div>
   </div>
+
+  <div class="hr"></div>
+
+  <!-- PROFILE hero: name right-justified next to HS photo (small) -->
+  <section class="hero">
+    <div class="container hero-grid">
+      <div class="icon-row">
+        <!-- only SEARCH in hero for profile pages -->
+        <button class="icon-btn" id="openSearch"><i class="ri-search-line"></i></button>
+      </div>
+      <div style="display:flex;align-items:center;gap:14px;margin-left:auto">
+        <div style="text-align:right">
+          <div id="heroName" style="font:400 28px Bebas Neue, sans-serif;letter-spacing:.02em">PLAYER NAME</div>
+          <div id="heroClass" class="small" style="text-align:right">CLASS OF 20XX</div>
+        </div>
+        <img id="heroHS" src="assets/img/placeholder.jpg" alt="" style="height:100px;width:auto;border-radius:6px;object-fit:cover">
+      </div>
+    </div>
+    <div class="container">
+      <div class="crumbs"><span class="subname">HAMILTON</span> ▸ <span id="crumbName">PLAYER NAME</span></div>
+    </div>
+  </section>
 </header>
 
-<!-- ===== PLAYER HERO ===== -->
-<section class="player-hero">
-  <div class="player-search">
-    <button class="iconbtn" id="openSearch" title="Search other players"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="11" cy="11" r="7" stroke-width="2"/><path d="m21 21-4.3-4.3" stroke-width="2" stroke-linecap="round"/></svg></button>
+<div class="drawer-mask"></div>
+<aside class="drawer" id="drawerLeft">
+  <h3>PLAYER PROFILE SEARCH</h3>
+  <div class="pad">
+    <input id="playerSearch" placeholder="Type to search…" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--ink)"/>
+    <div id="liveResults"></div>
   </div>
-  <div></div>
-  <div class="player-id">
-    <div class="player-name" id="pName">PLAYER NAME</div>
-    <div class="player-class" id="pClass">CLASS OF —</div>
+  <div class="pad"><h3>Navigation</h3>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <a href="index.html"><span class="thin">WHERE THEY</span> <span class="bold">YAT?</span></a>
+      <!-- same list as others -->
+    </div>
   </div>
-  <img class="player-hs" id="pHS" src="assets/img/sample-hs.jpg" alt="HS Photo">
-</section>
-
-<!-- ===== DRAWERS ===== -->
-<aside class="drawer left" id="drawerLeft">
-  <div class="hd">PLAYER PROFILE SEARCH</div>
-  <div class="body">
-    <div class="field"><label for="searchName">Name</label><input id="searchName" type="text" placeholder="Type to search…"></div>
-    <div class="actions"><button class="btn primary" id="goSearch">Search</button><button class="btn" id="closeLeft">Close</button></div>
-  </div>
-</aside>
-<aside class="drawer right" id="drawerRight">
-  <div class="hd">Filters</div>
-  <div class="body"><p style="color:#9aa2aa">Not used on profile.</p><div class="actions"><button class="btn" id="closeRight">Close</button></div></div>
-</aside>
-<aside class="drawer right" id="drawerAccount">
-  <div class="hd">Sign up | Login</div>
-  <div class="body"><p style="color:#9aa2aa">Global searches coming soon.</p></div>
+  <button class="icon-btn close-btn" onclick="document.body.classList.remove('drawer-left-open')"><i class="ri-close-line"></i></button>
 </aside>
 
-<!-- ===== CONTENT ===== -->
-<main class="wrap">
-  <div class="card-like">
-    <div style="font:400 18px 'Bebas Neue'">FUNZONE (placeholder)</div>
-    <p style="color:#9aa3ad">Modules will swap here via the triggers below.</p>
-  </div>
+<main class="container" style="padding:16px 14px 80px">
+  <section id="profileBody" class="card" style="border-radius:22px">
+    <div class="card-inner">
+      <div class="bg" id="profileBG" style="background-image:url('assets/img/placeholder.jpg')"></div>
+      <div class="shade"></div>
+      <div class="cap">
+        <div class="name" id="profName">Player Name</div>
+        <div id="profTeam" style="font-size:12px;opacity:.9"></div>
+        <div class="chips" id="profChips"></div>
+      </div>
+    </div>
+  </section>
 </main>
 
-<!-- ===== STICKY FOOTER ===== -->
-<nav class="tabbar" style="position:fixed;left:0;right:0;bottom:0;height:52px;background:#0e0f12;border-top:1px solid var(--line);display:flex;justify-content:space-around;align-items:center;z-index:60">
-  <a style="color:#fff;text-decoration:none;font:700 13px Oswald">BIO</a>
-  <a style="color:#9aa3ad;text-decoration:none;font:700 13px Oswald">NEWS</a>
-  <a style="color:#9aa3ad;text-decoration:none;font:700 13px Oswald">STATS</a>
-  <a style="color:#9aa3ad;text-decoration:none;font:700 13px Oswald">SOCIAL</a>
-  <a style="color:#9aa3ad;text-decoration:none;font:700 13px Oswald">NIL SCORE</a>
-  <a style="color:#9aa3ad;text-decoration:none;font:700 13px Oswald">VIDEO</a>
-  <a style="color:#9aa3ad;text-decoration:none;font:700 13px Oswald">PICS</a>
-</nav>
+<footer class="footer-tabs">
+  <div class="container tabs">
+    <a href="#">BIO</a><a href="#">NEWS</a><a href="#">STATS</a><a href="#">SOCIAL</a><a href="#">NIL SCORE</a><a href="#">VIDEO</a><a href="#">PICS</a>
+  </div>
+</footer>
 
 <script>
-const $=(s,r=document)=>r.querySelector(s); const tidy=s=>s?String(s).trim():"";
-const root=document.documentElement;
-
-/* Theme toggle */
-$("#btnTheme").addEventListener("click",()=>{
-  const dark=getComputedStyle(root).getPropertyValue('--bg').trim()==='#0b0b0b';
-  if(dark){ root.style.setProperty('--bg','#ffffff'); root.style.setProperty('--fg','#111'); root.style.setProperty('--muted','#444'); root.style.setProperty('--line','#e5e7eb'); }
-  else{ root.style.setProperty('--bg','#0b0b0b'); root.style.setProperty('--fg','#f6f7f9'); root.style.setProperty('--muted','#c7ccd1'); root.style.setProperty('--line','#1f2326'); }
-});
-
-/* Drawers */
-const L=$("#drawerLeft"), R=$("#drawerRight"), A=$("#drawerAccount");
-$("#btnMenu").addEventListener("click",()=>L.classList.toggle("open"));
-$("#openSearch").addEventListener("click",()=>L.classList.add("open"));
-$("#closeLeft").addEventListener("click",()=>L.classList.remove("open"));
-$("#btnAccount").addEventListener("click",()=>A.classList.toggle("open"));
-$("#closeRight").addEventListener("click",()=>R.classList.remove("open"));
-
-/* Load player from Google Sheets */
 const CSV_URL="https://docs.google.com/spreadsheets/d/e/2PACX-1vSB4q8nvjYfftVeWKkFNz42uDDWSuDXikimMa-a25WQk_XX-imZbiUd8q5Cj94rjZJjaabw5DGMvJFd/pub?gid=82179728&single=true&output=csv";
-function parseCSV(t){const r=[];let i=0,c="",q=false,row=[];while(i<t.length){const ch=t[i];if(ch==='\"'){if(q&&t[i+1]==='\"'){c+='\"';i++;}else q=!q;}else if(ch===','&&!q){row.push(c);c="";}else if((ch==='\n'||ch==='\r')&&!q){if(c.length||row.length){row.push(c);r.push(row);row=[];c="";}if(ch==='\r'&&t[i+1]==='\n')i++;}else c+=ch;i++;}if(c.length||row.length){row.push(c);r.push(row);}const h=r.shift().map(x=>x.toLowerCase().replace(/\s+/g,'_'));return r.map(a=>{const o={};h.forEach((k,idx)=>o[k]=a[idx]??"");return o;});}
-function qsParam(k){return new URL(location.href).searchParams.get(k);}
-async function loadPlayer(){
-  const res=await fetch(CSV_URL,{cache:"no-store"}); const txt=await res.text(); const rows=parseCSV(txt);
-  const slug=tidy(qsParam("slug")||""); const id=tidy(qsParam("id")||"");
-  const p = rows.find(r=> (slug && tidy(r.slug).toLowerCase()===slug.toLowerCase()) || (id && tidy(r.tbc_id)===id));
-  if(!p) return;
-  $("#pName").textContent = tidy(p.display_name || `${p.first||""} ${p.last||""}`).toUpperCase();
-  $("#pClass").textContent= `CLASS OF ${tidy(p.grad_class)||"—"}`;
-  $("#pHS").src = tidy(p.hs_img)||"assets/img/sample-hs.jpg";
+const $=s=>document.querySelector(s), $$=s=>Array.from(document.querySelectorAll(s));
+$('#hamburger').onclick=()=>document.body.classList.add('drawer-left-open');
+$('#openSearch') .onclick=()=>document.body.classList.add('drawer-left-open');
+$('.drawer-mask').onclick=()=>document.body.classList.remove('drawer-left-open');
+
+async function loadCSV(url){
+  const txt=await fetch(url,{cache:'no-store'}).then(r=>r.text());
+  const rows=txt.trim().split(/\r?\n/).map(r=>r.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/).map(c=>c.replace(/^"|"$/g,'')));
+  const header=rows.shift(); const idx=n=>header.indexOf(n);
+  return rows.map(r=>({
+    id:r[idx('tbc_id')]||r[idx('id')], slug:r[idx('slug')],
+    display_name:r[idx('display_name')], first:r[idx('first')], last:r[idx('last')],
+    grad_class:r[idx('grad_class')], letter_years:r[idx('letter_years')],
+    status:r[idx('status')], level:r[idx('level')], team:r[idx('team')], org:r[idx('org')],
+    front_img:r[idx('front_img')], hs_img:r[idx('hs_img')]
+  }));
 }
-loadPlayer();
+function qparam(k){ return new URLSearchParams(location.search).get(k); }
+function rosterChips(p){
+  const yrs=String(p.letter_years||'').split(',').map(s=>s.trim()).filter(Boolean).map(y=>y.slice(-2));
+  return `<span class="chip">${p.status||''}</span>` + yrs.map(y=>`<span class="chip">${y}</span>`).join('');
+}
+function setHero(p){
+  const name=p.display_name||(p.first&&p.last?`${p.first} ${p.last}`:'');
+  $('#heroName').textContent=name;
+  $('#heroClass').textContent=`CLASS OF ${p.grad_class||''}`;
+  $('#heroHS').src=p.hs_img||'assets/img/placeholder.jpg';
+  $('#crumbName').textContent=name;
+  // big background section
+  $('#profName').textContent=name;
+  $('#profTeam').textContent=p.team||'';
+  $('#profChips').innerHTML=rosterChips(p);
+  $('#profileBG').style.backgroundImage=`url('${p.front_img||'assets/img/placeholder.jpg'}')`;
+}
+(async()=>{
+  const players=await loadCSV(CSV_URL);
+  const id=qparam('id');
+  const p=players.find(x=>(String(x.id)===id)||x.slug===id) || players[0];
+  setHero(p);
+  // live search
+  const liveBox=$('#liveResults'); const input=$('#playerSearch');
+  const makeHit=p=>{
+    const el=document.createElement('div'); el.className='live-hit';
+    el.innerHTML=`<img src="${p.hs_img||p.front_img||'assets/img/placeholder.jpg'}"><div><div style="font-weight:700">${p.display_name||p.first+' '+p.last}</div><div style="opacity:.7;font-size:.92em">${p.level||''} • Class of ${p.grad_class||''}</div></div>`;
+    el.onclick=()=>location.href=`profile.html?id=${encodeURIComponent(p.id||p.slug||'')}`;
+    return el;
+  };
+  input?.addEventListener('input', (e)=>{
+    const q=(e.target.value||'').toLowerCase().trim();
+    if(!q){ liveBox.innerHTML=''; return; }
+    const hits=players.filter(p=>( (p.display_name||(`${p.first} ${p.last}`)||'').toLowerCase().includes(q))).slice(0,25);
+    liveBox.innerHTML=''; hits.forEach(x=>liveBox.appendChild(makeHit(x)));
+  });
+})();
 </script>
 </body>
 </html>
