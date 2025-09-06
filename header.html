@@ -3,73 +3,73 @@
 
 <style>
   :root{
-    --edge:10px;
-    --topH:44px;         /* tighter top row */
-    --brandH:58px;       /* tighter brand row */
-    --bg:#000; --fg:#fff; --muted:#8e96a0;
-    --wmH:clamp(18px,5vw,34px); /* YAT?STATS height: small on mobile, solid on desktop */
+    /* consistent left/right padding across header + hero */
+    --edge: clamp(12px, 2vw, 24px);
+
+    /* row heights (slimmer by request) */
+    --topH: 50px;       /* header row 1 */
+    --brandH: 74px;     /* header row 2 */
+
+    /* colors */
+    --bg:#000; --fg:#fff; --muted:#9aa1ab; --hair:#1f2530;
+    --mutedLight:#6b7280;
+    /* responsive sizes */
+    --wmH: clamp(22px, 4.4vw, 44px);  /* YAT?STATS height: ~50% on phones, full on desktop */
+    --hLogoH: clamp(52px, 7vw, 72px); /* Hamilton H logo scales with viewport */
   }
-  [data-theme="light"]{ --bg:#fff; --fg:#000; --muted:#60656c; }
+  [data-theme="light"]{
+    --bg:#fff; --fg:#000; --muted:#6b7280; --hair:#d1d5db; --mutedLight:#9aa1ab;
+  }
 
   body{padding-top: calc(var(--topH) + var(--brandH));}
-  .site-header{position:fixed;left:0;right:0;top:0;z-index:60;background:var(--bg);color:var(--fg);}
 
-  /* Row 1 */
-  .row-top{
-    height:var(--topH);
-    display:grid;grid-template-columns:auto 1fr auto;
-    align-items:center;gap:8px;padding:0 var(--edge)
-  }
-  .icons-left{display:flex;gap:6px}
-  .btn{
-    width:26px;height:26px;border:0;background:transparent;color:var(--fg);
-    display:grid;place-items:center;cursor:pointer
-  }
+  .site-header{position:fixed;inset:0 0 auto 0;z-index:60;background:var(--bg);color:var(--fg)}
+  /* ROW 1: icons • center nav • wordmark */
+  .row-top{height:var(--topH);display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:10px;padding:0 var(--edge)}
+  .icons-left{display:flex;gap:8px}
+  .btn{width:28px;height:28px;border-radius:8px;border:1px solid var(--hair);background:transparent;color:var(--fg);display:grid;place-items:center;cursor:pointer}
+  .btn:hover{background:rgba(255,255,255,.08)}
   .btn svg{width:16px;height:16px}
 
-  /* Center nav — hide early so logo never gets clipped */
-  .nav-top{display:none;justify-content:center;align-items:center;white-space:nowrap;overflow:hidden}
-  @media (min-width:1220px){ .nav-top{display:flex} }
-
+  /* center nav: tighter, but hides early so wordmark always fits */
+  .nav-top{display:none;white-space:nowrap;align-items:center;justify-content:center;overflow:hidden}
+  @media (min-width:1320px){ .nav-top{display:flex} }
   .pair{display:inline-flex;align-items:baseline}
-  .pair + .pair{margin-left:12px}
-  .slim{font:400 12px/1 "Oswald";color:var(--muted);margin-right:0;letter-spacing:0;text-decoration:none}
-  .strong{font:400 15px/1 "Bebas Neue";color:var(--fg);margin:0;text-decoration:none}
-  .pair .strong{transform:translateY(.5px)}
+  .pair + .pair{margin-left: clamp(12px, 1.6vw, 24px);}  /* “breathing room” */
+  .slim{font:400 clamp(12px,1.3vw,13px)/1 "Oswald";color:var(--muted);margin-right:0;text-decoration:none;letter-spacing:0}
+  .strong{font:400 clamp(15px,1.6vw,16px)/1 "Bebas Neue";color:var(--fg);text-decoration:none;margin:0}
+  .pair .strong{transform:translateY(.5px)} /* optical baseline align */
+  .wordmark{height:var(--wmH);width:auto;justify-self:end;min-width:150px}
 
-  .wordmark{height:var(--wmH);width:auto;justify-self:end;min-width:120px}
-
-  /* Row 2 (no lines) */
-  .row-brand{height:var(--brandH);display:flex;align-items:center;gap:8px;padding:0 var(--edge)}
-  .h-logo{height:46px;width:auto}
-  .h-type{display:flex;flex-direction:column;gap:0}
-  .ham-l1{font:300 12px/1.05 "Oswald";color:var(--muted);letter-spacing:.01em}
-  .ham-l2{font:400 18px/1 "Bebas Neue";color:var(--fg)}
-  .ham-l3{font:700 18px/1 "Bebas Neue";color:var(--fg)}
+  /* ROW 2: H logo + 3 lines (less vertical padding, same rail) */
+  .row-brand{height:var(--brandH);border-top:1px solid var(--hair);border-bottom:1px solid var(--hair);
+    display:flex;align-items:center;gap:12px;padding:0 var(--edge)}
+  .h-logo{height:var(--hLogoH);width:auto}
+  .h-type{display:flex;flex-direction:column;gap:1px}
+  .ham-l1{font:300 13px/1.1 "Oswald";color:var(--muted);letter-spacing:.02em}
+  .ham-l2,.ham-l3{font:400 20px/1 "Bebas Neue";color:var(--fg)} /* same font/weight for both lines */
   @media (max-width:640px){
-    .wordmark{height:clamp(18px,6vw,30px);min-width:110px}
-    .h-logo{height:42px}
-    .ham-l2,.ham-l3{font-size:17px}
+    .ham-l2,.ham-l3{font-size:18px}
   }
 
-  /* Drawers (no visual changes other than keeping them borderless) */
+  /* Drawers */
   .scrim{position:fixed;left:0;right:0;top:calc(var(--topH) + var(--brandH));bottom:0;background:rgba(0,0,0,.35);opacity:0;pointer-events:none;transition:opacity .25s;z-index:55}
   .scrim.open{opacity:1;pointer-events:auto}
   body.no-scroll{overflow:hidden}
-  .drawer{position:fixed;top:calc(var(--topH) + var(--brandH));bottom:0;width:clamp(300px,75vw,520px);background:#0b0f16;color:#e5e7eb;z-index:56;display:flex;flex-direction:column;transform:translateX(-100%)}
-  .drawer.right{left:auto;right:0;transform:translateX(100%)}
+  .drawer{position:fixed;top:calc(var(--topH) + var(--brandH));bottom:0;width:clamp(300px,75vw,520px);background:#0b0f16;color:#e5e7eb;z-index:56;display:flex;flex-direction:column;transform:translateX(-100%);border-right:1px solid #232a36}
+  .drawer.right{left:auto;right:0;border-right:none;border-left:1px solid #232a36;transform:translateX(100%)}
   .drawer.open{transform:translateX(0)}
-  .drawer-h{height:48px;display:flex;align-items:center;justify-content:space-between;padding:0 10px;color:#d5d9df;font:700 11px/1 "Oswald";letter-spacing:.12em;text-transform:uppercase}
-  .drawer-body{padding:10px;overflow:auto}
+  .drawer-h{height:52px;border-bottom:1px solid #232a36;display:flex;align-items:center;justify-content:space-between;padding:0 12px;color:#d5d9df;font:700 12px/1 "Oswald";letter-spacing:.12em;text-transform:uppercase}
+  .drawer-body{padding:12px;overflow:auto}
   .text{width:100%;background:#0e141f;border:1px solid #1b2330;border-radius:10px;padding:10px;color:#fff}
-  .nav-list{margin-top:12px;padding-top:8px}
-  .nav-title{font:700 11px/1 "Oswald";color:#cbd5e1;letter-spacing:.12em;margin-bottom:6px}
-  .nav-item{display:block;color:#e5e7eb;text-decoration:none;padding:6px 6px;border-radius:8px}
+  .nav-list{margin-top:14px;border-top:1px solid #232a36;padding-top:10px}
+  .nav-title{font:700 12px/1 "Oswald";color:#cbd5e1;letter-spacing:.12em;margin-bottom:8px}
+  .nav-item{display:block;color:#e5e7eb;text-decoration:none;padding:8px;border-radius:8px}
   .nav-item:hover{background:#111827}
 </style>
 
 <header class="site-header" role="banner" aria-label="Sticky site header">
-  <!-- Row 1 -->
+  <!-- ROW 1 -->
   <div class="row-top">
     <div class="icons-left">
       <button class="btn" id="openLeft" aria-label="Open navigation/search">
@@ -93,10 +93,11 @@
       <span class="pair"><a class="slim" href="#faq"></a><a class="strong" href="#faq">FAQ’s</a></span>
     </nav>
 
+    <!-- responsive wordmark -->
     <img class="wordmark" src="https://i.postimg.cc/C5mwXpQy/35878-20250830-222027-0000.png" alt="YAT?STATS">
   </div>
 
-  <!-- Row 2 -->
+  <!-- ROW 2 -->
   <div class="row-brand">
     <img class="h-logo" src="https://i.postimg.cc/pVm0vHdX/hamilton-logo-tight-transparent-background.png" alt="Hamilton H">
     <div class="h-type">
@@ -107,8 +108,10 @@
   </div>
 </header>
 
+<!-- shared scrim -->
 <div class="scrim" id="scrim" hidden></div>
 
+<!-- LEFT drawer -->
 <aside class="drawer" id="drawerLeft" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Search & Navigation">
   <div class="drawer-h">Player Profile Search
     <button class="btn" id="closeLeft" aria-label="Close">
@@ -132,6 +135,7 @@
   </div>
 </aside>
 
+<!-- RIGHT drawers -->
 <aside class="drawer right" id="drawerRight" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Filters">
   <div class="drawer-h">Filters
     <button class="btn" id="closeRight" aria-label="Close">
@@ -139,7 +143,7 @@
     </button>
   </div>
   <div class="drawer-body">
-    <div style="color:#cbd5e1;font:400 12px/1 'Oswald'">Filters UI (next step).</div>
+    <div style="color:#cbd5e1;font:400 13px/1 'Oswald'">Filters UI (next step).</div>
     <button id="openFiltersFromHero" style="display:none"></button>
   </div>
 </aside>
@@ -153,7 +157,7 @@
   <div class="drawer-body">
     <label class="nav-title">Email</label>
     <input type="email" class="text" placeholder="you@example.com">
-    <label class="nav-title" style="margin-top:8px">Password</label>
+    <label class="nav-title" style="margin-top:10px">Password</label>
     <input type="password" class="text" placeholder="••••••••">
   </div>
 </aside>
@@ -169,9 +173,7 @@
   function closeAll(){[L,R,A].forEach(x=>x.classList.remove('open'));scrim.classList.remove('open');scrim.hidden=true;document.body.classList.remove('no-scroll');lastFocus?.focus?.();}
 
   window.YAT = Object.assign(window.YAT||{}, {
-    openLeft: ()=>open(L),
-    openFilters: ()=>open(R),
-    closeAll
+    openLeft: ()=>open(L), openFilters: ()=>open(R), closeAll
   });
 
   byId('openLeft')?.addEventListener('click',()=>open(L));
@@ -180,10 +182,9 @@
   byId('closeAuth')?.addEventListener('click',()=>close(A));
   byId('closeRight')?.addEventListener('click',()=>close(R));
   byId('openFiltersFromHero')?.addEventListener('click',()=>open(R));
-
   scrim?.addEventListener('click',closeAll);
 
-  // Theme
+  // Theme toggle
   (function(){
     const k='theme', get=()=>localStorage.getItem(k)||'dark',
           set=t=>{document.documentElement.setAttribute('data-theme',t);localStorage.setItem(k,t);};
@@ -191,7 +192,7 @@
     byId('themeToggle')?.addEventListener('click',()=>set(get()==='dark'?'light':'dark'));
   })();
 
-  // Live search hook; list populates after players ready
+  // Live search (populated when cards load)
   const input=byId('localSearch'), list=byId('localResults');
   function bindLiveSearch(){
     const players = window.YAT?.players || [];
@@ -201,7 +202,7 @@
       players.filter(p=>(p.name||'').toLowerCase().includes(q)).slice(0,80).forEach(p=>{
         const li=document.createElement('li');
         li.textContent=`${p.name}${p.graduatingClass?` (CLASS OF ${p.graduatingClass})`:''}`;
-        li.style.cssText='padding:6px;border-radius:6px;cursor:pointer';
+        li.style.cssText='padding:8px 6px;border-radius:8px;cursor:pointer';
         li.addEventListener('click',()=>{location.href=`profile.html?id=${encodeURIComponent(p.id)}`;closeAll();});
         list.appendChild(li);
       });
