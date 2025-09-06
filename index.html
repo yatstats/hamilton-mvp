@@ -3,142 +3,18 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Where They YAT? • Hamilton HS Active Alumni</title>
-
-<!-- Google fonts -->
+<title>YAT? Flip Cards • Hamilton HS Active Alumni</title>
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400&family=Bebas+Neue&display=swap" rel="stylesheet">
+<!-- copy the same <style> block from index.html here (unchanged) -->
 <style>
-  /* ---------- Tokens ---------- */
-  :root{
-    --bg:#0b0b0b; --fg:#f6f7f9; --muted:#c7ccd1; --line:#1f2326;
-    --accent:#ffffff; /* white on black */
-    --hamSmall:13px;            /* CHANDLER, AZ + center nav skinny */
-    --hamBig:20px;              /* “HAMILTON HIGH SCHOOL” */
-    --hamBigger:24px;           /* “ACTIVE ALUMNI” (same baseline, overlaps tighter) */
-    --heroH:56px;               /* hero row height */
-    --headerTopH:44px;          /* top icon/nav row */
-    --headerMidH:78px;          /* H logo + 3 lines row */
-    --padX:16px;
-    --icon:22px;                /* header icon size */
-    --radius:12px;
-    --shadow:0 6px 22px rgba(0,0,0,.35);
-  }
-  @font-face{
-    font-family:"Indigo";
-    src:url("assets/fonts/Indigo.otf") format("opentype");
-    font-display:swap;
-  }
-  @media (max-width:1100px){ :root{ --icon:20px; } }
-  @media (max-width:860px){  :root{ --icon:18px; } }
-  html,body{height:100%;background:var(--bg);color:var(--fg);margin:0}
-  *{box-sizing:border-box}
-
-  /* ---------- Fixed Header (2 rows) ---------- */
-  .header{position:sticky;top:0;z-index:50;background:var(--bg)}
-  .row-top{height:var(--headerTopH);display:grid;grid-template-columns:1fr auto auto;align-items:center;padding:0 var(--padX);border-bottom:1px solid var(--line)}
-  .left-icons{display:flex;gap:10px;align-items:center}
-  .iconbtn{width:38px;height:30px;border:1px solid var(--line);border-radius:9px;display:grid;place-items:center;cursor:pointer;background:transparent}
-  .iconbtn svg{width:var(--icon);height:var(--icon);color:var(--fg)}
-  .nav-center{display:flex;gap:18px;justify-content:center;align-items:center;font-family:Oswald,sans-serif;font-weight:300;font-size:var(--hamSmall);letter-spacing:.02em;color:var(--muted);white-space:nowrap}
-  .nav-item{display:inline-flex;gap:6px;align-items:baseline}
-  .nav-item .bold{font-family:"Indigo","Bebas Neue",sans-serif;letter-spacing:.01em;color:var(--fg);font-size:calc(var(--hamSmall)*1.1)}
-  .right-wordmark{justify-self:end}
-  .wordmark{height:28px;display:block}
-  @media (max-width:1200px){
-    .nav-center{max-width:60vw;overflow:hidden}
-  }
-  @media (max-width:980px){
-    .nav-center{display:none} /* drop center nav sooner to preserve wordmark */
-  }
-
-  .row-mid{height:var(--headerMidH);display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:14px;padding:0 var(--padX);border-bottom:1px solid var(--line)}
-  .ham-logo{height:56px;width:auto;display:block}
-  .schoolblock{line-height:1}
-  .small{font-family:Oswald,sans-serif;font-weight:300;font-size:var(--hamSmall);letter-spacing:.02em;color:var(--muted)}
-  .big{font-family:"Bebas Neue",sans-serif;font-size:var(--hamBig);margin-top:2px}
-  .bigger{font-family:"Bebas Neue",sans-serif;font-size:var(--hamBigger);margin-top:-6px} /* tighter baseline lock */
-  .crumbs{font-family:Oswald,sans-serif;font-weight:300;font-size:calc(var(--hamSmall)*.5);letter-spacing:.02em;color:var(--muted);text-transform:uppercase;justify-self:end}
-  @media (max-width:640px){
-    .big{font-size:18px}
-    .bigger{font-size:22px;margin-top:-5px}
-    .ham-logo{height:48px}
-  }
-
-  /* ---------- Hero (single row) ---------- */
-  .hero{height:var(--heroH);display:grid;grid-template-columns:1fr auto;align-items:center;padding:0 var(--padX);border-bottom:1px solid var(--line)}
-  .tagline{display:flex;gap:34px;align-items:baseline;white-space:nowrap;overflow:hidden}
-  .tag-seg{display:inline-flex;gap:6px;align-items:baseline}
-  .tag-skinny{font-family:Oswald,sans-serif;font-weight:300;letter-spacing:.02em;color:var(--muted);font-size:var(--hamBig)}
-  .tag-bold{font-family:"Indigo","Bebas Neue",sans-serif;color:var(--fg);font-size:var(--hamBig);letter-spacing:.01em}
-  .hero-tools{display:flex;gap:10px}
-  .hero-tools .iconbtn{height:36px;width:42px}
-
-  /* ---------- Drawers ---------- */
-  .drawer{position:fixed;top:0;bottom:0;width:320px;background:#111;border-left:1px solid var(--line);box-shadow:var(--shadow);z-index:70;transform:translateX(100%);transition:transform .22s ease}
-  .drawer.left{left:0;width:340px;border-left:none;border-right:1px solid var(--line);transform:translateX(-100%)}
-  .drawer.open.left{transform:translateX(0)}
-  .drawer.open.right{transform:translateX(0)}
-  .drawer .hd{padding:14px var(--padX);font-family:"Bebas Neue",sans-serif;font-size:22px;border-bottom:1px solid var(--line)}
-  .drawer .body{padding:12px var(--padX);display:grid;gap:12px}
-  .field{display:grid;gap:6px}
-  .field label{font:600 12px/1.1 Oswald,sans-serif;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
-  .field input,.field select{background:#0f1113;color:var(--fg);border:1px solid #2a2f34;border-radius:10px;padding:10px 12px;font:400 14px/1.2 system-ui,Segoe UI,Roboto}
-  .drawer .actions{display:flex;gap:8px;margin-top:6px}
-  .btn{padding:10px 12px;border-radius:10px;border:1px solid #2a2f34;background:#181b1f;color:#fff;cursor:pointer}
-  .btn.primary{background:#fff;color:#000;border-color:#fff}
-
-  /* ---------- Page body ---------- */
-  .wrap{padding:18px var(--padX) 80px}
-  .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:16px}
-  @media (max-width:1200px){ .grid{grid-template-columns:repeat(8,1fr)} }
-  @media (max-width:760px){  .grid{grid-template-columns:repeat(2,1fr)} }
-  .card{grid-column:span 3;background:#0e0f12;border:1px solid #1c1f23;border-radius:18px;overflow:hidden;min-height:260px;position:relative}
-  @media (max-width:1200px){ .card{grid-column:span 4} }
-  @media (max-width:760px){  .card{grid-column:span 2} }
-  .card .photo{position:absolute;inset:0;background:#000}
-  .card .meta{position:absolute;left:14px;right:14px;bottom:14px;color:#fff}
-  .pill{display:inline-block;background:#fff;color:#000;border-radius:999px;padding:4px 10px;font:800 12px/1 Oswald,sans-serif;margin-right:8px}
-
-  /* ---------- Sticky Footer ---------- */
-  .tabbar{position:fixed;left:0;right:0;bottom:0;height:52px;background:#0e0f12;border-top:1px solid var(--line);display:flex;justify-content:space-around;align-items:center;z-index:60}
-  .tabbar a{color:var(--muted);text-decoration:none;font:700 13px/1 Oswald,sans-serif;letter-spacing:.04em}
-  .tabbar a.active{color:#fff}
+/* (FOR BREVITY IN THIS MESSAGE) — copy the entire style block from index.html */
 </style>
 </head>
 <body>
-
-<!-- ================== HEADER (identical on all pages) ================== -->
+<!-- copy the same HEADER from index.html -->
 <header class="header" id="siteHeader">
-  <!-- Row 1 -->
-  <div class="row-top">
-    <div class="left-icons">
-      <button class="iconbtn" id="btnMenu" title="Menu">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 6h18M3 12h18M3 18h18" stroke-width="2" stroke-linecap="round"/></svg>
-      </button>
-      <button class="iconbtn" id="btnAccount" title="Account">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5Zm7 9a7 7 0 0 0-14 0" stroke-width="2" stroke-linecap="round"/></svg>
-      </button>
-      <button class="iconbtn" id="btnTheme" title="Theme">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" stroke-width="2" stroke-linecap="round"/></svg>
-      </button>
-    </div>
-
-    <nav class="nav-center" aria-label="Top Navigation">
-      <a class="nav-item" href="index.html"><span>WHERE THEY</span><span class="bold">YAT?</span></a>
-      <a class="nav-item" href="#"><span>ACTIVE ALUMNI</span><span class="bold">NEWS</span></a>
-      <a class="nav-item" href="#"><span>NEXT-LEVEL</span><span class="bold">ALL-TIME LIST</span></a>
-      <a class="nav-item" href="#"><span>NIL & YAT-A-BOY</span><span class="bold">MARKETPLACE</span></a>
-      <a class="nav-item" href="#"><span>THE</span><span class="bold">CURRENT TEAM</span></a>
-      <a class="nav-item" href="#"><span>PCD ACTION</span><span class="bold">PARTNER PROGRAM</span></a>
-      <a class="nav-item" href="#"><span></span><span class="bold">FAQ’S</span></a>
-    </nav>
-
-    <div class="right-wordmark">
-      <img class="wordmark" src="assets/img/yatstats-logo.png" alt="YAT?STATS">
-    </div>
-  </div>
-
-  <!-- Row 2 -->
+  <!-- Row 1 ... (identical) -->
+  <!-- Row 2 with different crumbs -->
   <div class="row-mid">
     <img class="ham-logo" src="assets/img/hamilton-logo.png" alt="Hamilton H">
     <div class="schoolblock">
@@ -146,11 +22,11 @@
       <div class="big">HAMILTON HIGH SCHOOL</div>
       <div class="bigger">ACTIVE ALUMNI</div>
     </div>
-    <div class="crumbs">HOME ▸ WHERE THEY YAT?</div>
+    <div class="crumbs">HOME ▸ YAT? FLIP CARDS</div>
   </div>
 </header>
 
-<!-- ================== HERO (index/cards tagline) ================== -->
+<!-- same Hero (tagline + tools) -->
 <section class="hero" aria-label="Hero">
   <div class="tagline">
     <div class="tag-seg"><span class="tag-skinny">WHERE THEY</span><span class="tag-bold">YAT?</span></div>
@@ -163,122 +39,20 @@
   </div>
 </section>
 
-<!-- ================== LEFT / RIGHT DRAWERS ================== -->
-<aside class="drawer left" id="drawerLeft" aria-hidden="true">
-  <div class="hd">PLAYER PROFILE SEARCH</div>
-  <div class="body">
-    <div class="field"><label for="searchName">Name</label><input id="searchName" type="text" placeholder="Type to search…"></div>
-    <div class="actions"><button class="btn primary" id="goSearch">Search</button><button class="btn" id="closeLeft">Close</button></div>
-    <hr style="border-color:#1d2125">
-    <!-- Left navigation list -->
-    <div class="field"><label>Navigation</label></div>
-    <a class="nav-item" href="index.html"><span>WHERE THEY</span><span class="bold">YAT?</span></a>
-    <a class="nav-item" href="#"><span>ACTIVE ALUMNI</span><span class="bold">NEWS</span></a>
-    <a class="nav-item" href="#"><span>NEXT-LEVEL</span><span class="bold">ALL-TIME LIST</span></a>
-    <a class="nav-item" href="#"><span>NIL & YAT-A-BOY</span><span class="bold">MARKETPLACE</span></a>
-    <a class="nav-item" href="#"><span>THE</span><span class="bold">CURRENT TEAM</span></a>
-    <a class="nav-item" href="#"><span>PCD ACTION</span><span class="bold">PARTNER PROGRAM</span></a>
-    <a class="nav-item" href="#"><span></span><span class="bold">FAQ’S</span></a>
-  </div>
-</aside>
+<!-- copy the same drawers + footer + script from index.html -->
+<aside class="drawer left" id="drawerLeft" aria-hidden="true"> … </aside>
+<aside class="drawer right" id="drawerRight" aria-hidden="true" style="right:0"> … </aside>
+<aside class="drawer right" id="drawerAccount" aria-hidden="true" style="right:0"> … </aside>
 
-<aside class="drawer right" id="drawerRight" aria-hidden="true" style="right:0">
-  <div class="hd">Filters</div>
-  <div class="body">
-    <div class="field"><label>By Player Name</label><input id="fName" type="text" placeholder="Type name…"></div>
-    <div class="field"><label>By Level</label>
-      <select id="fLevel" multiple size="6">
-        <option>MLB</option><option>TRIPLE-A</option><option>DOUBLE-A</option>
-        <option>HIGH-A</option><option>LOW-A</option><option>ROOKIE</option>
-        <option>INDY</option><option>INTERNATIONAL</option>
-        <option>NCAA-D1</option><option>NCAA-D2</option><option>NCAA-D3</option>
-        <option>NAIA</option><option>JUCO</option>
-      </select>
-    </div>
-    <div class="field"><label>By Grad Class</label><select id="fGrad" multiple size="8">
-      <!-- 2025..1999 -->
-      <script>for(let y=2025;y>=1999;y--){document.write(`<option>${y}</option>`);}</script>
-    </select></div>
-    <div class="field"><label>By Roster Year</label><select id="fRoster" multiple size="8">
-      <script>for(let y=2025;y>=1999;y--){document.write(`<option>${y}</option>`);}</script>
-    </select></div>
-    <div class="field"><label>By Status</label>
-      <select id="fStatus" multiple size="6">
-        <option>ACTIVE 2025</option><option>INJURED</option><option>FREE AGENT</option>
-        <option>ACTIVE 2024</option><option>RETIRED</option><option>SPONSOR</option>
-      </select>
-    </div>
-    <div class="actions">
-      <button class="btn primary" id="applyFilters">Apply</button>
-      <button class="btn" id="clearFilters">Reset</button>
-      <button class="btn" id="closeRight">Close</button>
-    </div>
-  </div>
-</aside>
-
-<aside class="drawer right" id="drawerAccount" aria-hidden="true" style="right:0">
-  <div class="hd">Sign up | Login</div>
-  <div class="body">
-    <p style="color:#9aa2aa">Use the global platform searches:</p>
-    <a class="nav-item" href="#"><span>GLOBAL</span><span class="bold">SCHOOL SEARCH</span></a>
-    <a class="nav-item" href="#"><span>GLOBAL</span><span class="bold">ACTIVE PLAYER</span></a>
-  </div>
-</aside>
-
-<!-- ================== CONTENT ================== -->
 <main class="wrap">
   <div class="grid" id="cardsGrid">
-    <!-- sample placeholders (real data comes later from CSV/Sheets) -->
-    <article class="card">
-      <div class="photo" style="background: url('assets/img/sample-hs.jpg') center/cover no-repeat;"></div>
-      <div class="meta">
-        <div style="font:900 28px/1 'Bebas Neue',sans-serif;letter-spacing:.01em">BROCK SELVIDGE</div>
-        <div style="font:400 12px/1.2 Oswald,sans-serif;color:#d7dbe0">Somerset Patriots</div>
-        <div class="pill">INJURED 2025</div>
-        <div class="pill">21</div><div class="pill">20</div><div class="pill">19</div><div class="pill">18</div>
-      </div>
-    </article>
-    <!-- Add more sample cards as needed -->
+    <!-- same placeholder card(s) or leave empty for now -->
   </div>
 </main>
 
-<!-- ================== STICKY FOOTER ================== -->
-<nav class="tabbar" aria-label="Page Sections">
-  <a class="active" href="#">BIO</a>
-  <a href="#">NEWS</a>
-  <a href="#">STATS</a>
-  <a href="#">SOCIAL</a>
-  <a href="#">NIL SCORE</a>
-  <a href="#">VIDEO</a>
-  <a href="#">PICS</a>
-</nav>
-
+<nav class="tabbar" aria-label="Page Sections"> … </nav>
 <script>
-  // theme
-  const root = document.documentElement;
-  document.getElementById('btnTheme').onclick = () => {
-    const dark = getComputedStyle(root).getPropertyValue('--bg').trim() === '#0b0b0b';
-    if (dark){
-      root.style.setProperty('--bg','#ffffff'); root.style.setProperty('--fg','#111');
-      root.style.setProperty('--muted','#444'); root.style.setProperty('--line','#e5e7eb');
-    } else {
-      root.style.setProperty('--bg','#0b0b0b'); root.style.setProperty('--fg','#f6f7f9');
-      root.style.setProperty('--muted','#c7ccd1'); root.style.setProperty('--line','#1f2326');
-    }
-  };
-  // drawers
-  const L = document.getElementById('drawerLeft');
-  const R = document.getElementById('drawerRight');
-  const A = document.getElementById('drawerAccount');
-  document.getElementById('btnMenu').onclick = ()=> L.classList.toggle('open');
-  document.getElementById('openSearch').onclick = ()=> L.classList.add('open');
-  document.getElementById('closeLeft').onclick = ()=> L.classList.remove('open');
-  document.getElementById('btnAccount').onclick = ()=> A.classList.toggle('open');
-  document.getElementById('openFilter').onclick = ()=> R.classList.add('open');
-  document.getElementById('closeRight').onclick = ()=> R.classList.remove('open');
-  document.getElementById('applyFilters').onclick = ()=> R.classList.remove('open');
-  document.getElementById('clearFilters').onclick = ()=> {/* reset UI only for now */};
-  document.getElementById('resetFilters').onclick = ()=> {/* future: reset + sort default */};
+/* copy the same JS from index.html */
 </script>
 </body>
 </html>
