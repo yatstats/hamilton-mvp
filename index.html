@@ -2,107 +2,122 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Where They YAT? — Hamilton Active Alumni</title>
-
+<title>Where They YAT? — Hamilton</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400&family=Bebas+Neue&display=swap" rel="stylesheet">
 <style>
+/* ====== TOKENS ====== */
 :root{
-  /* layout */
-  --wrap:1280px;       /* content max width inside containers */
-  --pad:14px;          /* side padding */
-  /* colors */
-  --bg:#0c0c0c; --fg:#f2f2f2; --muted:#c7c7c7; --line:rgba(255,255,255,.08); --tagGrey:#cfd2d6;
-  /* type */
+  --bg:#0c0c0c; --fg:#f2f2f2; --muted:#cfd2d6; --ink:#e8e8e8; --line:rgba(255,255,255,0.10);
   --hamSmall:13px; --hamBig:20px; --hamBigger:24px;
+  --padX:14px;
 }
-@font-face{
-  font-family:'Indigo';
-  src:url('assets/fonts/Indigo.otf') format('opentype');
-  font-weight:400; font-style:normal; font-display:swap;
-}
-*{box-sizing:border-box} html,body{margin:0}
-body{background:var(--bg);color:var(--fg);font-family:Oswald,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
+@font-face{ font-family:'Indigo'; src:url('assets/fonts/Indigo.otf') format('opentype'); font-weight:400; font-style:normal; font-display:swap; }
+
+/* ====== BASE ====== */
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:Oswald,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
 a{color:inherit;text-decoration:none}
-.container{max-width:var(--wrap);margin:0 auto;padding:0 var(--pad)}
-.hr{border-top:1px solid var(--line)}
+.container{max-width:1280px;margin:0 auto;padding:0 var(--padX)}
+.hr-y{border-top:1px solid var(--line)}
 
-/* ===== HEADER (full-bleed background) ===== */
-.header{position:sticky;top:0;z-index:60;background:#000}
+/* ====== HEADER ====== */
+.header{position:sticky;top:0;z-index:50;background:#000}
 .topbar{display:flex;align-items:center;justify-content:space-between;padding:8px 0}
-.left-icons{display:flex;gap:8px;align-items:center}
-.icon-btn{background:none;border:none;color:var(--fg);opacity:.95;display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px}
-.icon-btn i{font-size:20px}
+.left-icons{display:flex;align-items:center;gap:10px;min-width:240px}
+.icon-btn{background:none;border:none;color:var(--fg);display:inline-flex;align-items:center;justify-content:center;width:auto;height:auto;padding:0;margin:0 6px}
+.icon-btn i{font-size:22px}
 
-/* center desktop nav — hides at 1300px to protect wordmark */
+/* Breadcrumbs — live in top-left next to icons (desktop) */
+.crumbs-top{
+  margin-left:10px; white-space:nowrap;
+  font:300 var(--hamSmall)/1 Oswald,system-ui,sans-serif;
+  letter-spacing:.02em; text-transform:uppercase; color:var(--muted);
+}
+.crumbs-top a{color:var(--muted)} .crumbs-top a:hover{color:#fff}
+
+/* Center nav (hides ≤ 1200px) */
 .topnav{display:flex;gap:18px;align-items:center;white-space:nowrap}
-.nav-pair .thin{font:300 var(--hamSmall) Oswald, sans-serif; letter-spacing:.02em; color:#cfd2d6; margin-right:2px}
-.nav-pair .bold{font:400 var(--hamSmall) Indigo,"Bebas Neue", sans-serif}
-@media (max-width:1300px){ .topnav{display:none !important} }
+.topnav .thin{font:300 var(--hamSmall) Oswald, sans-serif; letter-spacing:.02em; color:var(--muted); margin-right:2px}
+.topnav .bold{font:400 var(--hamSmall) Indigo,"Bebas Neue",sans-serif}
 
-/* wordmark */
-.wordmark-img{height:28px;width:auto;display:block}
+/* Wordmark (outline) */
+.wordmark-wrap{display:flex;align-items:center;justify-content:flex-end;min-width:180px}
+.wordmark-img{height:30px;width:auto;display:block}
 @media (max-width:640px){ .wordmark-img{height:22px} }
 
-/* ===== SCHOOL ROW (lovebirds + breadcrumbs at top-right) ===== */
-.schoolrow{
-  display:flex;justify-content:space-between;align-items:flex-start;gap:16px;padding:8px 0
-}
-.school-left{display:flex;align-items:flex-start;gap:16px;min-width:0}
-.ham-logo{height:56px;width:auto;display:block;object-fit:contain}
-@media (max-width:640px){ .ham-logo{height:48px} }
+/* School row */
+.schoolrow{display:flex;align-items:center;gap:16px;padding:8px 0}
+.ham-logo{height:60px;width:auto;object-fit:contain;display:block}
+@media (max-width:640px){ .ham-logo{height:52px} }
 .schooltext{line-height:1}
 .schooltext .small{font:300 var(--hamSmall)/1 Oswald;letter-spacing:.02em;color:var(--muted)}
 .schooltext .big1{font:400 var(--hamBig)/1 "Bebas Neue",sans-serif}
-.schooltext .big2{font:400 var(--hamBigger)/1 "Bebas Neue",sans-serif;margin-top:-4px}
-.crumbs{
-  font:300 clamp(11px,0.75rem + .2vw,16px)/1 Oswald;
-  letter-spacing:.02em;color:var(--muted);text-transform:uppercase;
-  text-align:right;margin-top:0; /* top-aligned in row */
-}
+.schooltext .big2{font:400 var(--hamBigger)/1 "Bebas Neue",sans-serif; margin-top:-4px}
 
-/* ===== HERO ===== */
+/* Hero row: tagline left, utility buttons right */
 .hero{padding:8px 0 4px}
 .hero-grid{display:flex;align-items:center;justify-content:space-between;gap:16px}
 .tagline{display:flex;align-items:center;gap:28px;white-space:nowrap}
-.tag-grey{font:300 clamp(18px,2vw,24px) Oswald,sans-serif;letter-spacing:.02em;color:var(--tagGrey)}
-.tag-bold{font:400 clamp(18px,2vw,24px) Indigo,"Bebas Neue",sans-serif}
-.tag-duo{position:relative;height:1.9em}
-.tag-swap{position:absolute;left:0;top:0;right:0;opacity:0;animation:swap 6s infinite}
-.tag-swap:nth-child(1){animation-delay:0s}
-.tag-swap:nth-child(2){animation-delay:3s}
-@keyframes swap{0%{opacity:0}10%{opacity:1}40%{opacity:1}50%{opacity:0}100%{opacity:0}}
+.tag-grey{font:300 1em Oswald,sans-serif;letter-spacing:.02em;color:#cfd2d6}
+.tag-bold{font:400 1em Indigo,"Bebas Neue",sans-serif}
 
-/* hero action icons — white, no squares */
-.hero-actions{display:flex;align-items:center;gap:10px}
-.round{width:36px;height:36px;border:none;border-radius:50%;display:flex;align-items:center;justify-content:center;background:transparent;color:#fff}
-.round i{font-size:20px}
-.round:hover{background:rgba(255,255,255,.10)}
+/* Mobile alternates the two phrases */
+@media (max-width:640px){
+  .tag-duo{position:relative;height:1.9em;overflow:hidden}
+  .tag-swap{position:absolute;left:0;top:0;right:0;opacity:0;animation:swap 6s infinite}
+  .tag-swap:nth-child(1){animation-delay:0s}
+  .tag-swap:nth-child(2){animation-delay:3s}
+}
+@keyframes swap{0%{opacity:0}5%{opacity:1}45%{opacity:1}50%{opacity:0}100%{opacity:0}}
 
-/* ===== DRAWERS ===== */
-.drawer-mask{position:fixed;inset:0;background:rgba(0,0,0,.35);opacity:0;pointer-events:none;transition:opacity .2s;z-index:70}
-.drawer{position:fixed;top:0;bottom:0;width:min(360px,82vw);background:rgba(10,10,10,.68);backdrop-filter:blur(4px);color:#e8e8e8;transform:translateX(-110%);transition:transform .25s;z-index:80}
-.drawer-right{left:auto;right:0;transform:translateX(110%)}
+/* Right-side hero buttons */
+.hero-actions{display:flex;gap:14px;align-items:center}
+.hero-btn{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:56px;height:48px;border-radius:14px;border:1px solid var(--line);
+  background:rgba(255,255,255,.06); color:#fff;
+}
+.hero-btn i{font-size:24px}
+
+/* Hide center nav ≤1200. Move crumbs to top-right under wordmark. */
+@media (max-width:1200px){ .topnav{display:none} }
+@media (max-width:900px){
+  .topbar{position:relative}
+  .crumbs-top{
+    position:absolute; right:12px; top:50%; transform:translateY(-50%);
+    font-size:12px;
+  }
+}
+
+/* ====== DRAWERS ====== */
+.drawer-mask{position:fixed;inset:0;background:rgba(0,0,0,.35);opacity:0;pointer-events:none;transition:opacity .2s;z-index:60}
+.drawer{position:fixed;top:0;bottom:0;width:min(360px,82vw);background:rgba(10,10,10,.65);backdrop-filter:blur(4px);color:#e8e8e8;transform:translateX(-110%);transition:transform .25s;z-index:70}
+.drawer-right{right:0;left:auto;transform:translateX(110%)}
 .drawer h3{margin:18px 16px 8px}
 .drawer .pad{padding:10px 16px}
+.drawer .close-btn{margin:8px 16px}
+.drawer a{color:#e8e8e8} .drawer a:hover{color:#fff}
 body.drawer-left-open .drawer-mask,body.drawer-right-open .drawer-mask{opacity:1;pointer-events:auto}
 body.drawer-left-open #drawerLeft{transform:translateX(0)}
 body.drawer-right-open #drawerRight{transform:translateX(0)}
-#liveResults{margin-top:10px;max-height:55vh;overflow:auto}
-.live-hit{display:flex;gap:10px;align-items:center;padding:8px 10px;border-radius:10px;cursor:pointer}
+#liveResults{margin:10px 4px 18px;max-height:55vh;overflow:auto}
+.live-hit{padding:10px 12px;display:flex;align-items:center;gap:10px;border-radius:10px;cursor:pointer}
 .live-hit:hover{background:rgba(255,255,255,.08)}
 .live-hit img{width:36px;height:36px;border-radius:6px;object-fit:cover}
 
-/* ===== GRID & CARDS ===== */
-.grid{display:grid;gap:14px;padding-bottom:40px}
-@media (min-width:1300px){ .grid{grid-template-columns:repeat(5,1fr)}}
-@media (max-width:1299px){ .grid{grid-template-columns:repeat(4,1fr)}}
-@media (max-width:1024px){ .grid{grid-template-columns:repeat(3,1fr)}}
-@media (max-width:768px){  .grid{grid-template-columns:repeat(2,1fr)}}
+/* ====== GRID + CARDS ====== */
+/* 5 → 4 → 3 → 2 → 1 */
+.grid{display:grid;gap:14px}
+@media (min-width:1500px){ .grid{grid-template-columns:repeat(5,1fr)}}
+@media (max-width:1499px){ .grid{grid-template-columns:repeat(4,1fr)}}
+@media (max-width:1100px){ .grid{grid-template-columns:repeat(3,1fr)}}
+@media (max-width:800px){  .grid{grid-template-columns:repeat(2,1fr)}}
 @media (max-width:520px){  .grid{grid-template-columns:repeat(1,1fr)}}
 
-/* 5:7 cards + flip */
+/* 5:7 cards */
 .card{position:relative;background:#171717;border-radius:16px;overflow:hidden}
 .card::before{content:"";display:block;padding-top:140%}
 .card-inner{position:absolute;inset:0;perspective:1200px}
@@ -111,118 +126,134 @@ body.drawer-right-open #drawerRight{transform:translateX(0)}
 .face{position:absolute;inset:0;backface-visibility:hidden}
 .face.back{transform:rotateY(180deg)}
 .bg{position:absolute;inset:0;background:#111 center/cover no-repeat}
-.shade{position:absolute;left:0;right:0;bottom:0;height:46%;background:linear-gradient(transparent,rgba(0,0,0,.9))}
+.shade{position:absolute;left:0;right:0;bottom:0;height:46%;background:linear-gradient(transparent,rgba(0,0,0,.92))}
 .cap{position:absolute;left:16px;right:16px;bottom:14px}
 .name{font:400 28px/1 "Indigo","Bebas Neue",sans-serif;letter-spacing:.02em}
 .meta-small{font:300 12px/1.25 Oswald;opacity:.9}
+
+/* chips top-right */
 .chips{position:absolute;right:14px;bottom:60px;display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
-.chip{background:#fff;color:#111;border-radius:28px;padding:6px 10px;font-weight:800;font-size:12px}
-/* roster dots */
+.chip{background:#fff;color:#111;border-radius:28px;padding:6px 10px;font-weight:700;font-size:12px}
+
+/* roster dots bottom-left */
 .dots{position:absolute;left:14px;bottom:12px;display:flex;gap:6px;z-index:2}
 .dot{width:28px;height:28px;border-radius:999px;background:#f3f4f6;color:#111;display:grid;place-items:center;
      font:900 12px/1 Oswald;border:1px solid rgba(0,0,0,.25)}
 
-/* utilities */
-.hide-sm{display:block} @media (max-width:640px){ .hide-sm{display:none !important} }
-.hr2{border-top:1px solid var(--line)}
+/* back face simple */
+.back-head{padding:10px 12px;border-bottom:1px solid rgba(0,0,0,.08);display:flex;justify-content:space-between;align-items:center;background:#fff}
+.back-body{padding:12px;background:#fff;color:#111}
+
+/* ====== STICKY SPONSOR FOOTER ====== */
+.footer-sponsor{
+  position:sticky;bottom:0;z-index:40;background:#0b0b0b;border-top:1px solid var(--line);
+  height:clamp(56px,7vh,77px); display:flex;align-items:center;justify-content:center
+}
+.footer-sponsor img{height:70%;width:auto;display:block}
+
+/* page padding bottom so last row isn't hidden behind footer */
+.page{padding-bottom:clamp(56px,7vh,77px)}
 </style>
 </head>
 <body>
 
+<!-- ====== HEADER ====== -->
 <header class="header">
   <div class="container topbar">
     <div class="left-icons">
       <button class="icon-btn" id="btnMenu" aria-label="Menu"><i class="ri-menu-line"></i></button>
       <button class="icon-btn" id="btnAccount" aria-label="Account"><i class="ri-user-3-line"></i></button>
       <button class="icon-btn" id="btnTheme" aria-label="Theme"><i class="ri-moon-line"></i></button>
+
+      <!-- Breadcrumbs (top-left, next to icons) -->
+      <nav class="crumbs-top" aria-label="Breadcrumb">
+        <a href="index.html">HAMILTON</a> ▸ <span>WHERE THEY YAT?</span>
+      </nav>
     </div>
 
-    <nav class="topnav" aria-label="Top Navigation">
-      <span class="nav-pair"><span class="thin">WHERE THEY</span><span class="bold">YAT?</span></span>
-      <span class="nav-pair"><span class="thin">ACTIVE ALUMNI</span><span class="bold">NEWS</span></span>
-      <span class="nav-pair"><span class="thin">NEXT-LEVEL</span><span class="bold">ALL-TIME LIST</span></span>
-      <span class="nav-pair"><span class="thin">NIL & YAT-A-BOY</span><span class="bold">MARKETPLACE</span></span>
-      <span class="nav-pair"><span class="thin">THE</span><span class="bold">CURRENT TEAM</span></span>
-      <span class="nav-pair"><span class="thin">PCD ACTION</span><span class="bold">PARTNER PROGRAM</span></span>
-      <span class="nav-pair"><span class="thin"></span><span class="bold">FAQ’S</span></span>
+    <!-- center nav (auto-hides ≤1200px) -->
+    <nav class="topnav" aria-label="Primary">
+      <a href="index.html"><span class="thin">WHERE THEY</span><span class="bold">YAT?</span></a>
+      <a href="alumni-news.html"><span class="thin">ACTIVE ALUMNI</span><span class="bold">NEWS</span></a>
+      <a href="all-time-alumni-list.html"><span class="thin">NEXT-LEVEL</span><span class="bold">ALL-TIME LIST</span></a>
+      <a href="nil-yat-a-boy-marketplace.html"><span class="thin">NIL & YAT-A-BOY</span><span class="bold">MARKETPLACE</span></a>
+      <a href="current-team.html"><span class="thin">THE</span><span class="bold">CURRENT TEAM</span></a>
+      <a href="partner-program.html"><span class="thin">PCD ACTION</span><span class="bold">PARTNER PROGRAM</span></a>
+      <a href="faq.html"><span class="thin"></span><span class="bold">FAQ’S</span></a>
     </nav>
 
-    <img class="wordmark-img" src="assets/img/yatstats-logo.png" alt="YAT?STATS">
+    <div class="wordmark-wrap">
+      <img class="wordmark-img" src="assets/img/yatstats-logo.png" alt="YAT?STATS">
+    </div>
   </div>
 
-  <div class="hr2"></div>
+  <div class="hr-y"></div>
 
-  <!-- SCHOOL ROW: left = H + three lines; right = breadcrumbs (top-right) -->
   <div class="container schoolrow">
-    <div class="school-left">
-      <img class="ham-logo" src="assets/img/hamilton-logo.png" alt="Hamilton H">
-      <div class="schooltext">
-        <div class="small">CHANDLER, AZ</div>
-        <div class="big1">HAMILTON HIGH SCHOOL</div>
-        <div class="big2">ACTIVE ALUMNI</div>
+    <img class="ham-logo" src="assets/img/hamilton-logo.png" alt="Hamilton H">
+    <div class="schooltext">
+      <div class="small">CHANDLER, AZ</div>
+      <div class="big1">HAMILTON HIGH SCHOOL</div>
+      <div class="big2">ACTIVE ALUMNI</div>
+    </div>
+  </div>
+
+  <div class="hr-y"></div>
+
+  <!-- HERO -->
+  <div class="container hero">
+    <div class="hero-grid">
+      <div class="tagline">
+        <!-- desktop: both phrases; mobile: alternate -->
+        <div class="tag-duo">
+          <div class="tag-swap"><span class="tag-grey">WHERE THEY</span> <span class="tag-bold">YAT?</span></div>
+          <div class="tag-swap"><span class="tag-grey">FLIP FOR</span> <span class="tag-bold">STATS!</span></div>
+        </div>
+      </div>
+
+      <div class="hero-actions">
+        <button class="hero-btn" id="btnSearch" aria-label="Search"><i class="ri-search-line"></i></button>
+        <button class="hero-btn" id="btnFilters" aria-label="Filters"><i class="ri-filter-3-line"></i></button>
+        <button class="hero-btn" id="btnReset" aria-label="Reset"><i class="ri-restart-line"></i></button>
       </div>
     </div>
-    <div class="crumbs" id="breadcrumbs">HAMILTON ▸ WHERE THEY YAT?</div>
   </div>
 
-  <div class="hr2"></div>
+  <div class="hr-y"></div>
 </header>
 
-<!-- HERO -->
-<section class="hero">
-  <div class="container hero-grid">
-    <!-- left: rotating tagline -->
-    <div class="tagline">
-      <div class="tag-duo">
-        <div class="tag-swap"><span class="tag-grey">WHERE THEY</span> <span class="tag-bold">YAT?</span></div>
-        <div class="tag-swap"><span class="tag-grey">FLIP FOR</span> <span class="tag-bold">STATS!</span></div>
-      </div>
-    </div>
-
-    <!-- right: action icons -->
-    <div class="hero-actions">
-      <button class="round" id="btnSearch" title="Search"><i class="ri-search-line"></i></button>
-      <button class="round" id="btnFilters" title="Filters"><i class="ri-filter-3-line"></i></button>
-      <button class="round" id="btnReset" title="Reset"><i class="ri-restart-line"></i></button>
-    </div>
-  </div>
-  <div class="hr2"></div>
-</section>
-
-<!-- GRID -->
-<main class="container" style="padding:16px 0 40px">
-  <section id="cardGrid" class="grid" aria-label="Active Alumni Grid"></section>
-</main>
-
-<!-- DRAWERS -->
+<!-- ====== DRAWERS ====== -->
 <div class="drawer-mask"></div>
 
+<!-- LEFT: search + nav -->
 <aside class="drawer" id="drawerLeft" aria-label="Left drawer">
   <h3>PLAYER PROFILE SEARCH</h3>
   <div class="pad">
-    <input id="playerSearch" placeholder="Type to search…" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:#fff">
+    <input id="playerSearch" placeholder="Type to search…" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--ink)">
     <div id="liveResults"></div>
   </div>
   <div class="pad">
     <h3>Navigation</h3>
     <div style="display:flex;flex-direction:column;gap:12px">
-      <a href="index.html"><span class="thin">WHERE THEY</span> <span class="bold">YAT?</span></a>
-      <a href="alumni-news.html"><span class="thin">ACTIVE ALUMNI</span> <span class="bold">NEWS</span></a>
-      <a href="all-time-alumni-list.html"><span class="thin">NEXT-LEVEL</span> <span class="bold">ALL-TIME LIST</span></a>
-      <a href="nil-yat-a-boy-marketplace.html"><span class="thin">NIL & YAT-A-BOY</span> <span class="bold">MARKETPLACE</span></a>
-      <a href="current-team.html"><span class="thin">THE</span> <span class="bold">CURRENT TEAM</span></a>
-      <a href="partner-program.html"><span class="thin">PCD ACTION</span> <span class="bold">PARTNER PROGRAM</span></a>
-      <a href="faq.html"><span class="thin"></span> <span class="bold">FAQ’S</span></a>
+      <a href="index.html"><span class="tag-grey">WHERE THEY</span> <span class="tag-bold">YAT?</span></a>
+      <a href="alumni-news.html"><span class="tag-grey">ACTIVE ALUMNI</span> <span class="tag-bold">NEWS</span></a>
+      <a href="all-time-alumni-list.html"><span class="tag-grey">NEXT-LEVEL</span> <span class="tag-bold">ALL-TIME LIST</span></a>
+      <a href="nil-yat-a-boy-marketplace.html"><span class="tag-grey">NIL & YAT-A-BOY</span> <span class="tag-bold">MARKETPLACE</span></a>
+      <a href="current-team.html"><span class="tag-grey">THE</span> <span class="tag-bold">CURRENT TEAM</span></a>
+      <a href="partner-program.html"><span class="tag-grey">PCD ACTION</span> <span class="tag-bold">PARTNER PROGRAM</span></a>
+      <a href="faq.html"><span class="tag-grey"></span> <span class="tag-bold">FAQ’S</span></a>
     </div>
   </div>
+  <button class="icon-btn close-btn" onclick="document.body.classList.remove('drawer-left-open')"><i class="ri-close-line"></i></button>
 </aside>
 
+<!-- RIGHT: filters -->
 <aside class="drawer drawer-right" id="drawerRight" aria-label="Filters drawer">
   <h3>Filters</h3>
-  <div class="pad" style="display:flex;flex-direction:column;gap:14px">
+  <div id="filters" class="pad" style="display:flex;flex-direction:column;gap:16px">
     <div>
       <div class="small" style="margin-bottom:6px">By NAME</div>
-      <input id="filterName" placeholder="Type a name…" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:#fff"/>
+      <input id="filterName" placeholder="Type a name…" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--ink)"/>
     </div>
     <div id="filterLevels">
       <div class="small" style="margin-bottom:6px">By LEVEL</div>
@@ -260,88 +291,123 @@ body.drawer-right-open #drawerRight{transform:translateX(0)}
     <div style="display:flex;gap:10px">
       <button id="filtersApply" class="icon-btn" style="padding:10px 14px;border:1px solid var(--line);border-radius:12px"><i class="ri-check-line"></i>&nbsp;Apply</button>
       <button id="filtersReset" class="icon-btn" style="padding:10px 14px;border:1px solid var(--line);border-radius:12px"><i class="ri-restart-line"></i>&nbsp;Reset</button>
+      <button class="icon-btn close-btn" onclick="document.body.classList.remove('drawer-right-open')" style="margin-left:auto"><i class="ri-close-line"></i></button>
     </div>
   </div>
 </aside>
 
+<!-- ====== PAGE ====== -->
+<main class="page">
+  <div class="container" style="padding-top:14px">
+    <section id="cardGrid" class="grid" aria-live="polite"></section>
+  </div>
+</main>
+
+<!-- Sticky sponsor footer -->
+<footer class="footer-sponsor">
+  <img src="assets/img/sponsor-logo.png" alt="Sponsor">
+</footer>
+
 <script>
-/* ===== helpers ===== */
-const $=s=>document.querySelector(s), $$=s=>Array.from(document.querySelectorAll(s));
-const debounce=(fn,ms=160)=>{let t;return(...a)=>{clearTimeout(t);t=setTimeout(()=>fn(...a),ms);}};
-
-/* ===== CSV source ===== */
+/* ====== GLOBAL UTIL ====== */
 const CSV_URL="https://docs.google.com/spreadsheets/d/e/2PACX-1vSB4q8nvjYfftVeWKkFNz42uDDWSuDXikimMa-a25WQk_XX-imZbiUd8q5Cj94rjZJjaabw5DGMvJFd/pub?gid=82179728&single=true&output=csv";
+const $=s=>document.querySelector(s), $$=s=>Array.from(document.querySelectorAll(s));
+const debounce=(fn,ms=180)=>{let t;return(...a)=>{clearTimeout(t);t=setTimeout(()=>fn(...a),ms);};};
 
-/* ===== drawers ===== */
+/* Drawers + theme */
 const openLeft = ()=>document.body.classList.add('drawer-left-open');
 const openRight= ()=>document.body.classList.add('drawer-right-open');
-const closeDrawers= ()=>document.body.classList.remove('drawer-left-open','drawer-right-open');
+$('#btnMenu')?.addEventListener('click', openLeft);
+$('#btnSearch')?.addEventListener('click', openLeft);
+$('#btnAccount')?.addEventListener('click', openRight);
+$('#btnFilters')?.addEventListener('click', openRight);
+$('.drawer-mask')?.addEventListener('click',()=>document.body.classList.remove('drawer-left-open','drawer-right-open'));
+$('#btnReset')?.addEventListener('click', ()=>{ resetFilters(); });
 
-$('#btnMenu')?.addEventListener('click',openLeft);
-$('#btnSearch')?.addEventListener('click',openLeft);
-$('#btnFilters')?.addEventListener('click',openRight);
-$('.drawer-mask')?.addEventListener('click',closeDrawers);
+$('#btnTheme')?.addEventListener('click', ()=>{
+  const isDark=getComputedStyle(document.documentElement).getPropertyValue('--bg').trim()==='#0c0c0c';
+  if(isDark){ document.documentElement.style.setProperty('--bg','#ffffff'); document.documentElement.style.setProperty('--fg','#111'); document.documentElement.style.setProperty('--muted','#444'); document.documentElement.style.setProperty('--line','#e5e7eb'); }
+  else{ document.documentElement.style.setProperty('--bg','#0c0c0c'); document.documentElement.style.setProperty('--fg','#f2f2f2'); document.documentElement.style.setProperty('--muted','#cfd2d6'); document.documentElement.style.setProperty('--line','rgba(255,255,255,0.10)'); }
+});
 
-/* ===== fill year checkboxes 2025..1999 ===== */
+/* Populate year checkboxes: 2025..1999 */
 (function fillYears(){
-  const years=[...Array(27)].map((_,i)=>2025-i);
-  const mk=(box)=>box&&(box.innerHTML=years.map(y=>`<label><input type="checkbox" value="${y}"> ${y}</label>`).join(' '));
-  mk($('#classBox')); mk($('#rosterBox'));
+  const make=(boxId,from=2025,to=1999)=>{
+    const el=$(boxId); if(!el) return;
+    const labels=[];
+    for(let y=from;y>=to;y--) labels.push(`<label><input type="checkbox" value="${y}"> ${y}</label>`);
+    el.innerHTML=labels.join(' ');
+  };
+  make('#classBox'); make('#rosterBox');
 })();
 
-/* ===== CSV loader ===== */
+/* CSV loader */
 async function loadCSV(url){
   const txt=await fetch(url,{cache:'no-store'}).then(r=>r.text());
   const rows=txt.trim().split(/\r?\n/).map(r=>r.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/).map(c=>c.replace(/^"|"$/g,'')));
-  const header=rows.shift(); const IDX=n=>header.indexOf(n);
-  const data = rows.map(r=>({
-    id:r[IDX('tbc_id')]||r[IDX('id')],
-    slug:r[IDX('slug')],
-    display_name:r[IDX('display_name')],
-    first:r[IDX('first')], last:r[IDX('last')],
-    grad_class:r[IDX('grad_class')],
-    letter_years:r[IDX('letter_years')],
-    status:r[IDX('status')], level:r[IDX('level')],
-    team:r[IDX('team')], org:r[IDX('org')], city_state:r[IDX('city_state')],
-    front_img:r[IDX('front_img')], hs_img:r[IDX('hs_img')]
+  const header=rows.shift(); const idx=n=>header.indexOf(n);
+  return rows.map(r=>({
+    id:r[idx('tbc_id')]||r[idx('id')]||'',
+    slug:r[idx('slug')]||'',
+    display_name:r[idx('display_name')]||'',
+    first:r[idx('first')]||'', last:r[idx('last')]||'',
+    grad_class:r[idx('grad_class')]||'',
+    letter_years:r[idx('letter_years')]||'',
+    status:(r[idx('status')]||'').toUpperCase(),
+    level:r[idx('level')]||'',
+    team:r[idx('team')]||'',
+    org:r[idx('org')]||'',
+    city_state:r[idx('city_state')]||'',
+    position:r[idx('position')]||'',
+    front_img:r[idx('front_img')]||'',
+    hs_img:r[idx('hs_img')]||''
   }));
-  return data;
 }
 
-/* ===== default sort (status→class(oldest)→level(high)→varsity years→last name) ===== */
+/* Default sort per your rules */
 function defaultSort(a,b){
+  // status priority
   const orderStatus=['ACTIVE 2025','FREE AGENT','INJURED','ACTIVE 2024','RETIRED','SPONSOR'];
-  const sA=orderStatus.indexOf((a.status||'').toUpperCase()), sB=orderStatus.indexOf((b.status||'').toUpperCase());
-  if(sA!==sB) return sA-sB;
-  const cA=+a.grad_class||0, cB=+b.grad_class||0; if(cA!==cB) return cA-cB;
-  const rank=v=>({'MLB':9,'TRIPLE-A':8,'DOUBLE-A':7,'HIGH-A':6,'LOW-A':5,'ROOKIE':4,'INDY':3,'INTERNATIONAL':2,
-                  'NCAA-D1':1,'NCAA-D2':1,'NCAA-D3':1,'NAIA':1,'JUCO':1}[String(v).toUpperCase()]||0);
-  const L=rank(a.level)-rank(b.level); if(L!==0) return -L;
-  const yrs=s=>String(s||'').split(',').filter(Boolean).length;
-  const vy=yrs(a.letter_years)-yrs(b.letter_years); if(vy!==0) return -vy;
+  const sA=orderStatus.indexOf(a.status), sB=orderStatus.indexOf(b.status);
+  if(sA!==sB) return (sA<0?99:sA) - (sB<0?99:sB);
+
+  // by grad class (older vs newer — keep ascending: 2013, 2014, ... 2025)
+  const cA=+a.grad_class||0, cB=+b.grad_class||0;
+  if(cA!==cB) return cA-cB;
+
+  // higher level first
+  const lvlRank=v=>({'MLB':9,'TRIPLE-A':8,'DOUBLE-A':7,'HIGH-A':6,'LOW-A':5,'ROOKIE':4,'INDY':3,'INTERNATIONAL':2,'NCAA-D1':1,'NCAA-D2':1,'NCAA-D3':1,'NAIA':1,'JUCO':1}[String(v).toUpperCase()]||0);
+  const L=lvlRank(a.level)-lvlRank(b.level); if(L!==0) return -L;
+
+  // more varsity letter years first
+  const yrs=p=>String(p.letter_years||'').split(',').filter(Boolean).length;
+  const vy=yrs(a)-yrs(b); if(vy!==0) return -vy;
+
+  // alpha by last name
   const lastA=(a.last||(a.display_name||'').split(' ').slice(-1)[0]||'').toLowerCase();
   const lastB=(b.last||(b.display_name||'').split(' ').slice(-1)[0]||'').toLowerCase();
   return lastA.localeCompare(lastB);
 }
 
-/* ===== roster dots ===== */
-function rosterDots(p){
-  const yrs=String(p.letter_years||'').split(',').map(s=>s.trim()).filter(Boolean).map(y=>y.slice(-2));
-  return yrs.map(y=>`<span class="dot" title="${y}">${y}</span>`).join('');
-}
-
-/* ===== profile URL ===== */
+/* Helpers */
+const imgOr = (...list)=> list.find(Boolean) || 'assets/img/placeholder.jpg';
 function profileURL(p){
-  const s=(p.slug||'').trim(); const id=(p.id||'').trim();
+  const s=(p.slug||'').trim(), id=(p.id||'').trim();
   if(s) return `profile.html?id=${encodeURIComponent(s)}`;
   if(id) return `profile.html?id=${encodeURIComponent(id)}`;
   return '#';
 }
+function rosterDots(p){
+  return String(p.letter_years||'')
+    .split(',').map(s=>s.trim()).filter(Boolean)
+    .map(y=>y.slice(-2))
+    .map(y=>`<span class="dot" title="${y}">${y}</span>`).join('');
+}
 
-/* ===== card HTML ===== */
+/* Card HTML */
 function cardHTML(p){
   const name=p.display_name||(p.first&&p.last?`${p.first} ${p.last}`:'');
-  const bg=p.front_img || `assets/img/now-players/${(p.slug||'').toLowerCase()}-now.jpg` || 'assets/img/placeholder.jpg';
+  const bg=imgOr(p.front_img, p.hs_img, 'assets/img/placeholder.jpg');
   const klass=p.grad_class||'';
   return `
   <article class="card" aria-label="${name}">
@@ -351,7 +417,7 @@ function cardHTML(p){
           <div class="bg" style="background-image:url('${bg}')"></div>
           <div class="shade"></div>
           <div class="cap">
-            <div class="name">${name}</div>
+            <div class="name"><a href="${profileURL(p)}">${name}</a></div>
             <div class="meta-small">${p.team||''}</div>
           </div>
           <div class="chips">
@@ -377,21 +443,17 @@ function cardHTML(p){
   </article>`;
 }
 
-/* ===== render & wire ===== */
+/* Render + interactions */
 function renderCards(list){
-  const grid=$('#cardGrid'); if(!grid) return;
+  const grid=document.getElementById('cardGrid'); if(!grid) return;
   grid.innerHTML=list.map(cardHTML).join('');
-  grid.querySelectorAll('.card').forEach((el,i)=>{
-    let last=0;
-    el.addEventListener('click',(ev)=>{
-      const now=Date.now();
-      if(now-last<300){ el.classList.toggle('is-flipped'); last=0; ev.preventDefault(); return; }
-      last=now; setTimeout(()=>{ if(last){ window.location.href=profileURL(window.PLAYERS_VIEW[i]); last=0; }},250);
-    });
+  // tap to flip
+  grid.querySelectorAll('.card').forEach(el=>{
+    el.addEventListener('click', ()=> el.classList.toggle('is-flipped'));
   });
 }
 
-/* ===== filters ===== */
+/* Filters */
 function readFilters(){
   const name=($('#filterName')?.value||'').trim().toLowerCase();
   const levels=$$('#filterLevels input:checked').map(i=>i.value);
@@ -401,65 +463,57 @@ function readFilters(){
   return {name,levels,classes,years,status};
 }
 function applyFilters(){
+  if(!window.PLAYERS) return;
   const F=readFilters();
   const filtered=window.PLAYERS.filter(p=>{
-    const nm=(p.display_name||(`${p.first||''} ${p.last||''}`)).toLowerCase();
+    const nm=(p.display_name||(`${p.first} ${p.last}`)||'').toLowerCase();
     const nameOk=!F.name||nm.includes(F.name);
     const lvlOk=!F.levels.length||F.levels.includes(p.level);
     const classOk=!F.classes.length||F.classes.includes(String(p.grad_class));
     const yearOk=!F.years.length||String(p.letter_years||'').split(',').some(y=>F.years.includes(y.trim()));
     const statOk=!F.status.length||F.status.includes(p.status);
     return nameOk&&lvlOk&&classOk&&yearOk&&statOk;
-  }).sort(defaultSort);
-  window.PLAYERS_VIEW=filtered;
+  });
   renderCards(filtered);
-  closeDrawers();
+  document.body.classList.remove('drawer-right-open');
 }
 function resetFilters(){
-  $$('#drawerRight input[type="checkbox"]').forEach(i=>i.checked=false);
+  $$('#filters input[type="checkbox"]').forEach(i=>i.checked=false);
   $('#filterName')?.value='';
-  window.PLAYERS_VIEW = window.PLAYERS.slice().sort(defaultSort);
-  renderCards(window.PLAYERS_VIEW);
+  if(window.PLAYERS) renderCards(window.PLAYERS.slice().sort(defaultSort));
 }
 $('#filtersApply')?.addEventListener('click',applyFilters);
-$('#filtersReset')?.addEventListener('click',resetFilters);
+$('#filtersReset')?.addEventListener('click',()=>{ resetFilters(); });
+document.addEventListener('keydown',e=>{ if(e.key==='Enter' && document.activeElement?.id==='filterName'){ applyFilters(); }});
 
-/* ===== live search (left drawer) ===== */
-document.addEventListener('input',e=>{ if(e.target && e.target.id==='playerSearch') debounce(liveSearch,120)(); });
-function liveSearch(){
-  const q=($('#playerSearch')?.value||'').trim().toLowerCase();
-  const box=$('#liveResults'); if(!box) return;
-  if(!q){ box.innerHTML=''; return; }
-  const hits=(window.PLAYERS||[]).filter(p=>((p.display_name||(`${p.first||''} ${p.last||''}`)).toLowerCase().includes(q))).slice(0,25);
-  box.innerHTML='';
-  hits.forEach(p=>{
-    const img=p.hs_img || p.front_img || `assets/img/hs-players/${(p.slug||'').toLowerCase()}-hs.jpg` || 'assets/img/placeholder.jpg';
-    const el=document.createElement('div');
-    el.className='live-hit';
-    el.innerHTML=`<img src="${img}"><div><div style="font-weight:700">${p.display_name||p.first+' '+p.last}</div><div style="opacity:.7;font-size:.92em">${p.level||''} • Class of ${p.grad_class||''}</div></div>`;
-    el.onclick=()=>location.href=profileURL(p);
-    box.appendChild(el);
-  });
+/* Live search in left drawer */
+const searchInput=()=>document.getElementById('playerSearch');
+const liveBox=()=>document.getElementById('liveResults');
+function makeHit(p){
+  const el=document.createElement('div'); el.className='live-hit';
+  const thumb=imgOr(p.hs_img,p.front_img,'assets/img/placeholder.jpg');
+  const name=p.display_name||(`${p.first} ${p.last}`.trim());
+  el.innerHTML=`<img src="${thumb}"><div><div style="font-weight:700">${name}</div><div style="opacity:.7;font-size:.92em">${p.level||''} • Class of ${p.grad_class||''}</div></div>`;
+  el.onclick=()=>location.href=profileURL(p);
+  return el;
 }
+function liveSearch(){
+  const q=(searchInput()?.value||'').trim().toLowerCase();
+  if(!q){ if(liveBox()) liveBox().innerHTML=''; return; }
+  const hits=(window.PLAYERS||[]).filter(p=>((p.display_name||(`${p.first} ${p.last}`)||'').toLowerCase().includes(q))).slice(0,25);
+  if(liveBox()){ liveBox().innerHTML=''; hits.forEach(p=>liveBox().appendChild(makeHit(p))); }
+}
+document.addEventListener('input',(e)=>{ if(e.target && e.target.id==='playerSearch') debounce(liveSearch,120)(); });
 
-/* ===== theme quick toggle (kept simple) ===== */
-$('#btnTheme')?.addEventListener('click',()=>{
-  const r=document.documentElement;
-  const dark=getComputedStyle(r).getPropertyValue('--bg').trim()==='#0c0c0c';
-  if(dark){ r.style.setProperty('--bg','#ffffff'); r.style.setProperty('--fg','#111'); r.style.setProperty('--muted','#444'); r.style.setProperty('--line','#e6e6e6'); }
-  else   { r.style.setProperty('--bg','#0c0c0c'); r.style.setProperty('--fg','#f2f2f2'); r.style.setProperty('--muted','#c7c7c7'); r.style.setProperty('--line','rgba(255,255,255,.08)'); }
-});
-
-/* ===== boot ===== */
+/* Boot */
 (async ()=>{
   try{
-    const data = await loadCSV(CSV_URL);
-    window.PLAYERS = data.slice().sort(defaultSort);
-    window.PLAYERS_VIEW = window.PLAYERS.slice();
-    renderCards(window.PLAYERS_VIEW);
-  }catch(err){
-    console.error('CSV load failed', err);
-    $('#cardGrid').innerHTML = `<div style="opacity:.75">Could not load players.</div>`;
+    window.PLAYERS = await loadCSV(CSV_URL);
+    window.PLAYERS.sort(defaultSort);
+    renderCards(window.PLAYERS);
+  }catch(e){
+    console.error('CSV load failed', e);
+    $('#cardGrid').innerHTML = `<div style="opacity:.8">Unable to load player data.</div>`;
   }
 })();
 </script>
