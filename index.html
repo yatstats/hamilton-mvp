@@ -288,7 +288,9 @@ body.drawer-right-open #drawerRight{transform:translateX(0)}
 </footer>
 
 <script>
-/* ---- Hamilton logo fallback ---- */
+/* ---- YATSTATS • Hamilton • build 5.0.1 ---- */
+
+/* Hamilton logo fallback (path/case safety) */
 (function(){
   const img = document.getElementById('hamLogo');
   if(!img) return;
@@ -298,14 +300,13 @@ body.drawer-right-open #drawerRight{transform:translateX(0)}
     '/assets/img/hamilton-logo.png'
   ];
   let i = 0;
-  const next = () => { i++; if(i < tries.length){ img.src = tries[i]; } };
-  img.addEventListener('error', next, {once:false});
+  img.addEventListener('error', ()=>{ i++; if(i < tries.length) img.src = tries[i]; });
 })();
 
-/* ---- Utils ---- */
-const CSV_URL="https://docs.google.com/spreadsheets/d/e/2PACX-1vSB4q8nvjYfftVeWKkFNz42uDDWSuDXikimMa-a25WQk_XX-imZbiUd8q5Cj94rjZJjaabw5DGMvJFd/pub?gid=82179728&single=true&output=csv";
-const $=s=>document.querySelector(s), $$=s=>Array.from(document.querySelectorAll(s));
-const debounce=(fn,ms=180)=>{let t;return(...a)=>{clearTimeout(t);t=setTimeout(()=>fn(...a),ms);};};
+/* Utils */
+const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSB4q8nvjYfftVeWKkFNz42uDDWSuDXikimMa-a25WQk_XX-imZbiUd8q5Cj94rjZJjaabw5DGMvJFd/pub?gid=82179728&single=true&output=csv";
+const $ = s => document.querySelector(s), $$ = s => Array.from(document.querySelectorAll(s));
+const debounce = (fn, ms=180)=>{ let t; return (...a)=>{ clearTimeout(t); t=setTimeout(()=>fn(...a),ms); }; };
 
 /* drawers */
 const openLeft = ()=>document.body.classList.add('drawer-left-open');
@@ -319,33 +320,49 @@ $('.drawer-mask')?.addEventListener('click', closeBoth);
 /* theme */
 $('#btnTheme')?.addEventListener('click', ()=>{
   const isDark=getComputedStyle(document.documentElement).getPropertyValue('--bg').trim()==='#0c0c0c';
-  if(isDark){ document.documentElement.style.setProperty('--bg','#ffffff'); document.documentElement.style.setProperty('--fg','#111'); document.documentElement.style.setProperty('--muted','#444'); document.documentElement.style.setProperty('--line','#e5e7eb'); }
-  else{ document.documentElement.style.setProperty('--bg','#0c0c0c'); document.documentElement.style.setProperty('--fg','#f2f2f2'); document.documentElement.style.setProperty('--muted','#c4c4c4'); document.documentElement.style.setProperty('--line','rgba(255,255,255,0.08)'); }
+  if(isDark){
+    document.documentElement.style.setProperty('--bg','#ffffff');
+    document.documentElement.style.setProperty('--fg','#111');
+    document.documentElement.style.setProperty('--muted','#444');
+    document.documentElement.style.setProperty('--line','#e5e7eb');
+  }else{
+    document.documentElement.style.setProperty('--bg','#0c0c0c');
+    document.documentElement.style.setProperty('--fg','#f2f2f2');
+    document.documentElement.style.setProperty('--muted','#c4c4c4');
+    document.documentElement.style.setProperty('--line','rgba(255,255,255,0.08)');
+  }
 });
 
 /* year chips 2025..1999 */
 (function fillYears(){
-  const mk=(id)=>{ const el=$(id); if(!el) return; el.innerHTML=[...Array(27)].map((_,i)=>2025-i).map(y=>`<label><input type="checkbox" value="${y}"> ${y}</label>`).join(' ') };
+  const mk=(id)=>{ const el=$(id); if(!el) return;
+    el.innerHTML=[...Array(27)].map((_,i)=>2025-i).map(y=>`<label><input type="checkbox" value="${y}"> ${y}</label>`).join(' ');
+  };
   mk('#classBox'); mk('#rosterBox');
 })();
 
-/* CSV loader with sample fallback */
+/* CSV loader (no fallback) */
 async function loadCSV(url){
-  const txt=await fetch(url,{cache:'no-store'}).then(r=>r.text());
-  const rows=txt.trim().split(/\r?\n/).map(r=>r.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/).map(c=>c.replace(/^"|"$/g,'')));
-  const header=rows.shift(); const idx=n=>header.indexOf(n);
+  const r = await fetch(url, {mode:'cors', cache:'no-store'});
+  if(!r.ok) throw new Error(`HTTP ${r.status}`);
+  const txt = await r.text();
+  if(!txt.trim()) throw new Error('Empty CSV');
+  const rows = txt.trim().split(/\r?\n/).map(line =>
+    line.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/).map(c=>c.replace(/^"|"$/g,''))
+  );
+  const header = rows.shift();
+  const idx=n=>header.indexOf(n);
   return rows.map(r=>({
-    id:r[idx('tbc_id')]||r[idx('id')], slug:r[idx('slug')],
-    display_name:r[idx('display_name')], first:r[idx('first')], last:r[idx('last')],
+    id:r[idx('tbc_id')]||r[idx('id')],
+    slug:r[idx('slug')],
+    display_name:r[idx('display_name')],
+    first:r[idx('first')], last:r[idx('last')],
     grad_class:r[idx('grad_class')], letter_years:r[idx('letter_years')],
-    status:r[idx('status')], level:r[idx('level')], team:r[idx('team')], org:r[idx('org')], city_state:r[idx('city_state')],
+    status:r[idx('status')], level:r[idx('level')], team:r[idx('team')],
+    org:r[idx('org')], city_state:r[idx('city_state')],
     position:r[idx('position')], front_img:r[idx('front_img')], hs_img:r[idx('hs_img')]
   }));
 }
-const SAMPLE=[
-  {id:"180827", slug:"cody-bellinger", display_name:"CODY BELLINGER", grad_class:"2013", letter_years:"11,12,13", status:"ACTIVE 2025", level:"MLB", team:"Chicago Cubs", front_img:"assets/img/placeholder.jpg", hs_img:"assets/img/placeholder.jpg"},
-  {id:"999002", slug:"brock-selvidge", display_name:"BROCK SELVIDGE", grad_class:"2021", letter_years:"18,19,20,21", status:"INJURED", level:"DOUBLE-A", team:"Somerset Patriots", front_img:"assets/img/placeholder.jpg", hs_img:"assets/img/placeholder.jpg"}
-];
 
 /* ranking & helpers */
 function defaultSort(a,b){
@@ -364,7 +381,8 @@ function defaultSort(a,b){
 function slugOf(p){
   const s=(p.slug||'').trim();
   if(s) return s;
-  const base=(p.display_name||`${p.first||''} ${p.last||''}`||'').trim().toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');
+  const base=(p.display_name||`${p.first||''} ${p.last||''}`||'')
+    .trim().toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');
   return base;
 }
 function profileURL(p){
@@ -432,10 +450,9 @@ function cardHTML(p){
 function renderCards(list){
   const grid=document.getElementById('cardGrid'); if(!grid) return;
   grid.innerHTML=list.map(cardHTML).join('');
-  // single tap to flip
   grid.querySelectorAll('.card').forEach((el)=>{
     el.addEventListener('click', (e)=>{
-      if(e.target.closest('a')) return;
+      if(e.target.closest('a')) return; // allow profile link
       el.classList.toggle('is-flipped');
     });
   });
@@ -467,7 +484,7 @@ function applyFilters(){
 }
 function resetFilters(){
   $$('#filters input[type="checkbox"]').forEach(i=>i.checked=false);
-  $('#filterName')?.value='';
+  $('#filterName')!.value='';
   if(window.PLAYERS) renderCards(window.PLAYERS.slice().sort(defaultSort));
 }
 $('#filtersApply')?.addEventListener('click',applyFilters);
@@ -496,17 +513,26 @@ function liveSearch(){
 }
 document.addEventListener('input',(e)=>{ if(e.target && e.target.id==='playerSearch') debounce(liveSearch,120)(); });
 
-/* boot */
+/* boot (NO FALLBACK). If anything fails, show an inline error so we know why cards aren’t rendering. */
+function showLoadError(msg){
+  const grid=document.getElementById('cardGrid');
+  if(grid) grid.innerHTML = `<div style="padding:16px;color:#fca5a5;background:#1a1a1a;border:1px solid #402">
+    <strong>Couldn’t load players from Google Sheets.</strong><br>${msg}
+  </div>`;
+}
+
 (async ()=>{
   try{
-    window.PLAYERS = await loadCSV(CSV_URL);
-    if(!Array.isArray(window.PLAYERS) || !window.PLAYERS.length) throw new Error('empty');
-  }catch(e){
-    window.PLAYERS = SAMPLE;
+    const data = await loadCSV(CSV_URL);
+    if(!Array.isArray(data) || !data.length) throw new Error('No rows found in CSV.');
+    window.PLAYERS = data.sort(defaultSort);
+    renderCards(window.PLAYERS);
+  }catch(err){
+    console.error('CSV load failed', err);
+    showLoadError(String(err));
   }
-  window.PLAYERS.sort(defaultSort);
-  renderCards(window.PLAYERS);
 })();
 </script>
+
 </body>
 </html>
