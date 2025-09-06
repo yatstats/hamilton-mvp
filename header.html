@@ -4,46 +4,52 @@
 <style>
   :root{
     --edge:14px;
-    --topH:54px;         /* row 1 (reference height) */
-    --brandH:78px;       /* row 2 */
-    --bg:#000; --fg:#fff; --muted:#cbd5e1; --ring:#1f2530;
+    --topH:54px;         /* Header row 1 height */
+    --brandH:78px;       /* Header row 2 height */
+    --bg:#000; --fg:#fff; --muted:#9aa1ab; --ring:#1f2530;
+    --wmH:clamp(22px,5.6vw,42px); /* YAT?STATS wordmark height -> ~50% on narrow */
   }
-  [data-theme="light"]{ --bg:#fff; --fg:#000; --muted:#374151; --ring:#d1d5db; }
-  body{padding-top: calc(var(--topH) + var(--brandH));}
-  .site-header{position:fixed;left:0;right:0;top:0;z-index:60;background:var(--bg);color:var(--fg);border-bottom:1px solid var(--ring)}
+  [data-theme="light"]{ --bg:#fff; --fg:#000; --muted:#6b7280; --ring:#d1d5db; }
 
-  /* Row 1 */
+  body{padding-top: calc(var(--topH) + var(--brandH));}
+  .site-header{position:fixed;left:0;right:0;top:0;z-index:60;background:var(--bg);color:var(--fg);}
+
+  /* Row 1 (icons • center nav • wordmark) */
   .row-top{height:var(--topH);display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:10px;padding:0 var(--edge)}
   .icons-left{display:flex;gap:6px}
-  .btn{width:32px;height:32px;border-radius:8px;border:1px solid var(--ring);background:transparent;color:var(--fg);display:grid;place-items:center;cursor:pointer}
+  .btn{width:30px;height:30px;border-radius:8px;border:1px solid var(--ring);background:transparent;color:var(--fg);display:grid;place-items:center;cursor:pointer}
   .btn:hover{background:rgba(255,255,255,.08)}
-  .btn svg{width:18px;height:18px}
-  #themeToggle svg path{ d:path("M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"); }
+  .btn svg{width:17px;height:17px}
 
-  /* Center nav — hide earlier so logo never gets pushed off-screen */
+  /* Center nav — hide earlier so logo stays visible */
   .nav-top{display:none;justify-content:center;align-items:center;white-space:nowrap;overflow:hidden}
-  /* Previously 980px — now 1220px so it collapses sooner */
   @media (min-width:1220px){ .nav-top{display:flex} }
 
   .pair{display:inline-flex;align-items:baseline}
-  /* Butt grey to bold (no gap), then space between pairs */
   .pair + .pair{margin-left:16px}
-  .slim{font:400 13px/1 "Oswald";color:var(--muted);margin-right:0;letter-spacing:0;text-shadow:none}
-  .strong{font:400 16px/1 "Bebas Neue";color:var(--fg);margin:0;text-shadow:none}
+  .slim{font:400 13px/1 "Oswald";color:var(--muted);margin-right:0;letter-spacing:0;text-decoration:none}
+  .strong{font:400 16px/1 "Bebas Neue";color:var(--fg);margin:0;text-decoration:none}
+  /* ensure same optical height */
+  .pair .strong{transform:translateY(.5px)}
 
-  /* Wordmark: reserve space so it can’t be pushed off */
-  .wordmark{height:34px;width:auto;justify-self:end;min-width:150px}
+  /* Wordmark: responsive height, reserved min width so it never gets squeezed off */
+  .wordmark{height:var(--wmH);width:auto;justify-self:end;min-width:150px}
 
-  /* Row 2 */
-  .row-brand{height:var(--brandH);border-top:1px solid var(--ring);display:flex;align-items:center;gap:10px;padding:0 var(--edge)}
+  /* Row 2 (Hamilton H + 3 lines) */
+  .row-brand{height:var(--brandH);border-top:1px solid var(--ring);border-bottom:1px solid var(--ring);display:flex;align-items:center;gap:10px;padding:0 var(--edge)}
   .h-logo{height:60px;width:auto}
   .h-type{display:flex;flex-direction:column;gap:2px}
   .ham-l1{font:300 13px/1.1 "Oswald";color:var(--muted);letter-spacing:.02em}
-  .ham-l2{font:400 20px/1 "Bebas Neue";color:var(--fg);text-shadow:none}
-  .ham-l3{font:700 20px/1 "Bebas Neue";color:var(--fg);text-shadow:none}
-  @media (max-width:640px){ .wordmark{height:30px;min-width:130px}.h-logo{height:52px}.ham-l2,.ham-l3{font-size:18px} }
+  .ham-l2{font:400 20px/1 "Bebas Neue";color:var(--fg)}
+  .ham-l3{font:700 20px/1 "Bebas Neue";color:var(--fg)}
+  /* Align hamburger, H logo, and hero start on same x and baseline feel */
+  @media (max-width:640px){
+    .wordmark{height:clamp(20px,7vw,34px);min-width:130px}
+    .h-logo{height:52px}
+    .ham-l2,.ham-l3{font-size:18px}
+  }
 
-  /* Drawers */
+  /* Drawers (same as before) */
   .scrim{position:fixed;left:0;right:0;top:calc(var(--topH) + var(--brandH));bottom:0;background:rgba(0,0,0,.35);opacity:0;pointer-events:none;transition:opacity .25s;z-index:55}
   .scrim.open{opacity:1;pointer-events:auto}
   body.no-scroll{overflow:hidden}
@@ -52,15 +58,7 @@
   .drawer.open{transform:translateX(0)}
   .drawer-h{height:56px;border-bottom:1px solid #232a36;display:flex;align-items:center;justify-content:space-between;padding:0 12px;color:#d5d9df;font:700 12px/1 "Oswald";letter-spacing:.12em;text-transform:uppercase}
   .drawer-body{padding:12px;overflow:auto}
-  .field{margin:10px 0}
   .text{width:100%;background:#0e141f;border:1px solid #1b2330;border-radius:10px;padding:10px;color:#fff}
-  .cbgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
-  .cb{display:flex;align-items:center;gap:6px;background:#0e141f;border:1px solid #1b2330;border-radius:10px;padding:8px}
-  .cb input{accent-color:#fff}
-  .actions{display:flex;gap:8px;margin-top:12px}
-  .btn-solid{background:#fff;color:#000;border:0;border-radius:10px;padding:10px 12px;font-weight:800;cursor:pointer}
-  .btn-ghost{background:transparent;color:#fff;border:1px solid #384152;border-radius:10px;padding:10px 12px;font-weight:800;cursor:pointer}
-
   .nav-list{margin-top:16px;border-top:1px solid #232a36;padding-top:12px}
   .nav-title{font:700 12px/1 "Oswald";color:#cbd5e1;letter-spacing:.12em;margin-bottom:8px}
   .nav-item{display:block;color:#e5e7eb;text-decoration:none;padding:8px 8px;border-radius:8px}
@@ -83,13 +81,13 @@
     </div>
 
     <nav class="nav-top" aria-label="Primary">
-      <span class="pair"><a class="slim" href="#">WHERE THEY</a><a class="strong" href="#">YAT?</a></span>
+      <span class="pair"><a class="slim" href="index.html">WHERE THEY</a><a class="strong" href="index.html">YAT?</a></span>
       <span class="pair"><a class="slim" href="#">ACTIVE ALUMNI</a><a class="strong" href="#">NEWS</a></span>
       <span class="pair"><a class="slim" href="#">NEXT-LEVEL</a><a class="strong" href="#">ALL-TIME LIST</a></span>
       <span class="pair"><a class="slim" href="#">NIL &amp; YAT-A-BOY</a><a class="strong" href="#">MARKETPLACE</a></span>
       <span class="pair"><a class="slim" href="#">THE</a><a class="strong" href="#">CURRENT TEAM</a></span>
       <span class="pair"><a class="slim" href="#">PCD ACTION</a><a class="strong" href="#">PARTNER PROGRAM</a></span>
-      <span class="pair"><a class="slim" href="#faq"></a><a class="strong" href="#">FAQ’s</a></span>
+      <span class="pair"><a class="slim" href="#faq"></a><a class="strong" href="#faq">FAQ’s</a></span>
     </nav>
 
     <img class="wordmark" src="https://i.postimg.cc/C5mwXpQy/35878-20250830-222027-0000.png" alt="YAT?STATS">
@@ -106,10 +104,9 @@
   </div>
 </header>
 
-<!-- Shared Scrim + Drawers -->
+<!-- Shared scrim + drawers -->
 <div class="scrim" id="scrim" hidden></div>
 
-<!-- LEFT drawer -->
 <aside class="drawer" id="drawerLeft" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Search & Navigation">
   <div class="drawer-h">Player Profile Search
     <button class="btn" id="closeLeft" aria-label="Close">
@@ -133,7 +130,6 @@
   </div>
 </aside>
 
-<!-- RIGHT drawer — Filters -->
 <aside class="drawer right" id="drawerRight" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Filters">
   <div class="drawer-h">Filters
     <button class="btn" id="closeRight" aria-label="Close">
@@ -141,17 +137,11 @@
     </button>
   </div>
   <div class="drawer-body">
-    <!-- (Filter fields live here; unchanged for this pass) -->
-    <div style="color:#cbd5e1;font:400 13px/1 'Oswald'">Filters UI coming from previous version (unchanged).</div>
-    <div class="actions">
-      <button id="btnApply" class="btn-solid">Apply</button>
-      <button id="btnReset" class="btn-ghost">Reset</button>
-      <button id="openFiltersFromHero" style="display:none"></button>
-    </div>
+    <div style="color:#cbd5e1;font:400 13px/1 'Oswald'">Filters UI (next step).</div>
+    <button id="openFiltersFromHero" style="display:none"></button>
   </div>
 </aside>
 
-<!-- RIGHT drawer — Auth -->
 <aside class="drawer right" id="drawerAuth" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Sign Up | Login">
   <div class="drawer-h">Sign Up | Login
     <button class="btn" id="closeAuth" aria-label="Close">
@@ -199,7 +189,7 @@
     byId('themeToggle')?.addEventListener('click',()=>set(get()==='dark'?'light':'dark'));
   })();
 
-  // Minimal live search wiring (list populates when cards engine sets players)
+  // Live search wiring (will populate once cards data is ready)
   const input=byId('localSearch'), list=byId('localResults');
   function bindLiveSearch(){
     const players = window.YAT?.players || [];
@@ -208,7 +198,7 @@
       if(!q) return;
       players.filter(p=>(p.name||'').toLowerCase().includes(q)).slice(0,80).forEach(p=>{
         const li=document.createElement('li');
-        li.textContent=`${p.name}${p.graduatingClass?` (Class of ${p.graduatingClass})`:''}`;
+        li.textContent=`${p.name}${p.graduatingClass?` (CLASS OF ${p.graduatingClass})`:''}`;
         li.style.cssText='padding:8px 6px;border-radius:8px;cursor:pointer';
         li.addEventListener('click',()=>{location.href=`profile.html?id=${encodeURIComponent(p.id)}`;closeAll();});
         list.appendChild(li);
