@@ -6,43 +6,70 @@
   <title>YAT?STATS — WHERE THEY YAT?</title>
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@300;400;600&display=swap" rel="stylesheet">
   <style>
-    :root{
-      --bg: #000; --fg:#fff; --muted:#cbd5e1; --ring:#1f2530;
-      --heroH:76px; --crumbH:26px; --edge:14px;
-    }
+    :root{ --bg:#000; --fg:#fff; --muted:#cbd5e1; --ring:#1f2530; --heroH:54px; --crumbH:22px; --edge:14px; }
     [data-theme="light"]{ --bg:#fff; --fg:#000; --muted:#374151; --ring:#d1d5db; }
     html,body{margin:0;background:var(--bg);color:var(--fg);font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial}
-    /* --- HERO (separate from header) --- */
+    /* Sticky header mount */
+    #headerMount{position:relative;z-index:60}
+
+    /* HERO (separate from header) — same height as top row */
     .hero{position:sticky;top:calc(54px + 78px);z-index:50;background:var(--bg);border-bottom:1px solid var(--ring)}
     .hero-inner{display:grid;grid-template-columns:1fr auto;align-items:center;gap:10px;height:var(--heroH);padding:0 var(--edge)}
-    .pair{display:inline-flex;align-items:baseline}
-    .slim{font:400 22px/1 "Oswald",sans-serif;color:var(--muted);margin-right:6px}
-    .strong{font:400 28px/1 "Bebas Neue",sans-serif;color:var(--fg)}
-    .actions{display:flex;align-items:center;gap:8px}
-    .hbtn{width:38px;height:38px;border-radius:10px;border:1px solid var(--ring);background:transparent;color:var(--fg);display:grid;place-items:center;cursor:pointer}
+    .pair{display:inline-flex;align-items:baseline;white-space:nowrap}
+    .slim{font:400 12px/1 "Oswald",sans-serif;color:var(--muted);margin-right:6px}
+    .strong{font:400 16px/1 "Bebas Neue",sans-serif;color:var(--fg)}
+    .actions{display:flex;align-items:center;gap:6px}
+    .hbtn{width:32px;height:32px;border-radius:8px;border:1px solid var(--ring);background:transparent;color:var(--fg);display:grid;place-items:center;cursor:pointer}
     .hbtn:hover{background:rgba(255,255,255,.08)}
-    .hbtn svg{width:21px;height:21px}
-    .crumbs{height:var(--crumbH);display:flex;align-items:center;padding:0 var(--edge);color:var(--muted);font:300 12px/1 "Oswald",sans-serif;letter-spacing:.02em}
-    /* --- GRID --- */
-    .wrap{padding:16px var(--edge) 40px}
+    .hbtn svg{width:18px;height:18px}
+    .crumbs{height:var(--crumbH);display:flex;align-items:center;padding:0 var(--edge);color:var(--muted);font:300 11px/1 "Oswald",sans-serif;letter-spacing:.02em}
+
+    /* Grid */
+    .wrap{padding:12px var(--edge) 40px}
     .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
-    /* mount points */
-    #headerMount{position:relative;z-index:60}
-    /* helpful for phones with bottom bars */
-    .bottom-pad{height:20px}
+
+    /* Splash overlay */
+    .splash{position:fixed;inset:0;background:#000;display:grid;grid-template-rows:1fr auto;z-index:1000;transition:opacity .4s ease}
+    .splash.hide{opacity:0;pointer-events:none}
+    .splash-center{display:grid;place-items:center}
+    .splash-logo{width:min(72vw,420px);filter:drop-shadow(0 0 24px rgba(255,255,255,.18))}
+    .splash-bottom{display:flex;align-items:center;justify-content:center;gap:28px;margin-bottom:24px}
+    .sp-h{height:44px}
+    .sp-bmx{height:44px}
+    .presented{font:400 12px/1 "Oswald",sans-serif;color:#cbd5e1;margin-top:4px;text-align:center}
   </style>
 </head>
 <body>
 
+  <!-- Splash -->
+  <div id="splash" class="splash">
+    <div class="splash-center">
+      <!-- YAT?STATS official logo (same asset you use in header) -->
+      <img class="splash-logo" src="https://i.postimg.cc/C5mwXpQy/35878-20250830-222027-0000.png" alt="YAT?STATS">
+    </div>
+    <div>
+      <div class="splash-bottom">
+        <div style="text-align:center">
+          <img class="sp-h" src="https://i.postimg.cc/pVm0vHdX/hamilton-logo-tight-transparent-background.png" alt="Hamilton">
+        </div>
+        <div style="width:2px;height:32px;background:#333"></div>
+        <div style="text-align:center">
+          <img class="sp-bmx" src="https://i.postimg.cc/R0GsT1Mg/sponsor-logo.png" alt="USA BMX">
+          <div class="presented">presented by USA BMX</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Global header gets injected here -->
   <div id="headerMount"></div>
 
-  <!-- HERO: tagline on left + search/filter/reset on right, crumbs on second line -->
+  <!-- HERO -->
   <section class="hero" aria-label="Hero row">
     <div class="hero-inner">
       <div class="tagline">
         <span class="pair"><span class="slim">WHERE THEY</span><span class="strong">YAT?</span></span>
-        <span class="pair" style="margin-left:18px"><span class="slim">FLIP FOR</span><span class="strong">STATS!</span></span>
+        <span class="pair" style="margin-left:14px"><span class="slim">FLIP FOR</span><span class="strong">STATS!</span></span>
       </div>
       <div class="actions">
         <button class="hbtn" id="heroSearch" aria-label="Search">
@@ -64,15 +91,12 @@
     <div id="grid" class="grid" aria-live="polite"></div>
   </main>
 
-  <div class="bottom-pad"></div>
-
   <script>
-    // --- mount helper to load partial HTMLs (header & cards) and execute their scripts ---
     async function mountPartial(url, mountSelector){
       const html = await fetch(url, {cache:'no-cache'}).then(r=>r.text());
       const mount = document.querySelector(mountSelector);
       mount.innerHTML = html;
-      // re-execute inline scripts
+      // execute inline scripts
       mount.querySelectorAll('script').forEach(old=>{
         const s=document.createElement('script');
         if(old.type) s.type=old.type;
@@ -82,17 +106,24 @@
       });
     }
 
-    // Load header then wire hero buttons
     (async function(){
+      // 1) Header
       await mountPartial('header.html','#headerMount');
-      // Load cards engine (data + renderers)
-      await mountPartial('cards.html', document.body.appendChild(document.createElement('div')).appendChild(document.createElement('div')).parentNode); // temporary mount
+      // 2) Cards engine (CSV)
+      const tmp = document.createElement('div'); document.body.appendChild(tmp);
+      tmp.innerHTML = await fetch('cards.html',{cache:'no-cache'}).then(r=>r.text());
+      tmp.querySelectorAll('script').forEach(old=>{ const s=document.createElement('script'); s.textContent=old.textContent; document.body.appendChild(s); old.remove(); });
 
-      // Hook hero buttons to drawers / grid actions
-      const q = sel => document.querySelector(sel);
-      q('#heroSearch')?.addEventListener('click', ()=> document.getElementById('openLeft')?.click());
-      q('#heroFilter')?.addEventListener('click', ()=> document.getElementById('openFiltersFromHero')?.click());
-      q('#heroReset') ?.addEventListener('click', ()=> window.YAT?.resetAll?.());
+      // 3) Wire hero buttons after header is present
+      const byId=id=>document.getElementById(id);
+      byId('heroSearch')?.addEventListener('click', ()=> byId('openLeft')?.click());
+      byId('heroFilter')?.addEventListener('click', ()=> byId('openFiltersFromHero')?.click());
+      byId('heroReset') ?.addEventListener('click', ()=> window.YAT?.resetAll?.());
+
+      // 4) Hide splash after players are ready (or timeout fallback)
+      const hideSplash = ()=> document.getElementById('splash')?.classList.add('hide');
+      document.addEventListener('yat:players-ready', hideSplash, {once:true});
+      setTimeout(hideSplash, 4000); // safety fade even if network is slow
     })();
   </script>
 </body>
