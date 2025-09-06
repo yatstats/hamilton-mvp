@@ -1,42 +1,119 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Where They YAT?</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Where They YAT? • Hamilton</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <!-- Include header -->
-  <?php include 'header.html'; ?>
 
-  <!-- Hero row -->
+  <!-- Header (inlined) -->
+  <!-- paste from “Shared header markup” block -->
+  <!-- START HEADER -->
+  <!-- (for brevity in this message, assume the same header block here) -->
+  <!-- END HEADER -->
+
+  <!-- Hero: tagline + actions -->
   <section class="hero">
     <div class="tagline">
-      <span class="pair"><span class="slim">WHERE THEY</span> <span class="strong">YAT?</span></span>
-      <span class="pair"><span class="slim">FLIP FOR</span> <span class="strong">STATS!</span></span>
+      <span class="pair"><span class="slim">WHERE THEY</span><span class="strong">YAT?</span></span>
+      <span class="pair"><span class="slim">FLIP FOR</span><span class="strong">STATS!</span></span>
     </div>
     <div class="hero-actions">
-      <button class="ibtn" onclick="YAT.openLeft()" aria-label="Search"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.57 4.23l5.92 5.92-1.41 1.41-5.92-5.92A6.5 6.5 0 1 1 9.5 3z"/></svg></button>
-      <button class="ibtn" onclick="YAT.openFilters()" aria-label="Filter"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M3 5h18v2H3zm4 6h10v2H7zm2 6h6v2H9z"/></svg></button>
-      <button class="ibtn" onclick="YAT.resetAll()" aria-label="Reset"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 6V4l8 8-8 8v-2H4v-4h8v-4H4V6z"/></svg></button>
+      <button class="ibtn" aria-label="Search" onclick="YAT.openLeft()">
+        <svg viewBox="0 0 24 24"><path fill="currentColor" d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.6-.6 3.1-1.6 4.2l5.9 5.9-1.4 1.4-5.9-5.9A6.5 6.5 0 1 1 9.5 3z"/></svg>
+      </button>
+      <button class="ibtn" aria-label="Filter" onclick="YAT.openFilters()">
+        <svg viewBox="0 0 24 24"><path fill="currentColor" d="M3 5h18v2H3zm4 6h10v2H7zm2 6h6v2H9z"/></svg>
+      </button>
+      <button class="ibtn" aria-label="Reset" onclick="YAT.resetAll()">
+        <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 6V4l8 8-8 8v-2H4v-4h8v-4H4V6z"/></svg>
+      </button>
     </div>
   </section>
 
-  <!-- Cards -->
-  <main id="cardsGrid" class="cards-grid"></main>
+  <!-- Cards grid -->
+  <main id="cardsGrid" class="cards-grid" aria-live="polite"></main>
 
   <!-- Sticky footer -->
-  <footer class="sticky-foot" role="contentinfo" aria-label="Player sections">
-    <a href="#" class="fitem"><b>BIO</b></a>
-    <a href="#" class="fitem"><b>NEWS</b></a>
-    <a href="#" class="fitem"><b>STATS</b></a>
-    <a href="#" class="fitem"><b>SOCIAL</b></a>
-    <a href="#" class="fitem"><b>NIL SCORE</b></a>
-    <a href="#" class="fitem"><b>VIDEO</b></a>
-    <a href="#" class="fitem"><b>PICS</b></a>
+  <footer class="sticky-foot">
+    <a class="fitem" href="#"><b>BIO</b></a>
+    <a class="fitem" href="#"><b>NEWS</b></a>
+    <a class="fitem" href="#"><b>STATS</b></a>
+    <a class="fitem" href="#"><b>SOCIAL</b></a>
+    <a class="fitem" href="#"><b>NIL SCORE</b></a>
+    <a class="fitem" href="#"><b>VIDEO</b></a>
+    <a class="fitem" href="#"><b>PICS</b></a>
   </footer>
 
-  <script src="cards.js"></script>
+  <!-- PapaParse for CSV -->
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+  <script>
+  (function(){
+    const CSV_URL="https://docs.google.com/spreadsheets/d/e/2PACX-1vSB4q8nvjYfftVeWKkFNz42uDDWSuDXikimMa-a25WQk_XX-imZbiUd8q5Cj94rjZJjaabw5DGMvJFd/pub?gid=82179728&single=true&output=csv";
+    const grid=document.getElementById('cardsGrid');
+
+    function render(players){
+      // DEFAULT ORDER on load (status blocks, then by class asc, level rank, letters desc, last name asc)
+      const levelRank = {
+        "MLB":9,"TRIPLE-A":8,"DOUBLE-A":7,"HIGH-A":6,"LOW-A":5,"ROOKIE":4,
+        "INDY":3,"INTERNATIONAL":2,"NCAA-D1":1.9,"NCAA-D2":1.8,"NCAA-D3":1.7,"NAIA":1.6,"JUCO":1.5
+      };
+      const statusOrder = ["ACTIVE 2025","FREE AGENT","INJURED","ACTIVE 2024","RETIRED","SPONSOR"];
+
+      const byStatus = players.sort((a,b)=>{
+        const so = statusOrder.indexOf(a.status||"") - statusOrder.indexOf(b.status||"");
+        if(so!==0) return so;
+        const ga = (parseInt(a.grad_class)||9999) - (parseInt(b.grad_class)||9999);
+        if(ga!==0) return ga;
+        const la = (levelRank[(a.level||"").toUpperCase()]||0) - (levelRank[(b.level||"").toUpperCase()]||0);
+        if(la!==0) return -la; // higher first
+        const ya = (String(a.letter_years||"").split(",").length) - (String(b.letter_years||"").split(",").length);
+        if(ya!==0) return -ya;
+        return String(a.last||"").localeCompare(String(b.last||""));
+      });
+
+      grid.innerHTML = byStatus.map(p=>{
+        const letters=(p.letter_years||"").split(",").map(s=>s.trim()).filter(Boolean);
+        const dots=letters.slice().sort((a,b)=>b-a).slice(0,4).map(y=>`<span class="chip">${String(y).slice(-2)}</span>`).join(" ");
+        return `
+          <article class="card" tabindex="0">
+            <img src="${p.front_img||''}" alt="${p.display_name||''}">
+            <div class="bottom-grad"></div>
+            <div class="front-left">
+              <div class="name">${p.display_name||''}</div>
+              <div class="team">${p.team||''}</div>
+              <div class="parent">${(p.level||'').toUpperCase()}</div>
+            </div>
+            <div class="front-right">
+              <div class="chip">${(p.status||'').toUpperCase()}</div><br/>
+              ${dots||''}
+            </div>
+          </article>`;
+      }).join("");
+    }
+
+    Papa.parse(CSV_URL,{
+      download:true,header:true,skipEmptyLines:true,
+      complete:res=>{
+        const rows=res.data.filter(r=>r.tbc_id||r.slug||r.display_name);
+        render(rows);
+      },
+      error:err=>{
+        grid.innerHTML=`<div>Failed to load data.</div>`;
+        console.error(err);
+      }
+    });
+
+    // Filters (applies & resets auto-close via header script)
+    document.addEventListener('filters:apply',()=>{
+      // In a later pass we’ll read active buttons and re-filter; stub keeps UX flow
+    });
+    document.addEventListener('filters:reset',()=>{
+      // No-op now
+    });
+  })();
+  </script>
 </body>
 </html>
