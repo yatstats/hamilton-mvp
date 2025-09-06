@@ -3,65 +3,68 @@
 
 <style>
   :root{
-    --edge:14px;
-    --topH:54px;         /* Header row 1 height */
-    --brandH:78px;       /* Header row 2 height */
-    --bg:#000; --fg:#fff; --muted:#9aa1ab; --ring:#1f2530;
-    --wmH:clamp(22px,5.6vw,42px); /* YAT?STATS wordmark height -> ~50% on narrow */
+    --edge:10px;
+    --topH:44px;         /* tighter top row */
+    --brandH:58px;       /* tighter brand row */
+    --bg:#000; --fg:#fff; --muted:#8e96a0;
+    --wmH:clamp(18px,5vw,34px); /* YAT?STATS height: small on mobile, solid on desktop */
   }
-  [data-theme="light"]{ --bg:#fff; --fg:#000; --muted:#6b7280; --ring:#d1d5db; }
+  [data-theme="light"]{ --bg:#fff; --fg:#000; --muted:#60656c; }
 
   body{padding-top: calc(var(--topH) + var(--brandH));}
   .site-header{position:fixed;left:0;right:0;top:0;z-index:60;background:var(--bg);color:var(--fg);}
 
-  /* Row 1 (icons • center nav • wordmark) */
-  .row-top{height:var(--topH);display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:10px;padding:0 var(--edge)}
+  /* Row 1 */
+  .row-top{
+    height:var(--topH);
+    display:grid;grid-template-columns:auto 1fr auto;
+    align-items:center;gap:8px;padding:0 var(--edge)
+  }
   .icons-left{display:flex;gap:6px}
-  .btn{width:30px;height:30px;border-radius:8px;border:1px solid var(--ring);background:transparent;color:var(--fg);display:grid;place-items:center;cursor:pointer}
-  .btn:hover{background:rgba(255,255,255,.08)}
-  .btn svg{width:17px;height:17px}
+  .btn{
+    width:26px;height:26px;border:0;background:transparent;color:var(--fg);
+    display:grid;place-items:center;cursor:pointer
+  }
+  .btn svg{width:16px;height:16px}
 
-  /* Center nav — hide earlier so logo stays visible */
+  /* Center nav — hide early so logo never gets clipped */
   .nav-top{display:none;justify-content:center;align-items:center;white-space:nowrap;overflow:hidden}
   @media (min-width:1220px){ .nav-top{display:flex} }
 
   .pair{display:inline-flex;align-items:baseline}
-  .pair + .pair{margin-left:16px}
-  .slim{font:400 13px/1 "Oswald";color:var(--muted);margin-right:0;letter-spacing:0;text-decoration:none}
-  .strong{font:400 16px/1 "Bebas Neue";color:var(--fg);margin:0;text-decoration:none}
-  /* ensure same optical height */
+  .pair + .pair{margin-left:12px}
+  .slim{font:400 12px/1 "Oswald";color:var(--muted);margin-right:0;letter-spacing:0;text-decoration:none}
+  .strong{font:400 15px/1 "Bebas Neue";color:var(--fg);margin:0;text-decoration:none}
   .pair .strong{transform:translateY(.5px)}
 
-  /* Wordmark: responsive height, reserved min width so it never gets squeezed off */
-  .wordmark{height:var(--wmH);width:auto;justify-self:end;min-width:150px}
+  .wordmark{height:var(--wmH);width:auto;justify-self:end;min-width:120px}
 
-  /* Row 2 (Hamilton H + 3 lines) */
-  .row-brand{height:var(--brandH);border-top:1px solid var(--ring);border-bottom:1px solid var(--ring);display:flex;align-items:center;gap:10px;padding:0 var(--edge)}
-  .h-logo{height:60px;width:auto}
-  .h-type{display:flex;flex-direction:column;gap:2px}
-  .ham-l1{font:300 13px/1.1 "Oswald";color:var(--muted);letter-spacing:.02em}
-  .ham-l2{font:400 20px/1 "Bebas Neue";color:var(--fg)}
-  .ham-l3{font:700 20px/1 "Bebas Neue";color:var(--fg)}
-  /* Align hamburger, H logo, and hero start on same x and baseline feel */
+  /* Row 2 (no lines) */
+  .row-brand{height:var(--brandH);display:flex;align-items:center;gap:8px;padding:0 var(--edge)}
+  .h-logo{height:46px;width:auto}
+  .h-type{display:flex;flex-direction:column;gap:0}
+  .ham-l1{font:300 12px/1.05 "Oswald";color:var(--muted);letter-spacing:.01em}
+  .ham-l2{font:400 18px/1 "Bebas Neue";color:var(--fg)}
+  .ham-l3{font:700 18px/1 "Bebas Neue";color:var(--fg)}
   @media (max-width:640px){
-    .wordmark{height:clamp(20px,7vw,34px);min-width:130px}
-    .h-logo{height:52px}
-    .ham-l2,.ham-l3{font-size:18px}
+    .wordmark{height:clamp(18px,6vw,30px);min-width:110px}
+    .h-logo{height:42px}
+    .ham-l2,.ham-l3{font-size:17px}
   }
 
-  /* Drawers (same as before) */
+  /* Drawers (no visual changes other than keeping them borderless) */
   .scrim{position:fixed;left:0;right:0;top:calc(var(--topH) + var(--brandH));bottom:0;background:rgba(0,0,0,.35);opacity:0;pointer-events:none;transition:opacity .25s;z-index:55}
   .scrim.open{opacity:1;pointer-events:auto}
   body.no-scroll{overflow:hidden}
-  .drawer{position:fixed;top:calc(var(--topH) + var(--brandH));bottom:0;width:clamp(300px,75vw,520px);background:#0b0f16;color:#e5e7eb;z-index:56;display:flex;flex-direction:column;transform:translateX(-100%);border-right:1px solid #232a36}
-  .drawer.right{left:auto;right:0;border-right:none;border-left:1px solid #232a36;transform:translateX(100%)}
+  .drawer{position:fixed;top:calc(var(--topH) + var(--brandH));bottom:0;width:clamp(300px,75vw,520px);background:#0b0f16;color:#e5e7eb;z-index:56;display:flex;flex-direction:column;transform:translateX(-100%)}
+  .drawer.right{left:auto;right:0;transform:translateX(100%)}
   .drawer.open{transform:translateX(0)}
-  .drawer-h{height:56px;border-bottom:1px solid #232a36;display:flex;align-items:center;justify-content:space-between;padding:0 12px;color:#d5d9df;font:700 12px/1 "Oswald";letter-spacing:.12em;text-transform:uppercase}
-  .drawer-body{padding:12px;overflow:auto}
+  .drawer-h{height:48px;display:flex;align-items:center;justify-content:space-between;padding:0 10px;color:#d5d9df;font:700 11px/1 "Oswald";letter-spacing:.12em;text-transform:uppercase}
+  .drawer-body{padding:10px;overflow:auto}
   .text{width:100%;background:#0e141f;border:1px solid #1b2330;border-radius:10px;padding:10px;color:#fff}
-  .nav-list{margin-top:16px;border-top:1px solid #232a36;padding-top:12px}
-  .nav-title{font:700 12px/1 "Oswald";color:#cbd5e1;letter-spacing:.12em;margin-bottom:8px}
-  .nav-item{display:block;color:#e5e7eb;text-decoration:none;padding:8px 8px;border-radius:8px}
+  .nav-list{margin-top:12px;padding-top:8px}
+  .nav-title{font:700 11px/1 "Oswald";color:#cbd5e1;letter-spacing:.12em;margin-bottom:6px}
+  .nav-item{display:block;color:#e5e7eb;text-decoration:none;padding:6px 6px;border-radius:8px}
   .nav-item:hover{background:#111827}
 </style>
 
@@ -104,7 +107,6 @@
   </div>
 </header>
 
-<!-- Shared scrim + drawers -->
 <div class="scrim" id="scrim" hidden></div>
 
 <aside class="drawer" id="drawerLeft" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Search & Navigation">
@@ -137,7 +139,7 @@
     </button>
   </div>
   <div class="drawer-body">
-    <div style="color:#cbd5e1;font:400 13px/1 'Oswald'">Filters UI (next step).</div>
+    <div style="color:#cbd5e1;font:400 12px/1 'Oswald'">Filters UI (next step).</div>
     <button id="openFiltersFromHero" style="display:none"></button>
   </div>
 </aside>
@@ -151,7 +153,7 @@
   <div class="drawer-body">
     <label class="nav-title">Email</label>
     <input type="email" class="text" placeholder="you@example.com">
-    <label class="nav-title" style="margin-top:10px">Password</label>
+    <label class="nav-title" style="margin-top:8px">Password</label>
     <input type="password" class="text" placeholder="••••••••">
   </div>
 </aside>
@@ -166,7 +168,6 @@
   function close(d){d.classList.remove('open');if(!L.classList.contains('open')&&!R.classList.contains('open')&&!A.classList.contains('open')){scrim.classList.remove('open');scrim.hidden=true;document.body.classList.remove('no-scroll');}}
   function closeAll(){[L,R,A].forEach(x=>x.classList.remove('open'));scrim.classList.remove('open');scrim.hidden=true;document.body.classList.remove('no-scroll');lastFocus?.focus?.();}
 
-  // Expose global helpers so hero buttons can open drawers reliably
   window.YAT = Object.assign(window.YAT||{}, {
     openLeft: ()=>open(L),
     openFilters: ()=>open(R),
@@ -179,6 +180,7 @@
   byId('closeAuth')?.addEventListener('click',()=>close(A));
   byId('closeRight')?.addEventListener('click',()=>close(R));
   byId('openFiltersFromHero')?.addEventListener('click',()=>open(R));
+
   scrim?.addEventListener('click',closeAll);
 
   // Theme
@@ -189,7 +191,7 @@
     byId('themeToggle')?.addEventListener('click',()=>set(get()==='dark'?'light':'dark'));
   })();
 
-  // Live search wiring (will populate once cards data is ready)
+  // Live search hook; list populates after players ready
   const input=byId('localSearch'), list=byId('localResults');
   function bindLiveSearch(){
     const players = window.YAT?.players || [];
@@ -199,7 +201,7 @@
       players.filter(p=>(p.name||'').toLowerCase().includes(q)).slice(0,80).forEach(p=>{
         const li=document.createElement('li');
         li.textContent=`${p.name}${p.graduatingClass?` (CLASS OF ${p.graduatingClass})`:''}`;
-        li.style.cssText='padding:8px 6px;border-radius:8px;cursor:pointer';
+        li.style.cssText='padding:6px;border-radius:6px;cursor:pointer';
         li.addEventListener('click',()=>{location.href=`profile.html?id=${encodeURIComponent(p.id)}`;closeAll();});
         list.appendChild(li);
       });
