@@ -10,10 +10,10 @@
 :root{
   --bg:#0c0c0c; --fg:#f2f2f2; --muted:#c4c4c4; --ink:#e8e8e8; --line:rgba(255,255,255,0.08);
   --hamSmall:13px; --hamBig:20px; --hamBigger:24px; --tagGrey:#cfd2d6;
-  --crestH: clamp(56px, 8.5vw, 82px);      /* H logo height (shrinks less on mobile) */
-  --pairGap: 10px;                          /* H ↔ text spacing (“lovebirds”) */
-  --containerPad: 16px;                     /* side margins */
-  --footerH: clamp(56px, 8vh, 77px);        /* sticky footer height */
+  --crestH: clamp(56px, 8.5vw, 82px);
+  --pairGap: 10px;
+  --containerPad: 16px;
+  --footerH: clamp(56px, 8vh, 77px);
 }
 @font-face{ font-family:'Indigo'; src:url('assets/fonts/Indigo.otf') format('opentype'); font-weight:400; font-style:normal; font-display:swap; }
 
@@ -25,51 +25,36 @@ a{color:inherit;text-decoration:none}
 
 /* HEADER */
 .header{position:sticky;top:0;z-index:50;background:#000}
-
-/* top bar: allow wrap on mobile so crumbs can sit under wordmark */
 .topbar{display:flex;align-items:center;justify-content:space-between;padding:8px 0}
-@media (max-width:680px){ .topbar{flex-wrap:wrap} }
-
 .left-icons{display:flex;align-items:center;gap:8px}
 .icon-btn{background:none;border:none;color:var(--fg);opacity:.92;display:inline-flex;align-items:center;justify-content:center;padding:0;margin:0 2px}
 .icon-btn i{font-size:20px}
 
-/* center nav */
 .topnav{display:flex;gap:18px;align-items:center}
 .nav-pair{white-space:nowrap}
 .nav-pair .thin{font:300 var(--hamSmall) Oswald, sans-serif; letter-spacing:.02em; color:#cfd2d6; margin-right:2px}
 .nav-pair .bold{font:400 var(--hamSmall) Indigo, "Bebas Neue", sans-serif}
-/* hide the center nav sooner (<=1200px) */
-@media (max-width:1200px){ .topnav{display:none !important} }
-
-/* right: wordmark */
 .wordmark-wrap{display:flex;align-items:center;justify-content:flex-end;min-width:120px}
 .wordmark-img{height:clamp(18px,3.2vw,28px);width:auto;display:block}
-
-/* breadcrumbs (moved to topbar) */
-.crumbs{
-  font:300 var(--hamSmall)/1 Oswald;
-  letter-spacing:.02em;color:var(--muted);text-transform:uppercase;
-  margin-left:12px; white-space:nowrap;
-}
-/* mobile: push crumbs under the wordmark (second line, right-align, smaller) */
-@media (max-width:680px){
-  .crumbs{order:99;width:100%;text-align:right;font-size:11px;margin:6px 0 0}
-}
+@media (max-width:1100px){ .topnav{display:none !important} }
 
 .hr-y{border-top:1px solid var(--line)}
-
-/* school row (“lovebirds”) */
 .schoolrow{display:flex;align-items:center;gap:var(--pairGap);padding:6px 0}
 .ham-logo{height:var(--crestH);width:auto;object-fit:contain;display:block}
 .schooltext{line-height:1}
 .schooltext .small{font:300 var(--hamSmall)/1 Oswald;letter-spacing:.02em;color:var(--muted)}
 .schooltext .big1{font:400 var(--hamBig)/1 "Bebas Neue",sans-serif}
 .schooltext .big2{font:400 var(--hamBigger)/1 "Bebas Neue",sans-serif;margin-top:-4px}
+/* crumbs base stays tiny */
+.crumbs{font:300 calc(var(--hamSmall)*.5)/1 Oswald;letter-spacing:.02em;color:var(--muted);text-transform:uppercase}
 
-/* HERO (animated everywhere) */
+/* HERO (animated tagline) */
 .hero{padding:6px 0}
 .hero-grid{display:flex;align-items:center;justify-content:space-between;gap:16px}
+/* NEW: stack tagline + tiny crumbs on the left */
+.hero-left{display:flex;flex-direction:column;gap:4px}
+.hero-crumbs{margin:0; text-align:left; white-space:nowrap}
+
 .tag-duo{position:relative;height:1.8em}
 .tag-swap{position:absolute;left:0;top:0;right:0;opacity:0;animation:swap 6s infinite;white-space:nowrap}
 .tag-swap:nth-child(1){animation-delay:0s}
@@ -147,7 +132,7 @@ body.drawer-right-open #drawerRight{transform:translateX(0)}
 .site-footer .wrap{height:100%;display:flex;align-items:center;justify-content:center;padding:0 var(--containerPad)}
 .sponsor-banner{height:calc(var(--footerH) - 12px); width:100%; display:flex;align-items:center;justify-content:center}
 .sponsor-banner img{
-  height:100%; width:100%; object-fit:contain; /* keep CTA centered, no crop */
+  height:100%; width:100%; object-fit:contain;
   filter: saturate(.95);
 }
 </style>
@@ -160,8 +145,6 @@ body.drawer-right-open #drawerRight{transform:translateX(0)}
       <button class="icon-btn" id="btnMenu" aria-label="Menu"><i class="ri-menu-line"></i></button>
       <button class="icon-btn" id="btnAccount" aria-label="Account"><i class="ri-user-3-line"></i></button>
       <button class="icon-btn" id="btnTheme" aria-label="Theme"><i class="ri-moon-line"></i></button>
-      <!-- moved: breadcrumbs live in the topbar, right after the icons -->
-      <div class="crumbs" id="crumbs">HAMILTON ▸ WHERE THEY YAT?</div>
     </div>
 
     <nav class="topnav" aria-label="Top Navigation">
@@ -177,8 +160,6 @@ body.drawer-right-open #drawerRight{transform:translateX(0)}
     <div class="wordmark-wrap">
       <img class="wordmark-img" src="assets/img/yatstats-logo.png" alt="YAT?STATS">
     </div>
-
-    <!-- on mobile the topbar wraps; the breadcrumbs (order:99) will fall under this wordmark -->
   </div>
 
   <div class="hr-y"></div>
@@ -190,6 +171,7 @@ body.drawer-right-open #drawerRight{transform:translateX(0)}
       <div class="big1">HAMILTON HIGH SCHOOL</div>
       <div class="big2">ACTIVE ALUMNI</div>
     </div>
+    <!-- crumbs REMOVED from here -->
   </div>
 
   <div class="hr-y"></div>
@@ -197,10 +179,16 @@ body.drawer-right-open #drawerRight{transform:translateX(0)}
 
 <section class="hero">
   <div class="container hero-grid">
-    <div class="tag-duo" aria-live="polite">
-      <div class="tag-swap"><span class="tag-grey">WHERE THEY</span> <span class="tag-bold">YAT?</span></div>
-      <div class="tag-swap"><span class="tag-grey">FLIP FOR</span> <span class="tag-bold">STATS!</span></div>
+    <!-- LEFT: tagline + tiny crumbs (moved here) -->
+    <div class="hero-left" aria-live="polite">
+      <div class="tag-duo">
+        <div class="tag-swap"><span class="tag-grey">WHERE THEY</span> <span class="tag-bold">YAT?</span></div>
+        <div class="tag-swap"><span class="tag-grey">FLIP FOR</span> <span class="tag-bold">STATS!</span></div>
+      </div>
+      <div class="crumbs hero-crumbs">HAMILTON ▸ WHERE THEY YAT?</div>
     </div>
+
+    <!-- RIGHT: actions -->
     <div class="hero-right">
       <button id="openSearch" class="hero-icon icon-btn" aria-label="Open search"><i class="ri-search-line"></i></button>
       <button id="openFilters" class="hero-icon icon-btn" aria-label="Open filters"><i class="ri-filter-3-line"></i></button>
@@ -444,6 +432,7 @@ function cardHTML(p){
 function renderCards(list){
   const grid=document.getElementById('cardGrid'); if(!grid) return;
   grid.innerHTML=list.map(cardHTML).join('');
+  // single tap to flip
   grid.querySelectorAll('.card').forEach((el)=>{
     el.addEventListener('click', (e)=>{
       if(e.target.closest('a')) return;
