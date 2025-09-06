@@ -1,370 +1,58 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Where They YAT? — Flip Cards</title>
-
-<!-- Fonts -->
-<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500&family=Bebas+Neue&display=swap" rel="stylesheet">
+<title>YAT? Flip Cards • Hamilton HS Active Alumni</title>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400&family=Bebas+Neue&display=swap" rel="stylesheet">
+<!-- copy the same <style> block from index.html here (unchanged) -->
 <style>
-/* Indigo font (the solid one you uploaded) */
-@font-face{
-  font-family: "Indigo";
-  src: url("./assets/fonts/Indigo.otf") format("opentype");
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-
-/* ============ THEME TOKENS ============ */
-:root{
-  --bg:#0b0b0b;
-  --card:#000;
-  --ink:#fff;
-  --ink-dim:#d6d6d6;
-  --line:#1f2937;
-  --chip:#111;
-  --chip-bd:#333;
-  --ok:#14b8a6;
-  --tag:#e5e7eb;
-
-  --oswald:"Oswald",system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
-  --bebas:"Bebas Neue","Oswald",system-ui,Arial,sans-serif;
-  --indigo:"Indigo","Bebas Neue","Oswald",sans-serif;
-
-  --r:12px;              /* card radius */
-  --gap:16px;            /* grid gap   */
-  --shadow:0 6px 28px rgba(0,0,0,.45);
-}
-
-/* ============ PAGE LAYOUT ============ */
-*{box-sizing:border-box}
-html,body{height:100%}
-body{
-  margin:0;background:var(--bg);color:var(--ink);
-  font-family:var(--oswald);font-weight:300;
-}
-.container{max-width:1400px;margin:0 auto;padding:12px}
-
-/* ============ TAGLINE BAR (hero row) ============ */
-.hero{
-  display:flex;align-items:center;justify-content:space-between;
-  border-bottom:1px solid var(--line);padding:10px 4px 10px;
-  gap:8px;flex-wrap:nowrap
-}
-.tagline{
-  display:flex;align-items:baseline;gap:20px;white-space:nowrap;min-width:0
-}
-.t-grey{
-  font-family:var(--oswald);font-weight:300;letter-spacing:.02em;
-  color:#BFC6CE;font-size:20px;line-height:1
-}
-.t-bold{
-  font-family:var(--indigo);font-weight:400;font-size:20px;line-height:1;
-  margin-left:6px;color:#fff
-}
-.actions{display:flex;gap:10px}
-.iconbtn{
-  width:40px;height:40px;border-radius:10px;border:1px solid var(--line);
-  display:grid;place-items:center;background:#0e0e0e;color:#fff;cursor:pointer
-}
-.iconbtn:active{transform:translateY(1px)}
-.iconbtn svg{width:20px;height:20px}
-
-/* ============ GRID ============ */
-.grid{
-  display:grid;gap:var(--gap);
-  grid-template-columns:repeat(1,minmax(0,1fr));
-  padding:14px 2px 28px;
-}
-@media(min-width:620px){ .grid{grid-template-columns:repeat(2,1fr)} }
-@media(min-width:980px){ .grid{grid-template-columns:repeat(3,1fr)} }
-@media(min-width:1280px){ .grid{grid-template-columns:repeat(4,1fr)} }
-
-/* ============ CARD ============ */
-.card{
-  background:var(--card);border-radius:var(--r);box-shadow:var(--shadow);
-  overflow:hidden;position:relative;user-select:none;aspect-ratio:5/6;
-}
-.flip{position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform .6s cubic-bezier(.2,.7,.2,1)}
-.card.back .flip{transform:rotateY(180deg)}
-.face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden}
-
-/* FRONT */
-.front{transform:rotateY(0deg)}
-.bg{
-  position:absolute;inset:0;background:#111;object-fit:cover;width:100%;height:100%
-}
-.grad{position:absolute;left:0;right:0;bottom:0;height:66%;background:linear-gradient(to top,rgba(0,0,0,.96),rgba(0,0,0,.1))}
-.meta{
-  position:absolute;left:14px;right:14px;bottom:12px;z-index:2;color:#fff;
-  display:grid;grid-template-columns:1fr auto;gap:10px;align-items:end
-}
-.meta-left{}
-.player-name{
-  font-family:var(--indigo);font-size:28px;line-height:1;letter-spacing:.01em
-}
-.team-line{color:var(--ink-dim);font-size:14px;margin-top:6px}
-.chips{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
-.chip{
-  display:inline-flex;align-items:center;gap:8px;padding:6px 10px;border-radius:999px;
-  background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.18);
-  font-weight:700;font-size:12px;letter-spacing:.06em;text-transform:uppercase
-}
-.chip.level{background:#19324d;border-color:#274760}
-.chip.status{background:#0b3b2f;border-color:#16624f}
-.chip.class{background:#333;border-color:#444}
-
-/* right column: next game + last 3 */
-.meta-right{
-  display:flex;flex-direction:column;align-items:end;gap:10px;text-align:right;min-width:180px
-}
-.pill{
-  padding:6px 12px;border-radius:999px;background:rgba(255,255,255,.08);
-  border:1px solid rgba(255,255,255,.22);font-weight:900;font-size:12px;letter-spacing:.12em
-}
-.kvlist{font-size:13px;line-height:1.25;color:#e8eef3}
-.kvlist .muted{opacity:.75}
-
-/* letter-year dots */
-.dots{position:absolute;right:14px;bottom:12px;display:flex;gap:6px;z-index:2}
-.dot{
-  width:28px;height:28px;border-radius:999px;background:#f3f4f6;color:#111;
-  display:grid;place-items:center;font-weight:900;border:1px solid rgba(0,0,0,.25)
-}
-
-/* BACK */
-.back{transform:rotateY(180deg);background:#fff;color:#111;display:grid;grid-template-rows:auto 1fr}
-.back-head{padding:10px 12px;border-bottom:1px solid #eaeaea;display:flex;justify-content:space-between;align-items:center}
-.back-body{padding:12px;overflow:auto}
-.linkbtn{display:inline-block;padding:8px 12px;border-radius:10px;background:#111;color:#fff;font-weight:800}
-
-/* INTERACT */
-.card .hit{position:absolute;inset:0;z-index:3;background:transparent;border:0;cursor:pointer}
-
-/* Small tweaks */
-@media(max-width:420px){
-  .player-name{font-size:24px}
-  .meta-right{min-width:150px}
-  .t-grey,.t-bold{font-size:18px}
-}
+/* (FOR BREVITY IN THIS MESSAGE) — copy the entire style block from index.html */
 </style>
 </head>
 <body>
-  <div class="container">
-
-    <!-- HERO ROW (index page) -->
-    <div class="hero" aria-label="Page hero">
-      <div class="tagline" aria-label="tagline">
-        <div class="t-grey">WHERE THEY<span class="t-bold">YAT?</span></div>
-        <div class="t-grey">FLIP FOR<span class="t-bold">STATS!</span></div>
-      </div>
-      <div class="actions">
-        <button class="iconbtn" id="openSearch" title="Search">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.35-4.35"/></svg>
-        </button>
-        <button class="iconbtn" id="openFilters" title="Filters">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M6 12h12m-7 6h2"/></svg>
-        </button>
-        <button class="iconbtn" id="doReset" title="Reset">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 3-6.708"/><path d="M3 3v6h6"/></svg>
-        </button>
-      </div>
+<!-- copy the same HEADER from index.html -->
+<header class="header" id="siteHeader">
+  <!-- Row 1 ... (identical) -->
+  <!-- Row 2 with different crumbs -->
+  <div class="row-mid">
+    <img class="ham-logo" src="assets/img/hamilton-logo.png" alt="Hamilton H">
+    <div class="schoolblock">
+      <div class="small">CHANDLER, AZ</div>
+      <div class="big">HAMILTON HIGH SCHOOL</div>
+      <div class="bigger">ACTIVE ALUMNI</div>
     </div>
-
-    <!-- GRID -->
-    <div id="grid" class="grid" aria-live="polite"></div>
-
+    <div class="crumbs">HOME ▸ YAT? FLIP CARDS</div>
   </div>
+</header>
 
+<!-- same Hero (tagline + tools) -->
+<section class="hero" aria-label="Hero">
+  <div class="tagline">
+    <div class="tag-seg"><span class="tag-skinny">WHERE THEY</span><span class="tag-bold">YAT?</span></div>
+    <div class="tag-seg"><span class="tag-skinny">FLIP FOR</span><span class="tag-bold">STATS!</span></div>
+  </div>
+  <div class="hero-tools">
+    <button class="iconbtn" id="openSearch" title="Search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="11" cy="11" r="7" stroke-width="2"/><path d="m21 21-4.3-4.3" stroke-width="2" stroke-linecap="round"/></svg></button>
+    <button class="iconbtn" id="openFilter" title="Filter"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 6h18M6 12h12M10 18h4" stroke-width="2" stroke-linecap="round"/></svg></button>
+    <button class="iconbtn" id="resetFilters" title="Reset"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 12a9 9 0 1 1 3 6" stroke-width="2"/><path d="M3 3v6h6" stroke-width="2" stroke-linecap="round"/></svg></button>
+  </div>
+</section>
+
+<!-- copy the same drawers + footer + script from index.html -->
+<aside class="drawer left" id="drawerLeft" aria-hidden="true"> … </aside>
+<aside class="drawer right" id="drawerRight" aria-hidden="true" style="right:0"> … </aside>
+<aside class="drawer right" id="drawerAccount" aria-hidden="true" style="right:0"> … </aside>
+
+<main class="wrap">
+  <div class="grid" id="cardsGrid">
+    <!-- same placeholder card(s) or leave empty for now -->
+  </div>
+</main>
+
+<nav class="tabbar" aria-label="Page Sections"> … </nav>
 <script>
-/* ---------- CONFIG ---------- */
-const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSB4q8nvjYfftVeWKkFNz42uDDWSuDXikimMa-a25WQk_XX-imZbiUd8q5Cj94rjZJjaabw5DGMvJFd/pub?gid=82179728&single=true&output=csv";
-
-/* ---------- UTIL ---------- */
-const $ = (sel,root=document)=>root.querySelector(sel);
-const $$ = (sel,root=document)=>Array.from(root.querySelectorAll(sel));
-const tidy = s => (s==null?"":String(s)).trim();
-
-/* simple CSV parser that respects quotes */
-function parseCSV(text){
-  const rows=[]; let i=0, cur="", inQ=false, row=[];
-  while(i<text.length){
-    const c=text[i];
-    if(c==='\"'){ if(inQ && text[i+1]==='\"'){ cur+='\"'; i++; } else { inQ=!inQ; } }
-    else if(c===',' && !inQ){ row.push(cur); cur=""; }
-    else if((c==='\n' || c==='\r') && !inQ){
-      if(cur.length||row.length){ row.push(cur); rows.push(row); row=[]; cur=""; }
-      if(c==='\r' && text[i+1]==='\n') i++;
-    } else cur+=c;
-    i++;
-  }
-  if(cur.length||row.length){ row.push(cur); rows.push(row); }
-  const header = rows.shift().map(h=>h.toLowerCase().replace(/\s+/g,'_'));
-  return rows.map(r=>{
-    const o={}; header.forEach((h,idx)=>o[h]=r[idx]??""); return o;
-  });
-}
-
-function toDots(lettersStr){
-  // Accept "2017, 2016" OR "17,16"
-  const years = tidy(lettersStr)
-    .split(/[,;/\s]+/).map(y=>y.trim()).filter(Boolean)
-    .map(y=> y.length===4 ? y.slice(-2) : y.padStart(2,'0'));
-  if(!years.length) return "";
-  return years.map(y=>`<span class="dot" title="${y}">${y}</span>`).join("");
-}
-
-function nextGameLines(row){
-  const date = tidy(row.next_game_date || row.next_game || "");
-  const opp  = tidy(row.next_game_opponent || row.ng_opponent || "");
-  if(!date && !opp) return "";
-  let line1 = date || "—";
-  let line2 = opp ? (opp.toUpperCase().startsWith("@")||opp.toUpperCase().startsWith("VS") ? opp.toUpperCase() : `@ ${opp.toUpperCase()}`) : "—";
-  return `<div class="kvlist"><div>${line1}</div><div class="muted">${line2}</div></div>`;
-}
-
-function last3(row){
-  const l1 = tidy(row.last3_1 || "");
-  const l2 = tidy(row.last3_2 || "");
-  const l3 = tidy(row.last3_3 || "");
-  if(!l1 && !l2 && !l3) return "";
-  const line = s => s ? `<div class="muted">${s}</div>` : "";
-  return `<div class="kvlist">${line(l1)}${line(l2)}${line(l3)}</div>`;
-}
-
-/* ---------- RENDER ---------- */
-function cardHTML(p){
-  const name  = tidy(p.display_name || `${p.first||""} ${p.last||""}` ).toUpperCase();
-  const team  = tidy(p.team || p.org || "");
-  const level = tidy(p.level || "");
-  const status= tidy(p.status || "");
-  const klass = tidy(p.grad_class || p.class_of || "");
-  const img   = tidy(p.front_img || p.image || "");
-  const dots  = toDots(p.letter_years || p.roster_years || "");
-
-  const next  = nextGameLines(p);
-  const last  = last3(p);
-
-  return `
-  <article class="card" tabindex="0" aria-label="${name}">
-    <div class="flip">
-      <!-- FRONT -->
-      <div class="face front">
-        <img class="bg" src="${img}" alt="${name}" onerror="this.style.display='none';this.closest('.card').style.background='#0e0e0e'">
-        <div class="grad"></div>
-
-        <div class="meta">
-          <div class="meta-left">
-            <div class="player-name">${name}</div>
-            <div class="team-line">${team}</div>
-            <div class="chips">
-              ${level ? `<span class="chip level">${level}</span>`:""}
-              ${status? `<span class="chip status">${status}</span>`:""}
-              ${klass ? `<span class="chip class">Class of ${klass}</span>`:""}
-            </div>
-          </div>
-
-          <div class="meta-right">
-            ${next ? `<span class="pill">NEXT GAME</span>${next}` : ""}
-            ${last ? `<span class="pill" style="margin-top:6px">LAST 3 GAMES</span>${last}` : ""}
-          </div>
-        </div>
-
-        <div class="dots">${dots}</div>
-      </div>
-
-      <!-- BACK (placeholder for now) -->
-      <div class="face back">
-        <div class="back-head">
-          <strong>${name}</strong>
-          <a class="linkbtn" href="${tidy(p.profile_link)||'#'}">Profile</a>
-        </div>
-        <div class="back-body">
-          <p><strong>Level:</strong> ${level||"—"}</p>
-          <p><strong>Status:</strong> ${status||"—"}</p>
-          <p><strong>Class of:</strong> ${klass||"—"}</p>
-          <p><strong>Team:</strong> ${team||"—"}</p>
-        </div>
-      </div>
-    </div>
-
-    <button class="hit" aria-label="Flip card"></button>
-  </article>`;
-}
-
-function attachFlips(root){
-  $$(".card .hit",root).forEach(btn=>{
-    btn.addEventListener("click",()=>{
-      const c = btn.closest(".card");
-      c.classList.toggle("back");
-    });
-  });
-}
-
-/* ---------- LOAD ---------- */
-async function boot(){
-  try{
-    const res = await fetch(CSV_URL,{cache:"no-store"});
-    const txt = await res.text();
-    const rows = parseCSV(txt);
-
-    // Default ordering: ACTIVE 2025 → FREE AGENT → INJURED → ACTIVE 2024 → others
-    const statusRank = s=>{
-      s = String(s||"").toUpperCase();
-      if(s.includes("ACTIVE 2025")) return 0;
-      if(s.includes("FREE")) return 1;
-      if(s.includes("INJURED")) return 2;
-      if(s.includes("ACTIVE 2024")) return 3;
-      return 9;
-    };
-    const levelRank = l=>{
-      l=String(l||"").toUpperCase();
-      return ({
-        "MLB":0,"TRIPLE-A":1,"AAA":1,"DOUBLE-A":2,"AA":2,
-        "HIGH-A":3,"A+":3,"LOW-A":4,"A":4,"ROOKIE":5,
-        "KBO":2,"NPB":2,"INDY":6,"INTERNATIONAL":6,
-        "NCAA-D1":7,"NCAA-D2":8,"NCAA-D3":9,"NAIA":10,"JUCO":11
-      }[l] ?? 50);
-    };
-    const varsityYearsCount = s=>{
-      const list = tidy(s).split(/[,;/\s]+/).filter(Boolean);
-      return list.length;
-    };
-
-    rows.sort((a,b)=>{
-      const s = statusRank(a.status) - statusRank(b.status);
-      if(s) return s;
-      // by grad class (oldest first = smaller year first)
-      const ga = parseInt(a.grad_class||"9999",10);
-      const gb = parseInt(b.grad_class||"9999",10);
-      if(ga!==gb) return ga-gb;
-      // by level
-      const lv = levelRank(a.level) - levelRank(b.level);
-      if(lv) return lv;
-      // by most varsity years (desc)
-      const va = varsityYearsCount(a.letter_years)-varsityYearsCount(b.letter_years);
-      if(va) return -va;
-      // by last name
-      return String(a.last||"").localeCompare(String(b.last||""));
-    });
-
-    const html = rows.map(cardHTML).join("");
-    const grid = $("#grid");
-    grid.innerHTML = html;
-    attachFlips(grid);
-  }catch(err){
-    console.error(err);
-    $("#grid").innerHTML = `<p style="color:#fca5a5">Failed to load players.</p>`;
-  }
-}
-boot();
-
-/* Buttons (wired later to drawers) */
-$("#openSearch").addEventListener("click",()=>alert("Left drawer/search will open here."));
-$("#openFilters").addEventListener("click",()=>alert("Right drawer/filters will open here."));
-$("#doReset").addEventListener("click",()=>location.reload());
+/* copy the same JS from index.html */
 </script>
 </body>
 </html>
