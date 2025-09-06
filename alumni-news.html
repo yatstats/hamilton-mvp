@@ -1,0 +1,452 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Active Alumni News — Hamilton</title>
+
+<!-- Icons + Web fonts -->
+<link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400&family=Bebas+Neue&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --bg:#0c0c0c; --fg:#f2f2f2; --muted:#c4c4c4; --ink:#e8e8e8; --line:rgba(255,255,255,0.08);
+  --hamSmall:13px; --hamBig:20px; --hamBigger:24px; --tagGrey:#cfd2d6;
+  --card:#121212; --chip:#eaeaea; --chipInk:#111;
+}
+@font-face{ font-family:'Indigo'; src:url('assets/fonts/Indigo.otf') format('opentype'); font-weight:400; font-style:normal; font-display:swap; }
+
+*{box-sizing:border-box} html,body{margin:0}
+body{background:var(--bg);color:var(--fg);font-family:Oswald,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
+a{color:inherit;text-decoration:none}
+.container{max-width:1280px;margin:0 auto;padding:0 14px}
+
+/* ===== GLOBAL HEADER (2 rows only, hard-coded) ===== */
+.header{position:sticky;top:0;z-index:50;background:#000}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:8px 0}
+.left-icons{display:flex;align-items:center;gap:10px}
+.icon-btn{background:none;border:none;color:var(--fg);opacity:.9;display:inline-flex;align-items:center;justify-content:center;width:auto;height:auto;padding:0;margin:0 6px}
+.icon-btn i{font-size:20px}
+
+/* center nav */
+.topnav{display:flex;gap:18px;align-items:center}
+.nav-pair{white-space:nowrap}
+.nav-pair .thin{font:300 var(--hamSmall) Oswald,sans-serif;letter-spacing:.02em;color:#cfd2d6;margin-right:2px}
+.nav-pair .bold{font:400 var(--hamSmall) Indigo,"Bebas Neue",sans-serif}
+
+/* right wordmark */
+.wordmark-wrap{display:flex;align-items:center;justify-content:flex-end;min-width:140px}
+.wordmark-img{height:28px;width:auto;display:block}
+@media (max-width:640px){ .wordmark-img{height:22px} }
+
+.hr-y{border-top:1px solid var(--line)}
+
+.schoolrow{display:flex;align-items:center;gap:16px;padding:8px 0}
+.ham-logo{height:56px;width:auto;object-fit:contain;display:block}
+@media (max-width:640px){ .ham-logo{height:44px} }
+.schooltext{line-height:1}
+.schooltext .small{font:300 var(--hamSmall)/1 Oswald;letter-spacing:.02em;color:var(--muted)}
+.schooltext .big1{font:400 var(--hamBig)/1 "Bebas Neue",sans-serif}
+.schooltext .big2{font:400 var(--hamBigger)/1 "Bebas Neue",sans-serif;margin-top:-4px}
+
+/* ===== PAGE HERO (news) ===== */
+.hero{padding:8px 0 4px}
+.hero-grid{display:flex;align-items:center;justify-content:space-between;gap:16px}
+.tagline{display:flex;align-items:center;gap:12px;white-space:nowrap}
+.tag-grey{font:300 1em Oswald,sans-serif;letter-spacing:.02em;color:var(--tagGrey)}
+.tag-bold{font:400 1em Indigo,"Bebas Neue",sans-serif}
+.crumbs{font:300 calc(var(--hamSmall)*.5)/1 Oswald;letter-spacing:.02em;color:var(--muted);text-transform:uppercase;text-align:right}
+.icon-row button i{font-size:20px}
+
+/* ===== DRAWERS ===== */
+.drawer-mask{position:fixed;inset:0;background:rgba(0,0,0,.35);opacity:0;pointer-events:none;transition:opacity .2s;z-index:60}
+.drawer{position:fixed;top:0;bottom:0;width:min(360px,82vw);background:rgba(10,10,10,.65);backdrop-filter:blur(4px);color:#e8e8e8;transform:translateX(-110%);transition:transform .25s;z-index:70}
+.drawer-right{right:0;left:auto;transform:translateX(110%)}
+.drawer h3{margin:18px 16px 8px}
+.drawer .pad{padding:10px 16px}
+.drawer .close-btn{margin:8px 16px}
+.drawer a{color:#e8e8e8}
+.drawer a:hover{color:#fff}
+body.drawer-left-open .drawer-mask,body.drawer-right-open .drawer-mask{opacity:1;pointer-events:auto}
+body.drawer-left-open #drawerLeft{transform:translateX(0)}
+body.drawer-right-open #drawerRight{transform:translateX(0)}
+#liveResults{margin:10px 4px 18px;max-height:55vh;overflow:auto}
+.live-hit{padding:10px 12px;display:flex;align-items:center;gap:10px;border-radius:10px;cursor:pointer}
+.live-hit:hover{background:rgba(255,255,255,.08)}
+.live-hit img{width:36px;height:36px;border-radius:6px;object-fit:cover}
+
+/* ===== NEWS LIST ===== */
+.controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:8px 0 12px}
+.select, .input{background:#111;border:1px solid var(--line);color:var(--fg);border-radius:10px;padding:8px 10px}
+.input{min-width:220px}
+
+.news-list{display:grid;gap:12px;margin:8px 0 80px}
+.news-card{display:grid;grid-template-columns:160px 1fr;gap:12px;background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+@media (max-width:640px){ .news-card{grid-template-columns:1fr} }
+.news-img{width:100%;height:100%;object-fit:cover;background:#0d0d0d;min-height:120px}
+.news-body{padding:10px 12px}
+.news-title{font:400 20px/1.1 "Indigo","Bebas Neue",sans-serif;margin:2px 0 6px}
+.news-meta{font:300 12px/1.2 Oswald;color:#cfd2d6}
+.news-desc{font:300 13px/1.35 Oswald;color:#e8e8e8;margin-top:6px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.chip{background:var(--chip);color:var(--chipInk);border-radius:999px;padding:4px 8px;font:700 10px/1 Oswald;letter-spacing:.06em}
+.badge{background:#fff;color:#111;border-radius:6px;padding:2px 6px;font:700 10px/1 Oswald;margin-left:8px}
+
+.footer-tabs{position:sticky;bottom:0;background:#0d0d0d;border-top:1px solid var(--line)}
+.tabs{display:flex;justify-content:space-between;gap:14px;padding:10px 12px}
+.tabs a{font:700 16px "Bebas Neue",sans-serif;opacity:.9}
+.hide-sm{display:block} @media (max-width:640px){ .hide-sm{display:none} }
+</style>
+</head>
+<body>
+
+<!-- ===== GLOBAL HEADER (hard-coded) ===== -->
+<header class="header">
+  <div class="container topbar">
+    <div class="left-icons">
+      <button class="icon-btn" id="btnMenu" aria-label="Menu"><i class="ri-menu-line"></i></button>
+      <button class="icon-btn" id="btnAccount" aria-label="Account"><i class="ri-user-3-line"></i></button>
+      <button class="icon-btn" id="btnTheme" aria-label="Theme"><i class="ri-moon-line"></i></button>
+    </div>
+
+    <nav class="topnav hide-sm" aria-label="Top Navigation">
+      <span class="nav-pair"><span class="thin">WHERE THEY</span><span class="bold">YAT?</span></span>
+      <span class="nav-pair"><span class="thin">ACTIVE ALUMNI</span><span class="bold">NEWS</span></span>
+      <span class="nav-pair"><span class="thin">NEXT-LEVEL</span><span class="bold">ALL-TIME LIST</span></span>
+      <span class="nav-pair"><span class="thin">NIL & YAT-A-BOY</span><span class="bold">MARKETPLACE</span></span>
+      <span class="nav-pair"><span class="thin">THE</span><span class="bold">CURRENT TEAM</span></span>
+      <span class="nav-pair"><span class="thin">PCD ACTION</span><span class="bold">PARTNER PROGRAM</span></span>
+      <span class="nav-pair"><span class="thin"></span><span class="bold">FAQ’S</span></span>
+    </nav>
+
+    <div class="wordmark-wrap">
+      <img class="wordmark-img" src="assets/img/yatstats-logo.png" alt="YAT?STATS">
+    </div>
+  </div>
+
+  <div class="hr-y"></div>
+
+  <div class="container schoolrow">
+    <img class="ham-logo" src="assets/img/hamilton-logo.png" alt="Hamilton H">
+    <div class="schooltext">
+      <div class="small">CHANDLER, AZ</div>
+      <div class="big1">HAMILTON HIGH SCHOOL</div>
+      <div class="big2">ACTIVE ALUMNI</div>
+    </div>
+  </div>
+
+  <div class="hr-y"></div>
+</header>
+
+<!-- ===== LEFT DRAWER (search + nav) ===== -->
+<div class="drawer-mask"></div>
+<aside class="drawer" id="drawerLeft" aria-label="Left drawer">
+  <h3>PLAYER PROFILE SEARCH</h3>
+  <div class="pad">
+    <input id="playerSearch" placeholder="Type to search…" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--ink)">
+    <div id="liveResults"></div>
+  </div>
+  <div class="pad">
+    <h3>Navigation</h3>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <a href="index.html"><span class="thin">WHERE THEY</span> <span class="bold">YAT?</span></a>
+      <a href="alumni-news.html"><span class="thin">ACTIVE ALUMNI</span> <span class="bold">NEWS</span></a>
+      <a href="all-time-alumni-list.html"><span class="thin">NEXT-LEVEL</span> <span class="bold">ALL-TIME LIST</span></a>
+      <a href="nil-yat-a-boy-marketplace.html"><span class="thin">NIL & YAT-A-BOY</span> <span class="bold">MARKETPLACE</span></a>
+      <a href="current-team.html"><span class="thin">THE</span> <span class="bold">CURRENT TEAM</span></a>
+      <a href="partner-program.html"><span class="thin">PCD ACTION</span> <span class="bold">PARTNER PROGRAM</span></a>
+      <a href="faq.html"><span class="thin"></span> <span class="bold">FAQ’S</span></a>
+    </div>
+  </div>
+  <button class="icon-btn close-btn" onclick="document.body.classList.remove('drawer-left-open')"><i class="ri-close-line"></i></button>
+</aside>
+
+<!-- ===== RIGHT DRAWER (filters) ===== -->
+<aside class="drawer drawer-right" id="drawerRight" aria-label="Filters drawer">
+  <h3>Filter News</h3>
+  <div class="pad" style="display:flex;flex-direction:column;gap:16px">
+    <div>
+      <div class="small" style="margin-bottom:6px">By KEYWORD</div>
+      <input id="fKeyword" placeholder="Search headlines…" class="input" style="width:100%"/>
+    </div>
+    <div>
+      <div class="small" style="margin-bottom:6px">By PLAYER NAME</div>
+      <input id="fPlayer" placeholder="Type a player…" class="input" />
+    </div>
+    <div>
+      <div class="small" style="margin-bottom:6px">By LEVEL</div>
+      <div id="fLevels" style="display:flex;flex-wrap:wrap;gap:8px">
+        ${['MLB','TRIPLE-A','DOUBLE-A','HIGH-A','LOW-A','ROOKIE','INDY','INTERNATIONAL','NCAA-D1','NCAA-D2','NCAA-D3','NAIA','JUCO'].map(v=>`<label><input type="checkbox" value="${v}"> ${v}</label>`).join(' ')}
+      </div>
+    </div>
+    <div>
+      <div class="small" style="margin-bottom:6px">By GRAD CLASS</div>
+      <div id="fClasses" style="display:flex;flex-wrap:wrap;gap:8px"></div>
+    </div>
+    <div>
+      <div class="small" style="margin-bottom:6px">By STATUS</div>
+      <div id="fStatus" style="display:flex;flex-wrap:wrap;gap:8px">
+        ${['ACTIVE 2025','FREE AGENT','INJURED','ACTIVE 2024','RETIRED','SPONSOR'].map(v=>`<label><input type="checkbox" value="${v}"> ${v}</label>`).join(' ')}
+      </div>
+    </div>
+    <div>
+      <div class="small" style="margin-bottom:6px">By SOURCE</div>
+      <select id="fSource" class="select"><option value="">All sources</option></select>
+    </div>
+    <div>
+      <div class="small" style="margin-bottom:6px">By DATE</div>
+      <select id="fDate" class="select">
+        <option value="all">All time</option>
+        <option value="1">Last 24 hours</option>
+        <option value="7">Last 7 days</option>
+        <option value="30">Last 30 days</option>
+      </select>
+    </div>
+
+    <div style="display:flex;gap:10px">
+      <button id="filtersApply" class="icon-btn" style="padding:10px 14px;border:1px solid var(--line);border-radius:12px"><i class="ri-check-line"></i>&nbsp;Apply</button>
+      <button id="filtersReset" class="icon-btn" style="padding:10px 14px;border:1px solid var(--line);border-radius:12px"><i class="ri-restart-line"></i>&nbsp;Reset</button>
+      <button class="icon-btn close-btn" onclick="document.body.classList.remove('drawer-right-open')" style="margin-left:auto"><i class="ri-close-line"></i></button>
+    </div>
+  </div>
+</aside>
+
+<!-- ===== PAGE HERO (news) ===== -->
+<section class="hero">
+  <div class="container hero-grid">
+    <div class="tagline">
+      <span class="tag-grey">ACTIVE ALUMNI</span> <span class="tag-bold">NEWS</span>
+    </div>
+    <div class="icon-row">
+      <button class="icon-btn" onclick="document.body.classList.add('drawer-left-open')" aria-label="Search"><i class="ri-search-line"></i></button>
+      <button class="icon-btn" onclick="document.body.classList.add('drawer-right-open')" aria-label="Filters"><i class="ri-filter-3-line"></i></button>
+      <button class="icon-btn" onclick="resetNewsFilters()" aria-label="Reset"><i class="ri-arrow-go-back-line"></i></button>
+    </div>
+  </div>
+  <div class="container"><div class="crumbs">HAMILTON ▸ ACTIVE ALUMNI NEWS</div></div>
+</section>
+
+<!-- ===== CONTROLS (quick filters) ===== -->
+<section class="container">
+  <div class="controls">
+    <input id="q" class="input" placeholder="Search headlines…">
+    <select id="dateQuick" class="select">
+      <option value="all">All time</option>
+      <option value="1">Last 24h</option>
+      <option value="7">Last 7d</option>
+      <option value="30">Last 30d</option>
+    </select>
+    <select id="sourceQuick" class="select"><option value="">All sources</option></select>
+    <div style="margin-left:auto">
+      <button class="icon-btn" onclick="document.body.classList.add('drawer-right-open')" title="More filters"><i class="ri-equalizer-line"></i></button>
+    </div>
+  </div>
+</section>
+
+<!-- ===== NEWS LIST ===== -->
+<main class="container">
+  <div id="newsList" class="news-list" aria-live="polite"></div>
+</main>
+
+<!-- ===== FOOTER TABS (demo anchor) ===== -->
+<footer class="footer-tabs">
+  <div class="container tabs">
+    <a href="index.html">CARDS</a><a href="#">NEWS</a><a href="#">STATS</a><a href="#">SOCIAL</a><a href="#">NIL</a><a href="#">VIDEO</a><a href="#">PICS</a>
+  </div>
+</footer>
+
+<script>
+/* === Config === */
+const CSV_URL="https://docs.google.com/spreadsheets/d/e/2PACX-1vSB4q8nvjYfftVeWKkFNz42uDDWSuDXikimMa-a25WQk_XX-imZbiUd8q5Cj94rjZJjaabw5DGMvJFd/pub?gid=82179728&single=true&output=csv";
+const NEWS_URL="data/news.json"; // produced by GitHub Action scraper
+
+/* === Utils === */
+const $=s=>document.querySelector(s), $$=s=>Array.from(document.querySelectorAll(s));
+const debounce=(fn,ms=180)=>{let t;return(...a)=>{clearTimeout(t);t=setTimeout(()=>fn(...a),ms);};};
+const fmtDate=iso=>{ if(!iso) return ''; const d=new Date(iso); return d.toLocaleDateString(undefined,{month:'short',day:'numeric'})+" "+d.toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit'}) };
+const daysAgo=(iso)=>{ if(!iso) return 1e9; const ms=(Date.now()-new Date(iso).getTime()); return ms/(1000*60*60*24); };
+
+/* === Header wiring === */
+$('#btnMenu')?.addEventListener('click',()=>document.body.classList.add('drawer-left-open'));
+$('#btnAccount')?.addEventListener('click',()=>document.body.classList.add('drawer-right-open'));
+document.querySelector('.drawer-mask')?.addEventListener('click',()=>document.body.classList.remove('drawer-left-open','drawer-right-open'));
+$('#btnTheme')?.addEventListener('click', ()=>{
+  const isDark=getComputedStyle(document.documentElement).getPropertyValue('--bg').trim()==='#0c0c0c';
+  if(isDark){ document.documentElement.style.setProperty('--bg','#ffffff'); document.documentElement.style.setProperty('--fg','#111'); document.documentElement.style.setProperty('--muted','#444'); document.documentElement.style.setProperty('--line','#e5e7eb'); }
+  else{ document.documentElement.style.setProperty('--bg','#0c0c0c'); document.documentElement.style.setProperty('--fg','#f2f2f2'); document.documentElement.style.setProperty('--muted','#c4c4c4'); document.documentElement.style.setProperty('--line','rgba(255,255,255,0.08)'); }
+});
+
+/* === Live player search (left drawer) === */
+const liveBox=()=>document.getElementById('liveResults');
+function makeHit(p){
+  const el=document.createElement('div'); el.className='live-hit';
+  el.innerHTML=`<img src="${p.hs_img||p.front_img||'assets/img/placeholder.jpg'}"><div><div style="font-weight:700">${p.display_name||p.first+' '+p.last}</div><div style="opacity:.7;font-size:.92em">${p.level||''} • Class of ${p.grad_class||''}</div></div>`;
+  el.onclick=()=>location.href=profileURL(p);
+  return el;
+}
+function liveSearch(q){
+  if(!q){ if(liveBox()) liveBox().innerHTML=''; return; }
+  const hits=(window.PLAYERS||[]).filter(p=>((p.display_name||(`${p.first} ${p.last}`)||'').toLowerCase().includes(q.toLowerCase()))).slice(0,25);
+  if(liveBox()){ liveBox().innerHTML=''; hits.forEach(p=>liveBox().appendChild(makeHit(p))); }
+}
+document.addEventListener('input',(e)=>{
+  if(e.target && e.target.id==='playerSearch'){
+    const q=(e.target.value||'').trim(); debounce(()=>liveSearch(q),120)();
+  }
+});
+
+/* === CSV loader (players) === */
+async function loadCSV(url){
+  const txt=await fetch(url,{cache:'no-store'}).then(r=>r.text());
+  const rows=txt.trim().split(/\r?\n/).map(r=>r.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/).map(c=>c.replace(/^"|"$/g,'')));
+  const header=rows.shift(); const i=n=>header.indexOf(n);
+  return rows.map(r=>({
+    id:r[i('tbc_id')]||r[i('id')], slug:r[i('slug')],
+    display_name:r[i('display_name')], first:r[i('first')], last:r[i('last')],
+    grad_class:r[i('grad_class')], letter_years:r[i('letter_years')],
+    status:r[i('status')], level:r[i('level')], team:r[i('team')], org:r[i('org')], city_state:r[i('city_state')],
+    front_img:r[i('front_img')], hs_img:r[i('hs_img')]
+  }));
+}
+function profileURL(p){
+  const s=(p.slug||'').trim(), id=(p.id||'').trim();
+  if(s) return `profile.html?id=${encodeURIComponent(s)}`;
+  if(id) return `profile.html?id=${encodeURIComponent(id)}`;
+  return '#';
+}
+
+/* === News loader === */
+async function loadNews(){
+  const res=await fetch(NEWS_URL,{cache:'no-store'});
+  if(!res.ok) throw new Error('news.json not found');
+  return await res.json();
+}
+
+/* === Match news story to players (simple name match) === */
+function likelyMatches(story, p){
+  const hay=( (story.title||'')+' '+(story.description||'') ).toLowerCase();
+  const name=(p.display_name || (p.first&&p.last?`${p.first} ${p.last}`:'') ).toLowerCase();
+  const pieces=name.split(/\s+/).filter(Boolean);
+  return pieces.length>=2 && pieces.every(tok=>hay.includes(tok));
+}
+
+/* === Fill filter boxes for classes, sources === */
+function fillClassYears(){
+  const box=$('#fClasses'); if(!box) return;
+  box.innerHTML=[...Array(27)].map((_,i)=>2025-i).map(y=>`<label><input type="checkbox" value="${y}"> ${y}</label>`).join(' ');
+}
+function fillSources(stories){
+  const s=$('#fSource'), q=$('#sourceQuick'); if(!s||!q) return;
+  const set=new Set(stories.map(n=>n.source).filter(Boolean));
+  const opts=[...set].sort();
+  s.innerHTML = `<option value="">All sources</option>` + opts.map(o=>`<option>${o}</option>`).join('');
+  q.innerHTML = `<option value="">All sources</option>` + opts.map(o=>`<option>${o}</option>`).join('');
+}
+
+/* === Render === */
+function newsCardHTML(n){
+  const when = fmtDate(n.date);
+  const chips = (n.players||[]).map(p=>`<a class="chip" href="${profileURL(p)}">${p.display_name||p.first+' '+p.last}</a>`).join('');
+  return `
+  <article class="news-card">
+    <div class="img-wrap">
+      <img class="news-img" src="${n.image||'assets/img/placeholder.jpg'}" alt="">
+    </div>
+    <div class="news-body">
+      <a class="news-title" href="${n.url}" target="_blank" rel="noopener">${n.title||''}</a>
+      <div class="news-meta">${n.source||''}<span class="badge">${when||''}</span></div>
+      <div class="news-desc">${(n.description||'').slice(0,220)}${(n.description||'').length>220?'…':''}</div>
+      ${chips?`<div class="chips" style="margin-top:10px">${chips}</div>`:''}
+    </div>
+  </article>`;
+}
+
+function renderNews(list){
+  const el=$('#newsList'); if(!el) return;
+  el.innerHTML = (list&&list.length)? list.map(newsCardHTML).join('') :
+    `<div style="opacity:.8;padding:12px">No stories match your filters.</div>`;
+}
+
+/* === Filter application === */
+function readFilters(){
+  const kw = ($('#q')?.value || $('#fKeyword')?.value || '').trim().toLowerCase();
+  const player = ($('#fPlayer')?.value || '').trim().toLowerCase();
+  const src = ($('#sourceQuick')?.value || $('#fSource')?.value || '').trim();
+  const dateWin = ($('#dateQuick')?.value || $('#fDate')?.value || 'all');
+  const lvls = $$('#fLevels input:checked').map(i=>i.value);
+  const classes = $$('#fClasses input:checked').map(i=>i.value);
+  const stats = $$('#fStatus input:checked').map(i=>i.value);
+  return {kw, player, src, dateWin, lvls, classes, stats};
+}
+
+function applyNewsFilters(){
+  if(!window.NEWS) return;
+  const F = readFilters();
+  const withinDays = (d)=> F.dateWin==='all' ? true : daysAgo(d) <= (+F.dateWin||1e9);
+
+  const list = window.NEWS.filter(n=>{
+    const text = `${n.title||''} ${n.description||''}`.toLowerCase();
+    const kwOk = !F.kw || text.includes(F.kw);
+    const srcOk = !F.src || (n.source||'')===F.src;
+    const dateOk= withinDays(n.date);
+
+    // player / level / class / status checks from matched players
+    const players = n.players||[];
+    const playerOk = !F.player || players.some(p => (p.display_name || `${p.first} ${p.last}` || '').toLowerCase().includes(F.player));
+    const levelOk  = !F.lvls.length || players.some(p => F.lvls.includes(p.level));
+    const classOk  = !F.classes.length || players.some(p => F.classes.includes(String(p.grad_class)));
+    const statusOk = !F.stats.length || players.some(p => F.stats.includes(p.status));
+
+    return kwOk && srcOk && dateOk && playerOk && levelOk && classOk && statusOk;
+  });
+
+  renderNews(list);
+  document.body.classList.remove('drawer-right-open');
+}
+
+function resetNewsFilters(){
+  $('#q')?.value=''; $('#fKeyword')?.value=''; $('#fPlayer')?.value='';
+  $('#dateQuick').value='all'; $('#fDate').value='all';
+  $('#sourceQuick').value=''; $('#fSource').value='';
+  ['#fLevels','#fClasses','#fStatus'].forEach(sel=> $$(sel+' input[type="checkbox"]').forEach(i=>i.checked=false));
+  renderNews(window.NEWS||[]);
+}
+
+/* === Boot === */
+(async()=>{
+  try{
+    fillClassYears();
+
+    // Load players (for matching + live search)
+    window.PLAYERS = await loadCSV(CSV_URL);
+
+    // Load news and annotate with matched players
+    const stories = await loadNews();
+    // attach matched players (first hit wins to keep it lightweight)
+    const enriched = stories.map(st=>{
+      const matches = (window.PLAYERS||[]).filter(p=>likelyMatches(st,p)).slice(0,3);
+      return Object.assign({}, st, { players: matches });
+    });
+
+    window.NEWS = enriched;
+
+    // Fill sources after we know them
+    fillSources(enriched);
+
+    // Wire quick controls
+    $('#q')?.addEventListener('input', debounce(applyNewsFilters,160));
+    $('#dateQuick')?.addEventListener('change', applyNewsFilters);
+    $('#sourceQuick')?.addEventListener('change', applyNewsFilters);
+    $('#filtersApply')?.addEventListener('click', applyNewsFilters);
+    $('#filtersReset')?.addEventListener('click', resetNewsFilters);
+
+    renderNews(enriched);
+  }catch(e){
+    console.error(e);
+    $('#newsList').innerHTML = `<div style="opacity:.8">Couldn’t load news.json. Add the GitHub Action or drop a sample file into /data/news.json.</div>`;
+  }
+})();
+</script>
+</body>
+</html>
