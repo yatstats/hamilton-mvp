@@ -1,214 +1,30 @@
-<!-- header.html -->
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@300;400;600&display=swap" rel="stylesheet">
-
-<style>
-  :root{
-    /* consistent left/right padding across header + hero */
-    --edge: clamp(12px, 2vw, 24px);
-
-    /* row heights (slimmer by request) */
-    --topH: 50px;       /* header row 1 */
-    --brandH: 74px;     /* header row 2 */
-
-    /* colors */
-    --bg:#000; --fg:#fff; --muted:#9aa1ab; --hair:#1f2530;
-    --mutedLight:#6b7280;
-    /* responsive sizes */
-    --wmH: clamp(22px, 4.4vw, 44px);  /* YAT?STATS height: ~50% on phones, full on desktop */
-    --hLogoH: clamp(52px, 7vw, 72px); /* Hamilton H logo scales with viewport */
-  }
-  [data-theme="light"]{
-    --bg:#fff; --fg:#000; --muted:#6b7280; --hair:#d1d5db; --mutedLight:#9aa1ab;
-  }
-
-  body{padding-top: calc(var(--topH) + var(--brandH));}
-
-  .site-header{position:fixed;inset:0 0 auto 0;z-index:60;background:var(--bg);color:var(--fg)}
-  /* ROW 1: icons • center nav • wordmark */
-  .row-top{height:var(--topH);display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:10px;padding:0 var(--edge)}
-  .icons-left{display:flex;gap:8px}
-  .btn{width:28px;height:28px;border-radius:8px;border:1px solid var(--hair);background:transparent;color:var(--fg);display:grid;place-items:center;cursor:pointer}
-  .btn:hover{background:rgba(255,255,255,.08)}
-  .btn svg{width:16px;height:16px}
-
-  /* center nav: tighter, but hides early so wordmark always fits */
-  .nav-top{display:none;white-space:nowrap;align-items:center;justify-content:center;overflow:hidden}
-  @media (min-width:1320px){ .nav-top{display:flex} }
-  .pair{display:inline-flex;align-items:baseline}
-  .pair + .pair{margin-left: clamp(12px, 1.6vw, 24px);}  /* “breathing room” */
-  .slim{font:400 clamp(12px,1.3vw,13px)/1 "Oswald";color:var(--muted);margin-right:0;text-decoration:none;letter-spacing:0}
-  .strong{font:400 clamp(15px,1.6vw,16px)/1 "Bebas Neue";color:var(--fg);text-decoration:none;margin:0}
-  .pair .strong{transform:translateY(.5px)} /* optical baseline align */
-  .wordmark{height:var(--wmH);width:auto;justify-self:end;min-width:150px}
-
-  /* ROW 2: H logo + 3 lines (less vertical padding, same rail) */
-  .row-brand{height:var(--brandH);border-top:1px solid var(--hair);border-bottom:1px solid var(--hair);
-    display:flex;align-items:center;gap:12px;padding:0 var(--edge)}
-  .h-logo{height:var(--hLogoH);width:auto}
-  .h-type{display:flex;flex-direction:column;gap:1px}
-  .ham-l1{font:300 13px/1.1 "Oswald";color:var(--muted);letter-spacing:.02em}
-  .ham-l2,.ham-l3{font:400 20px/1 "Bebas Neue";color:var(--fg)} /* same font/weight for both lines */
-  @media (max-width:640px){
-    .ham-l2,.ham-l3{font-size:18px}
-  }
-
-  /* Drawers */
-  .scrim{position:fixed;left:0;right:0;top:calc(var(--topH) + var(--brandH));bottom:0;background:rgba(0,0,0,.35);opacity:0;pointer-events:none;transition:opacity .25s;z-index:55}
-  .scrim.open{opacity:1;pointer-events:auto}
-  body.no-scroll{overflow:hidden}
-  .drawer{position:fixed;top:calc(var(--topH) + var(--brandH));bottom:0;width:clamp(300px,75vw,520px);background:#0b0f16;color:#e5e7eb;z-index:56;display:flex;flex-direction:column;transform:translateX(-100%);border-right:1px solid #232a36}
-  .drawer.right{left:auto;right:0;border-right:none;border-left:1px solid #232a36;transform:translateX(100%)}
-  .drawer.open{transform:translateX(0)}
-  .drawer-h{height:52px;border-bottom:1px solid #232a36;display:flex;align-items:center;justify-content:space-between;padding:0 12px;color:#d5d9df;font:700 12px/1 "Oswald";letter-spacing:.12em;text-transform:uppercase}
-  .drawer-body{padding:12px;overflow:auto}
-  .text{width:100%;background:#0e141f;border:1px solid #1b2330;border-radius:10px;padding:10px;color:#fff}
-  .nav-list{margin-top:14px;border-top:1px solid #232a36;padding-top:10px}
-  .nav-title{font:700 12px/1 "Oswald";color:#cbd5e1;letter-spacing:.12em;margin-bottom:8px}
-  .nav-item{display:block;color:#e5e7eb;text-decoration:none;padding:8px;border-radius:8px}
-  .nav-item:hover{background:#111827}
-</style>
-
-<header class="site-header" role="banner" aria-label="Sticky site header">
-  <!-- ROW 1 -->
+<header class="site-header">
+  <!-- Row 1: top row -->
   <div class="row-top">
-    <div class="icons-left">
-      <button class="btn" id="openLeft" aria-label="Open navigation/search">
-        <svg viewBox="0 0 24 24"><path fill="currentColor" d="M3 6h18v2H3zM3 11h18v2H3zM3 16h18v2H3z"/></svg>
-      </button>
-      <button class="btn" id="iconProfile" aria-label="Account">
-        <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm0 2c-4.2 0-8 2.1-8 5v1h16v-1c0-2.9-3.8-5-8-5z"/></svg>
-      </button>
-      <button class="btn" id="themeToggle" aria-label="Toggle theme">
-        <svg viewBox="0 0 24 24"><path fill="currentColor"/></svg>
-      </button>
+    <div class="left-icons">
+      <button id="openLeft" class="ibtn" aria-label="Menu"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg></button>
+      <button id="accountBtn" class="ibtn" aria-label="Account"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5zm0 2c-3.33 0-10 1.67-10 5v3h20v-3c0-3.33-6.67-5-10-5z"/></svg></button>
+      <button id="themeToggle" class="ibtn" aria-label="Toggle Theme"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 3v2a7 7 0 0 0 0 14v2a9 9 0 0 1 0-18z"/></svg></button>
     </div>
-
-    <nav class="nav-top" aria-label="Primary">
-      <span class="pair"><a class="slim" href="index.html">WHERE THEY</a><a class="strong" href="index.html">YAT?</a></span>
-      <span class="pair"><a class="slim" href="#">ACTIVE ALUMNI</a><a class="strong" href="#">NEWS</a></span>
-      <span class="pair"><a class="slim" href="#">NEXT-LEVEL</a><a class="strong" href="#">ALL-TIME LIST</a></span>
-      <span class="pair"><a class="slim" href="#">NIL &amp; YAT-A-BOY</a><a class="strong" href="#">MARKETPLACE</a></span>
-      <span class="pair"><a class="slim" href="#">THE</a><a class="strong" href="#">CURRENT TEAM</a></span>
-      <span class="pair"><a class="slim" href="#">PCD ACTION</a><a class="strong" href="#">PARTNER PROGRAM</a></span>
-      <span class="pair"><a class="slim" href="#faq"></a><a class="strong" href="#faq">FAQ’s</a></span>
+    <nav class="nav-top">
+      <a href="#" class="pair"><span class="slim">YAT?</span><span class="strong">NEWS</span></a>
+      <a href="#" class="pair"><span class="slim">ALL-TIME</span><span class="strong">LIST</span></a>
+      <a href="#" class="pair"><span class="slim">MARKET</span><span class="strong">PLACE</span></a>
+      <a href="#" class="pair"><span class="slim">CURRENT</span><span class="strong">TEAM</span></a>
+      <a href="#" class="pair"><span class="slim">PARTNER</span><span class="strong">PROGRAM</span></a>
+      <a href="#" class="pair"><span class="strong">FAQ's</span></a>
     </nav>
-
-    <!-- responsive wordmark -->
-    <img class="wordmark" src="https://i.postimg.cc/C5mwXpQy/35878-20250830-222027-0000.png" alt="YAT?STATS">
+    <img src="assets/img/yatstats-logo.png" class="wordmark" alt="YAT?STATS">
   </div>
 
-  <!-- ROW 2 -->
-  <div class="row-brand">
-    <img class="h-logo" src="https://i.postimg.cc/pVm0vHdX/hamilton-logo-tight-transparent-background.png" alt="Hamilton H">
+  <!-- Row 2: Hamilton logo + text + breadcrumbs -->
+  <div class="row-ham">
+    <img src="assets/img/hamilton-logo.png" class="ham-logo" alt="Hamilton H">
     <div class="h-type">
       <div class="ham-l1">CHANDLER, AZ</div>
       <div class="ham-l2">HAMILTON HIGH SCHOOL</div>
       <div class="ham-l3">ACTIVE ALUMNI</div>
     </div>
+    <div class="brand-crumbs">HOME ▸ WHERE THEY YAT?</div>
   </div>
 </header>
-
-<!-- shared scrim -->
-<div class="scrim" id="scrim" hidden></div>
-
-<!-- LEFT drawer -->
-<aside class="drawer" id="drawerLeft" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Search & Navigation">
-  <div class="drawer-h">Player Profile Search
-    <button class="btn" id="closeLeft" aria-label="Close">
-      <svg viewBox="0 0 24 24"><path fill="currentColor" d="M6.225 4.811 4.811 6.225 10.586 12l-5.775 5.775 1.414 1.414L12 13.414l5.775 5.775 1.414-1.414L13.414 12l5.775-5.775-1.414-1.414L12 10.586z"/></svg>
-    </button>
-  </div>
-  <div class="drawer-body">
-    <input id="localSearch" class="text" type="text" placeholder="Type a player name…"/>
-    <ul id="localResults" style="list-style:none;margin:10px 0 0;padding:0"></ul>
-
-    <div class="nav-list">
-      <div class="nav-title">Navigation</div>
-      <a class="nav-item" href="index.html">WHERE THEY <b>YAT?</b></a>
-      <a class="nav-item" href="#">ACTIVE ALUMNI <b>NEWS</b></a>
-      <a class="nav-item" href="#">NEXT-LEVEL <b>ALL-TIME LIST</b></a>
-      <a class="nav-item" href="#">NIL &amp; YAT-A-BOY <b>MARKETPLACE</b></a>
-      <a class="nav-item" href="#">THE <b>CURRENT TEAM</b></a>
-      <a class="nav-item" href="#">PCD ACTION <b>PARTNER PROGRAM</b></a>
-      <a class="nav-item" href="#faq"><b>FAQ’s</b></a>
-    </div>
-  </div>
-</aside>
-
-<!-- RIGHT drawers -->
-<aside class="drawer right" id="drawerRight" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Filters">
-  <div class="drawer-h">Filters
-    <button class="btn" id="closeRight" aria-label="Close">
-      <svg viewBox="0 0 24 24"><path fill="currentColor" d="M6.225 4.811 4.811 6.225 10.586 12l-5.775 5.775 1.414 1.414L12 13.414l5.775 5.775 1.414-1.414L13.414 12l5.775-5.775-1.414-1.414L12 10.586z"/></svg>
-    </button>
-  </div>
-  <div class="drawer-body">
-    <div style="color:#cbd5e1;font:400 13px/1 'Oswald'">Filters UI (next step).</div>
-    <button id="openFiltersFromHero" style="display:none"></button>
-  </div>
-</aside>
-
-<aside class="drawer right" id="drawerAuth" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Sign Up | Login">
-  <div class="drawer-h">Sign Up | Login
-    <button class="btn" id="closeAuth" aria-label="Close">
-      <svg viewBox="0 0 24 24"><path fill="currentColor" d="M6.225 4.811 4.811 6.225 10.586 12l-5.775 5.775 1.414 1.414L12 13.414l5.775 5.775 1.414-1.414L13.414 12l5.775-5.775-1.414-1.414L12 10.586z"/></svg>
-    </button>
-  </div>
-  <div class="drawer-body">
-    <label class="nav-title">Email</label>
-    <input type="email" class="text" placeholder="you@example.com">
-    <label class="nav-title" style="margin-top:10px">Password</label>
-    <input type="password" class="text" placeholder="••••••••">
-  </div>
-</aside>
-
-<script>
-(function(){
-  const $=s=>document.querySelector(s), byId=id=>document.getElementById(id);
-  const scrim=byId('scrim'), L=byId('drawerLeft'), R=byId('drawerRight'), A=byId('drawerAuth');
-  let lastFocus=null;
-
-  function open(d){[L,R,A].forEach(x=>x.classList.remove('open'));lastFocus=document.activeElement;d.classList.add('open');scrim.classList.add('open');scrim.hidden=false;document.body.classList.add('no-scroll');}
-  function close(d){d.classList.remove('open');if(!L.classList.contains('open')&&!R.classList.contains('open')&&!A.classList.contains('open')){scrim.classList.remove('open');scrim.hidden=true;document.body.classList.remove('no-scroll');}}
-  function closeAll(){[L,R,A].forEach(x=>x.classList.remove('open'));scrim.classList.remove('open');scrim.hidden=true;document.body.classList.remove('no-scroll');lastFocus?.focus?.();}
-
-  window.YAT = Object.assign(window.YAT||{}, {
-    openLeft: ()=>open(L), openFilters: ()=>open(R), closeAll
-  });
-
-  byId('openLeft')?.addEventListener('click',()=>open(L));
-  byId('closeLeft')?.addEventListener('click',()=>close(L));
-  byId('iconProfile')?.addEventListener('click',()=>open(A));
-  byId('closeAuth')?.addEventListener('click',()=>close(A));
-  byId('closeRight')?.addEventListener('click',()=>close(R));
-  byId('openFiltersFromHero')?.addEventListener('click',()=>open(R));
-  scrim?.addEventListener('click',closeAll);
-
-  // Theme toggle
-  (function(){
-    const k='theme', get=()=>localStorage.getItem(k)||'dark',
-          set=t=>{document.documentElement.setAttribute('data-theme',t);localStorage.setItem(k,t);};
-    set(get());
-    byId('themeToggle')?.addEventListener('click',()=>set(get()==='dark'?'light':'dark'));
-  })();
-
-  // Live search (populated when cards load)
-  const input=byId('localSearch'), list=byId('localResults');
-  function bindLiveSearch(){
-    const players = window.YAT?.players || [];
-    input?.addEventListener('input', e=>{
-      const q=e.target.value.toLowerCase(); list.innerHTML='';
-      if(!q) return;
-      players.filter(p=>(p.name||'').toLowerCase().includes(q)).slice(0,80).forEach(p=>{
-        const li=document.createElement('li');
-        li.textContent=`${p.name}${p.graduatingClass?` (CLASS OF ${p.graduatingClass})`:''}`;
-        li.style.cssText='padding:8px 6px;border-radius:8px;cursor:pointer';
-        li.addEventListener('click',()=>{location.href=`profile.html?id=${encodeURIComponent(p.id)}`;closeAll();});
-        list.appendChild(li);
-      });
-    });
-  }
-  document.addEventListener('yat:players-ready', bindLiveSearch);
-  if (window.YAT?.players) bindLiveSearch();
-})();
-</script>
