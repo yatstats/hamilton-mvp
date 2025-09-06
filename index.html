@@ -1,414 +1,215 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Where They YAT? — Hamilton</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Where They Yat? — Hamilton</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <style>
+    :root {
+      --bg: #000;
+      --fg: #fff;
+      --accent: #b22222;
+    }
 
-<!-- Icon font (needed for the small glyphs) -->
-<link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
-<!-- Web fonts -->
-<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400&family=Bebas+Neue&display=swap" rel="stylesheet">
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--fg);
+      font-family: Arial, sans-serif;
+    }
 
-<style>
-:root{
-  --bg:#0c0c0c; --fg:#f2f2f2; --muted:#bfc6cc; --line:rgba(255,255,255,.09);
-  --hamSmall:13px; --hamBig:20px; --hamBigger:24px;
-  --gutter:14px; --padX:12px; --max:1600px;
-}
-@font-face{
-  font-family:'Indigo';
-  src:url('assets/fonts/Indigo.otf') format('opentype');
-  font-weight:400; font-style:normal; font-display:swap;
-}
-*{box-sizing:border-box}
-html,body{margin:0;background:var(--bg);color:var(--fg);font-family:Oswald,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
-a{color:inherit;text-decoration:none}
-.container{max-width:var(--max);margin:0 auto;padding:0 var(--padX)}
-.hr{border-top:1px solid var(--line)}
+    /* --- TOPBAR --- */
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 6px 12px;
+      background: #111;
+      width: 100%;
+    }
 
-/* ===== HEADER ===== */
-.header{position:sticky;top:0;z-index:50;background:#000}
-.topbar{display:flex;align-items:center;gap:12px;padding:8px 0}
-.icon-btn{background:none;border:none;color:var(--fg);display:inline-flex;align-items:center;justify-content:center}
-.icon-btn i{font-size:22px;opacity:.95}
-.crumbs{font:300 var(--hamSmall)/1 Oswald;letter-spacing:.02em;color:var(--muted);text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.flex-1{flex:1 1 auto}
-.wordmark{height:28px;width:auto;display:block}
-@media (max-width:640px){ .wordmark{height:22px} }
+    .left-controls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
 
-/* center nav (desktop only) */
-.topnav{display:flex;gap:18px;align-items:center;padding:8px 0}
-.topnav .thin{font:300 var(--hamSmall)/1 Oswald;letter-spacing:.02em;color:#cfd2d6;margin-right:2px;white-space:nowrap}
-.topnav .bold{font:400 var(--hamSmall)/1 Indigo,"Bebas Neue",sans-serif;white-space:nowrap}
-@media (max-width:1200px){ .topnav{display:none} }
+    .hamburger, .icon-btn {
+      font-size: 20px;
+      cursor: pointer;
+    }
 
-/* school row */
-.schoolrow{display:flex;align-items:center;gap:16px;padding:10px 0}
-.ham-logo{height:64px;width:auto;object-fit:contain;display:block}
-@media (max-width:640px){ .ham-logo{height:54px} }
-.schooltext{line-height:1}
-.schooltext .small{font:300 var(--hamSmall)/1 Oswald;letter-spacing:.02em;color:var(--muted)}
-.schooltext .big1{font:400 var(--hamBig)/1 "Bebas Neue",sans-serif}
-.schooltext .big2{font:400 var(--hamBigger)/1 "Bebas Neue",sans-serif;margin-top:-4px}
+    .crumbs {
+      font-size: 13px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 55vw;
+    }
 
-/* hero row */
-.hero{padding:8px 0}
-.hero-wrap{display:flex;align-items:center;justify-content:space-between;gap:16px}
-.tag-duo{position:relative;height:1.9em}
-.tag-swap{position:absolute;inset:0;opacity:0;animation:swap 6s infinite}
-.tag-swap:nth-child(1){animation-delay:0s}
-.tag-swap:nth-child(2){animation-delay:3s}
-.tag-grey{font:300 20px Oswald;letter-spacing:.02em;color:#cfd2d6}
-.tag-bold{font:400 20px Indigo,"Bebas Neue",sans-serif}
-@keyframes swap{0%{opacity:0}5%{opacity:1}45%{opacity:1}50%{opacity:0}100%{opacity:0}}
-@media (max-width:640px){ .tag-grey,.tag-bold{font-size:18px} }
+    .wordmark {
+      font-size: 24px;
+      font-weight: bold;
+      white-space: nowrap;
+    }
 
-.actions{display:flex;align-items:center;gap:12px}
-.action{height:44px;width:44px;border:1px solid var(--line);border-radius:12px;display:grid;place-items:center;color:var(--fg)}
-.action i{font-size:22px}
+    /* --- HERO HEADER --- */
+    .hero-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+    }
 
-/* ===== GRID + CARDS ===== */
-.main{padding:14px 0 80px}
-.grid{display:grid;gap:var(--gutter)}
-@media (min-width:1300px){ .grid{grid-template-columns:repeat(5,1fr)}}
-@media (max-width:1299px){ .grid{grid-template-columns:repeat(4,1fr)}}
-@media (max-width:1024px){ .grid{grid-template-columns:repeat(3,1fr)}}
-@media (max-width:768px){  .grid{grid-template-columns:repeat(2,1fr)}}
-@media (max-width:520px){  .grid{grid-template-columns:repeat(1,1fr)}}
+    .school-block {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
 
-.card{position:relative;background:#171717;border-radius:16px;overflow:hidden}
-.card::before{content:"";display:block;padding-top:140%} /* 5:7 */
-.card-inner{position:absolute;inset:0;perspective:1200px}
-.flip{position:absolute;inset:0;transform-style:preserve-3d;transition:transform .6s cubic-bezier(.2,.7,.2,1)}
-.card.is-flipped .flip{transform:rotateY(180deg)}
-.face{position:absolute;inset:0;backface-visibility:hidden}
-.face.back{transform:rotateY(180deg)}
-.bg{position:absolute;inset:0;background:#111 center/cover no-repeat}
-.shade{position:absolute;left:0;right:0;bottom:0;height:46%;background:linear-gradient(transparent,rgba(0,0,0,.92))}
-.cap{position:absolute;left:16px;right:16px;bottom:14px}
-.name{font:400 28px/1 Indigo,"Bebas Neue",sans-serif;letter-spacing:.02em}
-.meta-small{font:300 12px/1.25 Oswald;opacity:.9}
-.chips{position:absolute;right:14px;bottom:60px;display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
-.chip{background:#fff;color:#111;border-radius:28px;padding:6px 10px;font-weight:700;font-size:12px}
+    .school-logo {
+      height: 60px;
+    }
 
-/* roster dots */
-.dots{position:absolute;left:14px;bottom:12px;display:flex;gap:6px;z-index:2}
-.dot{width:28px;height:28px;border-radius:999px;background:#f3f4f6;color:#111;display:grid;place-items:center;
-     font:900 12px/1 Oswald;border:1px solid rgba(0,0,0,.25)}
+    .school-text {
+      display: flex;
+      flex-direction: column;
+      font-size: 14px;
+      line-height: 1.3;
+    }
 
-/* back */
-.back-head{padding:10px 12px;border-bottom:1px solid rgba(0,0,0,.08);display:flex;justify-content:space-between;align-items:center;background:#fff}
-.back-body{padding:12px;background:#fff;color:#111}
+    .school-text strong {
+      font-size: 18px;
+    }
 
-/* drawers */
-.drawer-mask{position:fixed;inset:0;background:rgba(0,0,0,.35);opacity:0;pointer-events:none;transition:opacity .2s;z-index:60}
-.drawer{position:fixed;top:0;bottom:0;width:min(360px,82vw);background:rgba(10,10,10,.65);backdrop-filter:blur(4px);color:#e8e8e8;transform:translateX(-110%);transition:transform .25s;z-index:70}
-.drawer-right{right:0;left:auto;transform:translateX(110%)}
-.drawer h3{margin:18px 16px 8px}
-.drawer .pad{padding:10px 16px}
-.drawer .close-btn{margin:8px 16px}
-body.drawer-left-open .drawer-mask,body.drawer-right-open .drawer-mask{opacity:1;pointer-events:auto}
-body.drawer-left-open #drawerLeft{transform:translateX(0)}
-body.drawer-right-open #drawerRight{transform:translateX(0)}
-#liveResults{margin:10px 4px 18px;max-height:55vh;overflow:auto}
-.live-hit{padding:10px 12px;display:flex;align-items:center;gap:10px;border-radius:10px;cursor:pointer}
-.live-hit:hover{background:rgba(255,255,255,.08)}
-.live-hit img{width:36px;height:36px;border-radius:6px;object-fit:cover}
-</style>
+    /* Tagline below */
+    .tag-duo {
+      display: flex;
+      gap: 6px;
+      margin-top: 6px;
+      font-size: 18px;
+    }
+
+    .tag-grey {
+      color: #aaa;
+    }
+
+    .tag-bold {
+      font-weight: bold;
+    }
+
+    /* --- ACTIONS --- */
+    .actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .action {
+      background: transparent;
+      border: 1px solid var(--fg);
+      height: 40px;
+      width: 40px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    .action i {
+      font-size: 20px;
+      color: var(--fg);
+    }
+
+    /* --- NAV --- */
+    .center-nav {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      background: #111;
+      padding: 6px 0;
+    }
+
+    .center-nav a {
+      color: var(--fg);
+      text-decoration: none;
+      font-weight: bold;
+      font-size: 14px;
+    }
+
+    @media (max-width:1200px) {
+      .center-nav {
+        display: none;
+      }
+    }
+
+    /* --- MOBILE --- */
+    @media (max-width:640px) {
+      .wordmark {
+        font-size: 18px;
+      }
+      .crumbs {
+        font-size: 11px;
+        max-width: 40vw;
+      }
+      .school-logo {
+        height: 45px;
+      }
+      .tag-grey, .tag-bold {
+        font-size: 16px;
+        white-space: nowrap;
+      }
+      .action {
+        height: 36px;
+        width: 36px;
+      }
+      .action i {
+        font-size: 18px;
+      }
+    }
+  </style>
 </head>
 <body>
-
-<header class="header">
-  <div class="container topbar">
-    <button class="icon-btn" id="btnMenu" aria-label="Menu"><i class="ri-menu-line"></i></button>
-    <button class="icon-btn" id="btnAccount" aria-label="Account"><i class="ri-user-3-line"></i></button>
-    <button class="icon-btn" id="btnTheme" aria-label="Theme"><i class="ri-moon-line"></i></button>
-
-    <!-- BREADCRUMBS (top row, left) -->
-    <div class="crumbs" id="crumbsTop">HAMILTON ▸ WHERE THEY YAT?</div>
-
-    <div class="flex-1"></div>
-    <img class="wordmark" src="assets/img/yatstats-logo.png" alt="YAT?STATS">
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="left-controls">
+      <div class="hamburger"><i class="fas fa-bars"></i></div>
+      <div class="icon-btn"><i class="fas fa-user"></i></div>
+      <div class="icon-btn"><i class="fas fa-moon"></i></div>
+      <div class="crumbs">HAMILTON ▸ WHERE THEY YAT?</div>
+    </div>
+    <div class="wordmark">YAT?STATS</div>
   </div>
 
-  <div class="hr"></div>
-  <!-- Desktop center nav -->
-  <nav class="container topnav" aria-label="Site">
-    <a href="index.html"><span class="thin">WHERE THEY</span><span class="bold">YAT?</span></a>
-    <a href="#"><span class="thin">ACTIVE ALUMNI</span><span class="bold">NEWS</span></a>
-    <a href="#"><span class="thin">NEXT-LEVEL</span><span class="bold">ALL-TIME LIST</span></a>
-    <a href="#"><span class="thin">NIL & YAT-A-BOY</span><span class="bold">MARKETPLACE</span></a>
-    <a href="#"><span class="thin">THE</span><span class="bold">CURRENT TEAM</span></a>
-    <a href="#"><span class="thin">PCD ACTION</span><span class="bold">PARTNER PROGRAM</span></a>
-    <a href="#"><span class="thin"></span><span class="bold">FAQ’S</span></a>
-  </nav>
-  <div class="hr"></div>
-
-  <!-- School row -->
-  <div class="container schoolrow">
-    <img class="ham-logo" src="assets/img/hamilton-logo.png" alt="Hamilton H">
-    <div class="schooltext">
-      <div class="small">CHANDLER, AZ</div>
-      <div class="big1">HAMILTON HIGH SCHOOL</div>
-      <div class="big2">ACTIVE ALUMNI</div>
-    </div>
-  </div>
-
-  <!-- Rotating tagline + actions -->
-  <div class="container hero">
-    <div class="hero-wrap">
-      <div class="tag-duo" aria-label="Tagline">
-        <div class="tag-swap"><span class="tag-grey">WHERE THEY</span> <span class="tag-bold">YAT?</span></div>
-        <div class="tag-swap"><span class="tag-grey">FLIP FOR</span> <span class="tag-bold">STATS!</span></div>
-      </div>
-      <div class="actions">
-        <button class="action" id="btnSearch" aria-label="Search"><i class="ri-search-line"></i></button>
-        <button class="action" id="btnFilters" aria-label="Filters"><i class="ri-filter-3-line"></i></button>
-        <button class="action" id="btnReset" aria-label="Reset"><i class="ri-restart-line"></i></button>
-      </div>
-    </div>
-  </div>
-  <div class="hr"></div>
-</header>
-
-<!-- Drawers -->
-<div class="drawer-mask"></div>
-
-<aside class="drawer" id="drawerLeft" aria-label="Left drawer">
-  <h3>PLAYER PROFILE SEARCH</h3>
-  <div class="pad">
-    <input id="playerSearch" placeholder="Type to search…" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:#e8e8e8">
-    <div id="liveResults"></div>
-  </div>
-  <div class="pad">
-    <h3>Navigation</h3>
-    <div style="display:flex;flex-direction:column;gap:12px">
-      <a href="index.html"><span class="thin">WHERE THEY</span> <span class="bold">YAT?</span></a>
-      <a href="#"><span class="thin">ACTIVE ALUMNI</span> <span class="bold">NEWS</span></a>
-      <a href="#"><span class="thin">NEXT-LEVEL</span> <span class="bold">ALL-TIME LIST</span></a>
-      <a href="#"><span class="thin">NIL & YAT-A-BOY</span> <span class="bold">MARKETPLACE</span></a>
-      <a href="#"><span class="thin">THE</span> <span class="bold">CURRENT TEAM</span></a>
-      <a href="#"><span class="thin">PCD ACTION</span> <span class="bold">PARTNER PROGRAM</span></a>
-      <a href="#"><span class="thin"></span> <span class="bold">FAQ’S</span></a>
-    </div>
-  </div>
-  <button class="icon-btn close-btn" onclick="document.body.classList.remove('drawer-left-open')"><i class="ri-close-line"></i></button>
-</aside>
-
-<aside class="drawer drawer-right" id="drawerRight" aria-label="Filters drawer">
-  <h3>Filters</h3>
-  <div class="pad" style="display:flex;flex-direction:column;gap:16px">
-    <div>
-      <div class="small" style="margin-bottom:6px">By NAME</div>
-      <input id="filterName" placeholder="Type a name…" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:#e8e8e8"/>
-    </div>
-    <div id="filterLevels">
-      <div class="small" style="margin-bottom:6px">By LEVEL</div>
-      <label><input type="checkbox" value="MLB"> MLB</label>
-      <label><input type="checkbox" value="TRIPLE-A"> TRIPLE-A</label>
-      <label><input type="checkbox" value="DOUBLE-A"> DOUBLE-A</label>
-      <label><input type="checkbox" value="HIGH-A"> HIGH-A</label>
-      <label><input type="checkbox" value="LOW-A"> LOW-A</label>
-      <label><input type="checkbox" value="ROOKIE"> ROOKIE</label>
-      <label><input type="checkbox" value="INDY"> INDY</label>
-      <label><input type="checkbox" value="INTERNATIONAL"> INTERNATIONAL</label>
-      <label><input type="checkbox" value="NCAA-D1"> NCAA-D1</label>
-      <label><input type="checkbox" value="NCAA-D2"> NCAA-D2</label>
-      <label><input type="checkbox" value="NCAA-D3"> NCAA-D3</label>
-      <label><input type="checkbox" value="NAIA"> NAIA</label>
-      <label><input type="checkbox" value="JUCO"> JUCO</label>
-    </div>
-    <div id="filterClasses">
-      <div class="small" style="margin-bottom:6px">By GRAD CLASS</div>
-      <div id="classBox" style="display:flex;flex-wrap:wrap;gap:8px"></div>
-    </div>
-    <div id="filterRoster">
-      <div class="small" style="margin-bottom:6px">By ROSTER YEAR</div>
-      <div id="rosterBox" style="display:flex;flex-wrap:wrap;gap:8px"></div>
-    </div>
-    <div id="filterStatus">
-      <div class="small" style="margin-bottom:6px">By STATUS</div>
-      <label><input type="checkbox" value="ACTIVE 2025"> ACTIVE 2025</label>
-      <label><input type="checkbox" value="FREE AGENT"> FREE AGENT</label>
-      <label><input type="checkbox" value="INJURED"> INJURED</label>
-      <label><input type="checkbox" value="ACTIVE 2024"> ACTIVE 2024</label>
-      <label><input type="checkbox" value="RETIRED"> RETIRED</label>
-      <label><input type="checkbox" value="SPONSOR"> SPONSOR</label>
-    </div>
-    <div style="display:flex;gap:10px">
-      <button id="filtersApply" class="icon-btn" style="padding:10px 14px;border:1px solid var(--line);border-radius:12px"><i class="ri-check-line"></i>&nbsp;Apply</button>
-      <button id="filtersReset" class="icon-btn" style="padding:10px 14px;border:1px solid var(--line);border-radius:12px"><i class="ri-restart-line"></i>&nbsp;Reset</button>
-      <button class="icon-btn close-btn" onclick="document.body.classList.remove('drawer-right-open')" style="margin-left:auto"><i class="ri-close-line"></i></button>
-    </div>
-  </div>
-</aside>
-
-<main class="main container">
-  <section id="cardGrid" class="grid" aria-label="Player cards"></section>
-</main>
-
-<script>
-/* quick helpers */
-const CSV_URL="https://docs.google.com/spreadsheets/d/e/2PACX-1vSB4q8nvjYfftVeWKkFNz42uDDWSuDXikimMa-a25WQk_XX-imZbiUd8q5Cj94rjZJjaabw5DGMvJFd/pub?gid=82179728&single=true&output=csv";
-const $=s=>document.querySelector(s), $$=s=>Array.from(document.querySelectorAll(s));
-const debounce=(fn,ms=180)=>{let t;return(...a)=>{clearTimeout(t);t=setTimeout(()=>fn(...a),ms);};};
-
-/* drawers / actions */
-$('#btnMenu')?.addEventListener('click',()=>document.body.classList.add('drawer-left-open'));
-$('#btnSearch')?.addEventListener('click',()=>document.body.classList.add('drawer-left-open'));
-$('#btnFilters')?.addEventListener('click',()=>document.body.classList.add('drawer-right-open'));
-$('.drawer-mask')?.addEventListener('click',()=>document.body.classList.remove('drawer-left-open','drawer-right-open'));
-$('#btnTheme')?.addEventListener('click', ()=>{
-  const isDark=getComputedStyle(document.documentElement).getPropertyValue('--bg').trim()==='#0c0c0c';
-  if(isDark){ document.documentElement.style.setProperty('--bg','#ffffff'); document.documentElement.style.setProperty('--fg','#111'); document.documentElement.style.setProperty('--muted','#444'); document.documentElement.style.setProperty('--line','#e5e7eb'); }
-  else{ document.documentElement.style.setProperty('--bg','#0c0c0c'); document.documentElement.style.setProperty('--fg','#f2f2f2'); document.documentElement.style.setProperty('--muted','#bfc6cc'); document.documentElement.style.setProperty('--line','rgba(255,255,255,.09)'); }
-});
-
-/* fill years */
-(function(){ const fill=(id)=>{ const el=$(id); if(!el) return; el.innerHTML=[...Array(27)].map((_,i)=>2025-i).map(y=>`<label><input type="checkbox" value="${y}"> ${y}</label>`).join(' '); }; fill('#classBox'); fill('#rosterBox'); })();
-
-/* CSV */
-async function loadCSV(url){
-  const txt=await fetch(url,{cache:'no-store'}).then(r=>r.text());
-  const rows=txt.trim().split(/\r?\n/).map(r=>r.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/).map(c=>c.replace(/^"|"$/g,'')));
-  const header=rows.shift(); const idx=n=>header.indexOf(n);
-  return rows.map(r=>({
-    id:r[idx('tbc_id')]||r[idx('id')], slug:r[idx('slug')],
-    display_name:r[idx('display_name')]||`${r[idx('first')]||''} ${r[idx('last')]||''}`.trim(),
-    first:r[idx('first')], last:r[idx('last')],
-    grad_class:r[idx('grad_class')], letter_years:r[idx('letter_years')],
-    status:r[idx('status')], level:r[idx('level')], team:r[idx('team')], org:r[idx('org')], city_state:r[idx('city_state')],
-    position:r[idx('position')], front_img:r[idx('front_img')], hs_img:r[idx('hs_img')]
-  }));
-}
-function defaultSort(a,b){
-  const order=['ACTIVE 2025','FREE AGENT','INJURED','ACTIVE 2024','RETIRED','SPONSOR'];
-  const sA=order.indexOf((a.status||'').toUpperCase()), sB=order.indexOf((b.status||'').toUpperCase());
-  if(sA!==sB) return sA-sB;
-  const cA=+a.grad_class||0, cB=+b.grad_class||0; if(cA!==cB) return cA-cB;
-  const rank=v=>({'MLB':9,'TRIPLE-A':8,'DOUBLE-A':7,'HIGH-A':6,'LOW-A':5,'ROOKIE':4,'INDY':3,'INTERNATIONAL':2,'NCAA-D1':1,'NCAA-D2':1,'NCAA-D3':1,'NAIA':1,'JUCO':1}[String(v).toUpperCase()]||0);
-  const L=rank(a.level)-rank(b.level); if(L!==0) return -L;
-  const yrs=p=>String(p.letter_years||'').split(',').filter(Boolean).length;
-  const vy=yrs(a)-yrs(b); if(vy!==0) return -vy;
-  const lastA=(a.last||(a.display_name||'').split(' ').slice(-1)[0]||'').toLowerCase();
-  const lastB=(b.last||(b.display_name||'').split(' ').slice(-1)[0]||'').toLowerCase();
-  return lastA.localeCompare(lastB);
-}
-function rosterDots(p){
-  return String(p.letter_years||'').split(',').map(s=>s.trim()).filter(Boolean)
-    .map(y=>y.slice(-2)).map(y=>`<span class="dot" title="${y}">${y}</span>`).join('');
-}
-function profileURL(p){
-  const s=(p.slug||'').trim(), id=(p.id||'').trim();
-  if(s) return `profile.html?id=${encodeURIComponent(s)}`;
-  if(id) return `profile.html?id=${encodeURIComponent(id)}`;
-  return '#';
-}
-function cardHTML(p){
-  const bg=p.front_img||'assets/img/placeholder.jpg';
-  const name=p.display_name||`${p.first||''} ${p.last||''}`.trim();
-  const klass=p.grad_class||'';
-  return `
-  <article class="card" aria-label="${name}">
-    <div class="card-inner">
-      <div class="flip">
-        <div class="face front">
-          <div class="bg" style="background-image:url('${bg}')"></div>
-          <div class="shade"></div>
-          <div class="cap">
-            <div class="name">${name}</div>
-            <div class="meta-small">${p.team||''}</div>
-          </div>
-          <div class="chips">
-            ${p.status?`<span class="chip">${p.status}</span>`:''}
-            ${klass?`<span class="chip">CLASS OF ${klass}</span>`:''}
-          </div>
-          <div class="dots">${rosterDots(p)}</div>
-        </div>
-        <div class="face back">
-          <div class="back-head">
-            <strong style="font:900 16px 'Bebas Neue'">${name}</strong>
-            <a class="icon-btn" href="${profileURL(p)}" style="padding:8px 12px;border:1px solid #ddd;border-radius:10px;color:#111"><i class="ri-user-line"></i>&nbsp;Profile</a>
-          </div>
-          <div class="back-body">
-            <p><strong>Level:</strong> ${p.level||'—'}</p>
-            <p><strong>Status:</strong> ${p.status||'—'}</p>
-            <p><strong>Class of:</strong> ${klass||'—'}</p>
-            <p><strong>Team:</strong> ${p.team||'—'}</p>
-          </div>
+  <!-- HERO HEADER -->
+  <div class="hero-header">
+    <div class="school-block">
+      <img src="assets/img/hamilton-logo.png" alt="Hamilton Logo" class="school-logo">
+      <div class="school-text">
+        CHANDLER, AZ <br>
+        <strong>HAMILTON HIGH SCHOOL <br> ACTIVE ALUMNI</strong>
+        <div class="tag-duo">
+          <span class="tag-grey">FLIP FOR</span>
+          <span class="tag-bold">STATS!</span>
         </div>
       </div>
     </div>
-  </article>`;
-}
-function renderCards(list){
-  const grid=$("#cardGrid"); if(!grid) return;
-  grid.innerHTML=list.map(cardHTML).join('');
-  const cards=[...grid.querySelectorAll('.card')];
-  cards.forEach((el,i)=>{
-    el.addEventListener('click', (ev)=>{ if(!ev.detail || ev.detail===1){ window.location.href=profileURL(list[i]); }});
-    el.addEventListener('dblclick', ()=> el.classList.toggle('is-flipped'));
-  });
-}
+    <div class="actions">
+      <div class="action"><i class="fas fa-search"></i></div>
+      <div class="action"><i class="fas fa-filter"></i></div>
+      <div class="action"><i class="fas fa-undo"></i></div>
+    </div>
+  </div>
 
-/* filters */
-function readFilters(){
-  const name=($('#filterName')?.value||'').trim().toLowerCase();
-  const levels=$$('#filterLevels input:checked').map(i=>i.value);
-  const classes=$$('#classBox input:checked').map(i=>i.value);
-  const years=$$('#rosterBox input:checked').map(i=>i.value);
-  const status=$$('#filterStatus input:checked').map(i=>i.value);
-  return {name,levels,classes,years,status};
-}
-function applyFilters(){
-  if(!window.PLAYERS) return;
-  const F=readFilters();
-  const filtered=window.PLAYERS.filter(p=>{
-    const nameOk=!F.name||((p.display_name||(`${p.first} ${p.last}`)||'').toLowerCase().includes(F.name));
-    const lvlOk=!F.levels.length||F.levels.includes(p.level);
-    const classOk=!F.classes.length||F.classes.includes(String(p.grad_class));
-    const yearOk=!F.years.length||String(p.letter_years||'').split(',').some(y=>F.years.includes(y.trim()));
-    const statOk=!F.status.length||F.status.includes(p.status);
-    return nameOk&&lvlOk&&classOk&&yearOk&&statOk;
-  });
-  renderCards(filtered);
-  document.body.classList.remove('drawer-right-open');
-}
-function resetFilters(){
-  $$('#drawerRight input[type="checkbox"]').forEach(i=>i.checked=false);
-  $('#filterName')?.value='';
-  if(window.PLAYERS) renderCards(window.PLAYERS.slice().sort(defaultSort));
-}
-$('#filtersApply')?.addEventListener('click',applyFilters);
-$('#filtersReset')?.addEventListener('click',resetFilters);
-
-/* live search */
-function makeHit(p){
-  const el=document.createElement('div'); el.className='live-hit';
-  el.innerHTML=`<img src="${p.hs_img||p.front_img||'assets/img/placeholder.jpg'}"><div><div style="font-weight:700">${p.display_name||p.first+' '+p.last}</div><div style="opacity:.7;font-size:.92em">${p.level||''} • Class of ${p.grad_class||''}</div></div>`;
-  el.onclick=()=>location.href=profileURL(p);
-  return el;
-}
-function liveSearch(){
-  const q=($('#playerSearch')?.value||'').trim().toLowerCase();
-  const box=$('#liveResults');
-  if(!q){ if(box) box.innerHTML=''; return; }
-  const hits=(window.PLAYERS||[]).filter(p=>((p.display_name||(`${p.first} ${p.last}`)||'').toLowerCase().includes(q))).slice(0,25);
-  if(box){ box.innerHTML=''; hits.forEach(p=>box.appendChild(makeHit(p))); }
-}
-document.addEventListener('input',(e)=>{ if(e.target && e.target.id==='playerSearch') debounce(liveSearch,120)(); });
-
-/* boot */
-(async ()=>{
-  try{
-    window.PLAYERS = await loadCSV(CSV_URL);
-    window.PLAYERS.sort(defaultSort);
-    renderCards(window.PLAYERS);
-  }catch(e){
-    console.error('CSV load failed', e);
-  }
-})();
-</script>
+  <!-- NAVIGATION -->
+  <div class="center-nav">
+    <a href="index.html">WHERE THEY YAT?</a>
+    <a href="alumni-news.html">ACTIVE ALUMNI NEWS</a>
+    <a href="all-time-alumni-list.html">ALL-TIME LIST</a>
+    <a href="nil-yat-a-boy-marketplace.html">MARKETPLACE</a>
+    <a href="current-team.html">CURRENT TEAM</a>
+    <a href="faq.html">FAQ’S</a>
+  </div>
 </body>
 </html>
