@@ -1,125 +1,111 @@
-<!-- cards.html (data + rendering engine) -->
+<!-- cards.html — pulls players from your published CSV and renders the grid -->
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+
 <style>
-  /* Card look */
+  /* Card visuals */
   .card{background:#000;border-radius:14px;overflow:hidden;position:relative;aspect-ratio:5/7;min-height:320px;box-shadow:0 8px 28px rgba(0,0,0,.35);user-select:none;cursor:pointer}
   .card img.bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:brightness(.9)}
   .grad{position:absolute;left:0;right:0;bottom:0;height:64%;background:linear-gradient(to top,rgba(0,0,0,.98),rgba(0,0,0,.05))}
   .front{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:flex-end;color:#fff;padding:12px}
   .chips{display:flex;gap:6px;margin-bottom:6px;flex-wrap:wrap}
-  .chip{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.25);border-radius:999px;padding:2px 8px;font:800 11px/1 "Oswald"}
+  .chip{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.25);border-radius:999px;padding:2px 8px;font:800 11px/1 "Oswald",sans-serif}
   .chip.neg{background:#111827;border-color:#1f2937}
-  .name{font:400 22px/1 "Bebas Neue";letter-spacing:.02em}
-  .team{font:400 13px/1.2 "Oswald";opacity:.95}
+  .name{font:400 22px/1 "Bebas Neue",sans-serif;letter-spacing:.02em}
+  .team{font:400 13px/1.2 "Oswald",sans-serif;opacity:.95}
   .right-badges{position:absolute;right:10px;bottom:10px;display:flex;flex-direction:column;gap:6px;align-items:flex-end}
-  .rb{background:rgba(0,0,0,.68);border:1px solid rgba(255,255,255,.2);color:#fff;border-radius:999px;padding:6px 10px;font:800 12px/1 "Oswald"}
-
+  .rb{background:rgba(0,0,0,.68);border:1px solid rgba(255,255,255,.2);color:#fff;border-radius:999px;padding:6px 10px;font:800 12px/1 "Oswald",sans-serif}
   .letters{display:flex;gap:6px;margin-top:8px}
-  .letter-dot{width:20px;height:20px;border-radius:50%;background:#fff;color:#111;display:grid;place-items:center;font:900 11px/1 "Oswald";border:1px solid rgba(0,0,0,.15)}
+  .letter-dot{width:20px;height:20px;border-radius:50%;background:#fff;color:#111;display:grid;place-items:center;font:900 11px/1 "Oswald",sans-serif;border:1px solid rgba(0,0,0,.15)}
 
-  /* Profile blocks (reused in profile page) */
+  /* Profile sections reused in profile.html */
   .profile{background:#0b0f16;border:1px solid #1f2937;border-radius:12px;padding:12px}
   .profile .grid{display:grid;grid-template-columns:1fr 210px;gap:12px}
   .profile .photo{border-radius:12px;overflow:hidden;background:#111}
   .profile .photo img{width:100%;height:auto;display:block}
   .kv12{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px}
   .kv{background:#0f172a;border:1px solid #1f2937;border-radius:10px;text-align:center;padding:10px}
-  .kv .k{font:400 12px/1 "Oswald";color:#9aa1ab}
-  .kv .v{font:800 14px/1 "Oswald";color:#fff}
+  .kv .k{font:400 12px/1 "Oswald",sans-serif;color:#9aa1ab}
+  .kv .v{font:800 14px/1 "Oswald",sans-serif;color:#fff}
   @media (max-width:640px){ .profile .grid{grid-template-columns:1fr} }
 </style>
 
 <script>
 (function(){
-  // ====== Google Sheet → gviz loader ======
-  const SHEET_ID = '1TA0IZU7Ch2OSIxOQZR4xCUyu0KhKKUwe_Pwg8knGwMU';
-  const GVIZ = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json`;
+  // ===== CSV endpoint you provided =====
+  const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSB4q8nvjYfftVeWKkFNz42uDDWSuDXikimMa-a25WQk_XX-imZbiUd8q5Cj94rjZJjaabw5DGMvJFd/pub?gid=82179728&single=true&output=csv";
 
-  async function fetchSheet(){
-    const res = await fetch(GVIZ,{cache:'no-cache'});
-    if(!res.ok) throw new Error(`Sheet fetch failed (${res.status})`);
-    const text = await res.text();
-    const json = JSON.parse(text.slice(text.indexOf('{'), text.lastIndexOf('}')+1));
-    const cols = json.table.cols.map(c=> (c.label||c.id||'').toString().trim());
-    const rows = json.table.rows.map(r=> r.c.map(c=> c?.v ?? ''));
-    const firstRowIsHeader = rows.length && rows[0].every(v => typeof v === 'string' && v && v.length < 60);
-    const headers = firstRowIsHeader ? rows.shift().map(String) : cols;
-    return rows.map(r => Object.fromEntries(r.map((v,i)=>[headers[i]||`col${i}`, v])));
+  // ===== Utilities =====
+  const LEVEL_RANK = { 'MLB':12,'TRIPLE-A':11,'DOUBLE-A':10,'HIGH-A':9,'LOW-A':8,'ROOKIE':7,'INDY':6,'INTERNATIONAL':5,'NCAA-D1':4,'NCAA-D2':3,'NCAA-D3':2,'NAIA':1,'JUCO':0 };
+  const statusGroup = s=>{
+    s=String(s||'').toUpperCase();
+    if(s.includes('ACTIVE 2025')) return 1;
+    if(s.includes('FREE AGENT'))  return 2;
+    if(s.includes('INJURED'))     return 3;
+    if(s.includes('ACTIVE 2024')) return 4;
+    if(s.includes('RETIRED'))     return 9;
+    if(s.includes('SPONSOR'))     return 9;
+    return 8;
+  };
+  const lastName = n => {
+    n=String(n||'').trim();
+    const parts=n.split(/\s+/); 
+    return parts[parts.length-1]||n;
+  };
+
+  function normLevel(v){
+    v=String(v||'').toUpperCase().trim();
+    return v.replace('AAA','TRIPLE-A').replace(/\bAA\b/,'DOUBLE-A');
   }
 
-  // ====== Mapping helpers (support flexible headers) ======
-  const normKey = s => String(s||'').toLowerCase().trim()
-    .replace(/\s+/g,'_').replace(/[^\w_]+/g,'');
-  const alias = (obj, names) => { for(const n of names){ const k=normKey(n); for(const key in obj){ if(normKey(key)===k) return obj[key]; } } return undefined; };
+  function parseYears(s){
+    return String(s||'')
+      .split(/[,\|]/)
+      .map(x=>parseInt(x.trim(),10))
+      .filter(n=>!isNaN(n));
+  }
 
   function mapRow(r){
-    const name = alias(r,['display_name','name','player','full_name']) || '';
-    const id = alias(r,['id','player_id','slug','tbc_id']) || name.toLowerCase().replace(/\s+/g,'-');
-    const grad = alias(r,['grad_class','class_of','grad','graduating_class']);
-    const level = alias(r,['level','current_level']);
-    const status = alias(r,['status']);
-    const frontImg = alias(r,['front_image_url','front_img','image','img']);
-    const hsImg = alias(r,['hs_image_url','hs_img','highschool_img','profile_img']);
-    const letters = (alias(r,['letter_years','roster_years','letters_won']) || '').toString();
-    const nextDate = alias(r,['next_game_date','next_date']);
-    const nextOpp  = alias(r,['next_game_opponent','next_opp']);
-    const last1 = alias(r,['last3_1','last_1','g1']);
-    const last2 = alias(r,['last3_2','last_2','g2']);
-    const last3 = alias(r,['last3_3','last_3','g3']);
-
-    const parseYears = (s)=> String(s||'').split(/[,\|]/).map(x=>parseInt(x.trim(),10)).filter(n=>!isNaN(n));
-    const letterWinnerYears = parseYears(letters);
-
-    // basic batting/pitching autodetect (optional)
-    const batting = (r.AVG||r.avg||r.obp||r.slg||r.ops)?{
-      avg:r.AVG||r.avg, obp:r.obp, slg:r.slg, ops:r.ops, hits:r.h||r.hits, runs:r.r||r.runs, hr:r.hr, rbi:r.rbi, doubles:r.doubles, triples:r.triples, sb:r.sb, bb:r.bb
-    }:undefined;
-    const pitching = (!batting && (r.era||r.whip||r.so||r.ip))?{
-      era:r.era, whip:r.whip, so:r.so, ip:r.ip, oba:r.oba, kbb:r.kbb, fip:r.fip, er:r.er, hr:r.hr, qs:r.qs, w:r.w, sv:r.sv
-    }:undefined;
-
-    const mk3=(s)=>{ if(!s) return null;
-      const parts=String(s).split(/\s*[-–—]\s*|,\s*/).filter(Boolean);
-      let date=parts[0]||'',opp=parts[1]||'',line=parts.slice(2).join(', ');
-      if(!line&&parts.length===3) line=parts[2];
-      return {date:date||'—',opp:opp||'—',line:line||'—'};
+    const p = {
+      id:        String(r.tbc_id || r.id || r.slug || '').trim(),
+      slug:      String(r.slug || '').trim(),
+      name:      String(r.display_name || r.name || '').toUpperCase().trim(),
+      first:     String(r.first || '').trim(),
+      last:      String(r.last || '').trim(),
+      graduatingClass: r.grad_class ? String(r.grad_class).trim() : '',
+      status:    String(r.status || '').toUpperCase().trim(),
+      currentLevel: normLevel(r.level),
+      team:      String(r.team || '').trim(),
+      org:       r.org || '',
+      parentLeague: r.parent_league || '',
+      cityState: r.city_state || '',
+      position:  r.position || '',
+      bats:      r.bats || '',
+      throws:    r.throws || '',
+      height:    r.height || '',
+      weight:    r.weight || '',
+      frontImg:  r.front_img || '',
+      highSchoolImg: r.hs_img || r.mini_img || r.hero_img || '',
+      letterWinnerYears: parseYears(r.letter_years || r.roster_years)
     };
 
-    return {
-      id:String(id),
-      name:String(name).toUpperCase(),
-      graduatingClass: grad,
-      currentLevel: String(level||'').toUpperCase().replace('AAA','TRIPLE-A').replace('AA','DOUBLE-A'),
-      status: String(status||'').toUpperCase(),
-      position: r.position || '',
-      team: r.team || r.org_team || '',
-      frontImg, highSchoolImg: hsImg,
-      batting, pitching,
-      letterWinnerYears,
-      nextGame: (nextDate||nextOpp) ? {date:nextDate, opponent:nextOpp} : undefined,
-      last3:[last1,last2,last3].map(mk3).filter(Boolean)
-    };
+    // ignore rows without an id or name
+    if(!p.id || !p.name) return null;
+    return p;
   }
 
-  // ====== Rendering ======
+  // ===== Rendering =====
   function letterDots(years){
-    if(!years||!years.length) return '';
+    if(!years || !years.length) return '';
     const sorted=[...years].sort((a,b)=>b-a).slice(0,4);
     return `<div class="letters">${sorted.map(y=>`<span class="letter-dot" title="${y}">${String(y).slice(-2)}</span>`).join('')}</div>`;
   }
 
   function makeCard(p){
-    const img=p.frontImg||'https://images.unsplash.com/photo-1518600506278-4e8ef466b810?q=80&w=1200&auto=format&fit=crop';
+    const img=p.frontImg || 'https://images.unsplash.com/photo-1518600506278-4e8ef466b810?q=80&w=1200&auto=format&fit=crop';
     const chips=[];
     if(p.currentLevel) chips.push(`<span class="chip">${p.currentLevel}</span>`);
     if(p.status)       chips.push(`<span class="chip neg">${p.status}</span>`);
-    const right=[];
-    if(p.nextGame?.date||p.nextGame?.opponent){
-      right.push('<div class="rb">NEXT GAME</div>');
-      const t=p.nextGame.date?`${p.nextGame.date}`:'';
-      if(t) right.push(`<div class="rb">${t}</div>`);
-      if(p.nextGame.opponent) right.push(`<div class="rb">${p.nextGame.opponent}</div>`);
-    }
-    if(p.last3?.length) right.push('<div class="rb">LAST 3 GAMES</div>');
 
     const node=document.createElement('article');
     node.className='card';
@@ -132,127 +118,77 @@
         <div class="name">${p.name}</div>
         <div class="team">${p.team||''}</div>
         ${letterDots(p.letterWinnerYears)}
-      </div>
-      <div class="right-badges">${right.join('')}</div>`;
-    node.addEventListener('click',()=>location.href=`profile.html?id=${encodeURIComponent(p.id)}`);
+      </div>`;
+    node.addEventListener('click',()=>location.href=\`profile.html?id=\${encodeURIComponent(p.id)}\`);
     node.addEventListener('keyup',e=>{if(e.key==='Enter'||e.key===' ')node.click();});
     return node;
   }
 
   function renderCards(root,list){
-    root = root || document.getElementById('grid');
     if(!root) return;
     root.innerHTML='';
-    if(!list.length){ root.innerHTML='<p style="color:#e11d48">No players found.</p>'; return; }
+    if(!list.length){
+      root.innerHTML = '<p style="color:#e11d48">No players found.</p>';
+      return;
+    }
     list.forEach(p=>root.appendChild(makeCard(p)));
   }
 
-  // small helper for profile page
-  function makeKV(k,v){ return `<div class="kv"><div class="k">${k}</div><div class="v">${v??'—'}</div></div>`; }
-  function renderProfile(root,p){
-    const img=p.highSchoolImg||p.frontImg;
-    const stat12 = p.batting ? `
-      ${makeKV('AVG',p.batting.avg)} ${makeKV('OBP',p.batting.obp)} ${makeKV('SLG',p.batting.slg)} ${makeKV('OPS',p.batting.ops)}
-      ${makeKV('H',p.batting.hits||'—')} ${makeKV('R',p.batting.runs||'—')} ${makeKV('HR',p.batting.hr||'—')} ${makeKV('RBI',p.batting.rbi||'—')}
-      ${makeKV('2B',p.batting.doubles||'—')} ${makeKV('3B',p.batting.triples||'—')} ${makeKV('SB',p.batting.sb||'—')} ${makeKV('BB',p.batting.bb||'—')}
-    ` : `
-      ${makeKV('ERA',p.pitching?.era)} ${makeKV('WHIP',p.pitching?.whip)} ${makeKV('SO',p.pitching?.so)} ${makeKV('IP',p.pitching?.ip)}
-      ${makeKV('OBA',p.pitching?.oba||'—')} ${makeKV('K/BB',p.pitching?.kbb||'—')} ${makeKV('FIP',p.pitching?.fip||'—')} ${makeKV('W',p.pitching?.w||'—')}
-      ${makeKV('ER',p.pitching?.er||'—')} ${makeKV('HR',p.pitching?.hr||'—')} ${makeKV('QS',p.pitching?.qs||'—')} ${makeKV('SV',p.pitching?.sv||'—')}
-    `;
-    root.innerHTML=`
-      <section class="profile">
-        <div class="grid">
-          <div>
-            <div class="photo"><img src="${img}" alt="${p.name}"></div>
-            <div class="kv12">${stat12}</div>
-          </div>
-          <div>
-            <div class="kv">${makeKV('LEVEL',p.currentLevel||'—')}</div>
-            <div class="kv" style="margin-top:8px">${makeKV('TEAM',p.team||'—')}</div>
-            <div class="kv" style="margin-top:8px">${makeKV('STATUS',p.status||'—')}</div>
-          </div>
-        </div>
-      </section>`;
-  }
-
-  // ====== Sorting per your default rules ======
-  const LEVEL_RANK = { 'MLB':12,'TRIPLE-A':11,'DOUBLE-A':10,'HIGH-A':9,'LOW-A':8,'ROOKIE':7,'INDY':6,'INTERNATIONAL':5,'NCAA-D1':4,'NCAA-D2':3,'NCAA-D3':2,'NAIA':1,'JUCO':0 };
-  function statusGroup(s){
-    s=String(s||'').toUpperCase();
-    if(s.includes('ACTIVE 2025')) return 1;
-    if(s.includes('FREE AGENT'))  return 2;
-    if(s.includes('INJURED'))     return 3;
-    if(s.includes('ACTIVE 2024')) return 4;
-    if(s.includes('RETIRED'))     return 9;
-    if(s.includes('SPONSOR'))     return 9;
-    return 8; // other/unknown
-  }
-  function lastName(n){ n=String(n||'').trim(); const parts=n.split(/\s+/); return parts[parts.length-1]||n; }
-
   function sortPlayersDefault(arr){
     return [...arr].sort((a,b)=>{
-      const g = statusGroup(a.status)-statusGroup(b.status);
+      const g = statusGroup(a.status) - statusGroup(b.status);
       if(g!==0) return g;
       const gc = (+a.graduatingClass||9999) - (+b.graduatingClass||9999);
       if(gc!==0) return gc;
       const lr = (LEVEL_RANK[a.currentLevel]??-1) - (LEVEL_RANK[b.currentLevel]??-1);
       if(lr!==0) return -lr; // higher first
       const la = (a.letterWinnerYears?.length||0) - (b.letterWinnerYears?.length||0);
-      if(la!==0) return -la; // more years first
+      if(la!==0) return -la; // more varsity years first
       return lastName(a.name).localeCompare(lastName(b.name));
     });
   }
 
-  function playersDefaultView(players){
-    // default excludes RETIRED + SPONSOR unless filtered explicitly
-    const include = p => !/RETIRED|SPONSOR/i.test(String(p.status||''));
-    return sortPlayersDefault(players.filter(include));
+  function defaultView(players){
+    return sortPlayersDefault(players.filter(p=>!(/RETIRED|SPONSOR/i.test(p.status||''))));
   }
 
-  // ====== Filter helpers (multi-select) ======
-  function applyFilters({name='', levels=[], gradYears=[], rosterYears=[], statuses=[]}={}, players){
-    let list=[...players];
-    const contains=(v,arr)=>arr.length?arr.includes(v):true;
-    const any=(arr,a)=>a.length?arr.some(x=>a.includes(String(x))):true;
-
-    if(name){ const q=name.toLowerCase(); list=list.filter(p=>(p.name||'').toLowerCase().includes(q)); }
-    if(levels.length){ list=list.filter(p=> contains((p.currentLevel||'').toUpperCase(), levels)); }
-    if(gradYears.length){ list=list.filter(p=> contains(String(p.graduatingClass), gradYears)); }
-    if(rosterYears.length){ list=list.filter(p=> any((p.letterWinnerYears||[]).map(String), rosterYears)); }
-    if(statuses.length){ list=list.filter(p=> contains(String(p.status||'').toUpperCase(), statuses)); }
-
-    return sortPlayersDefault(list);
-  }
-
-  // ====== Boot ======
-  let players=[];
-  document.addEventListener('DOMContentLoaded', async ()=>{
+  // ===== Boot (fetch CSV, map, render) =====
+  document.addEventListener('DOMContentLoaded', ()=>{
     const grid=document.getElementById('grid');
-    try{
-      const raw=await fetchSheet();
-      players=raw.map(mapRow).filter(p=>p.id && p.name);
-      window.YAT = Object.assign(window.YAT||{}, {
-        players,
-        renderCards,
-        renderProfile,
-        sortPlayersDefault,
-        playersDefaultView: ()=>playersDefaultView(players),
-        applyFilters: (f)=>renderCards(grid, applyFilters(f, players)),
-        resetAll: ()=>renderCards(grid, playersDefaultView(players))
-      });
-      // initial paint
-      if(grid) renderCards(grid, playersDefaultView(players));
-      document.dispatchEvent(new CustomEvent('yat:players-ready'));
-    }catch(err){
-      console.error(err);
-      if(grid){
-        grid.innerHTML=`<div style="background:#111;border:1px solid #2a3346;padding:14px;border-radius:12px">
-          <div style="color:#e11d48;font-weight:800;margin-bottom:6px">Couldn’t load players</div>
-          <div style="color:#cbd5e1">Share the Google Sheet as <b>Anyone with the link → Viewer</b> and refresh.</div>
-        </div>`;
+
+    Papa.parse(CSV_URL, {
+      download: true,
+      header: true,
+      skipEmptyLines: true,
+      complete: (res)=>{
+        let rows = Array.isArray(res.data) ? res.data : [];
+        let players = rows.map(mapRow).filter(Boolean);
+
+        // Expose API
+        window.YAT = Object.assign(window.YAT||{}, {
+          players,
+          renderCards,
+          sortPlayersDefault,
+          playersDefaultView: ()=>defaultView(players),
+          resetAll: ()=>renderCards(grid, defaultView(players))
+        });
+
+        // Initial paint
+        if(grid) renderCards(grid, defaultView(players));
+
+        // Notify other parts (e.g., splash)
+        document.dispatchEvent(new CustomEvent('yat:players-ready'));
+      },
+      error: (err)=>{
+        console.error('CSV parse error', err);
+        if(grid){
+          grid.innerHTML=`<div style="background:#111;border:1px solid #2a3346;padding:14px;border-radius:12px">
+            <div style="color:#e11d48;font-weight:800;margin-bottom:6px">Couldn’t load players</div>
+            <div style="color:#cbd5e1">CSV endpoint unreachable. Check publishing settings and try again.</div>
+          </div>`;
+        }
       }
-    }
+    });
   });
 })();
 </script>
