@@ -5,46 +5,45 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
   <title>YAT?STATS — WHERE THEY YAT?</title>
 
-  <!-- Fonts -->
+  <!-- Fonts + Papa (so cards can parse CSV when we hook it up) -->
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@300;400;600&display=swap" rel="stylesheet">
-  <!-- PapaParse (global for CSV cards) -->
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
 
   <style>
-    :root{ --bg:#000; --fg:#fff; --muted:#8e96a0; --topH:44px; --crumbH:16px; --edge:10px; }
-    [data-theme="light"]{ --bg:#fff; --fg:#000; --muted:#60656c; }
-    html,body{margin:0;background:var(--bg);color:var(--fg);font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial}
+    :root{
+      --bg:#000; --fg:#fff; --muted:#9aa1ab; --hair:#1f2530;
+      --edge: clamp(12px, 2vw, 24px);
+      --topH: 50px;      /* match header top row */
+      --crumbH: 18px;    /* smaller breadcrumbs, all caps */
+    }
+    [data-theme="light"]{ --bg:#fff; --fg:#000; --muted:#6b7280; --hair:#d1d5db; }
 
+    html,body{margin:0;background:var(--bg);color:var(--fg);font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial}
     #headerMount{position:relative;z-index:60}
 
-    /* HERO — match top row height; no lines/boxes */
-    .hero{position:sticky;top:calc(var(--topH) + 58px);z-index:50;background:var(--bg)}
-    .hero-inner{display:grid;grid-template-columns:1fr auto;align-items:center;gap:8px;height:var(--topH);padding:0 var(--edge)}
+    /* HERO (separate from header) */
+    .hero{position:sticky;top:calc(var(--topH) + 74px);z-index:50;background:var(--bg);border-bottom:1px solid var(--hair)}
+    .hero-inner{display:grid;grid-template-columns:1fr auto;align-items:center;gap:12px;height:var(--topH);padding:0 var(--edge)}
     .pair{display:inline-flex;align-items:baseline;white-space:nowrap}
-    .pair + .pair{margin-left:12px}
-    .slim{font:400 12px/1 "Oswald",sans-serif;color:var(--muted);margin-right:0;letter-spacing:0}
-    .strong{font:400 15px/1 "Bebas Neue",sans-serif;color:var(--fg);margin:0}
+    .pair + .pair{margin-left: clamp(12px, 1.6vw, 24px);}
+    .slim{font:400 clamp(12px,1.3vw,13px)/1 "Oswald",sans-serif;color:var(--muted)}
+    .strong{font:400 clamp(15px,1.6vw,16px)/1 "Bebas Neue",sans-serif;color:var(--fg);margin-left:0}
     .pair .strong{transform:translateY(.5px)}
 
     .actions{display:flex;align-items:center;gap:10px}
-    .hbtn{width:26px;height:26px;border:0;background:transparent;color:var(--fg);display:grid;place-items:center;cursor:pointer}
+    .hbtn{width:28px;height:28px;border-radius:8px;border:0;background:transparent;color:var(--fg);display:grid;place-items:center;cursor:pointer}
+    .hbtn:hover{opacity:.9}
     .hbtn svg{width:16px;height:16px}
 
     .crumbs{height:var(--crumbH);display:flex;align-items:center;padding:0 var(--edge);color:var(--muted);
-      font:700 9px/1 "Oswald",sans-serif;letter-spacing:.1em;text-transform:uppercase}
+      font:700 10px/1 "Oswald",sans-serif;letter-spacing:.08em;text-transform:uppercase}
 
-    /* micro scale to avoid wraps */
-    @media (max-width:380px){ .slim{font-size:11px} .strong{font-size:14px} .pair + .pair{margin-left:10px} }
-    @media (max-width:340px){ .slim{font-size:10px} .strong{font-size:13px} .pair + .pair{margin-left:8px} }
-
-    /* Grid */
-    .wrap{padding:10px var(--edge) 36px}
-    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
+    .wrap{padding:12px var(--edge) 40px}
+    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
   </style>
 </head>
 <body>
-
-  <!-- Header -->
+  <!-- Header mount -->
   <div id="headerMount"></div>
 
   <!-- HERO -->
@@ -66,7 +65,7 @@
         </button>
       </div>
     </div>
-    <!-- HYBRID breadcrumbs -->
+    <!-- HYBRID breadcrumbs: Splash = HOME, section named -->
     <div class="crumbs" id="breadcrumbs">HOME ▸ WHERE THEY YAT?</div>
   </section>
 
@@ -80,6 +79,7 @@
       const html = await fetch(url, {cache:'no-cache'}).then(r=>r.text());
       const mount = document.querySelector(mountSelector);
       mount.innerHTML = html;
+      // execute inline scripts from the partial
       mount.querySelectorAll('script').forEach(old=>{
         const s=document.createElement('script');
         if(old.type) s.type=old.type;
@@ -90,14 +90,15 @@
     }
 
     (async function(){
+      // 1) Header
       await mountPartial('header.html','#headerMount');
 
-      // Load cards engine (unchanged logic)
+      // 2) Cards engine (unchanged for this pass)
       const tmp = document.createElement('div'); document.body.appendChild(tmp);
       tmp.innerHTML = await fetch('cards.html',{cache:'no-cache'}).then(r=>r.text());
       tmp.querySelectorAll('script').forEach(old=>{ const s=document.createElement('script'); s.textContent=old.textContent; document.body.appendChild(s); old.remove(); });
 
-      // Wire hero buttons
+      // 3) Wire hero buttons to header APIs
       const q=id=>document.getElementById(id);
       q('heroSearch')?.addEventListener('click', ()=> window.YAT?.openLeft?.());
       q('heroFilter')?.addEventListener('click', ()=> window.YAT?.openFilters?.());
