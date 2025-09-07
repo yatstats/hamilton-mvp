@@ -1,4 +1,4 @@
-<!-- YATSTATS • Hamilton • build 5.0.22 -->
+<!-- YATSTATS • Hamilton • build 5.0.27 -->
 <!doctype html>
 <html lang="en">
 <head>
@@ -126,7 +126,7 @@ details[open] > .filter-title::after { transform: rotate(90deg); }
 .success { color: #86efac; }
 .main{padding:8px 0 calc(var(--footerH) + 12px)}
 .grid{display:grid;gap:14px; grid-template-columns:repeat(auto-fill, minmax(280px, 1fr));}
-.card{position:relative;background:#171717;border-radius:16px;overflow:hidden}
+.card{position:relative;background:#171717;border-radius:0;overflow:hidden}
 .card::before{content:"";display:block;padding-top:140%}
 .card-inner{position:absolute;inset:0;perspective:1200px}
 .flip{position:absolute;inset:0;transform-style:preserve-3d;transition:transform .6s cubic-bezier(.2,.7,.2,1)}
@@ -230,7 +230,7 @@ details[open] > .filter-title::after { transform: rotate(90deg); }
 <!-- Drawers -->
 <div class="drawer-mask"></div>
 <aside class="drawer" id="drawerLeft" aria-label="Left drawer">
-    <button class="icon-btn close-btn" onclick="closeDrawers()"><i class="ri-close-line"></i></button>
+    <button class="icon-btn close-btn"><i class="ri-close-line"></i></button>
     <div class="drawer-content">
         <h3>PLAYER PROFILE SEARCH</h3>
         <div class="pad">
@@ -251,7 +251,7 @@ details[open] > .filter-title::after { transform: rotate(90deg); }
 </aside>
 
 <aside class="drawer drawer-right" id="drawerFilters" style="display: flex;">
-    <button class="icon-btn close-btn" onclick="closeDrawers()"><i class="ri-close-line"></i></button>
+    <button class="icon-btn close-btn"><i class="ri-close-line"></i></button>
     <h3>FILTERS</h3>
     <div class="drawer-content" id="filters">
         <details class="filter-group" open>
@@ -294,7 +294,7 @@ details[open] > .filter-title::after { transform: rotate(90deg); }
 </aside>
 
 <aside class="drawer drawer-right" id="drawerAccount" style="display: none;">
-     <button class="icon-btn close-btn" onclick="closeDrawers()"><i class="ri-close-line"></i></button>
+     <button class="icon-btn close-btn"><i class="ri-close-line"></i></button>
     <h3>ACCOUNT</h3>
     <div class="drawer-content">
         <div class="auth-tabs">
@@ -332,7 +332,7 @@ details[open] > .filter-title::after { transform: rotate(90deg); }
 </footer>
 
 <script type="module">
-/* ---- YATSTATS • Hamilton • build 5.0.21 ---- */
+/* ---- YATSTATS • Hamilton • build 5.0.26 ---- */
 
 const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQcWJM6Q6hTdFnES_G5LUy4teCS-sJ5HdAc9F5HSY8DGE9egdGy8yUAe2ShT3tFm-CwUuCYeAYy_YiW/pub?gid=2028135390&single=true&output=csv";
 const $ = s => document.querySelector(s), $$ = s => Array.from(document.querySelectorAll(s));
@@ -350,6 +350,7 @@ async function loadCSV(url){
   return rows.map(r=> {
     const player = {
       slug:r[idx('slug')], display_name:r[idx('display_name')],
+      first:r[idx('first')], last:r[idx('last')],
       grad_class:r[idx('grad_class')], letter_years:r[idx('letter_years')], status:r[idx('status')], level:r[idx('level')], 
       team:r[idx('team')], org:r[idx('org')], position:r[idx('position')],
       next_game_opponent: r[idx('next_game_opponent')],
@@ -376,10 +377,19 @@ function populateFilters(players) {
     rosterYearContainer.innerHTML = '<label class="select-all-label"><input type="checkbox" class="select-all"> Select All</label>' + rosterYears.map(year => `<label><input type="checkbox" value="${year}"> ${year}</label>`).join('');
 }
 
+function imageNameOf(p) {
+    const first = (p.first || '').toLowerCase();
+    const last = (p.last || '').toLowerCase();
+    return (first && last) ? `${first}_${last}` : slugOf(p);
+}
+
 function cardHTML(p){
   const name = p.display_name || 'Player Name';
-  const slug = slugOf(p);
-  const bg_now = `assets/img/now-players/${slug}-now.jpg`;
+  const imageName = imageNameOf(p);
+  const bg_now_jpg = `assets/img/now_players/${imageName}.jpg`;
+  const bg_now_png = `assets/img/now_players/${imageName}.png`;
+  const bg_hs_jpg = `assets/img/hs_players/${imageName}.jpg`;
+  const bg_hs_png = `assets/img/hs_players/${imageName}.png`;
   const klass = p.grad_class || '';
   const org = p.org ? `• ${p.org}` : '';
   const playerInfo = JSON.stringify(p).replace(/'/g, "&apos;");
@@ -389,7 +399,7 @@ function cardHTML(p){
     <div class="card-inner">
       <div class="flip">
         <div class="face front">
-          <div class="bg" style="background-image:url('${bg_now}')" onerror="this.style.backgroundImage='url(assets/img/placeholder.jpg)'"></div>
+          <div class="bg" style="background-image:url('${bg_now_jpg}')" onerror="this.onerror=null; this.style.backgroundImage='url(${bg_now_png})'"></div>
           <div class="shade"></div>
           <div class="front-bottom-content">
             <div class="front-top-info">
@@ -419,7 +429,7 @@ function cardHTML(p){
                     <div class="back-header-name">${name}</div>
                     <div class="back-header-class">CLASS OF ${klass}</div>
                 </div>
-                <img src="${bg_now}" class="back-header-thumb" alt="${name}" onerror="this.src='assets/img/placeholder.jpg'">
+                <img src="${bg_hs_jpg}" class="back-header-thumb" alt="${name}" onerror="this.onerror=null; this.src='${bg_hs_png}'">
             </div>
             <div class="fun-zone">${generateStatsGridHTML(p)}</div>
             <nav class="back-nav">
@@ -482,6 +492,7 @@ function setupEventListeners() {
         document.body.classList.add('drawer-right-open', 'drawer-open');
     });
     
+    $$('.close-btn').forEach(btn => btn.addEventListener('click', closeDrawers));
     $('.drawer-mask')?.addEventListener('click', closeDrawers);
     $('#filtersReset')?.addEventListener('click', resetFilters);
     $('#filtersReset2')?.addEventListener('click', resetFilters);
@@ -517,7 +528,7 @@ function slugOf(p){
   if(s) return s;
   return (p.display_name||'').trim().toLowerCase().replace(/[^a-z0-9]+/g,'-');
 }
-function profileURL(p) { return `profile.html?player=${slugOf(p)}`; }
+function profileURL(p) { return `./profile.html?player=${slugOf(p)}`; }
 
 function applyFilters(){
   if(!window.PLAYERS) return;
@@ -554,12 +565,13 @@ function resetFilters(){
 
 function makeHit(p){
   const el=document.createElement('div'); el.className='live-hit';
-  const slug=slugOf(p);
-  const hsImg=`assets/img/hs-players/${slug}-hs.jpg`;
-  el.innerHTML=`<img src="${hsImg}" onerror="this.src='assets/img/placeholder.jpg';">
+  const imageName = imageNameOf(p);
+  const hsImgJpg=`assets/img/hs_players/${imageName}.jpg`;
+  const hsImgPng=`assets/img/hs_players/${imageName}.png`;
+  el.innerHTML=`<img src="${hsImgJpg}" onerror="this.onerror=null;this.src='${hsImgPng}';">
                 <div><div style="font-weight:700">${p.display_name}</div>
                 <div style="opacity:.7;font-size:.92em">${p.level||''} • Class of ${p.grad_class||''}</div></div>`;
-  el.onclick=()=>location.href=profileURL(p);
+  el.onclick=()=>window.location.href=profileURL(p);
   return el;
 }
 function liveSearch(){
@@ -571,20 +583,46 @@ function liveSearch(){
 }
 
 async function handleFunZone(button) {
-    const card = button.closest('.card');
+    const card = button.closest('.card') || document.body;
     const funZone = card.querySelector('.fun-zone');
     const player = JSON.parse(card.dataset.playerInfo || '{}');
     const content = button.dataset.content;
     card.querySelectorAll('.back-nav-link').forEach(btn => btn.classList.remove('active'));
     button.classList.add('active');
     funZone.innerHTML = '<p>Loading...</p>';
-    if (content === 'stats') funZone.innerHTML = generateStatsGridHTML(player);
-    else if (content === 'bio') funZone.innerHTML = `<p><strong>Position:</strong> ${player.position||'—'}</p><p>A brief bio for ${player.display_name} will appear here.</p>`;
-    else if (content === 'news') funZone.innerHTML = `<p>News for ${player.display_name} coming soon.</p>`;
-    else if (content === 'social') funZone.innerHTML = `<p>Social feed for ${player.display_name} coming soon.</p>`;
-    else if (content === 'nil') funZone.innerHTML = `<p>NIL Score for ${player.display_name} coming soon.</p>`;
-    else if (content === 'video') funZone.innerHTML = `<iframe width="100%" height="215" src="https://www.youtube.com/embed/ZSoRzk-z35w" title="YouTube video player" frameborder="0" allowfullscreen style="border-radius: 8px;"></iframe>`;
-    else if (content === 'pics') funZone.innerHTML = `<p>Fan Pics for ${player.display_name} coming soon.</p>`;
+    
+    const { generateGeminiText } = window.gemini;
+
+    if (content === 'stats') {
+        funZone.innerHTML = generateStatsGridHTML(player);
+    } else if (content === 'bio') {
+        const prompt = `Act as an optimistic but knowledgeable high school baseball scout. Write a brief, 2-3 sentence scouting report for ${player.display_name}. Highlight his journey and potential future in a positive, "Yat-A-Boy!" style.`;
+        funZone.innerHTML = await generateGeminiText(prompt);
+    } else if (content === 'news') {
+        const prompt = `Generate 2-3 recent, realistic, and positive sports news headlines for baseball player ${player.display_name}.`;
+        const newsText = await generateGeminiText(prompt);
+        funZone.innerHTML = newsText.split('\n').map(line => {
+            if (!line.trim() || line.startsWith('*')) return '';
+            const parts = line.split(' - ');
+            return `<div class="news-item"><div class="news-headline">${parts[0].replace(/^\d\.\s/, '')}</div><div class="news-source">${parts[1] || 'YatStats Network'}</div></div>`
+        }).join('');
+    } else if (content === 'social') {
+        let socialHTML = '<div class="social-links">';
+        if (player.x_handle) socialHTML += `<a href="https://x.com/${player.x_handle}" target="_blank">X / Twitter</a>`;
+        if (player.ig_handle) socialHTML += `<a href="https://instagram.com/${player.ig_handle}" target="_blank">Instagram</a>`;
+        if (!player.x_handle && !player.ig_handle) socialHTML += 'No social media links available.';
+        socialHTML += '</div>';
+        const prompt = `Generate a realistic, short, and positive X/Twitter post from a baseball player like ${player.display_name} about an upcoming game or recent performance. Include a relevant hashtag like #YatABoy${player.display_name.split(' ').join('')}.`;
+        const postText = await generateGeminiText(prompt);
+        socialHTML += `<div class="social-post"><p><strong>Latest Post (Sample):</strong></p><p>"${postText}"</p></div>`;
+        funZone.innerHTML = socialHTML;
+    } else if (content === 'nil') {
+        funZone.innerHTML = `<p>NIL Score for ${player.display_name} coming soon.</p>`;
+    } else if (content === 'video') {
+        funZone.innerHTML = `<iframe width="100%" height="215" src="https://www.youtube.com/embed/ZSoRzk-z35w" title="YouTube video player" frameborder="0" allowfullscreen style="border-radius: 8px;"></iframe>`;
+    } else if (content === 'pics') {
+        funZone.innerHTML = `<p>Fan Pics for ${player.display_name} coming soon.</p>`;
+    }
 }
 
 /* --- FIREBASE AUTHENTICATION --- */
@@ -633,6 +671,24 @@ function setupAuth() {
         });
     });
 }
+
+/* --- GEMINI API --- */
+window.gemini = {
+    async generateGeminiText(prompt) {
+        const apiKey = ""; 
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${apiKey}`;
+        const payload = { contents: [{ parts: [{ text: prompt }] }] };
+        try {
+            const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+            if (!response.ok) { return `Error: The AI service failed to respond.`; }
+            const result = await response.json();
+            return result.candidates?.[0]?.content?.parts?.[0]?.text || "No response from AI.";
+        } catch (error) {
+            console.error('Gemini API call failed:', error);
+            return 'AI service is currently unavailable.';
+        }
+    }
+};
 
 
 /* --- BOOTSTRAP --- */
