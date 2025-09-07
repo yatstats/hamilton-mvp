@@ -1,4 +1,4 @@
-<!-- YATSTATS • Hamilton • build 5.0.4 -->
+<!-- YATSTATS • Hamilton • build 5.0.22 -->
 <!doctype html>
 <html lang="en">
 <head>
@@ -7,7 +7,36 @@
 <title>Where They YAT? • Hamilton YATSTATS</title>
 <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400&family=Bebas+Neue&display=swap" rel="stylesheet">
+
+<!-- Firebase SDKs -->
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, signInWithCustomToken, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    
+    window.firebaseAuth = { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, signInWithCustomToken, signInAnonymously };
+
+    try {
+        const firebaseConfig = JSON.parse(window.__firebase_config || '{}');
+        const app = initializeApp(firebaseConfig);
+        window.auth = getAuth(app);
+        
+        onAuthStateChanged(window.auth, user => {
+            const event = new CustomEvent('authStateChanged', { detail: { user } });
+            document.dispatchEvent(event);
+        });
+
+        if (window.__initial_auth_token) {
+            await signInWithCustomToken(window.auth, window.__initial_auth_token);
+        } else {
+            await signInAnonymously(window.auth);
+        }
+    } catch (e) {
+        console.error("Firebase initialization error:", e);
+    }
+</script>
+
 <style>
+/* All CSS is now embedded in this file */
 :root{
   --bg:#0c0c0c; --fg:#f2f2f2; --muted:#c4c4c4; --ink:#e8e8e8; --line:rgba(255,255,255,0.08);
   --hamSmall:13px; --hamBig:20px; --hamBigger:24px; --tagGrey:#cfd2d6;
@@ -17,26 +46,17 @@
   --footerH: clamp(56px, 8vh, 77px);
 }
 @font-face{ font-family:'Indigo'; src:url('assets/fonts/Indigo.otf') format('opentype'); font-weight:400; font-style:normal; font-display:swap; }
-
 *{box-sizing:border-box} html,body{margin:0}
 body{background:var(--bg);color:var(--fg);font-family:Oswald,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
+body.drawer-open { overflow: hidden; }
 a{color:inherit;text-decoration:none}
 .container{max-width:1280px;margin:0 auto;padding:0 var(--containerPad)}
 @media (max-width:520px){ .container{padding:0 12px} }
-
-/* HEADER */
-.sticky-header-container {
-  position: sticky;
-  top: 0;
-  z-index: 50;
-  background: #000;
-}
-.header{/* position:sticky removed */}
+.header{position:sticky;top:0;z-index:50;background:#000}
 .topbar{display:flex;align-items:center;justify-content:space-between;padding:8px 0}
 .left-icons{display:flex;align-items:center;gap:8px}
 .icon-btn{background:none;border:none;color:var(--fg);opacity:.92;display:inline-flex;align-items:center;justify-content:center;padding:0;margin:0 2px; cursor: pointer;}
 .icon-btn i{font-size:20px}
-
 .topnav{display:flex;gap:18px;align-items:center}
 .nav-pair{white-space:nowrap}
 .nav-pair .thin{font:300 var(--hamSmall) Oswald, sans-serif; letter-spacing:.02em; color:#cfd2d6; margin-right:2px}
@@ -44,7 +64,6 @@ a{color:inherit;text-decoration:none}
 .wordmark-wrap{display:flex;align-items:center;justify-content:flex-end;min-width:120px}
 .wordmark-img{height:clamp(18px,3.2vw,28px);width:auto;display:block}
 @media (max-width:1100px){ .topnav{display:none !important} }
-
 .hr-y{border-top:1px solid var(--line)}
 .schoolrow{display:flex;align-items:center;gap:var(--pairGap);padding:6px 0}
 .ham-logo{height:var(--crestH);width:auto;object-fit:contain;display:block}
@@ -53,13 +72,10 @@ a{color:inherit;text-decoration:none}
 .schooltext .big1{font:400 var(--hamBig)/1 "Bebas Neue",sans-serif}
 .schooltext .big2{font:400 var(--hamBigger)/1 "Bebas Neue",sans-serif;margin-top:-4px}
 .crumbs{font:300 calc(var(--hamSmall)*.5)/1 Oswald;letter-spacing:.02em;color:var(--muted);text-transform:uppercase}
-
-/* HERO (animated tagline) */
 .hero{padding:6px 0}
 .hero-grid{display:flex;align-items:center;justify-content:space-between;gap:16px}
 .hero-left{display:flex;flex-direction:column;gap:4px}
 .hero-crumbs{margin:0; text-align:left; white-space:nowrap}
-
 .tag-duo{position:relative;height:1.8em}
 .tag-swap{position:absolute;left:0;top:0;right:0;opacity:0;animation:swap 6s infinite;white-space:nowrap}
 .tag-swap:nth-child(1){animation-delay:0s}
@@ -69,518 +85,479 @@ a{color:inherit;text-decoration:none}
 @keyframes swap{0%{opacity:0}5%{opacity:1}45%{opacity:1}50%{opacity:0}100%{opacity:0}}
 .hero-right{display:flex;gap:10px}
 .hero-icon i{font-size:20px}
-
-/* DRAWERS */
 .drawer-mask{position:fixed;inset:0;background:rgba(0,0,0,.35);opacity:0;pointer-events:none;transition:opacity .2s;z-index:60}
 .drawer{position:fixed;top:0;bottom:0;width:min(360px,82vw);background:rgba(10,10,10,.65);backdrop-filter:blur(4px);color:#e8e8e8;transform:translateX(-110%);transition:transform .25s;z-index:70}
 .drawer-right{right:0;left:auto;transform:translateX(110%); display: flex; flex-direction: column; height: 100%;}
-.drawer h3{margin:18px 16px 8px}
+.drawer h3{margin:18px 16px 8px; padding-right: 30px;}
+.drawer .pad { padding: 10px 16px; }
+.drawer .close-btn { position: absolute; top: 12px; right: 12px; }
 .drawer a{color:#e8e8e8}
 .drawer a:hover{color:#fff}
 body.drawer-left-open .drawer-mask,body.drawer-right-open .drawer-mask{opacity:1;pointer-events:auto}
 body.drawer-left-open #drawerLeft{transform:translateX(0)}
-body.drawer-right-open #drawerRight{transform:translateX(0)}
-#liveResults{margin:10px 4px 18px;max-height:55vh;overflow:auto}
-.live-hit{padding:10px 12px;display:flex;align-items:center;gap:10px;border-radius:10px;cursor:pointer}
-.live-hit:hover{background:rgba(255,255,255,.08)}
-.live-hit img{width:36px;height:36px;border-radius:6px;object-fit:cover}
-
-/* DRAWER LAYOUT & ACCORDION FILTERS */
-.drawer-content { flex-grow: 1; overflow-y: auto; }
+body.drawer-right-open .drawer-right{transform:translateX(0)}
+.drawer-content { flex-grow: 1; overflow-y: auto; padding: 10px 16px;}
 .drawer-footer { flex-shrink: 0; padding: 12px 16px; border-top: 1px solid var(--line); background: rgba(10,10,10,.8); display:flex; gap: 10px; align-items: center;}
 .filter-group { border-bottom: 1px solid var(--line); }
 .filter-group:last-of-type { border-bottom: none; }
 .filter-title { padding: 14px 0; cursor: pointer; font-weight: 700; font-family: "Bebas Neue", sans-serif; letter-spacing: .05em; list-style: none; display: flex; justify-content: space-between; align-items: center; }
 .filter-title::-webkit-details-marker { display: none; }
-.filter-title::after { content: '▸'; font-size: 1em; transition: transform 0.2s; }
-.filter-group[open] > .filter-title::after { transform: rotate(90deg); }
+.filter-title::after { content: '▸'; font-size: 1.2em; transition: transform 0.2s; }
+details[open] > .filter-title::after { transform: rotate(90deg); }
 .filter-options { padding: 4px 0 16px 0; }
 .filter-options label { display: block; margin-bottom: 8px; padding-left: 4px;}
-.filter-options input[type=checkbox] { margin-right: 8px; }
-
-/* GRID + CARDS */
+.filter-options input[type=checkbox] { margin-right: 8px; transform: scale(1.1); }
+.select-all-label { font-weight: bold; border-bottom: 1px solid var(--line); padding-bottom: 8px !important; margin-bottom: 12px !important;}
+#liveResults{margin:10px 4px 18px;max-height:55vh;overflow:auto}
+.live-hit{padding:10px 12px;display:flex;align-items:center;gap:10px;border-radius:10px;cursor:pointer}
+.live-hit:hover{background:rgba(255,255,255,.08)}
+.live-hit img{width:36px;height:36px;border-radius:6px;object-fit:cover}
+.auth-tabs { display: flex; border-bottom: 1px solid var(--line); }
+.auth-tab { flex: 1; text-align: center; padding: 10px; cursor: pointer; background: transparent; border: none; color: var(--muted); font-family: "Bebas Neue", sans-serif; font-size: 16px; letter-spacing: .05em;}
+.auth-tab.active { color: var(--fg); border-bottom: 2px solid var(--fg); }
+.auth-form { display: none; }
+.auth-form.active { display: block; }
+.form-field { margin-bottom: 15px; }
+.form-field label { display: block; margin-bottom: 5px; font-size: 12px; }
+.form-field input { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--line); background: rgba(255,255,255,.06); color: var(--ink); }
+.auth-btn { width: 100%; padding: 12px; background: var(--fg); color: var(--bg); border: none; border-radius: 8px; font-family: "Bebas Neue", sans-serif; font-size: 16px; letter-spacing: .08em; cursor: pointer; }
+#authMessage { margin-top: 15px; text-align: center; font-size: 13px; }
+.error { color: #fca5a5; }
+.success { color: #86efac; }
 .main{padding:8px 0 calc(var(--footerH) + 12px)}
-.grid{display:grid;gap:14px}
-@media (min-width:1300px){ .grid{grid-template-columns:repeat(5,1fr)}}
-@media (max-width:1299px){ .grid{grid-template-columns:repeat(4,1fr)}}
-@media (max-width:1024px){ .grid{grid-template-columns:repeat(3,1fr)}}
-@media (max-width:768px){  .grid{grid-template-columns:repeat(2,1fr)}}
-@media (max-width:520px){  .grid{grid-template-columns:repeat(1,1fr)}}
-
-/* 5:7 with flip */
+.grid{display:grid;gap:14px; grid-template-columns:repeat(auto-fill, minmax(280px, 1fr));}
 .card{position:relative;background:#171717;border-radius:16px;overflow:hidden}
 .card::before{content:"";display:block;padding-top:140%}
 .card-inner{position:absolute;inset:0;perspective:1200px}
 .flip{position:absolute;inset:0;transform-style:preserve-3d;transition:transform .6s cubic-bezier(.2,.7,.2,1)}
 .card.is-flipped .flip{transform:rotateY(180deg)}
 .face{position:absolute;inset:0;backface-visibility:hidden}
-.face.back{transform:rotateY(180deg)}
-
-/* Front */
+.card:not(.is-flipped) .back { pointer-events: none; }
+.card.is-flipped .front { pointer-events: none; }
+.card .back a, .card .back button { pointer-events: auto; }
+.face.front { display: flex; flex-direction: column; justify-content: flex-end; }
 .bg{position:absolute;inset:0;background:#111 center/cover no-repeat}
-.shade{position:absolute;left:0;right:0;bottom:0;height:46%;background:linear-gradient(transparent,rgba(0,0,0,.9))}
-.cap{position:absolute;left:16px;right:16px;bottom:14px}
-.name{font:400 28px/1 "Indigo","Bebas Neue",sans-serif;letter-spacing:.02em}
-.meta-small{font:300 12px/1.25 Oswald;opacity:.9}
-.chips{position:absolute;right:14px;bottom:60px;display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
-.chip{background:#fff;color:#111;border-radius:28px;padding:6px 10px;font-weight:700;font-size:12px}
-
-/* Roster dots */
-.dots{position:absolute;left:14px;bottom:12px;display:flex;gap:6px;z-index:2}
-.dot{width:28px;height:28px;border-radius:999px;background:#f3f4f6;color:#111;display:grid;place-items:center;
-     font:900 12px/1 Oswald;border:1px solid rgba(0,0,0,.25)}
-
-/* Small profile button on the FRONT */
-.card-profile-front{
-  position:absolute;left:14px;top:14px;z-index:2;
-  display:inline-flex;align-items:center;gap:6px;
-  padding:6px 8px;border-radius:12px;background:rgba(0,0,0,.55);color:#fff;font:700 12px "Bebas Neue";
-  border:1px solid rgba(255,255,255,.25)
-}
-.card-profile-front i{font-size:14px}
-
-/* Back */
-.back-head{padding:10px 12px;border-bottom:1px solid rgba(0,0,0,.08);display:flex;justify-content:space-between;align-items:center;background:#fff}
-.back-body{padding:12px;background:#fff;color:#111}
-
-/* GEMINI FEATURE STYLES */
-.gemini-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  background: linear-gradient(145deg, #6a11cb 0%, #2575fc 100%);
-  color: white;
-  border: none;
-  border-radius: 10px;
-  padding: 8px 12px;
-  font-family: 'Oswald', sans-serif;
-  font-weight: 400;
-  cursor: pointer;
-  margin-top: 10px;
-  transition: transform 0.2s, box-shadow 0.2s;
-  width: 100%;
-  justify-content: center;
-}
-.gemini-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-}
-.gemini-btn:disabled {
-  background: #555;
-  cursor: not-allowed;
-  opacity: 0.7;
-}
-.outlook-content {
-  margin-top: 12px;
-  font-size: 13px;
-  line-height: 1.5;
-  background: #f0f0f0;
-  border-radius: 8px;
-  padding: 10px;
-  min-height: 50px;
-  color: #333;
-  border: 1px solid #ddd;
-}
-.outlook-content.loading {
-    animation: pulse 1.5s infinite;
-}
-@keyframes pulse {
-    0% { background-color: #f0f0f0; }
-    50% { background-color: #e0e0e0; }
-    100% { background-color: #f0f0f0; }
-}
-
-/* STICKY SPONSOR FOOTER */
+.shade{position:absolute;left:0;right:0;bottom:0;height:70%;background:linear-gradient(transparent,rgba(0,0,0,.95))}
+.name{font:400 28px/1 "Indigo","Bebas Neue",sans-serif;letter-spacing:.02em; color: #fff; text-shadow: 1px 1px 3px rgba(0,0,0,.5);}
+.meta-small{font:300 13px/1.2 Oswald;opacity:.9; color: #fff; text-shadow: 1px 1px 3px rgba(0,0,0,.5); margin-top: 2px;}
+.front-bottom-content { position: relative; z-index: 2; padding: 16px; display: flex; flex-direction: column; width: 100%;}
+.front-top-info { display: flex; justify-content: space-between; align-items: flex-start; }
+.front-info-left { flex: 1; margin-bottom: 12px; }
+.front-info-right { display: flex; flex-direction: column; gap: 8px; align-items: flex-end; }
+.front-chips-row { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap;}
+.front-chip { background: rgba(0,0,0,.5); color: #fff; border-radius: 6px; padding: 4px 8px; font-weight: 700; font-size: 10px; font-family: Oswald, sans-serif; border: 1px solid rgba(255,255,255,.15); text-transform: uppercase; }
+.game-chip { background: rgba(0,0,0,.5); color: #fff; border-radius: 8px; padding: 5px 10px; font-size: 11px; text-align: right; border: 1px solid rgba(255,255,255,.15); font-family: Oswald, sans-serif; line-height: 1.3; backdrop-filter: blur(2px); }
+.game-chip span { display: block; }
+.game-chip-label { font-weight: 700; font-size: 9px; opacity: .7; text-transform: uppercase; }
+.face.back{transform:rotateY(180deg); background: #fff; color: #111; display: flex; flex-direction: column;}
+.back-header { display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; border-bottom: 1px solid #e5e7eb; flex-shrink: 0; }
+.back-header-name { font: 700 20px "Bebas Neue", sans-serif; letter-spacing: .03em; }
+.back-header-class { font: 300 12px Oswald, sans-serif; opacity: .8; }
+.back-header-thumb { width: 40px; height: 56px; object-fit: cover; border-radius: 6px; border: 1px solid #ddd; margin-left: 10px; }
+.fun-zone { flex-grow: 1; padding: 12px; font-size: 14px; line-height: 1.5; overflow-y: auto; }
+.back-nav { display: flex; justify-content: space-around; border-top: 1px solid #e5e7eb; flex-shrink: 0; padding: 6px 0; }
+.back-nav-link { background: none; border: none; color: #555; font: 700 11px "Bebas Neue", sans-serif; letter-spacing: .05em; cursor: pointer; padding: 4px 6px; border-radius: 4px; }
+.back-nav-link:hover, .back-nav-link.active { color: #111; background-color: #f0f0f0; }
+.stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px 8px; font-family: Oswald, sans-serif; text-align: center;}
+.stat-item { background: #f7f7f7; border-radius: 6px; padding: 5px; }
+.stat-value { font-size: 16px; font-weight: 700; }
+.stat-label { font-size: 10px; text-transform: uppercase; opacity: .7; }
+.news-item { margin-bottom: 12px; }
+.news-headline { font-weight: bold; }
+.news-source { font-size: 12px; opacity: 0.7; }
+.social-links { margin-bottom: 10px; }
+.social-links a { margin-right: 10px; font-weight: bold; text-decoration: underline; }
+.social-post { border-top: 1px solid #ddd; padding-top: 10px; font-style: italic;}
 .site-footer{position:fixed;left:0;right:0;bottom:0;height:var(--footerH);background:#0b0b0b;border-top:1px solid var(--line);z-index:40}
 .site-footer .wrap{height:100%;display:flex;align-items:center;justify-content:center;padding:0 var(--containerPad)}
 .sponsor-banner{height:calc(var(--footerH) - 12px); width:100%; display:flex;align-items:center;justify-content:center}
-.sponsor-banner img{
-  height:100%; width:100%; object-fit:contain;
-  filter: saturate(.95);
-}
+.sponsor-banner img{ height:100%; width:100%; object-fit:contain; filter: saturate(.95); }
 </style>
 </head>
 
 <body>
-<div class="sticky-header-container">
-  <header class="header">
+<header class="header">
     <div class="container topbar">
-      <div class="left-icons">
-        <button class="icon-btn" id="btnMenu" aria-label="Menu"><i class="ri-menu-line"></i></button>
-        <button class="icon-btn" id="btnAccount" aria-label="Account"><i class="ri-user-3-line"></i></button>
-        <button class="icon-btn" id="btnTheme" aria-label="Theme"><i class="ri-moon-line"></i></button>
-      </div>
-
-      <nav class="topnav" aria-label="Top Navigation">
-        <span class="nav-pair"><span class="thin">WHERE THEY</span><span class="bold">YAT?</span></span>
-        <span class="nav-pair"><span class="thin">ACTIVE ALUMNI</span><span class="bold">NEWS</span></span>
-        <span class="nav-pair"><span class="thin">NEXT-LEVEL</span><span class="bold">ALL-TIME LIST</span></span>
-        <span class="nav-pair"><span class="thin">NIL & YAT-A-BOY</span><span class="bold">MARKETPLACE</span></span>
-        <span class="nav-pair"><span class="thin">THE</span><span class="bold">CURRENT TEAM</span></span>
-        <span class="nav-pair"><span class="thin">PCD ACTION</span><span class="bold">PARTNER PROGRAM</span></span>
-        <span class="nav-pair"><span class="thin"></span><span class="bold">FAQ’S</span></span>
-      </nav>
-
-      <div class="wordmark-wrap">
-        <img class="wordmark-img" src="assets/img/yatstats-logo.png" alt="YAT?STATS">
-      </div>
-    </div>
-
-    <div class="hr-y"></div>
-
-    <div class="container schoolrow">
-      <img id="hamLogo" class="ham-logo" src="assets/img/hamilton-logo.png" alt="Hamilton H">
-      <div class="schooltext">
-        <div class="small">CHANDLER, AZ</div>
-        <div class="big1">HAMILTON HIGH SCHOOL</div>
-        <div class="big2">ACTIVE ALUMNI</div>
-      </div>
-    </div>
-
-    <div class="hr-y"></div>
-  </header>
-
-  <section class="hero">
-    <div class="container hero-grid">
-      <div class="hero-left" aria-live="polite">
-        <div class="tag-duo">
-          <div class="tag-swap"><span class="tag-grey">WHERE THEY</span> <span class="tag-bold">YAT?</span></div>
-          <div class="tag-swap"><span class="tag-grey">FLIP FOR</span> <span class="tag-bold">STATS!</span></div>
+        <div class="left-icons">
+            <button class="icon-btn" id="btnMenu" aria-label="Menu"><i class="ri-menu-line"></i></button>
+            <div id="auth-container">
+                <button class="icon-btn" id="btnAccount" aria-label="Account"><i class="ri-user-3-line"></i></button>
+                <button class="icon-btn" id="btnSignOut" style="display: none;"><i class="ri-logout-box-line"></i></button>
+            </div>
+            <button class="icon-btn" id="btnTheme" aria-label="Theme"><i class="ri-moon-line"></i></button>
         </div>
-        <div class="crumbs hero-crumbs">HAMILTON ▸ WHERE THEY YAT?</div>
-      </div>
-
-      <div class="hero-right">
-        <button id="openSearch" class="hero-icon icon-btn" aria-label="Open search"><i class="ri-search-line"></i></button>
-        <button id="openFilters" class="hero-icon icon-btn" aria-label="Open filters"><i class="ri-filter-3-line"></i></button>
-        <button id="filtersReset2" class="hero-icon icon-btn" aria-label="Reset"><i class="ri-restart-line"></i></button>
-      </div>
+        <nav class="topnav" aria-label="Top Navigation">
+            <a href="index.html" class="nav-pair"><span class="thin">WHERE THEY</span><span class="bold">YAT?</span></a>
+            <a href="alumni-news.html" class="nav-pair"><span class="thin">ACTIVE ALUMNI</span><span class="bold">NEWS</span></a>
+            <a href="all-time-list.html" class="nav-pair"><span class="thin">NEXT-LEVEL</span><span class="bold">ALL-TIME LIST</span></a>
+            <a href="marketplace.html" class="nav-pair"><span class="thin">NIL & YAT-A-BOY</span><span class="bold">MARKETPLACE</span></a>
+            <a href="current-team.html" class="nav-pair"><span class="thin">THE</span><span class="bold">CURRENT TEAM</span></a>
+            <a href="partner-program.html" class="nav-pair"><span class="thin">PCD ACTION</span><span class="bold">PARTNER PROGRAM</span></a>
+            <a href="faq.html" class="nav-pair"><span class="bold">FAQ’S</span></a>
+        </nav>
+        <div class="wordmark-wrap">
+            <img class="wordmark-img" src="assets/img/yatstats-logo.png" alt="YAT?STATS">
+        </div>
     </div>
-  </section>
-</div>
+    <div class="hr-y"></div>
+    <div class="container schoolrow">
+        <img id="hamLogo" class="ham-logo" src="assets/img/hamilton-logo.png" alt="Hamilton H">
+        <div class="schooltext">
+            <div class="small">CHANDLER, AZ</div>
+            <div class="big1">HAMILTON HIGH SCHOOL</div>
+            <div class="big2">ACTIVE ALUMNI</div>
+        </div>
+    </div>
+    <div class="hr-y"></div>
+    <section class="hero">
+        <div class="container hero-grid">
+            <div class="hero-left" aria-live="polite">
+                <div class="tag-duo">
+                    <div class="tag-swap"><span class="tag-grey">WHERE THEY</span> <span class="tag-bold">YAT?</span></div>
+                    <div class="tag-swap"><span class="tag-grey">FLIP FOR</span> <span class="tag-bold">STATS!</span></div>
+                </div>
+                <div class="crumbs hero-crumbs">HAMILTON ▸ WHERE THEY YAT?</div>
+            </div>
+            <div class="hero-right">
+                <button id="openSearch" class="hero-icon icon-btn" aria-label="Open search"><i class="ri-search-line"></i></button>
+                <button id="openFilters" class="hero-icon icon-btn" aria-label="Open filters"><i class="ri-filter-3-line"></i></button>
+                <button id="filtersReset2" class="hero-icon icon-btn" aria-label="Reset"><i class="ri-restart-line"></i></button>
+            </div>
+        </div>
+    </section>
+</header>
 
-<!-- LEFT DRAWER -->
+<!-- Drawers -->
 <div class="drawer-mask"></div>
 <aside class="drawer" id="drawerLeft" aria-label="Left drawer">
-  <h3>PLAYER PROFILE SEARCH</h3>
-  <div class="pad">
-    <input id="playerSearch" placeholder="Type to search…" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--ink)">
-    <div id="liveResults"></div>
-  </div>
-  <div class="pad">
-    <h3>Navigation</h3>
-    <div style="display:flex;flex-direction:column;gap:12px">
-      <a href="index.html"><span class="thin">WHERE THEY</span> <span class="bold">YAT?</span></a>
-      <a href="alumni-news.html"><span class="thin">ACTIVE ALUMNI</span> <span class="bold">NEWS</span></a>
-      <a href="all-time-alumni-list.html"><span class="thin">NEXT-LEVEL</span> <span class="bold">ALL-TIME LIST</span></a>
-      <a href="nil-yat-a-boy-marketplace.html"><span class="thin">NIL & YAT-A-BOY</span> <span class="bold">MARKETPLACE</span></a>
-      <a href="current-team.html"><span class="thin">THE</span> <span class="bold">CURRENT TEAM</span></a>
-      <a href="partner-program.html"><span class="thin">PCD ACTION</span> <span class="bold">PARTNER PROGRAM</span></a>
-      <a href="faq.html"><span class="thin"></span> <span class="bold">FAQ’S</span></a>
+    <button class="icon-btn close-btn" onclick="closeDrawers()"><i class="ri-close-line"></i></button>
+    <div class="drawer-content">
+        <h3>PLAYER PROFILE SEARCH</h3>
+        <div class="pad">
+            <input id="playerSearch" placeholder="Type to search…" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--ink)">
+            <div id="liveResults"></div>
+        </div>
+        <h3>NAVIGATION</h3>
+        <div class="pad" style="display:flex;flex-direction:column;gap:12px">
+            <a href="index.html" class="nav-pair"><span class="thin">WHERE THEY</span><span class="bold">YAT?</span></a>
+            <a href="alumni-news.html" class="nav-pair"><span class="thin">ACTIVE ALUMNI</span><span class="bold">NEWS</span></a>
+            <a href="all-time-list.html" class="nav-pair"><span class="thin">NEXT-LEVEL</span><span class="bold">ALL-TIME LIST</span></a>
+            <a href="marketplace.html" class="nav-pair"><span class="thin">NIL & YAT-A-BOY</span><span class="bold">MARKETPLACE</span></a>
+            <a href="current-team.html" class="nav-pair"><span class="thin">THE</span><span class="bold">CURRENT TEAM</span></a>
+            <a href="partner-program.html" class="nav-pair"><span class="thin">PCD ACTION</span><span class="bold">PARTNER PROGRAM</span></a>
+            <a href="faq.html" class="nav-pair"><span class="bold">FAQ’S</span></a>
+        </div>
     </div>
-  </div>
-  <button class="icon-btn close-btn" onclick="document.body.classList.remove('drawer-left-open')"><i class="ri-close-line"></i></button>
 </aside>
 
-<!-- RIGHT DRAWER (filters) -->
-<aside class="drawer drawer-right" id="drawerRight" aria-label="Filters drawer">
-  <h3>Filters</h3>
-  <div class="drawer-content">
-      <div id="filters" style="padding: 0 16px;">
-          <details class="filter-group">
-              <summary class="filter-title">By NAME</summary>
-              <div class="filter-options">
+<aside class="drawer drawer-right" id="drawerFilters" style="display: flex;">
+    <button class="icon-btn close-btn" onclick="closeDrawers()"><i class="ri-close-line"></i></button>
+    <h3>FILTERS</h3>
+    <div class="drawer-content" id="filters">
+        <details class="filter-group" open>
+            <summary class="filter-title">By Name</summary>
+            <div class="filter-options">
                 <input id="filterName" placeholder="Type a name…" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--ink)"/>
-              </div>
-          </details>
-          <details class="filter-group" open>
-              <summary class="filter-title">By LEVEL</summary>
-              <div class="filter-options" id="filterLevels">
-                  <label><input type="checkbox" value="MLB"> MLB</label>
-                  <label><input type="checkbox" value="TRIPLE-A"> TRIPLE-A</label>
-                  <label><input type="checkbox" value="DOUBLE-A"> DOUBLE-A</label>
-                  <label><input type="checkbox" value="HIGH-A"> HIGH-A</label>
-                  <label><input type="checkbox" value="LOW-A"> LOW-A</label>
-                  <label><input type="checkbox" value="ROOKIE"> ROOKIE</label>
-                  <label><input type="checkbox" value="INDY"> INDY</label>
-                  <label><input type="checkbox" value="INTERNATIONAL"> INTERNATIONAL</label>
-                  <label><input type="checkbox" value="NCAA-D1"> NCAA-D1</label>
-                  <label><input type="checkbox" value="NCAA-D2"> NCAA-D2</label>
-                  <label><input type="checkbox" value="NCAA-D3"> NCAA-D3</label>
-                  <label><input type="checkbox" value="NAIA"> NAIA</label>
-                  <label><input type="checkbox" value="JUCO"> JUCO</label>
-              </div>
-          </details>
-          <details class="filter-group">
-              <summary class="filter-title">By GRAD CLASS</summary>
-              <div class="filter-options" id="classBox" style="display:flex;flex-wrap:wrap;gap:8px"></div>
-          </details>
-          <details class="filter-group">
-              <summary class="filter-title">By ROSTER YEAR</summary>
-              <div class="filter-options" id="rosterBox" style="display:flex;flex-wrap:wrap;gap:8px"></div>
-          </details>
-          <details class="filter-group">
-              <summary class="filter-title">By STATUS</summary>
-              <div class="filter-options" id="filterStatus">
+            </div>
+        </details>
+        <details class="filter-group">
+            <summary class="filter-title">By Level</summary>
+            <div class="filter-options" id="filterLevels">
+                 <label class="select-all-label"><input type="checkbox" class="select-all"> Select All</label>
+                 <!-- Levels populated here -->
+            </div>
+        </details>
+        <details class="filter-group">
+            <summary class="filter-title">By Graduating Class</summary>
+            <div class="filter-options" id="filterGradClass"></div>
+        </details>
+        <details class="filter-group">
+            <summary class="filter-title">By Roster Year</summary>
+            <div class="filter-options" id="filterRosterYear"></div>
+        </details>
+         <details class="filter-group">
+            <summary class="filter-title">By Status</summary>
+            <div class="filter-options" id="filterStatus">
+                <label class="select-all-label"><input type="checkbox" class="select-all"> Select All</label>
                 <label><input type="checkbox" value="ACTIVE 2025"> ACTIVE 2025</label>
+                <label><input type="checkbox" value="ACTIVE 2024"> ACTIVE 2024</label>
                 <label><input type="checkbox" value="FREE AGENT"> FREE AGENT</label>
                 <label><input type="checkbox" value="INJURED"> INJURED</label>
-                <label><input type="checkbox" value="ACTIVE 2024"> ACTIVE 2024</label>
                 <label><input type="checkbox" value="RETIRED"> RETIRED</label>
                 <label><input type="checkbox" value="SPONSOR"> SPONSOR</label>
-              </div>
-          </details>
-      </div>
-  </div>
-  <div class="drawer-footer">
-    <button id="filtersApply" class="icon-btn" style="padding:10px 14px;border:1px solid var(--line);border-radius:12px"><i class="ri-check-line"></i>&nbsp;Apply</button>
-    <button id="filtersReset" class="icon-btn" style="padding:10px 14px;border:1px solid var(--line);border-radius:12px"><i class="ri-restart-line"></i>&nbsp;Reset</button>
-    <button class="icon-btn close-btn" onclick="document.body.classList.remove('drawer-right-open')" style="margin-left:auto"><i class="ri-close-line"></i></button>
-  </div>
+            </div>
+        </details>
+    </div>
+    <div class="drawer-footer">
+        <button id="filtersReset" class="icon-btn" style="padding:10px 14px;border:1px solid var(--line);border-radius:12px"><i class="ri-restart-line"></i>&nbsp;Reset Filters</button>
+    </div>
+</aside>
+
+<aside class="drawer drawer-right" id="drawerAccount" style="display: none;">
+     <button class="icon-btn close-btn" onclick="closeDrawers()"><i class="ri-close-line"></i></button>
+    <h3>ACCOUNT</h3>
+    <div class="drawer-content">
+        <div class="auth-tabs">
+            <button class="auth-tab active" data-tab="signin">Sign In</button>
+            <button class="auth-tab" data-tab="register">Register</button>
+        </div>
+        <div id="auth-forms-container" class="pad">
+            <form id="signInForm" class="auth-form active">
+                <div class="form-field"><label for="signInEmail">Email</label><input type="email" id="signInEmail" required></div>
+                <div class="form-field"><label for="signInPassword">Password</label><input type="password" id="signInPassword" required></div>
+                <button type="submit" class="auth-btn">Sign In</button>
+            </form>
+            <form id="registerForm" class="auth-form">
+                <div class="form-field"><label for="registerEmail">Email</label><input type="email" id="registerEmail" required></div>
+                <div class="form-field"><label for="registerPassword">Password</label><input type="password" id="registerPassword" required></div>
+                <button type="submit" class="auth-btn">Create Account</button>
+            </form>
+            <p id="authMessage"></p>
+        </div>
+    </div>
 </aside>
 
 <main class="main container">
-  <div id="cardGrid" class="grid" aria-live="polite"></div>
+  <div id="cardGrid" class="grid" aria-live="polite">
+      <p style="color: var(--muted); grid-column: 1 / -1;">Loading YATSTATS players...</p>
+  </div>
 </main>
 
 <footer class="site-footer">
   <div class="wrap">
     <div class="sponsor-banner">
-      <img
-        src="assets/img/sponsor-1200x120.jpg"
-        srcset="assets/img/sponsor-640x90.jpg 640w,
-                assets/img/sponsor-1200x120.jpg 1200w,
-                assets/img/sponsor-1920x180.jpg 1920w"
-        sizes="(max-width: 680px) 96vw, (max-width: 1200px) 85vw, 1200px"
-        alt="Presented by YOUR SPONSOR">
+      <img src="assets/img/sponsor-1200x120.jpg" alt="Sponsor Banner">
     </div>
   </div>
 </footer>
 
-<script>
-/* ---- YATSTATS • Hamilton • build 5.0.4 ---- */
+<script type="module">
+/* ---- YATSTATS • Hamilton • build 5.0.21 ---- */
 
-/* Hamilton logo fallback (path/case safety) */
-(function(){
-  const img = document.getElementById('hamLogo');
-  if(!img) return;
-  const tries = [
-    'assets/img/hamilton-logo.png',
-    'assets/img/hamilton-logo-stacked.png',
-    '/assets/img/hamilton-logo.png'
-  ];
-  let i = 0;
-  img.addEventListener('error', ()=>{ i++; if(i < tries.length) img.src = tries[i]; });
-})();
-
-/* Utils */
 const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQcWJM6Q6hTdFnES_G5LUy4teCS-sJ5HdAc9F5HSY8DGE9egdGy8yUAe2ShT3tFm-CwUuCYeAYy_YiW/pub?gid=2028135390&single=true&output=csv";
 const $ = s => document.querySelector(s), $$ = s => Array.from(document.querySelectorAll(s));
-const debounce = (fn, ms=180)=>{ let t; return (...a)=>{ clearTimeout(t); t=setTimeout(()=>fn(...a),ms); }; };
+const debounce = (fn, ms=300)=>{ let t; return (...a)=>{ clearTimeout(t); t=setTimeout(()=>fn(...a),ms); }; };
 
-/* drawers */
-const openLeft = ()=>document.body.classList.add('drawer-left-open');
-const openRight= ()=>document.body.classList.add('drawer-right-open');
-const closeBoth = ()=>document.body.classList.remove('drawer-left-open','drawer-right-open');
-$('#btnMenu')?.addEventListener('click', openLeft);
-$('#openSearch')?.addEventListener('click', openLeft);
-$('#openFilters')?.addEventListener('click', openRight);
-$('.drawer-mask')?.addEventListener('click', closeBoth);
-
-/* theme */
-$('#btnTheme')?.addEventListener('click', ()=>{
-  const isDark=getComputedStyle(document.documentElement).getPropertyValue('--bg').trim()==='#0c0c0c';
-  if(isDark){
-    document.documentElement.style.setProperty('--bg','#ffffff');
-    document.documentElement.style.setProperty('--fg','#111');
-    document.documentElement.style.setProperty('--muted','#444');
-    document.documentElement.style.setProperty('--line','#e5e7eb');
-  }else{
-    document.documentElement.style.setProperty('--bg','#0c0c0c');
-    document.documentElement.style.setProperty('--fg','#f2f2f2');
-    document.documentElement.style.setProperty('--muted','#c4c4c4');
-    document.documentElement.style.setProperty('--line','rgba(255,255,255,0.08)');
-  }
-});
-
-/* year chips 2025..1999 */
-(function fillYears(){
-  const mk=(id)=>{ const el=$(id); if(!el) return;
-    el.innerHTML=[...Array(27)].map((_,i)=>2025-i).map(y=>`<label><input type="checkbox" value="${y}"> ${y}</label>`).join(' ');
-  };
-  mk('#classBox'); mk('#rosterBox');
-})();
-
-/* CSV loader (no fallback) */
 async function loadCSV(url){
-  const r = await fetch(url, {mode:'cors', cache:'no-store'});
-  if(!r.ok) throw new Error(`HTTP ${r.status}`);
-  const txt = await r.text();
-  if(!txt.trim()) throw new Error('Empty CSV');
-  const rows = txt.trim().split(/\r?\n/).map(line =>
-    line.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/).map(c=>c.replace(/^"|"$/g,''))
-  );
-  const header = rows.shift();
+  const response = await fetch(url);
+  if(!response.ok) throw new Error(`HTTP ${response.status}`);
+  const text = await response.text();
+  if(!text.trim()) throw new Error('Empty CSV');
+  const rows = text.trim().split(/\r?\n/).map(line => line.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/).map(c=>c.replace(/^"|"$/g,'')));
+  const header = rows.shift().map(h => h.trim());
   const idx=n=>header.indexOf(n);
-  return rows.map(r=>({
-    id:r[idx('tbc_id')]||r[idx('id')],
-    slug:r[idx('slug')],
-    display_name:r[idx('display_name')],
-    first:r[idx('first')], last:r[idx('last')],
-    grad_class:r[idx('grad_class')], letter_years:r[idx('letter_years')],
-    status:r[idx('status')], level:r[idx('level')], team:r[idx('team')],
-    org:r[idx('org')], city_state:r[idx('city_state')],
-    position:r[idx('position')], front_img:r[idx('front_img')], hs_img:r[idx('hs_img')]
-  }));
+  const statKeys = ['avg', 'obp', 'slg', 'hits', 'runs', 'rbi', 'hr', 'sb', 'w', 'l', 'era', 'so', 'qs', 'fip', 'whip', 'k/bb'];
+  return rows.map(r=> {
+    const player = {
+      slug:r[idx('slug')], display_name:r[idx('display_name')],
+      grad_class:r[idx('grad_class')], letter_years:r[idx('letter_years')], status:r[idx('status')], level:r[idx('level')], 
+      team:r[idx('team')], org:r[idx('org')], position:r[idx('position')],
+      next_game_opponent: r[idx('next_game_opponent')],
+      next_game_datetime: r[idx('next_game_datetime')],
+      x_handle: r[idx('x_handle')], ig_handle: r[idx('ig_handle')],
+      stats: {}
+    };
+    for (const key of statKeys) {
+        const statIndex = idx(key);
+        if (statIndex > -1 && r[statIndex]) player.stats[key.toUpperCase()] = r[statIndex];
+    }
+    return player;
+  });
 }
 
-/* ranking & helpers */
-function defaultSort(a,b){
-  const orderStatus=['ACTIVE 2025','FREE AGENT','INJURED','ACTIVE 2024','RETIRED','SPONSOR'];
-  const sA=orderStatus.indexOf((a.status||'').toUpperCase()), sB=orderStatus.indexOf((b.status||'').toUpperCase());
-  if(sA!==sB) return sA-sB;
-  const cA=+a.grad_class||0, cB=+b.grad_class||0; if(cA!==cB) return cA-cB;
-  const lvlRank=v=>({'MLB':9,'TRIPLE-A':8,'DOUBLE-A':7,'HIGH-A':6,'LOW-A':5,'ROOKIE':4,'INDY':3,'INTERNATIONAL':2,'NCAA-D1':1,'NCAA-D2':1,'NCAA-D3':1,'NAIA':1,'JUCO':1}[String(v).toUpperCase()]||0);
-  const L=lvlRank(a.level)-lvlRank(b.level); if(L!==0) return -L;
-  const yrs=p=>String(p.letter_years||'').split(',').filter(Boolean).length;
-  const vy=yrs(a)-yrs(b); if(vy!==0) return -vy;
-  const lastA=(a.last||(a.display_name||'').split(' ').slice(-1)[0]||'').toLowerCase();
-  const lastB=(b.last||(b.display_name||'').split(' ').slice(-1)[0]||'').toLowerCase();
-  return lastA.localeCompare(lastB);
-}
-function slugOf(p){
-  const s=(p.slug||'').trim();
-  if(s) return s;
-  const base=(p.display_name||`${p.first||''} ${p.last||''}`||'')
-    .trim().toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');
-  return base;
-}
-function profileURL(p){
-  const s=slugOf(p), id=(p.id||'').trim();
-  if(s) return `profile.html?id=${encodeURIComponent(s)}`;
-  if(id) return `profile.html?id=${encodeURIComponent(id)}`;
-  return '#';
-}
-function nowImg(p){
-  const slug = slugOf(p);
-  const chain = [
-    `assets/img/now-players/${slug}-now.jpg`,
-    `assets/img/now-players/${slug}-now.png`,
-    p.front_img,
-    'assets/img/placeholder.jpg'
-  ];
-  return chain.find(Boolean);
-}
-function rosterDots(p){
-  const yrs=String(p.letter_years||'').split(',').map(s=>s.trim()).filter(Boolean).map(y=>y.slice(-2));
-  return yrs.map(y=>`<span class="dot" title="${y}">${y}</span>`).join('');
+function populateFilters(players) {
+    const gradClasses = [...new Set(players.map(p => p.grad_class).filter(Boolean))].sort((a,b) => b-a);
+    const rosterYears = [...new Set(players.flatMap(p => (p.letter_years || '').split(',')).map(y => y.trim()).filter(Boolean))].sort((a,b) => b-a);
+    
+    const gradClassContainer = $('#filterGradClass');
+    const rosterYearContainer = $('#filterRosterYear');
+
+    gradClassContainer.innerHTML = '<label class="select-all-label"><input type="checkbox" class="select-all"> Select All</label>' + gradClasses.map(year => `<label><input type="checkbox" value="${year}"> ${year}</label>`).join('');
+    rosterYearContainer.innerHTML = '<label class="select-all-label"><input type="checkbox" class="select-all"> Select All</label>' + rosterYears.map(year => `<label><input type="checkbox" value="${year}"> ${year}</label>`).join('');
 }
 
-/* card */
 function cardHTML(p){
-  const name=p.display_name||(p.first&&p.last?`${p.first} ${p.last}`:'');
-  const bg=nowImg(p);
-  const klass=p.grad_class||'';
-  // Safely stringify player data for the data attribute
-  const playerData = JSON.stringify({
-      name, 
-      klass, 
-      level: p.level, 
-      team: p.team, 
-      position: p.position
-  }).replace(/'/g, "&apos;");
+  const name = p.display_name || 'Player Name';
+  const slug = slugOf(p);
+  const bg_now = `assets/img/now-players/${slug}-now.jpg`;
+  const klass = p.grad_class || '';
+  const org = p.org ? `• ${p.org}` : '';
+  const playerInfo = JSON.stringify(p).replace(/'/g, "&apos;");
 
   return `
-  <article class="card" aria-label="${name}">
+  <article class="card" aria-label="${name}" data-player-info='${playerInfo}'>
     <div class="card-inner">
       <div class="flip">
         <div class="face front">
-          <a class="card-profile-front" href="${profileURL(p)}" title="Open profile"><i class="ri-external-link-line"></i>PROFILE</a>
-          <div class="bg" style="background-image:url('${bg}')"></div>
+          <div class="bg" style="background-image:url('${bg_now}')" onerror="this.style.backgroundImage='url(assets/img/placeholder.jpg)'"></div>
           <div class="shade"></div>
-          <div class="cap">
-            <div class="name">${name}</div>
-            <div class="meta-small">${p.team||''}</div>
+          <div class="front-bottom-content">
+            <div class="front-top-info">
+              <div class="front-info-left">
+                  <div class="name">${name}</div>
+                  <div class="meta-small">${p.team||''} ${org}</div>
+              </div>
+              <div class="front-info-right">
+                  ${p.next_game_datetime ? `
+                  <div class="game-chip next-game">
+                      <span class="game-chip-label">NEXT GAME</span>
+                      <span>${p.next_game_datetime}</span>
+                      <span>${p.next_game_opponent}</span>
+                  </div>` : ''}
+              </div>
+            </div>
+            <div class="front-chips-row">
+                ${p.level?`<span class="front-chip">${p.level}</span>`:''}
+                ${p.status?`<span class="front-chip">${p.status}</span>`:''}
+                ${klass?`<span class="front-chip">CLASS OF ${klass}</span>`:''}
+            </div>
           </div>
-          <div class="chips">
-            ${p.status?`<span class="chip">${p.status}</span>`:''}
-            ${klass?`<span class="chip">CLASS OF ${klass}</span>`:''}
-          </div>
-          <div class="dots">${rosterDots(p)}</div>
         </div>
         <div class="face back">
-          <div class="back-head">
-            <strong style="font:900 16px 'Bebas Neue'">${name}</strong>
-            <a class="icon-btn" href="${profileURL(p)}" style="padding:8px 12px;border:1px solid #ddd;border-radius:10px;color:#111"><i class="ri-user-line"></i>&nbsp;Profile</a>
-          </div>
-          <div class="back-body">
-            <p><strong>Level:</strong> ${p.level||'—'}</p>
-            <p><strong>Status:</strong> ${p.status||'—'}</p>
-            <p><strong>Class of:</strong> ${klass||'—'}</p>
-            <p><strong>Team:</strong> ${p.team||'—'}</p>
-            <!-- GEMINI FEATURE -->
-            <button class="gemini-btn" data-player-info='${playerData}'>
-              ✨ Yat-A-Boy Outlook
-            </button>
-            <div class="outlook-content">Click the button to generate an AI scouting report!</div>
-          </div>
+            <div class="back-header">
+                <div>
+                    <div class="back-header-name">${name}</div>
+                    <div class="back-header-class">CLASS OF ${klass}</div>
+                </div>
+                <img src="${bg_now}" class="back-header-thumb" alt="${name}" onerror="this.src='assets/img/placeholder.jpg'">
+            </div>
+            <div class="fun-zone">${generateStatsGridHTML(p)}</div>
+            <nav class="back-nav">
+                <button class="back-nav-link active" data-content="stats">STATS</button>
+                <button class="back-nav-link" data-content="bio">BIO</button>
+                <button class="back-nav-link" data-content="news">NEWS</button>
+                <button class="back-nav-link" data-content="social">SOCIAL</button>
+                <button class="back-nav-link" data-content="nil">NIL PTS</button>
+                <button class="back-nav-link" data-content="video">VIDEO</button>
+                <button class="back-nav-link" data-content="pics">FAN PICS</button>
+            </nav>
         </div>
       </div>
     </div>
   </article>`;
 }
 
-/* render */
+function generateStatsGridHTML(player) {
+    if (!player || !player.stats || Object.keys(player.stats).length === 0) return '<p style="text-align: center; padding: 20px; opacity: 0.7;">No stats available.</p>';
+    let grid = '<div class="stats-grid">';
+    for (const [label, value] of Object.entries(player.stats)) {
+        grid += `<div class="stat-item"><div class="stat-value">${value}</div><div class="stat-label">${label}</div></div>`;
+    }
+    grid += '</div>';
+    return grid;
+}
+
 function renderCards(list){
-  const grid=document.getElementById('cardGrid'); if(!grid) return;
+  const grid=$('#cardGrid'); if(!grid) return;
+  if(list.length === 0) {
+      grid.innerHTML = `<p style="color: var(--muted); grid-column: 1 / -1;">No players match the current filters.</p>`;
+      return;
+  }
   grid.innerHTML=list.map(cardHTML).join('');
 }
 
-/* filters */
-function readFilters(){
-  const name=($('#filterName')?.value||'').trim().toLowerCase();
-  const levels=$$('#filterLevels input:checked').map(i=>i.value);
-  const classes=$$('#classBox input:checked').map(i=>i.value);
-  const years=$$('#rosterBox input:checked').map(i=>i.value);
-  const status=$$('#filterStatus input:checked').map(i=>i.value);
-  return {name,levels,classes,years,status};
+function defaultSort(a,b){
+    const aIsActive = (a.status || '').toUpperCase().includes('ACTIVE'), bIsActive = (b.status || '').toUpperCase().includes('ACTIVE');
+    if (aIsActive && !bIsActive) return -1;
+    if (!aIsActive && bIsActive) return 1;
+    const cA=+a.grad_class||9999, cB=+b.grad_class||9999; 
+    if(cA!==cB) return cA-cB;
+    return (a.display_name || '').localeCompare(b.display_name || '');
 }
+
+function closeDrawers() { document.body.classList.remove('drawer-left-open', 'drawer-right-open', 'drawer-open'); }
+
+function setupEventListeners() {
+    $('#btnMenu')?.addEventListener('click', () => { document.body.classList.add('drawer-left-open', 'drawer-open'); });
+    $('#openSearch')?.addEventListener('click', () => { document.body.classList.add('drawer-left-open', 'drawer-open'); });
+    
+    $('#openFilters')?.addEventListener('click', () => {
+        $('#drawerFilters').style.display = 'flex';
+        $('#drawerAccount').style.display = 'none';
+        document.body.classList.add('drawer-right-open', 'drawer-open');
+    });
+    $('#btnAccount')?.addEventListener('click', () => {
+        $('#drawerAccount').style.display = 'flex';
+        $('#drawerFilters').style.display = 'none';
+        document.body.classList.add('drawer-right-open', 'drawer-open');
+    });
+    
+    $('.drawer-mask')?.addEventListener('click', closeDrawers);
+    $('#filtersReset')?.addEventListener('click', resetFilters);
+    $('#filtersReset2')?.addEventListener('click', resetFilters);
+    
+    $('#filters')?.addEventListener('input', debounce(applyFilters));
+    $('#playerSearch')?.addEventListener('input', debounce(liveSearch));
+
+    $$('.filter-group').forEach(group => {
+        const selectAll = group.querySelector('.select-all');
+        if (!selectAll) return;
+        const options = [...group.querySelectorAll('.filter-options input[type="checkbox"]:not(.select-all)')];
+        selectAll.addEventListener('change', (e) => {
+            options.forEach(option => { option.checked = e.target.checked; });
+            debounce(applyFilters)();
+        });
+    });
+
+    $('#cardGrid').addEventListener('click', (e) => {
+        const card = e.target.closest('.card');
+        if (!card) return;
+        if (e.target.closest('.back-nav-link')) {
+            handleFunZone(e.target.closest('.back-nav-link'));
+            return; 
+        }
+        if (e.target.closest('a')) return;
+        card.classList.toggle('is-flipped');
+    });
+}
+
+function slugOf(p){
+  if (!p) return '';
+  const s=(p.slug||'').trim();
+  if(s) return s;
+  return (p.display_name||'').trim().toLowerCase().replace(/[^a-z0-9]+/g,'-');
+}
+function profileURL(p) { return `profile.html?player=${slugOf(p)}`; }
+
 function applyFilters(){
   if(!window.PLAYERS) return;
   const F=readFilters();
-  const filtered=window.PLAYERS.filter(p=>{
-    const nm=(p.display_name||(`${p.first} ${p.last}`)||'').toLowerCase();
+  const filtered = window.PLAYERS.filter(p=>{
+    const nm=(p.display_name||'').toLowerCase();
     const nameOk=!F.name||nm.includes(F.name);
     const lvlOk=!F.levels.length||F.levels.includes(p.level);
-    const classOk=!F.classes.length||F.classes.includes(String(p.grad_class));
-    const yearOk=!F.years.length||String(p.letter_years||'').split(',').some(y=>F.years.includes(y.trim()));
     const statOk=!F.status.length||F.status.includes(p.status);
-    return nameOk&&lvlOk&&classOk&&yearOk&&statOk;
+    const classOk=!F.classes.length||F.classes.includes(p.grad_class);
+    const rosterOk=!F.rosterYears.length||(p.letter_years || '').split(',').some(y => F.rosterYears.includes(y.trim()));
+    return nameOk && lvlOk && statOk && classOk && rosterOk;
   });
-  renderCards(filtered);
-  closeBoth();
+  renderCards(filtered.sort(defaultSort));
 }
-function resetFilters(){
-  $$('#filters input[type="checkbox"]').forEach(i=>i.checked=false);
-  const filterNameInput = $('#filterName');
-  if (filterNameInput) {
-    filterNameInput.value = '';
-  }
-  if(window.PLAYERS) renderCards(window.PLAYERS.slice().sort(defaultSort));
-}
-$('#filtersApply')?.addEventListener('click',applyFilters);
-$('#filtersReset')?.addEventListener('click',resetFilters);
-$('#filtersReset2')?.addEventListener('click',resetFilters);
 
-/* live search */
+function readFilters(){
+  const name=($('#filterName')?.value||'').trim().toLowerCase();
+  const levels=$$('#filterLevels input:checked:not(.select-all)').map(i=>i.value);
+  const status=$$('#filterStatus input:checked:not(.select-all)').map(i=>i.value);
+  const classes=$$('#filterGradClass input:checked:not(.select-all)').map(i=>i.value);
+  const rosterYears=$$('#filterRosterYear input:checked:not(.select-all)').map(i=>i.value);
+  return {name, levels, status, classes, rosterYears};
+}
+
+function resetFilters(){
+  $$('#filters input').forEach(i=> {
+    if(i.type === 'checkbox') i.checked = false;
+    if(i.type === 'text') i.value='';
+  });
+  $$('#filterStatus input[value^="ACTIVE"]').forEach(i => i.checked = true);
+  applyFilters();
+}
+
 function makeHit(p){
   const el=document.createElement('div'); el.className='live-hit';
   const slug=slugOf(p);
-  const hsGuessJpg=`assets/img/hs-players/${slug}-hs.jpg`;
-  const hsGuessPng=`assets/img/hs-players/${slug}-hs.png`;
-  const hs = p.hs_img || hsGuessJpg;
-  el.innerHTML=`<img src="${hs}" onerror="this.src='${hsGuessPng}'; this.onerror=null;">
-                <div><div style="font-weight:700">${p.display_name||p.first+' '+p.last}</div>
+  const hsImg=`assets/img/hs-players/${slug}-hs.jpg`;
+  el.innerHTML=`<img src="${hsImg}" onerror="this.src='assets/img/placeholder.jpg';">
+                <div><div style="font-weight:700">${p.display_name}</div>
                 <div style="opacity:.7;font-size:.92em">${p.level||''} • Class of ${p.grad_class||''}</div></div>`;
   el.onclick=()=>location.href=profileURL(p);
   return el;
@@ -589,100 +566,92 @@ function liveSearch(){
   const q=($('#playerSearch')?.value||'').trim().toLowerCase();
   const box=$('#liveResults'); if(!box) return;
   if(!q){ box.innerHTML=''; return; }
-  const hits=(window.PLAYERS||[]).filter(p=>((p.display_name||(`${p.first} ${p.last}`)||'').toLowerCase().includes(q))).slice(0,25);
+  const hits=(window.PLAYERS||[]).filter(p=>(p.display_name||'').toLowerCase().includes(q)).slice(0,25);
   box.innerHTML=''; hits.forEach(p=>box.appendChild(makeHit(p)));
 }
-document.addEventListener('input',(e)=>{ if(e.target.id==='playerSearch') debounce(liveSearch,120)(); });
 
-/* ---- GEMINI API INTEGRATION ---- */
-async function generateGeminiText(prompt) {
-    const apiKey = ""; // Injected by the runtime environment
-    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
-    const payload = { contents: [{ parts: [{ text: prompt }] }] };
-
-    try {
-        const response = await fetch(apiUrl, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-        });
-        if (!response.ok) {
-            const errorBody = await response.json();
-            return `Error: ${errorBody.error.message || 'Failed to get a response.'}`;
-        }
-        const result = await response.json();
-        const candidate = result.candidates?.[0];
-        return candidate?.content?.parts?.[0]?.text || "Could not generate an outlook. The model returned an empty response.";
-    } catch (error) {
-        console.error('Gemini API call failed:', error);
-        return 'An error occurred while contacting the AI. Please check the browser console.';
-    }
-}
-
-async function handleOutlookClick(event) {
-    const button = event.target.closest('.gemini-btn');
-    if (!button) return;
-
+async function handleFunZone(button) {
     const card = button.closest('.card');
-    const outlookContainer = card.querySelector('.outlook-content');
-
-    if (button.disabled) return;
-    button.disabled = true;
-    button.textContent = '🧠 Thinking...';
-    outlookContainer.classList.add('loading');
-    outlookContainer.textContent = '';
-
-    try {
-        const playerData = JSON.parse(button.dataset.playerInfo);
-        const prompt = `Act as an optimistic but knowledgeable high school baseball scout. Write a brief, 2-3 sentence scouting report for ${playerData.name}, a ${playerData.position || 'player'} from Hamilton High School's class of ${playerData.klass}. He is currently with ${playerData.team} at the ${playerData.level} level. Highlight his journey and potential future in a positive, "Yat-A-Boy!" style.`;
-        const outlookText = await generateGeminiText(prompt);
-        outlookContainer.textContent = outlookText;
-    } catch (error) {
-        console.error('Error processing player data or generating outlook:', error);
-        outlookContainer.textContent = 'Failed to generate outlook due to a local error.';
-    } finally {
-        button.disabled = false;
-        button.innerHTML = '✨ Regenerate Outlook';
-        outlookContainer.classList.remove('loading');
-    }
+    const funZone = card.querySelector('.fun-zone');
+    const player = JSON.parse(card.dataset.playerInfo || '{}');
+    const content = button.dataset.content;
+    card.querySelectorAll('.back-nav-link').forEach(btn => btn.classList.remove('active'));
+    button.classList.add('active');
+    funZone.innerHTML = '<p>Loading...</p>';
+    if (content === 'stats') funZone.innerHTML = generateStatsGridHTML(player);
+    else if (content === 'bio') funZone.innerHTML = `<p><strong>Position:</strong> ${player.position||'—'}</p><p>A brief bio for ${player.display_name} will appear here.</p>`;
+    else if (content === 'news') funZone.innerHTML = `<p>News for ${player.display_name} coming soon.</p>`;
+    else if (content === 'social') funZone.innerHTML = `<p>Social feed for ${player.display_name} coming soon.</p>`;
+    else if (content === 'nil') funZone.innerHTML = `<p>NIL Score for ${player.display_name} coming soon.</p>`;
+    else if (content === 'video') funZone.innerHTML = `<iframe width="100%" height="215" src="https://www.youtube.com/embed/ZSoRzk-z35w" title="YouTube video player" frameborder="0" allowfullscreen style="border-radius: 8px;"></iframe>`;
+    else if (content === 'pics') funZone.innerHTML = `<p>Fan Pics for ${player.display_name} coming soon.</p>`;
 }
 
-/* boot */
-function showLoadError(msg){
-  const grid=document.getElementById('cardGrid');
-  if(grid) grid.innerHTML = `<div style="padding:16px;color:#fca5a5;background:#1a1a1a;border:1px solid #402">
-    <strong>Couldn’t load players from Google Sheets.</strong><br>${msg}
-  </div>`;
+/* --- FIREBASE AUTHENTICATION --- */
+function setupAuth() {
+    const { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } = window.firebaseAuth;
+    const auth = window.auth;
+    const signInForm = $('#signInForm'), registerForm = $('#registerForm'), signOutBtn = $('#btnSignOut'), authMessage = $('#authMessage');
+    
+    signInForm?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        try {
+            await signInWithEmailAndPassword(auth, $('#signInEmail').value, $('#signInPassword').value);
+            authMessage.textContent = 'Sign in successful!'; authMessage.className = 'success';
+            setTimeout(() => { closeDrawers(); authMessage.textContent = ''; }, 1500);
+        } catch (error) { authMessage.textContent = error.message; authMessage.className = 'error'; }
+    });
+    registerForm?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        try {
+            await createUserWithEmailAndPassword(auth, $('#registerEmail').value, $('#registerPassword').value);
+            authMessage.textContent = 'Registration successful!'; authMessage.className = 'success';
+             setTimeout(() => { closeDrawers(); authMessage.textContent = ''; }, 1500);
+        } catch (error) { authMessage.textContent = error.message; authMessage.className = 'error'; }
+    });
+    signOutBtn?.addEventListener('click', async () => { await signOut(auth); });
+
+    document.addEventListener('authStateChanged', ({ detail }) => {
+        const { user } = detail;
+        const accountBtn = $('#btnAccount'), signOutBtn = $('#btnSignOut');
+        if (user && !user.isAnonymous) {
+            accountBtn.style.display = 'none';
+            signOutBtn.style.display = 'inline-flex';
+        } else {
+            accountBtn.style.display = 'inline-flex';
+            signOutBtn.style.display = 'none';
+        }
+    });
+
+    $$('.auth-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+            const target = tab.dataset.tab;
+            $$('.auth-tab').forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            $$('.auth-form').forEach(form => form.style.display = form.id === `${target}Form` ? 'block' : 'none');
+            authMessage.textContent = '';
+        });
+    });
 }
 
-(async ()=>{
-  // Setup master event listener for card interactions (flip & Gemini)
-  const grid = $('#cardGrid');
-  if (grid) {
-      grid.addEventListener('click', (e) => {
-          const card = e.target.closest('.card');
-          if (!card) return;
 
-          if (e.target.closest('.gemini-btn')) {
-              handleOutlookClick(e);
-          } else if (!e.target.closest('a')) {
-              card.classList.toggle('is-flipped');
-          }
-      });
-  }
-
-  // Load and render initial data
-  try{
-    const data = await loadCSV(CSV_URL);
-    if(!Array.isArray(data) || !data.length) throw new Error('No rows found in CSV.');
-    window.PLAYERS = data.sort(defaultSort);
-    renderCards(window.PLAYERS);
-  }catch(err){
-    console.error('CSV load failed', err);
-    showLoadError(String(err));
-  }
-})();
+/* --- BOOTSTRAP --- */
+document.addEventListener('DOMContentLoaded', () => {
+    (async ()=>{
+      try{
+        setupEventListeners();
+        setupAuth();
+        const data = await loadCSV(CSV_URL);
+        window.PLAYERS = data; 
+        populateFilters(data);
+        $$('#filterStatus input[value^="ACTIVE"]').forEach(i => i.checked = true);
+        applyFilters(); 
+      }catch(err){
+        console.error('Initialization failed', err);
+        $('#cardGrid').innerHTML = `<p style="color:red; grid-column: 1 / -1;"><strong>Error:</strong> Could not load page. ${err.message}</p>`;
+      }
+    })();
+});
 </script>
-
 </body>
 </html>
