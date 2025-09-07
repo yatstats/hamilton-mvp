@@ -1,4 +1,4 @@
-<!-- YATSTATS • Hamilton • build 5.0.2 -->
+<!-- YATSTATS • Hamilton • build 5.0.23 -->
 <!doctype html>
 <html lang="en">
 <head>
@@ -9,12 +9,12 @@
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400&family=Bebas+Neue&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#0c0c0c; --fg:#f2f2f2; --muted:#c4c4c4; --ink:#e8e8e8; --line:rgba(255,255,255,0.08);
-  --hamSmall:13px; --hamBig:20px; --hamBigger:24px; --tagGrey:#cfd2d6;
-  --crestH: clamp(56px, 8.5vw, 82px);
-  --pairGap: 10px;
-  --containerPad: 16px;
-  --footerH: clamp(56px, 8vh, 77px);
+  --bg:#0c0c0c; --fg:#f2f2f2; --muted:#c4c4c4; --ink:#e8e8e8; --line:rgba(255,255,255,0.08);
+  --hamSmall:13px; --hamBig:20px; --hamBigger:24px; --tagGrey:#cfd2d6;
+  --crestH: clamp(56px, 8.5vw, 82px);
+  --pairGap: 10px;
+  --containerPad: 16px;
+  --footerH: clamp(56px, 8vh, 77px);
 }
 @font-face{ font-family:'Indigo'; src:url('assets/fonts/Indigo.otf') format('opentype'); font-weight:400; font-style:normal; font-display:swap; }
 
@@ -23,6 +23,9 @@ body{background:var(--bg);color:var(--fg);font-family:Oswald,system-ui,-apple-sy
 a{color:inherit;text-decoration:none}
 .container{max-width:1280px;margin:0 auto;padding:0 var(--containerPad)}
 @media (max-width:520px){ .container{padding:0 12px} }
+/* CHANGE: Go full-width on very wide screens */
+@media (min-width: 1281px) { .container {max-width: none;} }
+
 
 /* HEADER */
 .header{position:sticky;top:0;z-index:50;background:#000}
@@ -37,7 +40,8 @@ a{color:inherit;text-decoration:none}
 .nav-pair .bold{font:400 var(--hamSmall) Indigo, "Bebas Neue", sans-serif}
 .wordmark-wrap{display:flex;align-items:center;justify-content:flex-end;min-width:120px}
 .wordmark-img{height:clamp(18px,3.2vw,28px);width:auto;display:block}
-@media (max-width:1100px){ .topnav{display:none !important} }
+/* CHANGE: Update nav breakpoint */
+@media (max-width:1200px){ .topnav{display:none !important} }
 
 .hr-y{border-top:1px solid var(--line)}
 .schoolrow{display:flex;align-items:center;gap:var(--pairGap);padding:6px 0}
@@ -46,13 +50,14 @@ a{color:inherit;text-decoration:none}
 .schooltext .small{font:300 var(--hamSmall)/1 Oswald;letter-spacing:.02em;color:var(--muted)}
 .schooltext .big1{font:400 var(--hamBig)/1 "Bebas Neue",sans-serif}
 .schooltext .big2{font:400 var(--hamBigger)/1 "Bebas Neue",sans-serif;margin-top:-4px}
-/* crumbs base stays tiny */
 .crumbs{font:300 calc(var(--hamSmall)*.5)/1 Oswald;letter-spacing:.02em;color:var(--muted);text-transform:uppercase}
 
 /* HERO (animated tagline) */
-.hero{padding:6px 0}
+.hero{
+  padding:6px 0;
+  background: #000; /* ADDED: To match sticky header */
+}
 .hero-grid{display:flex;align-items:center;justify-content:space-between;gap:16px}
-/* NEW: stack tagline + tiny crumbs on the left */
 .hero-left{display:flex;flex-direction:column;gap:4px}
 .hero-crumbs{margin:0; text-align:left; white-space:nowrap}
 
@@ -89,8 +94,8 @@ body.drawer-right-open #drawerRight{transform:translateX(0)}
 @media (min-width:1300px){ .grid{grid-template-columns:repeat(5,1fr)}}
 @media (max-width:1299px){ .grid{grid-template-columns:repeat(4,1fr)}}
 @media (max-width:1024px){ .grid{grid-template-columns:repeat(3,1fr)}}
-@media (max-width:768px){  .grid{grid-template-columns:repeat(2,1fr)}}
-@media (max-width:520px){  .grid{grid-template-columns:repeat(1,1fr)}}
+@media (max-width:768px){  .grid{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:520px){  .grid{grid-template-columns:repeat(1,1fr)}}
 
 /* 5:7 with flip */
 .card{position:relative;background:#171717;border-radius:16px;overflow:hidden}
@@ -113,14 +118,14 @@ body.drawer-right-open #drawerRight{transform:translateX(0)}
 /* Roster dots */
 .dots{position:absolute;left:14px;bottom:12px;display:flex;gap:6px;z-index:2}
 .dot{width:28px;height:28px;border-radius:999px;background:#f3f4f6;color:#111;display:grid;place-items:center;
-     font:900 12px/1 Oswald;border:1px solid rgba(0,0,0,.25)}
+     font:900 12px/1 Oswald;border:1px solid rgba(0,0,0,.25)}
 
 /* Small profile button on the FRONT */
 .card-profile-front{
-  position:absolute;left:14px;top:14px;z-index:2;
-  display:inline-flex;align-items:center;gap:6px;
-  padding:6px 8px;border-radius:12px;background:rgba(0,0,0,.55);color:#fff;font:700 12px "Bebas Neue";
-  border:1px solid rgba(255,255,255,.25)
+  position:absolute;left:14px;top:14px;z-index:2;
+  display:inline-flex;align-items:center;gap:6px;
+  padding:6px 8px;border-radius:12px;background:rgba(0,0,0,.55);color:#fff;font:700 12px "Bebas Neue";
+  border:1px solid rgba(255,255,255,.25)
 }
 .card-profile-front i{font-size:14px}
 
@@ -133,179 +138,174 @@ body.drawer-right-open #drawerRight{transform:translateX(0)}
 .site-footer .wrap{height:100%;display:flex;align-items:center;justify-content:center;padding:0 var(--containerPad)}
 .sponsor-banner{height:calc(var(--footerH) - 12px); width:100%; display:flex;align-items:center;justify-content:center}
 .sponsor-banner img{
-  height:100%; width:100%; object-fit:contain;
-  filter: saturate(.95);
+  height:100%; width:100%; object-fit:contain;
+  filter: saturate(.95);
 }
 </style>
 </head>
 
 <body>
 <header class="header">
-  <div class="container topbar">
-    <div class="left-icons">
-      <button class="icon-btn" id="btnMenu" aria-label="Menu"><i class="ri-menu-line"></i></button>
-      <button class="icon-btn" id="btnAccount" aria-label="Account"><i class="ri-user-3-line"></i></button>
-      <button class="icon-btn" id="btnTheme" aria-label="Theme"><i class="ri-moon-line"></i></button>
-    </div>
+  <div class="container topbar">
+    <div class="left-icons">
+      <button class="icon-btn" id="btnMenu" aria-label="Menu"><i class="ri-menu-line"></i></button>
+      <button class="icon-btn" id="btnAccount" aria-label="Account"><i class="ri-user-3-line"></i></button>
+      <button class="icon-btn" id="btnTheme" aria-label="Theme"><i class="ri-moon-line"></i></button>
+    </div>
 
-    <nav class="topnav" aria-label="Top Navigation">
-      <span class="nav-pair"><span class="thin">WHERE THEY</span><span class="bold">YAT?</span></span>
-      <span class="nav-pair"><span class="thin">ACTIVE ALUMNI</span><span class="bold">NEWS</span></span>
-      <span class="nav-pair"><span class="thin">NEXT-LEVEL</span><span class="bold">ALL-TIME LIST</span></span>
-      <span class="nav-pair"><span class="thin">NIL & YAT-A-BOY</span><span class="bold">MARKETPLACE</span></span>
-      <span class="nav-pair"><span class="thin">THE</span><span class="bold">CURRENT TEAM</span></span>
-      <span class="nav-pair"><span class="thin">PCD ACTION</span><span class="bold">PARTNER PROGRAM</span></span>
-      <span class="nav-pair"><span class="thin"></span><span class="bold">FAQ’S</span></span>
-    </nav>
+    <nav class="topnav" aria-label="Top Navigation">
+      <span class="nav-pair"><span class="thin">WHERE THEY</span><span class="bold">YAT?</span></span>
+      <span class="nav-pair"><span class="thin">ACTIVE ALUMNI</span><span class="bold">NEWS</span></span>
+      <span class="nav-pair"><span class="thin">NEXT-LEVEL</span><span class="bold">ALL-TIME LIST</span></span>
+      <span class="nav-pair"><span class="thin">NIL & YAT-A-BOY</span><span class="bold">MARKETPLACE</span></span>
+      <span class="nav-pair"><span class="thin">THE</span><span class="bold">CURRENT TEAM</span></span>
+      <span class="nav-pair"><span class="thin">PCD ACTION</span><span class="bold">PARTNER PROGRAM</span></span>
+      <span class="nav-pair"><span class="thin"></span><span class="bold">FAQ’S</span></span>
+    </nav>
 
-    <div class="wordmark-wrap">
-      <img class="wordmark-img" src="assets/img/yatstats-logo.png" alt="YAT?STATS">
-    </div>
-  </div>
+    <div class="wordmark-wrap">
+      <img class="wordmark-img" src="assets/img/yatstats-logo.png" alt="YAT?STATS">
+    </div>
+  </div>
 
-  <div class="hr-y"></div>
+  <div class="hr-y"></div>
 
-  <div class="container schoolrow">
-    <img id="hamLogo" class="ham-logo" src="assets/img/hamilton-logo.png" alt="Hamilton H">
-    <div class="schooltext">
-      <div class="small">CHANDLER, AZ</div>
-      <div class="big1">HAMILTON HIGH SCHOOL</div>
-      <div class="big2">ACTIVE ALUMNI</div>
-    </div>
-    <!-- crumbs REMOVED from here -->
-  </div>
+  <div class="container schoolrow">
+    <img id="hamLogo" class="ham-logo" src="assets/img/hamilton-logo.png" alt="Hamilton H">
+    <div class="schooltext">
+      <div class="small">CHANDLER, AZ</div>
+      <div class="big1">HAMILTON HIGH SCHOOL</div>
+      <div class="big2">ACTIVE ALUMNI</div>
+    </div>
+  </div>
 
-  <div class="hr-y"></div>
+  <div class="hr-y"></div>
+
+  <section class="hero">
+    <div class="container hero-grid">
+      <div class="hero-left" aria-live="polite">
+        <div class="tag-duo">
+          <div class="tag-swap"><span class="tag-grey">WHERE THEY</span> <span class="tag-bold">YAT?</span></div>
+          <div class="tag-swap"><span class="tag-grey">FLIP FOR</span> <span class="tag-bold">STATS!</span></div>
+        </div>
+        <div class="crumbs hero-crumbs">HAMILTON ▸ WHERE THEY YAT?</div>
+      </div>
+  
+      <div class="hero-right">
+        <button id="openSearch" class="hero-icon icon-btn" aria-label="Open search"><i class="ri-search-line"></i></button>
+        <button id="openFilters" class="hero-icon icon-btn" aria-label="Open filters"><i class="ri-filter-3-line"></i></button>
+        <button id="filtersReset2" class="hero-icon icon-btn" aria-label="Reset"><i class="ri-restart-line"></i></button>
+      </div>
+    </div>
+  </section>
 </header>
 
-<section class="hero">
-  <div class="container hero-grid">
-    <!-- LEFT: tagline + tiny crumbs (moved here) -->
-    <div class="hero-left" aria-live="polite">
-      <div class="tag-duo">
-        <div class="tag-swap"><span class="tag-grey">WHERE THEY</span> <span class="tag-bold">YAT?</span></div>
-        <div class="tag-swap"><span class="tag-grey">FLIP FOR</span> <span class="tag-bold">STATS!</span></div>
-      </div>
-      <div class="crumbs hero-crumbs">HAMILTON ▸ WHERE THEY YAT?</div>
-    </div>
-
-    <!-- RIGHT: actions -->
-    <div class="hero-right">
-      <button id="openSearch" class="hero-icon icon-btn" aria-label="Open search"><i class="ri-search-line"></i></button>
-      <button id="openFilters" class="hero-icon icon-btn" aria-label="Open filters"><i class="ri-filter-3-line"></i></button>
-      <button id="filtersReset2" class="hero-icon icon-btn" aria-label="Reset"><i class="ri-restart-line"></i></button>
-    </div>
-  </div>
-</section>
-
-<!-- LEFT DRAWER -->
 <div class="drawer-mask"></div>
 <aside class="drawer" id="drawerLeft" aria-label="Left drawer">
-  <h3>PLAYER PROFILE SEARCH</h3>
-  <div class="pad">
-    <input id="playerSearch" placeholder="Type to search…" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--ink)">
-    <div id="liveResults"></div>
-  </div>
-  <div class="pad">
-    <h3>Navigation</h3>
-    <div style="display:flex;flex-direction:column;gap:12px">
-      <a href="index.html"><span class="thin">WHERE THEY</span> <span class="bold">YAT?</span></a>
-      <a href="alumni-news.html"><span class="thin">ACTIVE ALUMNI</span> <span class="bold">NEWS</span></a>
-      <a href="all-time-alumni-list.html"><span class="thin">NEXT-LEVEL</span> <span class="bold">ALL-TIME LIST</span></a>
-      <a href="nil-yat-a-boy-marketplace.html"><span class="thin">NIL & YAT-A-BOY</span> <span class="bold">MARKETPLACE</span></a>
-      <a href="current-team.html"><span class="thin">THE</span> <span class="bold">CURRENT TEAM</span></a>
-      <a href="partner-program.html"><span class="thin">PCD ACTION</span> <span class="bold">PARTNER PROGRAM</span></a>
-      <a href="faq.html"><span class="thin"></span> <span class="bold">FAQ’S</span></a>
-    </div>
-  </div>
-  <button class="icon-btn close-btn" onclick="document.body.classList.remove('drawer-left-open')"><i class="ri-close-line"></i></button>
+  <h3>PLAYER PROFILE SEARCH</h3>
+  <div class="pad">
+    <input id="playerSearch" placeholder="Type to search…" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--ink)">
+    <div id="liveResults"></div>
+  </div>
+  <div class="pad">
+    <h3>Navigation</h3>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <a href="index.html"><span class="thin">WHERE THEY</span> <span class="bold">YAT?</span></a>
+      <a href="alumni-news.html"><span class="thin">ACTIVE ALUMNI</span> <span class="bold">NEWS</span></a>
+      <a href="all-time-alumni-list.html"><span class="thin">NEXT-LEVEL</span> <span class="bold">ALL-TIME LIST</span></a>
+      <a href="nil-yat-a-boy-marketplace.html"><span class="thin">NIL & YAT-A-BOY</span> <span class="bold">MARKETPLACE</span></a>
+      <a href="current-team.html"><span class="thin">THE</span> <span class="bold">CURRENT TEAM</span></a>
+      <a href="partner-program.html"><span class="thin">PCD ACTION</span> <span class="bold">PARTNER PROGRAM</span></a>
+      <a href="faq.html"><span class="thin"></span> <span class="bold">FAQ’S</span></a>
+    </div>
+  </div>
+  <button class="icon-btn close-btn" onclick="document.body.classList.remove('drawer-left-open')"><i class="ri-close-line"></i></button>
 </aside>
 
-<!-- RIGHT DRAWER (filters) -->
 <aside class="drawer drawer-right" id="drawerRight" aria-label="Filters drawer">
-  <h3>Filters</h3>
-  <div id="filters" class="pad" style="display:flex;flex-direction:column;gap:16px">
-    <div>
-      <div class="small" style="margin-bottom:6px">By NAME</div>
-      <input id="filterName" placeholder="Type a name…" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--ink)"/>
-    </div>
-    <div id="filterLevels">
-      <div class="small" style="margin-bottom:6px">By LEVEL</div>
-      <label><input type="checkbox" value="MLB"> MLB</label>
-      <label><input type="checkbox" value="TRIPLE-A"> TRIPLE-A</label>
-      <label><input type="checkbox" value="DOUBLE-A"> DOUBLE-A</label>
-      <label><input type="checkbox" value="HIGH-A"> HIGH-A</label>
-      <label><input type="checkbox" value="LOW-A"> LOW-A</label>
-      <label><input type="checkbox" value="ROOKIE"> ROOKIE</label>
-      <label><input type="checkbox" value="INDY"> INDY</label>
-      <label><input type="checkbox" value="INTERNATIONAL"> INTERNATIONAL</label>
-      <label><input type="checkbox" value="NCAA-D1"> NCAA-D1</label>
-      <label><input type="checkbox" value="NCAA-D2"> NCAA-D2</label>
-      <label><input type="checkbox" value="NCAA-D3"> NCAA-D3</label>
-      <label><input type="checkbox" value="NAIA"> NAIA</label>
-      <label><input type="checkbox" value="JUCO"> JUCO</label>
-    </div>
-    <div id="filterClasses">
-      <div class="small" style="margin-bottom:6px">By GRAD CLASS</div>
-      <div id="classBox" style="display:flex;flex-wrap:wrap;gap:8px"></div>
-    </div>
-    <div id="filterRoster">
-      <div class="small" style="margin-bottom:6px">By ROSTER YEAR</div>
-      <div id="rosterBox" style="display:flex;flex-wrap:wrap;gap:8px"></div>
-    </div>
-    <div id="filterStatus">
-      <div class="small" style="margin-bottom:6px">By STATUS</div>
-      <label><input type="checkbox" value="ACTIVE 2025"> ACTIVE 2025</label>
-      <label><input type="checkbox" value="FREE AGENT"> FREE AGENT</label>
-      <label><input type="checkbox" value="INJURED"> INJURED</label>
-      <label><input type="checkbox" value="ACTIVE 2024"> ACTIVE 2024</label>
-      <label><input type="checkbox" value="RETIRED"> RETIRED</label>
-      <label><input type="checkbox" value="SPONSOR"> SPONSOR</label>
-    </div>
-    <div style="display:flex;gap:10px">
-      <button id="filtersApply" class="icon-btn" style="padding:10px 14px;border:1px solid var(--line);border-radius:12px"><i class="ri-check-line"></i>&nbsp;Apply</button>
-      <button id="filtersReset" class="icon-btn" style="padding:10px 14px;border:1px solid var(--line);border-radius:12px"><i class="ri-restart-line"></i>&nbsp;Reset</button>
-      <button class="icon-btn close-btn" onclick="document.body.classList.remove('drawer-right-open')" style="margin-left:auto"><i class="ri-close-line"></i></button>
-    </div>
-  </div>
+  <h3>Filters</h3>
+  <div id="filters" class="pad" style="display:flex;flex-direction:column;gap:16px">
+    <div>
+      <div class="small" style="margin-bottom:6px">By NAME</div>
+      <input id="filterName" placeholder="Type a name…" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--ink)"/>
+    </div>
+    <div id="filterLevels">
+      <div class="small" style="margin-bottom:6px">By LEVEL</div>
+      <label><input type="checkbox" value="MLB"> MLB</label>
+      <label><input type="checkbox" value="TRIPLE-A"> TRIPLE-A</label>
+      <label><input type="checkbox" value="DOUBLE-A"> DOUBLE-A</label>
+      <label><input type="checkbox" value="HIGH-A"> HIGH-A</label>
+      <label><input type="checkbox" value="LOW-A"> LOW-A</label>
+      <label><input type="checkbox" value="ROOKIE"> ROOKIE</label>
+      <label><input type="checkbox" value="INDY"> INDY</label>
+      <label><input type="checkbox" value="INTERNATIONAL"> INTERNATIONAL</label>
+      <label><input type="checkbox" value="NCAA-D1"> NCAA-D1</label>
+      <label><input type="checkbox" value="NCAA-D2"> NCAA-D2</label>
+      <label><input type="checkbox" value="NCAA-D3"> NCAA-D3</label>
+      <label><input type="checkbox" value="NAIA"> NAIA</label>
+      <label><input type="checkbox" value="JUCO"> JUCO</label>
+    </div>
+    <div id="filterClasses">
+      <div class="small" style="margin-bottom:6px">By GRAD CLASS</div>
+      <div id="classBox" style="display:flex;flex-wrap:wrap;gap:8px"></div>
+    </div>
+    <div id="filterRoster">
+      <div class="small" style="margin-bottom:6px">By ROSTER YEAR</div>
+      <div id="rosterBox" style="display:flex;flex-wrap:wrap;gap:8px"></div>
+    </div>
+    <div id="filterStatus">
+      <div class="small" style="margin-bottom:6px">By STATUS</div>
+      <label><input type="checkbox" value="ACTIVE 2025"> ACTIVE 2025</label>
+      <label><input type="checkbox" value="FREE AGENT"> FREE AGENT</label>
+      <label><input type="checkbox" value="INJURED"> INJURED</label>
+      <label><input type="checkbox" value="ACTIVE 2024"> ACTIVE 2024</label>
+      <label><input type="checkbox" value="RETIRED"> RETIRED</label>
+      <label><input type="checkbox" value="SPONSOR"> SPONSOR</label>
+    </div>
+    <div style="display:flex;gap:10px">
+      <button id="filtersApply" class="icon-btn" style="padding:10px 14px;border:1px solid var(--line);border-radius:12px"><i class="ri-check-line"></i>&nbsp;Apply</button>
+      <button id="filtersReset" class="icon-btn" style="padding:10px 14px;border:1px solid var(--line);border-radius:12px"><i class="ri-restart-line"></i>&nbsp;Reset</button>
+      <button class="icon-btn close-btn" onclick="document.body.classList.remove('drawer-right-open')" style="margin-left:auto"><i class="ri-close-line"></i></button>
+    </div>
+  </div>
 </aside>
 
 <main class="main container">
-  <div id="cardGrid" class="grid" aria-live="polite"></div>
+  <div id="cardGrid" class="grid" aria-live="polite"></div>
 </main>
 
 <footer class="site-footer">
-  <div class="wrap">
-    <div class="sponsor-banner">
-      <img
-        src="assets/img/sponsor-1200x120.jpg"
-        srcset="assets/img/sponsor-640x90.jpg 640w,
-                assets/img/sponsor-1200x120.jpg 1200w,
-                assets/img/sponsor-1920x180.jpg 1920w"
-        sizes="(max-width: 680px) 96vw, (max-width: 1200px) 85vw, 1200px"
-        alt="Presented by YOUR SPONSOR">
-    </div>
-  </div>
+  <div class="wrap">
+    <div class="sponsor-banner">
+      <img
+        src="assets/img/sponsor-1200x120.jpg"
+        srcset="assets/img/sponsor-640x90.jpg 640w,
+                assets/img/sponsor-1200x120.jpg 1200w,
+                assets/img/sponsor-1920x180.jpg 1920w"
+        sizes="(max-width: 680px) 96vw, (max-width: 1200px) 85vw, 1200px"
+        alt="Presented by YOUR SPONSOR">
+    </div>
+  </div>
 </footer>
 
 <script>
-/* ---- YATSTATS • Hamilton • build 5.0.1 ---- */
+/* ---- YATSTATS • Hamilton • build 5.0.2 ---- */
 
 /* Hamilton logo fallback (path/case safety) */
 (function(){
-  const img = document.getElementById('hamLogo');
-  if(!img) return;
-  const tries = [
-    'assets/img/hamilton-logo.png',
-    'assets/img/hamilton-logo-stacked.png',
-    '/assets/img/hamilton-logo.png'
-  ];
-  let i = 0;
-  img.addEventListener('error', ()=>{ i++; if(i < tries.length) img.src = tries[i]; });
+  const img = document.getElementById('hamLogo');
+  if(!img) return;
+  const tries = [
+    'assets/img/hamilton-logo.png',
+    'assets/img/hamilton-logo-stacked.png',
+    '/assets/img/hamilton-logo.png'
+  ];
+  let i = 0;
+  img.addEventListener('error', ()=>{ i++; if(i < tries.length) img.src = tries[i]; });
 })();
 
 /* Utils */
-const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQcWJM6Q6hTdFnES_G5LUy4teCS-sJ5HdAc9F5HSY8DGE9egdGy8yUAe2ShT3tFm-CwUuCYeAYy_YiW/pub?output=csv";
+const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQcWJM6Q6hTdFnES_G5LUy4teCS-sJ5HdAc9F5HSY8DGE9egdGy8yUAe2ShT3tFm-CwUuCYeAYy_YiW/pub?gid=2028135390&single=true&output=csv";
 const $ = s => document.querySelector(s), $$ = s => Array.from(document.querySelectorAll(s));
 const debounce = (fn, ms=180)=>{ let t; return (...a)=>{ clearTimeout(t); t=setTimeout(()=>fn(...a),ms); }; };
 
@@ -320,176 +320,177 @@ $('.drawer-mask')?.addEventListener('click', closeBoth);
 
 /* theme */
 $('#btnTheme')?.addEventListener('click', ()=>{
-  const isDark=getComputedStyle(document.documentElement).getPropertyValue('--bg').trim()==='#0c0c0c';
-  if(isDark){
-    document.documentElement.style.setProperty('--bg','#ffffff');
-    document.documentElement.style.setProperty('--fg','#111');
-    document.documentElement.style.setProperty('--muted','#444');
-    document.documentElement.style.setProperty('--line','#e5e7eb');
-  }else{
-    document.documentElement.style.setProperty('--bg','#0c0c0c');
-    document.documentElement.style.setProperty('--fg','#f2f2f2');
-    document.documentElement.style.setProperty('--muted','#c4c4c4');
-    document.documentElement.style.setProperty('--line','rgba(255,255,255,0.08)');
-  }
+  const isDark=getComputedStyle(document.documentElement).getPropertyValue('--bg').trim()==='#0c0c0c';
+  if(isDark){
+    document.documentElement.style.setProperty('--bg','#ffffff');
+    document.documentElement.style.setProperty('--fg','#111');
+    document.documentElement.style.setProperty('--muted','#444');
+    document.documentElement.style.setProperty('--line','#e5e7eb');
+  }else{
+    document.documentElement.style.setProperty('--bg','#0c0c0c');
+    document.documentElement.style.setProperty('--fg','#f2f2f2');
+    document.documentElement.style.setProperty('--muted','#c4c4c4');
+    document.documentElement.style.setProperty('--line','rgba(255,255,255,0.08)');
+  }
 });
 
 /* year chips 2025..1999 */
 (function fillYears(){
-  const mk=(id)=>{ const el=$(id); if(!el) return;
-    el.innerHTML=[...Array(27)].map((_,i)=>2025-i).map(y=>`<label><input type="checkbox" value="${y}"> ${y}</label>`).join(' ');
-  };
-  mk('#classBox'); mk('#rosterBox');
+  const mk=(id)=>{ const el=$(id); if(!el) return;
+    el.innerHTML=[...Array(27)].map((_,i)=>2025-i).map(y=>`<label><input type="checkbox" value="${y}"> ${y}</label>`).join(' ');
+  };
+  mk('#classBox'); mk('#rosterBox');
 })();
 
 /* CSV loader (no fallback) */
 async function loadCSV(url){
-  const r = await fetch(url, {mode:'cors', cache:'no-store'});
-  if(!r.ok) throw new Error(`HTTP ${r.status}`);
-  const txt = await r.text();
-  if(!txt.trim()) throw new Error('Empty CSV');
-  const rows = txt.trim().split(/\r?\n/).map(line =>
-    line.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/).map(c=>c.replace(/^"|"$/g,''))
-  );
-  const header = rows.shift();
-  const idx=n=>header.indexOf(n);
-  return rows.map(r=>({
-    id:r[idx('tbc_id')]||r[idx('id')],
-    slug:r[idx('slug')],
-    display_name:r[idx('display_name')],
-    first:r[idx('first')], last:r[idx('last')],
-    grad_class:r[idx('grad_class')], letter_years:r[idx('letter_years')],
-    status:r[idx('status')], level:r[idx('level')], team:r[idx('team')],
-    org:r[idx('org')], city_state:r[idx('city_state')],
-    position:r[idx('position')], front_img:r[idx('front_img')], hs_img:r[idx('hs_img')]
-  }));
+  const r = await fetch(url, {mode:'cors', cache:'no-store'});
+  if(!r.ok) throw new Error(`HTTP ${r.status}`);
+  const txt = await r.text();
+  if(!txt.trim()) throw new Error('Empty CSV');
+  const rows = txt.trim().split(/\r?\n/).map(line =>
+    line.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/).map(c=>c.replace(/^"|"$/g,''))
+  );
+  const header = rows.shift();
+  const idx=n=>header.indexOf(n);
+  return rows.map(r=>({
+    id:r[idx('tbc_id')]||r[idx('id')],
+    slug:r[idx('slug')],
+    display_name:r[idx('display_name')],
+    first:r[idx('first')], last:r[idx('last')],
+    grad_class:r[idx('grad_class')], letter_years:r[idx('letter_years')],
+    status:r[idx('status')], level:r[idx('level')], team:r[idx('team')],
+    org:r[idx('org')], city_state:r[idx('city_state')],
+    position:r[idx('position')], front_img:r[idx('front_img')], hs_img:r[idx('hs_img')]
+  }));
 }
 
 /* ranking & helpers */
 function defaultSort(a,b){
-  const orderStatus=['ACTIVE 2025','FREE AGENT','INJURED','ACTIVE 2024','RETIRED','SPONSOR'];
-  const sA=orderStatus.indexOf((a.status||'').toUpperCase()), sB=orderStatus.indexOf((b.status||'').toUpperCase());
-  if(sA!==sB) return sA-sB;
-  const cA=+a.grad_class||0, cB=+b.grad_class||0; if(cA!==cB) return cA-cB;
-  const lvlRank=v=>({'MLB':9,'TRIPLE-A':8,'DOUBLE-A':7,'HIGH-A':6,'LOW-A':5,'ROOKIE':4,'INDY':3,'INTERNATIONAL':2,'NCAA-D1':1,'NCAA-D2':1,'NCAA-D3':1,'NAIA':1,'JUCO':1}[String(v).toUpperCase()]||0);
-  const L=lvlRank(a.level)-lvlRank(b.level); if(L!==0) return -L;
-  const yrs=p=>String(p.letter_years||'').split(',').filter(Boolean).length;
-  const vy=yrs(a)-yrs(b); if(vy!==0) return -vy;
-  const lastA=(a.last||(a.display_name||'').split(' ').slice(-1)[0]||'').toLowerCase();
-  const lastB=(b.last||(b.display_name||'').split(' ').slice(-1)[0]||'').toLowerCase();
-  return lastA.localeCompare(lastB);
+  const orderStatus=['ACTIVE 2025','FREE AGENT','INJURED','ACTIVE 2024','RETIRED','SPONSOR'];
+  const sA=orderStatus.indexOf((a.status||'').toUpperCase()), sB=orderStatus.indexOf((b.status||'').toUpperCase());
+  if(sA!==sB) return sA-sB;
+  const cA=+a.grad_class||0, cB=+b.grad_class||0; if(cA!==cB) return cA-cB;
+  const lvlRank=v=>({'MLB':9,'TRIPLE-A':8,'DOUBLE-A':7,'HIGH-A':6,'LOW-A':5,'ROOKIE':4,'INDY':3,'INTERNATIONAL':2,'NCAA-D1':1,'NCAA-D2':1,'NCAA-D3':1,'NAIA':1,'JUCO':1}[String(v).toUpperCase()]||0);
+  const L=lvlRank(a.level)-lvlRank(b.level); if(L!==0) return -L;
+  const yrs=p=>String(p.letter_years||'').split(',').filter(Boolean).length;
+  const vy=yrs(a)-yrs(b); if(vy!==0) return -vy;
+  const lastA=(a.last||(a.display_name||'').split(' ').slice(-1)[0]||'').toLowerCase();
+  const lastB=(b.last||(b.display_name||'').split(' ').slice(-1)[0]||'').toLowerCase();
+  return lastA.localeCompare(lastB);
 }
 function slugOf(p){
-  const s=(p.slug||'').trim();
-  if(s) return s;
-  const base=(p.display_name||`${p.first||''} ${p.last||''}`||'')
-    .trim().toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');
-  return base;
+  const s=(p.slug||'').trim();
+  if(s) return s;
+  const base=(p.display_name||`${p.first||''} ${p.last||''}`||'')
+    .trim().toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');
+  return base;
 }
 function profileURL(p){
-  const s=slugOf(p), id=(p.id||'').trim();
-  if(s) return `profile.html?id=${encodeURIComponent(s)}`;
-  if(id) return `profile.html?id=${encodeURIComponent(id)}`;
-  return '#';
+  const s=slugOf(p), id=(p.id||'').trim();
+  if(s) return `profile.html?id=${encodeURIComponent(s)}`;
+  if(id) return `profile.html?id=${encodeURIComponent(id)}`;
+  return '#';
 }
 function nowImg(p){
-  const slug = slugOf(p);
-  const chain = [
-    `assets/img/now-players/${slug}-now.jpg`,
-    `assets/img/now-players/${slug}-now.png`,
-    p.front_img,
-    'assets/img/placeholder.jpg'
-  ];
-  return chain.find(Boolean);
+  const slug = slugOf(p);
+  const chain = [
+    `assets/img/now-players/${slug}-now.jpg`,
+    `assets/img/now-players/${slug}-now.png`,
+    p.front_img,
+    'assets/img/placeholder.jpg'
+  ];
+  return chain.find(Boolean);
 }
 function rosterDots(p){
-  const yrs=String(p.letter_years||'').split(',').map(s=>s.trim()).filter(Boolean).map(y=>y.slice(-2));
-  return yrs.map(y=>`<span class="dot" title="${y}">${y}</span>`).join('');
+  const yrs=String(p.letter_years||'').split(',').map(s=>s.trim()).filter(Boolean).map(y=>y.slice(-2));
+  return yrs.map(y=>`<span class="dot" title="${y}">${y}</span>`).join('');
 }
 
 /* card */
 function cardHTML(p){
-  const name=p.display_name||(p.first&&p.last?`${p.first} ${p.last}`:'');
-  const bg=nowImg(p);
-  const klass=p.grad_class||'';
-  return `
-  <article class="card" aria-label="${name}">
-    <div class="card-inner">
-      <div class="flip">
-        <div class="face front">
-          <a class="card-profile-front" href="${profileURL(p)}" title="Open profile"><i class="ri-external-link-line"></i>PROFILE</a>
-          <div class="bg" style="background-image:url('${bg}')"></div>
-          <div class="shade"></div>
-          <div class="cap">
-            <div class="name">${name}</div>
-            <div class="meta-small">${p.team||''}</div>
-          </div>
-          <div class="chips">
-            ${p.status?`<span class="chip">${p.status}</span>`:''}
-            ${klass?`<span class="chip">CLASS OF ${klass}</span>`:''}
-          </div>
-          <div class="dots">${rosterDots(p)}</div>
-        </div>
-        <div class="face back">
-          <div class="back-head">
-            <strong style="font:900 16px 'Bebas Neue'">${name}</strong>
-            <a class="icon-btn" href="${profileURL(p)}" style="padding:8px 12px;border:1px solid #ddd;border-radius:10px;color:#111"><i class="ri-user-line"></i>&nbsp;Profile</a>
-          </div>
-          <div class="back-body">
-            <p><strong>Level:</strong> ${p.level||'—'}</p>
-            <p><strong>Status:</strong> ${p.status||'—'}</p>
-            <p><strong>Class of:</strong> ${klass||'—'}</p>
-            <p><strong>Team:</strong> ${p.team||'—'}</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </article>`;
+  const name=p.display_name||(p.first&&p.last?`${p.first} ${p.last}`:'');
+  const bg=nowImg(p);
+  const klass=p.grad_class||'';
+  return `
+  <article class="card" aria-label="${name}">
+    <div class="card-inner">
+      <div class="flip">
+        <div class="face front">
+          <a class="card-profile-front" href="${profileURL(p)}" title="Open profile"><i class="ri-external-link-line"></i>PROFILE</a>
+          <div class="bg" style="background-image:url('${bg}')"></div>
+          <div class="shade"></div>
+          <div class="cap">
+            <div class="name">${name}</div>
+            <div class="meta-small">${p.team||''}</div>
+          </div>
+          <div class="chips">
+            ${p.status?`<span class="chip">${p.status}</span>`:''}
+            ${klass?`<span class="chip">CLASS OF ${klass}</span>`:''}
+          </div>
+          <div class="dots">${rosterDots(p)}</div>
+        </div>
+        <div class="face back">
+          <div class="back-head">
+            <strong style="font:900 16px 'Bebas Neue'">${name}</strong>
+            <a class="icon-btn" href="${profileURL(p)}" style="padding:8px 12px;border:1px solid #ddd;border-radius:10px;color:#111"><i class="ri-user-line"></i>&nbsp;Profile</a>
+          </div>
+          <div class="back-body">
+            <p><strong>Level:</strong> ${p.level||'—'}</p>
+            <p><strong>Status:</strong> ${p.status||'—'}</p>
+            <p><strong>Class of:</strong> ${klass||'—'}</p>
+            <p><strong>Team:</strong> ${p.team||'—'}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </article>`;
 }
 
 /* render */
 function renderCards(list){
-  const grid=document.getElementById('cardGrid'); if(!grid) return;
-  grid.innerHTML=list.map(cardHTML).join('');
-  grid.querySelectorAll('.card').forEach((el)=>{
-    el.addEventListener('click', (e)=>{
-      if(e.target.closest('a')) return; // allow profile link
-      el.classList.toggle('is-flipped');
-    });
-  });
+  const grid=document.getElementById('cardGrid'); if(!grid) return;
+  grid.innerHTML=list.map(cardHTML).join('');
+  grid.querySelectorAll('.card').forEach((el)=>{
+    el.addEventListener('click', (e)=>{
+      if(e.target.closest('a')) return; // allow profile link
+      el.classList.toggle('is-flipped');
+    });
+  });
 }
 
 /* filters */
 function readFilters(){
-  const name=($('#filterName')?.value||'').trim().toLowerCase();
-  const levels=$$('#filterLevels input:checked').map(i=>i.value);
-  const classes=$$('#classBox input:checked').map(i=>i.value);
-  const years=$$('#rosterBox input:checked').map(i=>i.value);
-  const status=$$('#filterStatus input:checked').map(i=>i.value);
-  return {name,levels,classes,years,status};
+  const name=($('#filterName')?.value||'').trim().toLowerCase();
+  const levels=$$('#filterLevels input:checked').map(i=>i.value);
+  const classes=$$('#classBox input:checked').map(i=>i.value);
+  const years=$$('#rosterBox input:checked').map(i=>i.value);
+  const status=$$('#filterStatus input:checked').map(i=>i.value);
+  return {name,levels,classes,years,status};
 }
 function applyFilters(){
-  if(!window.PLAYERS) return;
-  const F=readFilters();
-  const filtered=window.PLAYERS.filter(p=>{
-    const nm=(p.display_name||(`${p.first} ${p.last}`)||'').toLowerCase();
-    const nameOk=!F.name||nm.includes(F.name);
-    const lvlOk=!F.levels.length||F.levels.includes(p.level);
-    const classOk=!F.classes.length||F.classes.includes(String(p.grad_class));
-    const yearOk=!F.years.length||String(p.letter_years||'').split(',').some(y=>F.years.includes(y.trim()));
-    const statOk=!F.status.length||F.status.includes(p.status);
-    return nameOk&&lvlOk&&classOk&&yearOk&&statOk;
-  });
-  renderCards(filtered);
-  closeBoth();
+  if(!window.PLAYERS) return;
+  const F=readFilters();
+  const filtered=window.PLAYERS.filter(p=>{
+    const nm=(p.display_name||(`${p.first} ${p.last}`)||'').toLowerCase();
+    const nameOk=!F.name||nm.includes(F.name);
+    const lvlOk=!F.levels.length||F.levels.includes(p.level);
+    const classOk=!F.classes.length||F.classes.includes(String(p.grad_class));
+    const yearOk=!F.years.length||String(p.letter_years||'').split(',').some(y=>F.years.includes(y.trim()));
+    const statOk=!F.status.length||F.status.includes(p.status);
+    return nameOk&&lvlOk&&classOk&&yearOk&&statOk;
+  });
+  renderCards(filtered);
+  closeBoth();
 }
 function resetFilters(){
-  $$('#filters input[type="checkbox"]').forEach(i=>i.checked=false);
+  $$('#filters input[type="checkbox"]').forEach(i=>i.checked=false);
+  // CHANGE: Corrected SyntaxError by removing '!' and adding a null check
   const filterNameInput = $('#filterName');
-if (filterNameInput) {
-  filterNameInput.value = '';
-}
-  if(window.PLAYERS) renderCards(window.PLAYERS.slice().sort(defaultSort));
+  if (filterNameInput) {
+    filterNameInput.value = '';
+  }
+  if(window.PLAYERS) renderCards(window.PLAYERS.slice().sort(defaultSort));
 }
 $('#filtersApply')?.addEventListener('click',applyFilters);
 $('#filtersReset')?.addEventListener('click',resetFilters);
@@ -497,46 +498,49 @@ $('#filtersReset2')?.addEventListener('click',resetFilters);
 
 /* live search */
 function makeHit(p){
-  const el=document.createElement('div'); el.className='live-hit';
-  const slug=slugOf(p);
-  const hsGuessJpg=`assets/img/hs-players/${slug}-hs.jpg`;
-  const hsGuessPng=`assets/img/hs-players/${slug}-hs.png`;
-  const hs = p.hs_img || hsGuessJpg;
-  el.innerHTML=`<img src="${hs}" onerror="this.src='${hsGuessPng}'; this.onerror=null;">
-                <div><div style="font-weight:700">${p.display_name||p.first+' '+p.last}</div>
-                <div style="opacity:.7;font-size:.92em">${p.level||''} • Class of ${p.grad_class||''}</div></div>`;
-  el.onclick=()=>location.href=profileURL(p);
-  return el;
+  const el=document.createElement('div'); el.className='live-hit';
+  const slug=slugOf(p);
+  const hsGuessJpg=`assets/img/hs-players/${slug}-hs.jpg`;
+  const hsGuessPng=`assets/img/hs-players/${slug}-hs.png`;
+  const hs = p.hs_img || hsGuessJpg;
+  el.innerHTML=`<img src="${hs}" onerror="this.src='${hsGuessPng}'; this.onerror=null;">
+                <div><div style="font-weight:700">${p.display_name||p.first+' '+p.last}</div>
+                <div style="opacity:.7;font-size:.92em">${p.level||''} • Class of ${p.grad_class||''}</div></div>`;
+  el.onclick=()=>location.href=profileURL(p);
+  return el;
 }
 function liveSearch(){
-  const q=($('#playerSearch')?.value||'').trim().toLowerCase();
-  const box=$('#liveResults'); if(!box) return;
-  if(!q){ box.innerHTML=''; return; }
-  const hits=(window.PLAYERS||[]).filter(p=>((p.display_name||(`${p.first} ${p.last}`)||'').toLowerCase().includes(q))).slice(0,25);
-  box.innerHTML=''; hits.forEach(p=>box.appendChild(makeHit(p)));
+  const q=($('#playerSearch')?.value||'').trim().toLowerCase();
+  const box=$('#liveResults'); if(!box) return;
+  if(!q){ box.innerHTML=''; return; }
+  const hits=(window.PLAYERS||[]).filter(p=>((p.display_name||(`${p.first} ${p.last}`)||'').toLowerCase().includes(q))).slice(0,25);
+  box.innerHTML=''; hits.forEach(p=>box.appendChild(makeHit(p)));
 }
 document.addEventListener('input',(e)=>{ if(e.target && e.target.id==='playerSearch') debounce(liveSearch,120)(); });
 
 /* boot (NO FALLBACK). If anything fails, show an inline error so we know why cards aren’t rendering. */
 function showLoadError(msg){
-  const grid=document.getElementById('cardGrid');
-  if(grid) grid.innerHTML = `<div style="padding:16px;color:#fca5a5;background:#1a1a1a;border:1px solid #402">
-    <strong>Couldn’t load players from Google Sheets.</strong><br>${msg}
-  </div>`;
+  const grid=document.getElementById('cardGrid');
+  if(grid) grid.innerHTML = `<div style="padding:16px;color:#fca5a5;background:#1a1a1a;border:1px solid #402">
+    <strong>Couldn’t load players from Google Sheets.</strong><br>${msg}
+  </div>`;
 }
 
 (async ()=>{
-  try{
-    const data = await loadCSV(CSV_URL);
-    if(!Array.isArray(data) || !data.length) throw new Error('No rows found in CSV.');
-    window.PLAYERS = data.sort(defaultSort);
-    renderCards(window.PLAYERS);
-  }catch(err){
-    console.error('CSV load failed', err);
-    showLoadError(String(err));
-  }
+  try{
+    const data = await loadCSV(CSV_URL);
+    if(!Array.isArray(data) || !data.length) throw new Error('No rows found in CSV.');
+    window.PLAYERS = data.sort(defaultSort);
+    renderCards(window.PLAYERS);
+  }catch(err){
+    console.error('CSV load failed', err);
+    showLoadError(String(err));
+  }
 })();
 </script>
+
+</body>
+</html>
 
 </body>
 </html>
