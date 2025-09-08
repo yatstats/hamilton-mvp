@@ -1,4 +1,4 @@
-<!-- YATSTATS • Hamilton • build 5.0.33 -->
+<!-- YATSTATS • Hamilton • build 5.0.34 -->
 <!doctype html>
 <html lang="en">
 <head>
@@ -157,13 +157,13 @@ details[open] > .filter-title::after { transform: rotate(90deg); }
 .front-bottom-content { position: relative; z-index: 2; padding: 16px; display: flex; align-items: flex-end; width: 100%;}
 .front-info-left { flex-grow: 1; display: flex; flex-direction: column; gap: 6px; }
 .front-info-right { flex-shrink: 0; display: flex; flex-direction: column; gap: 8px; align-items: flex-end; margin-left: 12px;}
-.front-chips-row { display: flex; flex-direction: column; gap: 6px; align-items: flex-start;}
-.front-chip { background: rgba(0,0,0,.5); color: #fff; border-radius: 6px; padding: 4px 8px; font-weight: 700; font-size: 10px; font-family: Oswald, sans-serif; border: 1px solid rgba(255,255,255,.15); text-transform: uppercase; }
-.game-chip { background: rgba(0,0,0,.5); color: #fff; border-radius: 8px; padding: 5px 10px; font-size: 11px; text-align: right; border: 1px solid rgba(255,255,255,.15); font-family: Oswald, sans-serif; line-height: 1.3; backdrop-filter: blur(2px); }
-.game-chip-label { font-weight: 700; font-size: 9px; opacity: .7; text-transform: uppercase; }
-.game-log { font-size: 10px; white-space: nowrap; line-height: 1.2; letter-spacing: -0.5px; font-family: system-ui, sans-serif; }
-.varsity-dots { display: flex; gap: 6px; margin-top: 10px; }
-.varsity-dot { width: 24px; height: 24px; border-radius: 50%; background: #fff; color: #111; display: grid; place-items: center; font-weight: 700; font-size: 10px; border: 1px solid rgba(0,0,0,.2); }
+.front-chips-row { display: flex; flex-direction: column; gap: 4px; align-items: flex-start;}
+.front-chip { background: rgba(0,0,0,.5); color: #fff; border-radius: 6px; padding: 2px 6px; font-weight: 700; font-size: 10px; font-family: Oswald, sans-serif; border: 1px solid rgba(255,255,255,.15); text-transform: uppercase; }
+.game-chip-label { background: rgba(0,0,0,.5); color: #fff; border-radius: 8px; padding: 2px 8px; font-size: 11px; border: 1px solid rgba(255,255,255,.15); font-family: Oswald, sans-serif; display: inline-block; }
+.game-data { font: 300 13px/1.2 Oswald; opacity:.9; color: #fff; text-shadow: 1px 1px 3px rgba(0,0,0,.5); margin-top: 4px; }
+.game-log { font: 400 10px system-ui, sans-serif; white-space: nowrap; line-height: 1.2; letter-spacing: -0.5px; }
+.varsity-dots { display: flex; gap: 4px; }
+.varsity-dot { width: 22px; height: 22px; border-radius: 50%; background: #fff; color: #111; display: grid; place-items: center; font-weight: 700; font-size: 10px; border: 1px solid rgba(0,0,0,.2); }
 .face.back{transform:rotateY(180deg); background: #fff; color: #111; display: flex; flex-direction: column;}
 .back-top-section { display: flex; padding: 12px; gap: 12px; background: #fff; color: #111; border-bottom: 1px solid #eee;}
 .back-info-left { flex-grow: 1; }
@@ -345,7 +345,7 @@ details[open] > .filter-title::after { transform: rotate(90deg); }
 </footer>
 
 <script type="module">
-/* ---- YATSTATS • Hamilton • build 5.0.33 ---- */
+/* ---- YATSTATS • Hamilton • build 5.0.34 ---- */
 
 const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQcWJM6Q6hTdFnES_G5LUy4teCS-sJ5HdAc9F5HSY8DGE9egdGy8yUAe2ShT3tFm-CwUuCYeAYy_YiW/pub?gid=2028135390&single=true&output=csv";
 const $ = s => document.querySelector(s), $$ = s => Array.from(document.querySelectorAll(s));
@@ -412,6 +412,7 @@ function cardHTML(p){
   const org = p.org ? p.org : (p.conference || '');
   const playerInfo = JSON.stringify(p).replace(/'/g, "&apos;");
   const letterYears = (p.letter_years || '').split(',').map(y => y.trim().slice(-2)).filter(Boolean);
+  const isRetired = (p.status || '').toUpperCase() === 'RETIRED';
 
   return `
   <article class="card" aria-label="${name}" data-player-info='${playerInfo}'>
@@ -424,27 +425,31 @@ function cardHTML(p){
             <div class="front-info-left">
                   <div class="name"><span>${p.first}</span><span>${p.last}</span></div>
                   <div class="meta-small"><span>${p.team||''}</span><span>${org}</span></div>
-                  <div class="front-chips-row">
-                    ${p.level?`<span class="front-chip">${p.level}</span>`:''}
-                    ${p.status?`<span class="front-chip">${p.status}</span>`:''}
-                    ${klass?`<span class="front-chip">CLASS OF ${klass}</span>`:''}
-                  </div>
                   <div class="varsity-dots">
                     ${letterYears.map(year => `<div class="varsity-dot">${year}</div>`).join('')}
                   </div>
+                  <div class="front-chips-row">
+                    ${klass?`<span class="front-chip">CLASS OF ${klass}</span>`:''}
+                    ${p.status?`<span class="front-chip">${p.status}</span>`:''}
+                    ${p.level?`<span class="front-chip">${p.level}</span>`:''}
+                  </div>
             </div>
             <div class="front-info-right">
-                ${p.next_game_datetime ? `
+                ${!isRetired ? `
                 <div class="game-chip next-game">
-                    <span class="game-chip-label">NEXT GAME</span>
-                    <span>${p.next_game_datetime}</span>
-                    <span>${p.next_game_opponent}</span>
+                    <div class="game-chip-label">NEXT GAME</div>
+                    <div class="game-data">
+                        <span>${p.next_game_datetime || 'TBD'}</span>
+                        <span>${p.next_game_opponent || ''}</span>
+                    </div>
                 </div>` : ''}
-                <div class="game-chip last-games">
-                    <span class="game-chip-label">LAST 3 GAMES</span>
-                    <span class="game-log">${p.last_game_1 || '--'}</span>
-                    <span class="game-log">${p.last_game_2 || '--'}</span>
-                    <span class="game-log">${p.last_game_3 || '--'}</span>
+                <div class="game-chip last-games" style="margin-top: 8px;">
+                    <div class="game-chip-label">LAST 3 GAMES</div>
+                    <div class="game-data">
+                        <span class="game-log">${p.last_game_1 || '--'}</span>
+                        <span class="game-log">${p.last_game_2 || '--'}</span>
+                        <span class="game-log">${p.last_game_3 || '--'}</span>
+                    </div>
                 </div>
             </div>
           </div>
@@ -670,7 +675,7 @@ async function handleFunZone(button) {
     } else if (content === 'nil') {
         funZone.innerHTML = `<p>NIL Score for ${player.display_name} coming soon.</p>`;
     } else if (content === 'video') {
-        funZone.innerHTML = `<iframe width="100%" height="215" src="https://www.youtube.com/embed/ZSoRzk-z35w" title="YouTube video player" frameborder="0" allowfullscreen style="border-radius: 8px;"></iframe>`;
+        funZone.innerHTML = `<iframe width="100%" height="215" src="https://www.youtube.com/embed/5O18C24I8o8" title="YouTube video player" frameborder="0" allowfullscreen style="border-radius: 8px;"></iframe>`;
     } else if (content === 'pics') {
         funZone.innerHTML = `<p>Fan Pics for ${player.display_name} coming soon.</p>`;
     }
@@ -762,4 +767,3 @@ document.addEventListener('DOMContentLoaded', () => {
 </script>
 </body>
 </html>
-
