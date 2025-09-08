@@ -9,9 +9,9 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, signInWithCustomToken, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { getAuth, onAuthStateChanged, signInWithCustomToken, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
     
-    window.firebaseAuth = { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, signInWithCustomToken, signInAnonymously };
+    window.firebaseAuth = { getAuth, onAuthStateChanged, signInWithCustomToken, signInAnonymously };
 
     try {
         const firebaseConfig = JSON.parse(window.__firebase_config || '{}');
@@ -38,8 +38,8 @@
 :root{
   --bg:#0c0c0c; --fg:#f2f2f2; --muted:#c4c4c4; --ink:#e8e8e8; --line:rgba(255,255,255,0.08);
   --hamSmall:13px; --hamBig:20px; --hamBigger:24px; --tagGrey:#cfd2d6;
-  --crestH: clamp(40px, 6vw, 60px);
-  --pairGap: 10px;
+  --crestH: clamp(50px, 8vw, 70px); /* Increased size slightly */
+  --pairGap: 16px;
   --containerPad: 16px;
   --footerH: clamp(56px, 8vh, 77px);
 }
@@ -50,98 +50,69 @@ body.drawer-open { overflow: hidden; }
 a{color:inherit;text-decoration:none}
 .container{max-width:1400px;margin:0 auto;padding:0 var(--containerPad)}
 .header{position:sticky;top:0;z-index:50;background:#000}
-.topbar{display:flex;align-items:center;justify-content:space-between;padding:8px 0}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:8px 0; gap: 12px;}
 .left-icons{display:flex;align-items:center;gap:8px}
 .icon-btn{background:none;border:none;color:var(--fg);opacity:.92;display:inline-flex;align-items:center;justify-content:center;padding:0;margin:0 2px; cursor: pointer;}
 .icon-btn i{font-size:20px}
-.topnav{display:flex;gap:18px;align-items:center}
-.nav-pair{white-space:nowrap}
-.nav-pair .thin{font:300 var(--hamSmall) Oswald, sans-serif; letter-spacing:.02em; color:#cfd2d6; margin-right:2px}
-.nav-pair .bold{font:400 var(--hamSmall) Indigo, "Bebas Neue", sans-serif}
+.back-btn { font-family: "Bebas Neue", sans-serif; font-size: 16px; letter-spacing: .05em; color: var(--fg); padding: 5px 12px; border: 1px solid var(--line); border-radius: 8px; cursor: pointer; }
 .wordmark-wrap{display:flex;align-items:center;justify-content:flex-end;min-width:120px}
-.wordmark-img{height:clamp(18px,3.2vw,28px);width:auto;display:block}
-@media (max-width:1200px){ .topnav{display:none !important} }
 .hr-y{border-top:1px solid var(--line)}
-.schoolrow{display:flex;align-items:center;gap:var(--pairGap);padding:6px 0}
+.schoolrow{display:flex;align-items:center;gap:var(--pairGap);padding:8px 0}
 .ham-logo{height:var(--crestH);width:auto;object-fit:contain;display:block; flex-shrink: 0;}
 .schooltext{line-height:1}
 .schooltext .small{font:300 var(--hamSmall)/1 Oswald;letter-spacing:.02em;color:var(--muted)}
 .schooltext .big1{font:400 var(--hamBig)/1 "Bebas Neue",sans-serif}
 .schooltext .big2{font:400 var(--hamBigger)/1 "Bebas Neue",sans-serif;margin-top:-4px}
-.crumbs{font:300 calc(var(--hamSmall)*.5)/1 Oswald;letter-spacing:.02em;color:var(--muted);text-transform:uppercase}
+.crumbs{font:300 calc(var(--hamSmall)*.8)/1 Oswald;letter-spacing:.02em;color:var(--muted);text-transform:uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
 .hero{padding:2px 0}
 .main{padding:8px 0 calc(var(--footerH) + 12px)}
 .site-footer{position:fixed;left:0;right:0;bottom:0;height:var(--footerH);background:#0b0b0b;border-top:1px solid var(--line);z-index:40}
 .site-footer .wrap{height:100%;display:flex;align-items:center;justify-content:center;padding:0 var(--containerPad)}
-.sponsor-banner{height:calc(var(--footerH) - 12px); width:100%; display:flex;align-items:center;justify-content:center}
-.sponsor-banner img{ height:100%; width:100%; object-fit:contain; filter: saturate(.95); }
+.sponsor-banner img{ height:100%; width:100%; object-fit:contain; }
 .drawer-mask{position:fixed;inset:0;background:rgba(0,0,0,.35);opacity:0;pointer-events:none;transition:opacity .2s;z-index:60}
 .drawer{position:fixed;top:0;bottom:0;width:min(360px,82vw);background:rgba(10,10,10,.65);backdrop-filter:blur(4px);color:#e8e8e8;transform:translateX(-110%);transition:transform .25s;z-index:70}
-.drawer-right{right:0;left:auto;transform:translateX(110%); display: flex; flex-direction: column; height: 100%;}
-.drawer h3{margin:18px 16px 8px; padding-right: 30px;}
-.drawer .pad { padding: 10px 16px; }
 .drawer .close-btn { position: absolute; top: 12px; right: 12px; }
-body.drawer-left-open .drawer-mask,body.drawer-right-open .drawer-mask{opacity:1;pointer-events:auto}
+body.drawer-left-open .drawer-mask{opacity:1;pointer-events:auto}
 body.drawer-left-open #drawerLeft{transform:translateX(0)}
-body.drawer-right-open .drawer-right{transform:translateX(0)}
 .drawer-content { flex-grow: 1; overflow-y: auto; padding: 10px 16px;}
-.live-hit{padding:10px 12px;display:flex;align-items:center;gap:10px;border-radius:10px;cursor:pointer}
 .live-hit:hover{background:rgba(255,255,255,.08)}
 .live-hit img{width:36px;height:36px;border-radius:6px;object-fit:cover}
 
-/* --- NEW STYLES for Profile Page --- */
-.profile-nav {
-    display: flex;
-    justify-content: space-around;
-    background: transparent;
-    border-bottom: 1px solid var(--line);
-    padding: 4px 0;
-}
-.profile-nav-link {
-    background: none;
-    border: none;
-    color: var(--muted);
-    font: 700 14px "Bebas Neue", sans-serif;
-    letter-spacing: .08em;
-    cursor: pointer;
-    padding: 8px 10px;
-    border-bottom: 2px solid transparent;
-    transition: all 0.2s;
-}
-.profile-nav-link:hover {
-    color: var(--fg);
-}
-.profile-nav-link.active {
-    color: var(--fg);
-    border-bottom-color: var(--fg);
-}
-#funzone-container {
-    padding-top: 24px;
-    background: #111;
-    border-radius: 12px;
-    margin-top: 16px;
-    min-height: 50vh;
-    color: var(--ink);
-}
-.funzone-content {
-    animation: fadeIn 0.5s;
-}
-@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+/* --- NEW STYLES for Profile Page Header Details --- */
+.player-header-details { flex-grow: 1; display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; }
+.player-tags-col { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; }
+.player-games-col { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; text-align: right;}
+.front-chip { background: rgba(255,255,255,.1); color: #fff; border-radius: 6px; padding: 2px 6px; font-weight: 700; font-size: 10px; font-family: Oswald, sans-serif; border: 1px solid rgba(255,255,255,.15); text-transform: uppercase; }
+.varsity-dots { display: flex; gap: 4px; margin-top: 2px;}
+.varsity-dot { width: 22px; height: 22px; border-radius: 50%; background: #fff; color: #111; display: grid; place-items: center; font-weight: 700; font-size: 10px; border: 1px solid rgba(0,0,0,.2); }
+.game-title-pill { background: rgba(255,255,255,.1); color: #fff; border-radius: 20px; padding: 3px 10px; font-size: 10px; font-family: Oswald, sans-serif; border: 1px solid rgba(255,255,255,.15); text-transform: uppercase; font-weight: 700; display: inline-block; }
+.game-data-text { font: 300 13px/1.2 Oswald; color: #fff; text-shadow: 1px 1px 3px rgba(0,0,0,.5); }
+.game-data-text span { display: block; }
+.game-log { font: 400 10px system-ui, sans-serif; white-space: nowrap; line-height: 1.2; letter-spacing: -0.5px; }
 
-/* Styles for Funzone content copied from original CSS */
-.stats-header-bar { background: #333; color: #fff; text-align: center; padding: 6px; font: 700 12px "Bebas Neue", sans-serif; letter-spacing: .08em; margin: 12px; border-radius: 6px;}
-.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); gap: 8px; font-family: Oswald, sans-serif; text-align: center; padding: 0 12px 12px;}
+/* --- FUNZONE STYLES --- */
+.profile-nav { display: flex; justify-content: space-around; background: transparent; border-bottom: 1px solid var(--line); padding: 4px 0; }
+.profile-nav-link { background: none; border: none; color: var(--muted); font: 700 14px "Bebas Neue", sans-serif; letter-spacing: .08em; cursor: pointer; padding: 8px 10px; border-bottom: 2px solid transparent; transition: all 0.2s; }
+.profile-nav-link:hover { color: var(--fg); }
+.profile-nav-link.active { color: var(--fg); border-bottom-color: var(--fg); }
+#funzone-container { padding-top: 24px; background: #111; border-radius: 12px; margin-top: 16px; min-height: 50vh; color: var(--ink); }
+.funzone-content { animation: fadeIn 0.5s; padding: 16px; line-height: 1.6; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+.stats-header-bar { background: #333; color: #fff; text-align: center; padding: 6px; font: 700 12px "Bebas Neue", sans-serif; letter-spacing: .08em; margin: 0 0 12px; border-radius: 6px;}
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); gap: 8px; font-family: Oswald, sans-serif; text-align: center; }
 .stat-item { background: #222; border-radius: 6px; padding: 8px 5px; }
 .stat-value { font-size: 16px; font-weight: 700; }
 .stat-label { font-size: 11px; text-transform: uppercase; opacity: .7; }
-.funzone-content { padding: 16px; line-height: 1.6; }
 .news-item { border-bottom: 1px solid var(--line); padding: 10px 0; }
-.news-item:last-child { border-bottom: none; }
 .news-headline { font-weight: bold; }
-.news-source { font-size: 12px; opacity: 0.7; margin-top: 4px; }
 .social-links a { display: inline-block; padding: 8px 12px; background: #222; border-radius: 8px; margin: 0 8px 8px 0; }
-.social-post { margin-top: 20px; padding: 15px; background: #1a1a1a; border-radius: 8px; font-style: italic; }
 
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .player-header-details { display: none; } /* Hide extra details on small screens to avoid clutter */
+    .topbar { flex-wrap: wrap; }
+    .crumbs { width: 100%; order: 3; text-align: center; padding-top: 4px;}
+}
 </style>
 </head>
 
@@ -150,20 +121,11 @@ body.drawer-right-open .drawer-right{transform:translateX(0)}
     <div class="container topbar">
         <div class="left-icons">
             <button class="icon-btn" id="btnMenu" aria-label="Menu"><i class="ri-menu-line"></i></button>
-            <div id="breadcrumbs" class="crumbs">HAMILTON ▸ LOADING...</div>
+            <button class="icon-btn" id="btnAccount" aria-label="Account"><i class="ri-user-3-line"></i></button>
+            <button class="icon-btn" id="openSearch" aria-label="Search"><i class="ri-search-line"></i></button>
         </div>
-        <nav class="topnav" aria-label="Top Navigation">
-            <a href="index.html" class="nav-pair"><span class="thin">WHERE THEY</span><span class="bold">YAT?</span></a>
-            <a href="alumni-news.html" class="nav-pair"><span class="thin">ACTIVE ALUMNI</span><span class="bold">NEWS</span></a>
-            <a href="all-time-list.html" class="nav-pair"><span class="thin">NEXT-LEVEL</span><span class="bold">ALL-TIME LIST</span></a>
-            <a href="marketplace.html" class="nav-pair"><span class="thin">NIL & YAT-A-BOY</span><span class="bold">MARKETPLACE</span></a>
-            <a href="current-team.html" class="nav-pair"><span class="thin">THE</span><span class="bold">CURRENT TEAM</span></a>
-            <a href="partner-program.html" class="nav-pair"><span class="thin">PCD ACTION</span><span class="bold">PARTNER PROGRAM</span></a>
-            <a href="faq.html" class="nav-pair"><span class="bold">FAQ’S</span></a>
-        </nav>
-        <div class="wordmark-wrap">
-            <img class="wordmark-img" src="assets/img/yatstats-logo.png" alt="YAT?STATS">
-        </div>
+        <div id="breadcrumbs" class="crumbs">HAMILTON ▸ LOADING...</div>
+        <button class="back-btn" onclick="history.back()">BACK</button>
     </div>
     <div class="hr-y"></div>
     <div class="container schoolrow">
@@ -172,6 +134,12 @@ body.drawer-right-open .drawer-right{transform:translateX(0)}
             <div id="playerTeamOrg" class="small">LOADING PLAYER...</div>
             <div id="playerFirstName" class="big1"></div>
             <div id="playerLastName" class="big2"></div>
+        </div>
+        <div class="player-header-details">
+            <div id="playerTagsCol" class="player-tags-col">
+                </div>
+            <div id="playerGamesCol" class="player-games-col">
+                </div>
         </div>
     </div>
     <div class="hr-y"></div>
@@ -192,19 +160,7 @@ body.drawer-right-open .drawer-right{transform:translateX(0)}
 
 <div class="drawer-mask"></div>
 <aside class="drawer" id="drawerLeft" aria-label="Left drawer">
-    <button class="icon-btn close-btn"><i class="ri-close-line"></i></button>
-    <div class="drawer-content">
-        <h3>PLAYER PROFILE SEARCH</h3>
-        <div class="pad">
-            <input id="playerSearch" placeholder="Type to search…" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--ink)">
-            <div id="liveResults"></div>
-        </div>
-        <h3>NAVIGATION</h3>
-        <div class="pad" style="display:flex;flex-direction:column;gap:12px">
-            <a href="index.html" class="nav-pair"><span class="thin">WHERE THEY</span><span class="bold">YAT?</span></a>
-            </div>
-    </div>
-</aside>
+    </aside>
 
 
 <main class="main container">
@@ -222,38 +178,32 @@ body.drawer-right-open .drawer-right{transform:translateX(0)}
 </footer>
 
 <script type="module">
-/* ---- YATSTATS • Hamilton Profile Page • build 5.1.0 ---- */
-
 const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQcWJM6Q6hTdFnES_G5LUy4teCS-sJ5HdAc9F5HSY8DGE9egdGy8yUAe2ShT3tFm-CwUuCYeAYy_YiW/pub?gid=2028135390&single=true&output=csv";
 const $ = s => document.querySelector(s), $$ = s => Array.from(document.querySelectorAll(s));
 const debounce = (fn, ms=300)=>{ let t; return (...a)=>{ clearTimeout(t); t=setTimeout(()=>fn(...a),ms); }; };
 
 async function loadCSV(url){
   const response = await fetch(url);
-  if(!response.ok) throw new Error(`HTTP ${response.status}`);
   const text = await response.text();
-  if(!text.trim()) throw new Error('Empty CSV');
   const rows = text.trim().split(/\r?\n/).map(line => line.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/).map(c=>c.replace(/^"|"$/g,'')));
   const header = rows.shift().map(h => h.trim());
   const idx=n=>header.indexOf(n);
   const statKeys = ['avg', 'obp', 'slg', 'ops', 'ab', 'h', 'r', 'rbi', '2b', '3b', 'hr', 'sb', 'bb', 'era', 'k/9', 'k/bb', 'whip', 'ip', 'er', 'ko', 'gp', 'w-l', 'saves', 'fip'];
-  return rows.map(r=> {
-    const player = {
+  return rows.map(r=>({
       slug:r[idx('slug')], display_name:r[idx('display_name')],
       first:r[idx('first')], last:r[idx('last')],
       grad_class:r[idx('grad_class')], letter_years:r[idx('letter_years')], status:r[idx('status')], level:r[idx('level')], 
       team:r[idx('team')], org:r[idx('org')], position:r[idx('position')],
-      height:r[idx('height')], weight:r[idx('weight')], bats:r[idx('bats')], throws:r[idx('throws')],
-      draft_info:r[idx('Draft_Info')], colleges:r[idx('Colleges')],
+      next_game_opponent: r[idx('next_game_opponent')],
+      next_game_datetime: r[idx('next_game_datetime')],
+      last_game_1: r[idx('last_game_1')], last_game_2: r[idx('last_game_2')], last_game_3: r[idx('last_game_3')],
       x_handle: r[idx('x_handle')], ig_handle: r[idx('ig_handle')],
-      stats: {}
-    };
-    for (const key of statKeys) {
-        const statIndex = idx(key);
-        if (statIndex > -1 && r[statIndex]) player.stats[key.toUpperCase()] = r[statIndex];
-    }
-    return player;
-  });
+      stats: statKeys.reduce((obj, key) => {
+          const statIndex = idx(key);
+          if (statIndex > -1 && r[statIndex]) obj[key.toUpperCase()] = r[statIndex];
+          return obj;
+      }, {})
+  }));
 }
 
 function imageNameOf(p) {
@@ -268,7 +218,6 @@ function slugOf(p){
   if(s) return s;
   return (`${p.first || ''}-${p.last || ''}`).trim().toLowerCase().replace(/[^a-z0-9]+/g,'-');
 }
-function profileURL(p) { return `./profile.html?player=${slugOf(p)}`; }
 
 function generateStatsGridHTML(player) {
     const isPitcher = player.stats['ERA'] !== undefined;
@@ -279,17 +228,10 @@ function generateStatsGridHTML(player) {
     grid += `<div class="stats-header-bar">${(player.status || '').includes('ACTIVE') ? '2025 SEASON STATS' : 'CAREER STATS'}</div>`;
     grid += '<div class="stats-grid">';
     let hasStats = false;
-    for (const stat of statsToShow) {
-        if (player.stats[stat]) {
-            hasStats = true;
-            grid += `<div class="stat-item"><div class="stat-value">${player.stats[stat]}</div><div class="stat-label">${stat}</div></div>`;
-        }
-    }
-    if (!hasStats) {
-        for (const stat of statsToShow) {
-             grid += `<div class="stat-item"><div class="stat-value">--</div><div class="stat-label">${stat}</div></div>`;
-        }
-    }
+    statsToShow.forEach(stat => {
+        if (player.stats[stat]) hasStats = true;
+        grid += `<div class="stat-item"><div class="stat-value">${player.stats[stat] || '--'}</div><div class="stat-label">${stat}</div></div>`;
+    });
     grid += '</div></div>';
     return grid;
 }
@@ -298,171 +240,131 @@ async function loadFunZoneContent(content, player) {
     const container = $('#funzone-container');
     container.innerHTML = '<p style="padding: 20px;">Loading...</p>';
     
-    // Lazy load the Gemini function if it's not available
-    if (!window.gemini) {
-        // Define a placeholder if Gemini isn't set up
-        window.gemini = {
-            generateGeminiText: async (prompt) => 'AI content generation is currently unavailable.'
-        };
-    }
-    const { generateGeminiText } = window.gemini;
-
-    let html = '';
-    if (content === 'stats') {
-        html = generateStatsGridHTML(player);
-    } else if (content === 'bio') {
-        const prompt = `Act as an optimistic but knowledgeable high school baseball scout. Write a brief, 2-3 sentence scouting report for ${player.display_name}. Highlight his journey and potential future in a positive, "Yat-A-Boy!" style.`;
-        const bioText = await generateGeminiText(prompt);
-        html = `<div class="funzone-content"><p>${bioText}</p></div>`;
-    } else if (content === 'news') {
-        const prompt = `Generate 2-3 recent, realistic, and positive sports news headlines for baseball player ${player.display_name}. Format each as: "Headline - Source"`;
-        const newsText = await generateGeminiText(prompt);
-        html = '<div class="funzone-content">' + newsText.split('\n').map(line => {
-            if (!line.trim() || line.startsWith('*')) return '';
-            const parts = line.split(' - ');
-            return `<div class="news-item"><div class="news-headline">${parts[0].replace(/^\d\.\s/, '')}</div><div class="news-source">${parts[1] || 'YatStats Network'}</div></div>`;
-        }).join('') + '</div>';
-    } else if (content === 'social') {
-        let socialHTML = '<div class="funzone-content"><div class="social-links">';
-        if (player.x_handle) socialHTML += `<a href="https://x.com/${player.x_handle}" target="_blank" rel="noopener">X / Twitter</a>`;
-        if (player.ig_handle) socialHTML += `<a href="https://instagram.com/${player.ig_handle}" target="_blank" rel="noopener">Instagram</a>`;
-        if (!player.x_handle && !player.ig_handle) socialHTML += 'No social media links available.';
-        socialHTML += '</div>';
-        const prompt = `Generate a realistic, short, and positive X/Twitter post from a baseball player like ${player.display_name} about an upcoming game or recent performance. Include a relevant hashtag like #YatABoy${player.display_name.replace(/\s/g, '')}.`;
-        const postText = await generateGeminiText(prompt);
-        socialHTML += `<div class="social-post"><p><strong>Latest Post (Sample):</strong></p><p>"${postText}"</p></div></div>`;
-        html = socialHTML;
-    } else if (content === 'nil') {
-        html = `<div class="funzone-content"><p>NIL Score and Marketplace opportunities for ${player.display_name} are coming soon.</p></div>`;
-    } else if (content === 'video') {
-        html = `<div class="funzone-content"><iframe width="100%" height="400" src="https://www.youtube.com/embed/5O18C24I8o8" title="YouTube video player" frameborder="0" allowfullscreen style="border-radius: 8px; max-width: 710px; display: block; margin: 0 auto;"></iframe></div>`;
-    } else if (content === 'pics') {
-        html = `<div class="funzone-content"><p>Fan Pics for ${player.display_name} are coming soon. Tag us on social media to be featured!</p></div>`;
-    }
+    // This is a placeholder for your AI text generation logic
+    const generateGeminiText = async (prompt) => `AI-generated content for: "${prompt.substring(0, 50)}..."`;
     
+    let html = '';
+    switch(content) {
+        case 'stats': html = generateStatsGridHTML(player); break;
+        case 'bio':
+            const bioText = await generateGeminiText(`Write a brief scouting report for ${player.display_name}.`);
+            html = `<div class="funzone-content"><p>${bioText}</p></div>`;
+            break;
+        case 'news':
+             const newsText = await generateGeminiText(`Generate news headlines for ${player.display_name}.`);
+             html = `<div class="funzone-content">${newsText.split('\n').map(line => `<div class="news-item"><div class="news-headline">${line}</div></div>`).join('')}</div>`;
+             break;
+        case 'social':
+            html = `<div class="funzone-content"><div class="social-links">`;
+            if (player.x_handle) html += `<a href="https://x.com/${player.x_handle}" target="_blank" rel="noopener">X / Twitter</a>`;
+            if (player.ig_handle) html += `<a href="https://instagram.com/${player.ig_handle}" target="_blank" rel="noopener">Instagram</a>`;
+            if (!player.x_handle && !player.ig_handle) html += 'No social media links available.';
+            html += `</div></div>`;
+            break;
+        case 'video':
+            // UPDATED VIDEO ID
+            html = `<div class="funzone-content"><iframe width="100%" height="400" src="https://www.youtube.com/embed/ZSoRzk-z35w" title="YouTube video player" frameborder="0" allowfullscreen style="border-radius: 8px; max-width: 710px; display: block; margin: 0 auto;"></iframe></div>`;
+            break;
+        default:
+            html = `<div class="funzone-content"><p>Content for ${content} coming soon for ${player.display_name}.</p></div>`;
+    }
     container.innerHTML = html;
 }
 
 function initializeProfilePage(player) {
-    // 1. Update page title
     document.title = `${player.display_name} • Hamilton YATSTATS`;
     
-    // 2. Update Header Content
     const imageName = imageNameOf(player);
-    const hsImgJpg = `assets/img/hs_players/${imageName}.jpg`;
-    const hsImgPng = `assets/img/hs_players/${imageName}.png`;
-    $('#playerLogo').src = hsImgJpg;
-    $('#playerLogo').onerror = () => { $('#playerLogo').src = hsImgPng; };
+    $('#playerLogo').src = `assets/img/hs_players/${imageName}.jpg`;
+    $('#playerLogo').onerror = () => { $('#playerLogo').src = `assets/img/hs_players/${imageName}.png`; };
     $('#playerLogo').alt = `High school photo of ${player.display_name}`;
 
     $('#playerTeamOrg').textContent = `${player.team || ''} - ${player.org || ''}`;
     $('#playerFirstName').textContent = player.first;
     $('#playerLastName').textContent = player.last;
-
-    // 3. Update Breadcrumbs
     $('#breadcrumbs').textContent = `HAMILTON ▸ ${player.first.toUpperCase()} ${player.last.toUpperCase()} PROFILE`;
 
-    // 4. Setup FUNZONE nav listeners
-    const navLinks = $$('.profile-nav-link');
-    navLinks.forEach(link => {
+    // --- NEW: Populate Header Details ---
+    const tagsCol = $('#playerTagsCol');
+    const gamesCol = $('#playerGamesCol');
+    
+    // Populate Tags Column
+    let tagsHTML = '';
+    if (player.grad_class) tagsHTML += `<span class="front-chip">CLASS OF ${player.grad_class}</span>`;
+    if (player.status) tagsHTML += `<span class="front-chip">${player.status}</span>`;
+    if (player.level) tagsHTML += `<span class="front-chip">${player.level}</span>`;
+    const letterYears = (player.letter_years || '').split(',').map(y => y.trim().slice(-2)).filter(Boolean);
+    if (letterYears.length > 0) {
+        tagsHTML += `<div class="varsity-dots">${letterYears.map(year => `<div class="varsity-dot">${year}</div>`).join('')}</div>`;
+    }
+    tagsCol.innerHTML = tagsHTML;
+
+    // Populate Games Column
+    const isRetired = (player.status || '').toUpperCase() === 'RETIRED';
+    let gamesHTML = '';
+    if (!isRetired) {
+        gamesHTML += `
+            <div>
+                <div class="game-title-pill">NEXT GAME</div>
+                <div class="game-data-text">
+                    <span>${player.next_game_datetime || 'TBD'}</span>
+                    <span>vs ${player.next_game_opponent || ''}</span>
+                </div>
+            </div>`;
+    }
+    gamesHTML += `
+        <div style="margin-top: 8px;">
+            <div class="game-title-pill">LAST 3 GAMES</div>
+            <div class="game-data-text">
+                <span class="game-log">${player.last_game_1 || '--'}</span>
+                <span class="game-log">${player.last_game_2 || '--'}</span>
+                <span class="game-log">${player.last_game_3 || '--'}</span>
+            </div>
+        </div>`;
+    gamesCol.innerHTML = gamesHTML;
+    // --- End of New Population Logic ---
+
+    $$('.profile-nav-link').forEach(link => {
         link.addEventListener('click', () => {
-            navLinks.forEach(l => l.classList.remove('active'));
+            $$('.profile-nav-link').forEach(l => l.classList.remove('active'));
             link.classList.add('active');
             loadFunZoneContent(link.dataset.content, player);
         });
     });
 
-    // 5. Load initial content (Stats)
     loadFunZoneContent('stats', player);
 }
 
 function setupEventListeners() {
-    $('#btnMenu')?.addEventListener('click', () => { document.body.classList.add('drawer-left-open', 'drawer-open'); });
+    const drawer = $('#drawerLeft');
+    const openButtons = ['#btnMenu', '#openSearch', '#btnAccount'];
+    openButtons.forEach(selector => {
+        $(selector)?.addEventListener('click', () => document.body.classList.add('drawer-left-open', 'drawer-open'));
+    });
     $$('.close-btn, .drawer-mask').forEach(el => el.addEventListener('click', () => {
         document.body.classList.remove('drawer-left-open', 'drawer-open');
     }));
-    $('#playerSearch')?.addEventListener('input', debounce(liveSearch));
 }
 
-function makeHit(p){
-  const el=document.createElement('div'); el.className='live-hit';
-  const imageName = imageNameOf(p);
-  const hsImgJpg=`assets/img/hs_players/${imageName}.jpg`;
-  const hsImgPng=`assets/img/hs_players/${imageName}.png`;
-  el.innerHTML=`<img src="${hsImgJpg}" onerror="this.onerror=null;this.src='${hsImgPng}';">
-                <div><div style="font-weight:700">${p.display_name}</div>
-                <div style="opacity:.7;font-size:.92em">${p.level||''} • Class of ${p.grad_class||''}</div></div>`;
-  el.onclick=()=>window.location.href=profileURL(p);
-  return el;
-}
-function liveSearch(){
-  const q=($('#playerSearch')?.value||'').trim().toLowerCase();
-  const box=$('#liveResults'); if(!box) return;
-  if(!q){ box.innerHTML=''; return; }
-  const hits=(window.ALL_PLAYERS||[]).filter(p=>(p.display_name||'').toLowerCase().includes(q)).slice(0,25);
-  box.innerHTML=''; hits.forEach(p=>box.appendChild(makeHit(p)));
-}
-
-/* --- GEMINI API (placeholder) --- */
-window.gemini = {
-    async generateGeminiText(prompt) {
-        // IMPORTANT: Replace "" with your actual Google AI API Key.
-        // It is highly recommended to handle API keys securely, e.g., via a backend proxy.
-        const apiKey = ""; 
-        if (!apiKey) return "AI service is not configured. (API key is missing).";
-        
-        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${apiKey}`;
-        const payload = { contents: [{ parts: [{ text: prompt }] }] };
-        try {
-            const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-            if (!response.ok) { return `Error: The AI service failed to respond.`; }
-            const result = await response.json();
-            return result.candidates?.[0]?.content?.parts?.[0]?.text || "No response from AI.";
-        } catch (error) {
-            console.error('Gemini API call failed:', error);
-            return 'AI service is currently unavailable.';
-        }
-    }
-};
-
-/* --- BOOTSTRAP --- */
-document.addEventListener('DOMContentLoaded', () => {
-    (async ()=>{
-      try{
+document.addEventListener('DOMContentLoaded', async () => {
+    try {
         setupEventListeners();
-        
-        // 1. Get player slug from URL
         const urlParams = new URLSearchParams(window.location.search);
         const playerSlug = urlParams.get('player');
+        if (!playerSlug) throw new Error("No player specified in the URL.");
 
-        if (!playerSlug) {
-            $('#funzone-container').innerHTML = `<p style="color:red; padding:20px;"><strong>Error:</strong> No player specified in the URL.</p>`;
-            return;
-        }
-
-        // 2. Load all player data
         const allPlayers = await loadCSV(CSV_URL);
-        window.ALL_PLAYERS = allPlayers; // Store for search drawer
-
-        // 3. Find the specific player
         const player = allPlayers.find(p => slugOf(p) === playerSlug);
-
-        if (!player) {
-            $('#funzone-container').innerHTML = `<p style="color:red; padding:20px;"><strong>Error:</strong> Player not found.</p>`;
-            return;
-        }
-
-        // 4. Populate the page with the player's data
+        if (!player) throw new Error("Player not found.");
+        
         initializeProfilePage(player);
 
-      } catch(err){
+    } catch(err) {
         console.error('Initialization failed', err);
-        $('#funzone-container').innerHTML = `<p style="color:red; padding:20px;"><strong>Error:</strong> Could not load page data. ${err.message}</p>`;
-      }
-    })();
+        $('#funzone-container').innerHTML = `<p style="color:red; padding:20px;"><strong>Error:</strong> ${err.message}</p>`;
+    }
 });
 </script>
 
 </body>
 </html>
-
