@@ -1,4 +1,4 @@
-<!-- YATSTATS • Hamilton • build 5.0.34 -->
+<!-- YATSTATS • Hamilton • build 5.0.35 -->
 <!doctype html>
 <html lang="en">
 <head>
@@ -346,7 +346,7 @@ details[open] > .filter-title::after { transform: rotate(90deg); }
 </footer>
 
 <script type="module">
-/* ---- YATSTATS • Hamilton • build 5.0.34 ---- */
+/* ---- YATSTATS • Hamilton • build 5.0.35 ---- */
 
 const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQcWJM6Q6hTdFnES_G5LUy4teCS-sJ5HdAc9F5HSY8DGE9egdGy8yUAe2ShT3tFm-CwUuCYeAYy_YiW/pub?gid=2028135390&single=true&output=csv";
 const $ = s => document.querySelector(s), $$ = s => Array.from(document.querySelectorAll(s));
@@ -360,7 +360,7 @@ async function loadCSV(url){
   const rows = text.trim().split(/\r?\n/).map(line => line.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/).map(c=>c.replace(/^"|"$/g,'')));
   const header = rows.shift().map(h => h.trim());
   const idx=n=>header.indexOf(n);
-  const statKeys = ['avg', 'obp', 'slg', 'ops', 'ab', 'hits', 'runs', 'rbi', '2b', '3b', 'hr', 'sb', 'era', 'k/9', 'k/bb', 'whip', 'ip', 'er', 'ko', 'bb', 'gp', 'w-l', 'saves', 'fip'];
+  const statKeys = ['avg', 'obp', 'slg', 'ops', 'ab', 'h', 'r', 'rbi', '2b', '3b', 'hr', 'sb', 'bb', 'era', 'k/9', 'k/bb', 'whip', 'ip', 'er', 'ko', 'gp', 'w-l', 'saves', 'fip'];
   return rows.map(r=> {
     const player = {
       slug:r[idx('slug')], display_name:r[idx('display_name')],
@@ -492,12 +492,13 @@ function cardHTML(p){
 }
 
 function generateStatsGridHTML(player) {
-    const isPitcher = player.position && player.position.toUpperCase().includes('P');
-    const statsToShow = isPitcher 
-        ? ['ERA', 'K/9', 'K/BB', 'WHIP', 'IP', 'ER', 'KO', 'BB', 'GP', 'W-L', 'SAVES', 'FIP']
-        : ['BAVG', 'OBP', 'SLG', 'OPS', 'AB', 'HITS', 'RUNS', 'RBI', '2B', '3B', 'HR', 'SB'];
+    const isPitcher = player.stats['ERA'] !== undefined;
+    const batterStats = ['AVG', 'OBP', 'SLG', 'OPS', 'H', 'R', 'HR', 'RBI', 'AB', '2B', '3B', 'SB'];
+    const pitcherStats = ['ERA', 'K/9', 'K/BB', 'WHIP', 'IP', 'ER', 'KO', 'BB', 'GP', 'W-L', 'SAVES', 'FIP'];
     
-    let grid = `<div class="stats-header-bar">${player.status === 'ACTIVE 2025' ? '2025 SEASON STATS' : 'CAREER STATS'}</div>`;
+    const statsToShow = isPitcher ? pitcherStats : batterStats;
+    
+    let grid = `<div class="stats-header-bar">${(player.status || '').includes('ACTIVE') ? '2025 SEASON STATS' : 'CAREER STATS'}</div>`;
     grid += '<div class="stats-grid">';
     
     let hasStats = false;
@@ -508,7 +509,15 @@ function generateStatsGridHTML(player) {
         }
     }
 
-    if (!hasStats) return '<p style="text-align: center; padding: 20px; opacity: 0.7;">No stats available for this season.</p>';
+    if (!hasStats) {
+        grid = `<div class="stats-header-bar">${(player.status || '').includes('ACTIVE') ? '2025 SEASON STATS' : 'CAREER STATS'}</div>`;
+        grid += '<div class="stats-grid">';
+        for (const stat of statsToShow) {
+             grid += `<div class="stat-item"><div class="stat-value">--</div><div class="stat-label">${stat}</div></div>`;
+        }
+        grid += '</div>';
+        return grid;
+    }
     
     grid += '</div>';
     return grid;
@@ -768,4 +777,3 @@ document.addEventListener('DOMContentLoaded', () => {
 </script>
 </body>
 </html>
-
