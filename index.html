@@ -204,10 +204,104 @@ details[open] > .filter-title::after { transform: rotate(90deg); }
     outline-offset: 2px;
 }
 .card:focus { outline: 2px solid var(--fg); } /* For card flips via keyboard */
+
+/* --- New Splash Screen Styles --- */
+#splashScreen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh; /* vh ensures it covers screen on mobile */
+  background-color: #000; /* Solid black background */
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between; /* Pushes content to top and bottom */
+  align-items: center;
+  box-sizing: border-box; /* Ensures padding is calculated correctly */
+  padding: 12vh 20px 10vh; /* Vertical padding responsive to screen height */
+  opacity: 1;
+  transition: opacity 0.8s ease-out; /* Smooth fade-out at the end */
+  pointer-events: auto;
+}
+
+#splashScreen.is-hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.splash-top {
+  text-align: center;
+  color: #fff;
+}
+
+.splash-top h1 {
+  font-family: "Indigo", "Bebas Neue", sans-serif;
+  font-size: clamp(48px, 12vw, 72px);
+  margin: 0;
+  font-weight: 400;
+  letter-spacing: .03em;
+}
+
+.splash-top p {
+  font-family: Oswald, sans-serif;
+  font-size: clamp(16px, 4vw, 22px);
+  letter-spacing: .05em;
+  opacity: 0.8;
+  margin: 8px 0 0;
+}
+
+.splash-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(12px, 4vw, 20px);
+}
+
+.splash-bottom .splash-logo-h {
+    height: clamp(50px, 12vw, 70px);
+    width: auto;
+}
+
+/* This animation makes the divider and second logo fade in later */
+.splash-bottom .splash-divider,
+.splash-bottom .splash-logo-ne {
+    animation: fadeInDelayed 1.5s ease-in-out forwards;
+    animation-delay: 1.2s; /* Wait 1.2s before starting fade-in */
+    opacity: 0; /* Start invisible */
+}
+
+.splash-bottom .splash-divider {
+  width: 2px;
+  height: clamp(40px, 10vw, 60px);
+  background-color: rgba(255,255,255,0.5);
+}
+
+.splash-bottom .splash-logo-ne {
+  height: clamp(40px, 9vw, 55px);
+  width: auto;
+}
+
+@keyframes fadeInDelayed {
+    to {
+        opacity: 1;
+    }
+}
 </style>
 </head>
 
 <body>
+<div id="splashScreen">
+  <div class="splash-top">
+    <h1>YAT? STATS</h1>
+    <p>HAMILTON HIGH SCHOOL</p>
+  </div>
+  <div class="splash-bottom">
+    <img src="assets/img/hamilton-logo.png" alt="Hamilton Huskies Logo" class="splash-logo-h">
+    <div class="splash-divider"></div>
+    <img src="assets/img/no-errors-logo.png" alt="No Errors Logo" class="splash-logo-ne">
+  </div>
+</div>
 <header class="header">
     <div class="container topbar">
         <div class="left-icons">
@@ -825,6 +919,20 @@ window.gemini = {
 
 /* --- BOOTSTRAP --- */
 document.addEventListener('DOMContentLoaded', () => {
+    // --- Splash Screen Logic ---
+    const splashScreen = document.querySelector('#splashScreen');
+    if (splashScreen) {
+        // Wait 4 seconds then start the fade out
+        setTimeout(() => {
+            splashScreen.classList.add('is-hidden');
+            // Completely hide it after the fade transition ends
+            splashScreen.addEventListener('transitionend', () => {
+                splashScreen.style.display = 'none';
+            }, { once: true });
+        }, 4000); // Time in milliseconds (4000ms = 4s)
+    }
+    // --- End Splash Screen Logic ---
+
     (async ()=>{
       try{
         setupEventListeners();
