@@ -48,7 +48,7 @@
   --shade-end: rgba(0, 0, 0, .95);
   
   --hamSmall:13px; --hamBig:20px; --hamBigger:24px; --tagGrey:#cfd2d6;
-  --crestH: clamp(40px, 6vw, 60px);
+  --crestH: clamp(28px, 4.2vw, 42px); /* LOGO REDUCED TO 70% */
   --pairGap: 10px;
   --containerPad: 16px;
   --footerH: clamp(56px, 8vh, 77px);
@@ -267,17 +267,20 @@ body.light-theme .card { box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
     background: var(--line);
     border-radius: 8px;
     padding: 8px 5px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 .face.back .stat-label {
     font-size: 11px;
     text-transform: uppercase;
     opacity: .7;
-    margin-bottom: 4px;
 }
 .face.back .stat-value {
     font-size: 18px;
     font-weight: 700;
     line-height: 1;
+    margin-top: 4px;
 }
 .nil-score-container {
     background: var(--line);
@@ -300,6 +303,7 @@ body.light-theme .card { box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
 }
 
 .site-footer{position:fixed;left:0;right:0;bottom:0;height:var(--footerH);background:var(--bg);border-top:1px solid var(--line);z-index:40}
+.site-footer a { display: block; height: 100%; width: 100%; }
 .site-footer img{ height:100%; width:100%; object-fit:contain; }
 .icon-btn:focus, button:focus, input:focus, details summary:focus { outline: 2px solid var(--fg); outline-offset: 2px; }
 .card:focus { outline: 2px solid var(--fg); } /* For card flips via keyboard */
@@ -570,7 +574,9 @@ body.light-theme .card { box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
 </main>
 
 <footer class="site-footer">
-  <img src="assets/img/partners/no-errors-banner.jpg" alt="Sponsor Banner">
+  <a href="https://no-errors.com/collections/all-webgems" target="_blank" rel="noopener noreferrer">
+    <img src="assets/img/partners/no-errors-banner.jpg" alt="Sponsor Banner">
+  </a>
 </footer>
 
 <script type="module">
@@ -630,6 +636,22 @@ function imageNameOf(p) {
     const first = (p.first || '').toLowerCase();
     const last = (p.last || '').toLowerCase();
     return (first && last) ? `${first}_${last}` : slugOf(p);
+}
+
+function formatStatValue(key, value) {
+    if (!value || value === '--') return '--';
+    const decimalStats = ['AVG', 'OBP', 'SLG', 'OPS'];
+    if (decimalStats.includes(key.toUpperCase())) {
+        const num = parseFloat(value);
+        if (isNaN(num)) return value; 
+
+        const formattedString = num.toFixed(3);
+        if (num < 1 && num > -1) {
+            return formattedString.substring(1);
+        }
+        return formattedString;
+    }
+    return value;
 }
 
 function cardHTML(p){
@@ -722,30 +744,16 @@ function generateStatsGridHTML(player) {
     const isPitcher = player.stats['ERA'] !== undefined;
     const batterStats = ['AVG', 'OBP', 'SLG', 'OPS', 'H', 'R', 'HR', 'RBI', 'AB', '2B', '3B', 'SB'];
     const pitcherStats = ['ERA', 'K/9', 'K/BB', 'WHIP', 'IP', 'ER', 'KO', 'BB', 'GP', 'W-L', 'SAVES', 'FIP'];
-    
     const statsToShow = isPitcher ? pitcherStats : batterStats;
     
     let grid = `<div class="stats-header-bar">${(player.status || '').includes('ACTIVE') ? '2025 SEASON STATS' : 'CAREER STATS'}</div>`;
     grid += '<div class="stats-grid">';
     
-    let hasStats = false;
-    for (const stat of statsToShow) {
-        if (player.stats[stat]) {
-            hasStats = true;
-            grid += `<div class="stat-item"><div class="stat-value">${player.stats[stat]}</div><div class="stat-label">${stat}</div></div>`;
-        }
-    }
+    grid += statsToShow.map(stat => {
+        const formattedValue = formatStatValue(stat, player.stats[stat]);
+        return `<div class="stat-item"><div class="stat-label">${stat}</div><div class="stat-value">${formattedValue}</div></div>`;
+    }).join('');
 
-    if (!hasStats) {
-        grid = `<div class="stats-header-bar">${(player.status || '').includes('ACTIVE') ? '2025 SEASON STATS' : 'CAREER STATS'}</div>`;
-        grid += '<div class="stats-grid">';
-        for (const stat of statsToShow) {
-             grid += `<div class="stat-item"><div class="stat-value">--</div><div class="stat-label">${stat}</div></div>`;
-        }
-        grid += '</div>';
-        return grid;
-    }
-    
     grid += '</div>';
     return grid;
 }
