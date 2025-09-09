@@ -544,12 +544,56 @@ function renderCards(list){
   grid.innerHTML=list.map(cardHTML).join('');
 }
 
-function defaultSort(a,b){
-    const aIsActive = (a.status || '').toUpperCase().includes('ACTIVE'), bIsActive = (b.status || '').toUpperCase().includes('ACTIVE');
-    if (aIsActive && !bIsActive) return -1;
-    if (!aIsActive && bIsActive) return 1;
-    const cA=+a.grad_class||9999, cB=+b.grad_class||9999; 
-    if(cA!==cB) return cA-cB;
+// This object defines the sorting hierarchy for player levels. Higher numbers are better.
+const levelOrder = {
+    'MLB': 10,
+    'AAA': 9,
+    'AA': 8,
+    'A+': 7, 'High-A': 7,
+    'A': 6, 'Low-A': 6,
+    'ROK': 5, 'Rookie': 5,
+    'NCAA D1': 4,
+    'NCAA D2': 3,
+    'NCAA D3': 2,
+    'NAIA': 1,
+    'JUCO': 0
+};
+
+function defaultSort(a, b) {
+    // Determine if players are in the priority group (Active or Free Agent)
+    const aIsPriority = (a.status || '').toUpperCase().includes('ACTIVE') || (a.status || '').toUpperCase() === 'FREE AGENT';
+    const bIsPriority = (b.status || '').toUpperCase().includes('ACTIVE') || (b.status || '').toUpperCase() === 'FREE AGENT';
+
+    // If one is priority and the other isn't, the priority one comes first.
+    if (aIsPriority && !bIsPriority) return -1;
+    if (!aIsPriority && bIsPriority) return 1;
+
+    // If both are priority players, apply the detailed sorting logic.
+    if (aIsPriority && bIsPriority) {
+        // 1. Sort by Level (highest first)
+        const levelA = levelOrder[a.level] ?? -1; // Use -1 for unlisted levels
+        const levelB = levelOrder[b.level] ?? -1;
+        if (levelA !== levelB) return levelB - levelA;
+
+        // 2. Sort by Grad Class (oldest first, e.g., 2019 before 2020)
+        const gradA = parseInt(a.grad_class, 10) || 0;
+        const gradB = parseInt(b.grad_class, 10) || 0;
+        if (gradA !== gradB) return gradA - gradB;
+
+        // 3. Sort by number of Varsity Letters (most first)
+        const lettersA = (a.letter_years || '').split(',').filter(Boolean).length;
+        const lettersB = (b.letter_years || '').split(',').filter(Boolean).length;
+        if (lettersA !== lettersB) return lettersB - lettersA;
+
+        // 4. Sort by Name (alphabetically)
+        return (a.display_name || '').localeCompare(b.display_name || '');
+    }
+
+    // Fallback for non-priority players (e.g., Retired, Sponsor).
+    // This sorts them by grad class (oldest first), then alphabetically.
+    const cA = +a.grad_class || 9999,
+          cB = +b.grad_class || 9999;
+    if (cA !== cB) return cA - cB;
     return (a.display_name || '').localeCompare(b.display_name || '');
 }
 
