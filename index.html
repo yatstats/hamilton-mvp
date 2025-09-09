@@ -48,7 +48,7 @@
   --shade-end: rgba(0, 0, 0, .95);
   
   --hamSmall:13px; --hamBig:20px; --hamBigger:24px; --tagGrey:#cfd2d6;
-  --crestH: clamp(28px, 4.2vw, 42px); /* LOGO REDUCED TO 70% */
+  --crestH: clamp(28px, 4.2vw, 42px);
   --pairGap: 10px;
   --containerPad: 16px;
   --footerH: clamp(56px, 8vh, 77px);
@@ -512,20 +512,6 @@ body.light-theme .card { box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
             </div>
         </details>
         <details class="filter-group">
-            <summary class="filter-title">By Level</summary>
-            <div class="filter-options" id="filterLevels">
-                 <label class="select-all-label"><input type="checkbox" class="select-all"> Select All</label>
-                 </div>
-        </details>
-        <details class="filter-group">
-            <summary class="filter-title">By Graduating Class</summary>
-            <div class="filter-options" id="filterGradClass"></div>
-        </details>
-        <details class="filter-group">
-            <summary class="filter-title">By Roster Year</summary>
-            <div class="filter-options" id="filterRosterYear"></div>
-        </details>
-         <details class="filter-group">
             <summary class="filter-title">By Status</summary>
             <div class="filter-options" id="filterStatus">
                 <label class="select-all-label"><input type="checkbox" class="select-all"> Select All</label>
@@ -536,6 +522,20 @@ body.light-theme .card { box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
                 <label><input type="checkbox" value="RETIRED"> RETIRED</label>
                 <label><input type="checkbox" value="SPONSOR"> SPONSOR</label>
             </div>
+        </details>
+        <details class="filter-group">
+            <summary class="filter-title">By Level</summary>
+            <div class="filter-options" id="filterLevels">
+                 <label class="select-all-label"><input type="checkbox" class="select-all"> Select All</label>
+            </div>
+        </details>
+        <details class="filter-group">
+            <summary class="filter-title">By Graduating Class</summary>
+            <div class="filter-options" id="filterGradClass"></div>
+        </details>
+        <details class="filter-group">
+            <summary class="filter-title">By Roster Year</summary>
+            <div class="filter-options" id="filterRosterYear"></div>
         </details>
     </div>
     <div class="drawer-footer">
@@ -586,6 +586,28 @@ const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQcWJM6Q6hTdFnE
 const $ = s => document.querySelector(s), $$ = s => Array.from(document.querySelectorAll(s));
 const debounce = (fn, ms=300)=>{ let t; return (...a)=>{ clearTimeout(t); t=setTimeout(()=>fn(...a),ms); }; };
 
+// This object defines the sorting hierarchy for player levels. Higher numbers are better.
+const levelOrder = {
+    'MLB': 13,
+    'KBO': 12,
+    'TRIPLE-A': 11,
+    'AAA': 11, // Alias for Triple-A
+    'DOUBLE-A': 10,
+    'AA': 10, // Alias for Double-A
+    'HIGH-A': 9,
+    'A+': 9, // Alias for High-A
+    'LOW-A': 8,
+    'A': 8, // Alias for Low-A
+    'ROOKIE': 7,
+    'ROK': 7, // Alias for Rookie
+    'INDY': 6,
+    'NCAA-D1': 5,
+    'NCAA-D2': 4,
+    'NCAA-D3': 3,
+    'NAIA': 2,
+    'JUCO': 1
+};
+
 async function loadCSV(url){
   const response = await fetch(url);
   if(!response.ok) throw new Error(`HTTP ${response.status}`);
@@ -622,13 +644,20 @@ async function loadCSV(url){
 }
 
 function populateFilters(players) {
-    const gradClasses = [...new Set(players.map(p => p.grad_class).filter(Boolean))].sort((a,b) => b-a);
-    const rosterYears = [...new Set(players.flatMap(p => (p.letter_years || '').split(',')).map(y => y.trim()).filter(Boolean))].sort((a,b) => b-a);
+    // --- Levels ---
+    const levels = [...new Set(players.map(p => p.level).filter(Boolean))];
+    levels.sort((a, b) => (levelOrder[b] ?? -1) - (levelOrder[a] ?? -1)); // Sort using levelOrder
+    const levelsContainer = $('#filterLevels');
+    levelsContainer.innerHTML = '<label class="select-all-label"><input type="checkbox" class="select-all"> Select All</label>' + levels.map(level => `<label><input type="checkbox" value="${level}"> ${level}</label>`).join('');
     
+    // --- Grad Classes ---
+    const gradClasses = [...new Set(players.map(p => p.grad_class).filter(Boolean))].sort((a,b) => b-a);
     const gradClassContainer = $('#filterGradClass');
-    const rosterYearContainer = $('#filterRosterYear');
-
     gradClassContainer.innerHTML = '<label class="select-all-label"><input type="checkbox" class="select-all"> Select All</label>' + gradClasses.map(year => `<label><input type="checkbox" value="${year}"> ${year}</label>`).join('');
+    
+    // --- Roster Years ---
+    const rosterYears = [...new Set(players.flatMap(p => (p.letter_years || '').split(',')).map(y => y.trim()).filter(Boolean))].sort((a,b) => b-a);
+    const rosterYearContainer = $('#filterRosterYear');
     rosterYearContainer.innerHTML = '<label class="select-all-label"><input type="checkbox" class="select-all"> Select All</label>' + rosterYears.map(year => `<label><input type="checkbox" value="${year}"> ${year}</label>`).join('');
 }
 
@@ -767,28 +796,6 @@ function renderCards(list){
   grid.innerHTML=list.map(cardHTML).join('');
 }
 
-// This object defines the sorting hierarchy for player levels. Higher numbers are better.
-const levelOrder = {
-    'MLB': 13,
-    'KBO': 12,
-    'TRIPLE-A': 11,
-    'AAA': 11, // Alias for Triple-A
-    'DOUBLE-A': 10,
-    'AA': 10, // Alias for Double-A
-    'HIGH-A': 9,
-    'A+': 9, // Alias for High-A
-    'LOW-A': 8,
-    'A': 8, // Alias for Low-A
-    'ROOKIE': 7,
-    'ROK': 7, // Alias for Rookie
-    'INDY': 6,
-    'NCAA-D1': 5,
-    'NCAA-D2': 4,
-    'NCAA-D3': 3,
-    'NAIA': 2,
-    'JUCO': 1
-};
-
 function defaultSort(a, b) {
     // --- NEW: Prioritize SPONSOR status ---
     const aIsSponsor = (a.status || '').toUpperCase() === 'SPONSOR';
@@ -860,17 +867,19 @@ function setupEventListeners() {
     $('#filtersReset')?.addEventListener('click', resetFilters);
     $('#filtersReset2')?.addEventListener('click', resetFilters);
     
-    $('#filters')?.addEventListener('input', debounce(applyFilters));
+    $('#filterName')?.addEventListener('input', debounce(applyFilters));
     $('#playerSearch')?.addEventListener('input', debounce(liveSearch));
 
-    $$('.filter-group').forEach(group => {
-        const selectAll = group.querySelector('.select-all');
-        if (!selectAll) return;
-        const options = [...group.querySelectorAll('.filter-options input[type="checkbox"]:not(.select-all)')];
-        selectAll.addEventListener('change', (e) => {
-            options.forEach(option => { option.checked = e.target.checked; });
-            debounce(applyFilters)();
-        });
+    $('#filters')?.addEventListener('change', (e) => {
+        if (e.target.classList.contains('select-all')) {
+            const isChecked = e.target.checked;
+            const optionsContainer = e.target.closest('.filter-options');
+            if (optionsContainer) {
+                const checkboxes = optionsContainer.querySelectorAll('input[type="checkbox"]:not(.select-all)');
+                checkboxes.forEach(cb => cb.checked = isChecked);
+            }
+        }
+        applyFilters();
     });
 
     $('#cardGrid').addEventListener('click', (e) => {
