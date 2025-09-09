@@ -584,6 +584,10 @@ async function loadCSV(url){
       last_game_2: r[idx('last_game_2')],
       last_game_3: r[idx('last_game_3')],
       x_handle: r[idx('x_handle')], ig_handle: r[idx('ig_handle')],
+     
+    video_url: r[idx('video_url')],
+      nil_score: r[idx('nil_score')],
+        
       stats: {}
     };
     for (const key of statKeys) {
@@ -915,39 +919,57 @@ async function handleFunZone(button) {
     const content = button.dataset.content;
     card.querySelectorAll('.back-nav-link').forEach(btn => btn.classList.remove('active'));
     button.classList.add('active');
-    funZone.innerHTML = '<p>Loading...</p>';
+    funZone.innerHTML = '<p style="padding: 12px; text-align: center;">Loading...</p>';
     
-    const { generateGeminiText } = window.gemini;
-
+    // --- STATS TAB ---
     if (content === 'stats') {
         funZone.innerHTML = generateStatsGridHTML(player);
-    } else if (content === 'bio') {
-        const prompt = `Act as an optimistic but knowledgeable high school baseball scout. Write a brief, 2-3 sentence scouting report for ${player.display_name}. Highlight his journey and potential future in a positive, "Yat-A-Boy!" style.`;
-        funZone.innerHTML = await generateGeminiText(prompt);
-    } else if (content === 'news') {
-        const prompt = `Generate 2-3 recent, realistic, and positive sports news headlines for baseball player ${player.display_name}.`;
-        const newsText = await generateGeminiText(prompt);
-        funZone.innerHTML = newsText.split('\n').map(line => {
-            if (!line.trim() || line.startsWith('*')) return '';
-            const parts = line.split(' - ');
-            return `<div class="news-item"><div class="news-headline">${parts[0].replace(/^\d\.\s/, '')}</div><div class="news-source">${parts[1] || 'YatStats Network'}</div></div>`
-        }).join('');
-    } else if (content === 'social') {
-        let socialHTML = '<div class="social-links">';
-        if (player.x_handle) socialHTML += `<a href="https://x.com/${player.x_handle}" target="_blank">X / Twitter</a>`;
-        if (player.ig_handle) socialHTML += `<a href="https://instagram.com/${player.ig_handle}" target="_blank">Instagram</a>`;
-        if (!player.x_handle && !player.ig_handle) socialHTML += 'No social media links available.';
-        socialHTML += '</div>';
-        const prompt = `Generate a realistic, short, and positive X/Twitter post from a baseball player like ${player.display_name} about an upcoming game or recent performance. Include a relevant hashtag like #YatABoy${player.display_name.split(' ').join('')}.`;
-        const postText = await generateGeminiText(prompt);
-        socialHTML += `<div class="social-post"><p><strong>Latest Post (Sample):</strong></p><p>"${postText}"</p></div>`;
-        funZone.innerHTML = socialHTML;
-    } else if (content === 'nil') {
-        funZone.innerHTML = `<p>NIL Score for ${player.display_name} coming soon.</p>`;
+
+    // --- VIDEO TAB (NEW) ---
     } else if (content === 'video') {
-        funZone.innerHTML = `<iframe width="100%" height="215" src="https://www.youtube.com/embed/5O18C24I8o8" title="YouTube video player" frameborder="0" allowfullscreen style="border-radius: 8px;"></iframe>`;
-    } else if (content === 'pics') {
-        funZone.innerHTML = `<p>Fan Pics for ${player.display_name} coming soon.</p>`;
+        if (player.video_url) {
+            funZone.innerHTML = `<iframe width="100%" height="215" src="${player.video_url}" title="YouTube video player" frameborder="0" allowfullscreen style="border-radius: 8px; display: block;"></iframe>`;
+        } else {
+            funZone.innerHTML = `<p style="padding: 12px; text-align: center;">No video available for ${player.display_name}.</p>`;
+        }
+
+    // --- NIL PTS TAB (NEW) ---
+    } else if (content === 'nil') {
+        if (player.nil_score) {
+             funZone.innerHTML = `<div class="stats-header-bar">YAT-A-BOY NIL SCORE</div>
+                                  <div class="nil-score-container">
+                                      <div class="nil-score-value">${player.nil_score}</div>
+                                      <div class="nil-score-label">Points</div>
+                                  </div>`;
+        } else {
+            funZone.innerHTML = `<p style="padding: 12px; text-align: center;">NIL Score not available for ${player.display_name}.</p>`;
+        }
+    
+    // --- OTHER TABS (This section now uses Gemini) ---
+    } else {
+        const { generateGeminiText } = window.gemini;
+        let prompt = '';
+        if (content === 'bio') {
+            prompt = `Act as an optimistic but knowledgeable high school baseball scout. Write a brief, 2-3 sentence scouting report for ${player.display_name}. Highlight his journey and potential future in a positive, "Yat-A-Boy!" style.`;
+            funZone.innerHTML = await generateGeminiText(prompt);
+        } else if (content === 'news') {
+            prompt = `Generate 2-3 recent, realistic, and positive sports news headlines for baseball player ${player.display_name}.`;
+            const newsText = await generateGeminiText(prompt);
+            funZone.innerHTML = newsText.split('\n').map(line => {
+                if (!line.trim() || line.startsWith('*')) return '';
+                const parts = line.split(' - ');
+                return `<div class="news-item" style="padding: 8px;"><div class="news-headline" style="font-weight: bold;">${parts[0].replace(/^\d\.\s/, '')}</div><div class="news-source" style="font-size: 0.8em; opacity: 0.7;">${parts[1] || 'YatStats Network'}</div></div>`
+            }).join('');
+        } else if (content === 'social') {
+            let socialHTML = '<div style="padding: 12px;">';
+            if (player.x_handle) socialHTML += `<a href="https://x.com/${player.x_handle}" target="_blank" style="display: block; margin-bottom: 8px;">View on X / Twitter</a>`;
+            if (player.ig_handle) socialHTML += `<a href="https://instagram.com/${player.ig_handle}" target="_blank" style="display: block; margin-bottom: 8px;">View on Instagram</a>`;
+            if (!player.x_handle && !player.ig_handle) socialHTML += 'No social media links available.';
+            socialHTML += '</div>';
+            funZone.innerHTML = socialHTML;
+        } else {
+            funZone.innerHTML = `<p style="padding: 12px; text-align: center;">Content for ${content} coming soon.</p>`;
+        }
     }
 }
 
