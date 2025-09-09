@@ -546,17 +546,24 @@ function renderCards(list){
 
 // This object defines the sorting hierarchy for player levels. Higher numbers are better.
 const levelOrder = {
-    'MLB': 10,
-    'AAA': 9,
-    'AA': 8,
-    'A+': 7, 'High-A': 7,
-    'A': 6, 'Low-A': 6,
-    'ROK': 5, 'Rookie': 5,
-    'NCAA D1': 4,
-    'NCAA D2': 3,
-    'NCAA D3': 2,
-    'NAIA': 1,
-    'JUCO': 0
+    'MLB': 13,
+    'KBO': 12,
+    'TRIPLE-A': 11,
+    'AAA': 11, // Alias for Triple-A
+    'DOUBLE-A': 10,
+    'AA': 10, // Alias for Double-A
+    'HIGH-A': 9,
+    'A+': 9, // Alias for High-A
+    'LOW-A': 8,
+    'A': 8, // Alias for Low-A
+    'ROOKIE': 7,
+    'ROK': 7, // Alias for Rookie
+    'INDY': 6,
+    'NCAA-D1': 5,
+    'NCAA-D2': 4,
+    'NCAA-D3': 3,
+    'NAIA': 2,
+    'JUCO': 1
 };
 
 function defaultSort(a, b) {
@@ -570,9 +577,13 @@ function defaultSort(a, b) {
 
     // If both are priority players, apply the detailed sorting logic.
     if (aIsPriority && bIsPriority) {
+        // Standardize the level text before lookup: convert to uppercase and trim whitespace.
+        const levelTextA = (a.level || '').toUpperCase().trim();
+        const levelTextB = (b.level || '').toUpperCase().trim();
+        
         // 1. Sort by Level (highest first)
-        const levelA = levelOrder[a.level] ?? -1; // Use -1 for unlisted levels
-        const levelB = levelOrder[b.level] ?? -1;
+        const levelA = levelOrder[levelTextA] ?? -1;
+        const levelB = levelOrder[levelTextB] ?? -1;
         if (levelA !== levelB) return levelB - levelA;
 
         // 2. Sort by Grad Class (oldest first, e.g., 2019 before 2020)
@@ -590,7 +601,6 @@ function defaultSort(a, b) {
     }
 
     // Fallback for non-priority players (e.g., Retired, Sponsor).
-    // This sorts them by grad class (oldest first), then alphabetically.
     const cA = +a.grad_class || 9999,
           cB = +b.grad_class || 9999;
     if (cA !== cB) return cA - cB;
