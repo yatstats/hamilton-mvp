@@ -382,23 +382,19 @@ body.light-theme .card { box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
   animation-delay: 1.5s;
 }
 
-.splash-bottom .splash-logo-h,
-.splash-bottom .splash-divider,
-.splash-bottom .splash-logo-ne {
+.splash-bottom .splash-logo-h {
+    height: clamp(32px, 7.8vw, 45px);
+    width: auto;
     animation: fadeInDelayed 1s ease-in-out forwards;
-    animation-delay: 1.2s; /* How long to wait before starting the fade */
-    opacity: 0; /* Start invisible */
+    animation-delay: 1.2s;
+    opacity: 0;
 }
-
-.splash-bottom .splash-divider {
-  width: 2px;
-  height: clamp(40px, 10vw, 60px);
-  background-color: rgba(255,255,255,0.5);
-}
-
 .splash-bottom .splash-logo-ne {
-  height: clamp(40px, 9vw, 55px);
-  width: auto;
+    height: clamp(26px, 5.85vw, 35px);
+    width: auto;
+    animation: fadeInDelayed 1s ease-in-out forwards;
+    animation-delay: 1.2s;
+    opacity: 0;
 }
 
 @keyframes fadeInDelayed {
@@ -424,7 +420,6 @@ body.light-theme .card { box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
   </div>
   <div class="splash-bottom">
     <img src="assets/img/hamilton-logo.png" alt="Hamilton Huskies Logo" class="splash-logo-h">
-    <div class="splash-divider"></div>
     <img src="assets/img/partners/no-errors.png" alt="No Errors Logo" class="splash-logo-ne">
   </div>
 </div>
@@ -870,7 +865,9 @@ function setupEventListeners() {
     $('#filterName')?.addEventListener('input', debounce(applyFilters));
     $('#playerSearch')?.addEventListener('input', debounce(liveSearch));
 
+    // New, robust event listener for all filter checkboxes
     $('#filters')?.addEventListener('change', (e) => {
+        // Handle the 'Select All' functionality
         if (e.target.classList.contains('select-all')) {
             const isChecked = e.target.checked;
             const optionsContainer = e.target.closest('.filter-options');
@@ -879,6 +876,7 @@ function setupEventListeners() {
                 checkboxes.forEach(cb => cb.checked = isChecked);
             }
         }
+        // Apply filters whenever any checkbox changes
         applyFilters();
     });
 
