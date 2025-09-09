@@ -1015,6 +1015,11 @@ async function handleFunZone(button) {
 
 /* --- FIREBASE AUTHENTICATION --- */
 function setupAuth() {
+    // Safety check to prevent crash on Safari
+    if (!window.firebaseAuth) {
+        console.warn("Firebase auth script not ready yet, skipping auth setup.");
+        return;
+    }
     const { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } = window.firebaseAuth;
     const auth = window.auth;
     const signInForm = $('#signInForm'), registerForm = $('#registerForm'), signOutBtn = $('#btnSignOut'), authMessage = $('#authMessage');
