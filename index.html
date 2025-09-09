@@ -24,7 +24,7 @@
         });
 
         if (window.__initial_auth_token) {
-            await signInWithEmailAndPassword(window.auth, window.__initial_auth_token);
+            await signInWithCustomToken(window.auth, window.__initial_auth_token);
         } else {
             await signInAnonymously(window.auth);
         }
@@ -36,20 +36,44 @@
 <style>
 /* All CSS is now embedded in this file */
 :root{
-  --bg:#0c0c0c; --fg:#f2f2f2; --muted:#c4c4c4; --ink:#e8e8e8; --line:rgba(255,255,255,0.08);
+  /* Default Dark Theme Colors */
+  --bg: #0c0c0c;
+  --fg: #f2f2f2;
+  --muted: #c4c4c4;
+  --ink: #e8e8e8;
+  --line: rgba(255, 255, 255, 0.08);
+  --card-bg: #171717;
+  --header-bg: #000;
+  --drawer-bg: rgba(10, 10, 10, .65);
+  --shade-end: rgba(0, 0, 0, .95);
+  
   --hamSmall:13px; --hamBig:20px; --hamBigger:24px; --tagGrey:#cfd2d6;
   --crestH: clamp(40px, 6vw, 60px);
   --pairGap: 10px;
   --containerPad: 16px;
   --footerH: clamp(56px, 8vh, 77px);
 }
+
+body.light-theme {
+  /* Light Theme Overrides */
+  --bg: #f4f4f4;
+  --fg: #121212;
+  --muted: #555;
+  --ink: #222;
+  --line: rgba(0, 0, 0, 0.1);
+  --card-bg: #ffffff;
+  --header-bg: #ffffff;
+  --drawer-bg: rgba(255, 255, 255, .65);
+  --shade-end: rgba(244, 244, 244, .95);
+}
+
 @font-face{ font-family:'Indigo'; src:url('assets/fonts/Indigo.otf') format('opentype'); font-weight:400; font-style:normal; font-display:swap; }
 *{box-sizing:border-box} html,body{margin:0}
-body{background:var(--bg);color:var(--fg);font-family:Oswald,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
+body{background:var(--bg);color:var(--fg);font-family:Oswald,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif; transition: background-color 0.3s, color 0.3s;}
 body.drawer-open { overflow: hidden; }
 a{color:inherit;text-decoration:none}
 .container{max-width:1400px;margin:0 auto;padding:0 var(--containerPad)}
-.header{position:sticky;top:0;z-index:50;background:#000}
+.header{position:sticky;top:0;z-index:50;background:var(--header-bg); transition: background-color 0.3s;}
 .topbar{display:flex;align-items:center;justify-content:space-between;padding:8px 0}
 .left-icons{display:flex;align-items:center;gap:8px}
 .icon-btn{background:none;border:none;color:var(--fg);opacity:.92;display:inline-flex;align-items:center;justify-content:center;padding:0;margin:0 2px; cursor: pointer;}
@@ -57,12 +81,14 @@ a{color:inherit;text-decoration:none}
 .topnav{display:flex;gap:18px;align-items:center}
 .nav-pair{white-space:nowrap}
 .nav-pair .thin{font:300 var(--hamSmall) Oswald, sans-serif; letter-spacing:.02em; color:#cfd2d6; margin-right:2px}
+body.light-theme .nav-pair .thin { color: var(--muted); }
 .nav-pair .bold{font:400 var(--hamSmall) Indigo, "Bebas Neue", sans-serif}
 .wordmark-wrap{display:flex;align-items:center;justify-content:flex-end;min-width:120px}
 .wordmark-img{height:clamp(18px,3.2vw,28px);width:auto;display:block}
+body.light-theme .wordmark-img { filter: invert(1); }
 @media (max-width:1200px){ .topnav{display:none !important} }
 .hr-y{border-top:1px solid var(--line)}
-.schoolrow{display:flex;align-items:center;gap:var(--pairGap);padding:6px 0}
+.schoolrow{display:flex;align-items:center;gap:10px;padding:6px var(--containerPad)}
 .ham-logo{height:var(--crestH);width:auto;object-fit:contain;display:block; flex-shrink: 0;}
 .schooltext{line-height:1}
 .schooltext .small{font:300 var(--hamSmall)/1 Oswald;letter-spacing:.02em;color:var(--muted)}
@@ -86,23 +112,25 @@ a{color:inherit;text-decoration:none}
 .tag-swap:nth-child(1){animation-delay:0s}
 .tag-swap:nth-child(2){animation-delay:3s}
 .tag-grey{font:300 1em Oswald,sans-serif;letter-spacing:.02em;color:var(--tagGrey)}
+body.light-theme .tag-grey { color: var(--muted); }
 .tag-bold{font:400 1em Indigo,"Bebas Neue",sans-serif}
 @keyframes swap{0%{opacity:0}5%{opacity:1}45%{opacity:1}50%{opacity:0}100%{opacity:0}}
 .hero-right{display:flex;gap:10px}
 .hero-icon i{font-size:20px}
 .drawer-mask{position:fixed;inset:0;background:rgba(0,0,0,.35);opacity:0;pointer-events:none;transition:opacity .2s;z-index:60}
-.drawer{position:fixed;top:0;bottom:0;width:min(360px,82vw);background:rgba(10,10,10,.65);backdrop-filter:blur(4px);color:#e8e8e8;transform:translateX(-110%);transition:transform .25s;z-index:70}
+.drawer{position:fixed;top:0;bottom:0;width:min(360px,82vw);background:var(--drawer-bg);backdrop-filter:blur(4px);color:var(--ink);transform:translateX(-110%);transition:transform .25s, background-color 0.3s;z-index:70}
 .drawer-right{right:0;left:auto;transform:translateX(110%); display: flex; flex-direction: column; height: 100%;}
 .drawer h3{margin:18px 16px 8px; padding-right: 30px;}
 .drawer .pad { padding: 10px 16px; }
 .drawer .close-btn { position: absolute; top: 12px; right: 12px; }
-.drawer a{color:#e8e8e8}
-.drawer a:hover{color:#fff}
+.drawer a{color:var(--ink)}
+.drawer a:hover{color:var(--fg)}
 body.drawer-left-open .drawer-mask,body.drawer-right-open .drawer-mask{opacity:1;pointer-events:auto}
 body.drawer-left-open #drawerLeft{transform:translateX(0)}
 body.drawer-right-open .drawer-right{transform:translateX(0)}
 .drawer-content { flex-grow: 1; overflow-y: auto; padding: 10px 16px;}
 .drawer-footer { flex-shrink: 0; padding: 12px 16px; border-top: 1px solid var(--line); background: rgba(10,10,10,.8); display:flex; gap: 10px; align-items: center;}
+body.light-theme .drawer-footer { background: rgba(255,255,255,.8); }
 .filter-group { border-bottom: 1px solid var(--line); }
 .filter-group:last-of-type { border-bottom: none; }
 .filter-title { padding: 14px 0; cursor: pointer; font-weight: 700; font-family: "Bebas Neue", sans-serif; letter-spacing: .05em; list-style: none; display: flex; justify-content: space-between; align-items: center; }
@@ -115,7 +143,7 @@ details[open] > .filter-title::after { transform: rotate(90deg); }
 .select-all-label { font-weight: bold; border-bottom: 1px solid var(--line); padding-bottom: 8px !important; margin-bottom: 12px !important;}
 #liveResults{margin:10px 4px 18px;max-height:55vh;overflow:auto}
 .live-hit{padding:10px 12px;display:flex;align-items:center;gap:10px;border-radius:10px;cursor:pointer}
-.live-hit:hover{background:rgba(255,255,255,.08)}
+.live-hit:hover{background:var(--line)}
 .live-hit img{width:36px;height:36px;border-radius:6px;object-fit:cover}
 .auth-tabs { display: flex; border-bottom: 1px solid var(--line); }
 .auth-tab { flex: 1; text-align: center; padding: 10px; cursor: pointer; background: transparent; border: none; color: var(--muted); font-family: "Bebas Neue", sans-serif; font-size: 16px; letter-spacing: .05em;}
@@ -125,6 +153,7 @@ details[open] > .filter-title::after { transform: rotate(90deg); }
 .form-field { margin-bottom: 15px; }
 .form-field label { display: block; margin-bottom: 5px; font-size: 12px; }
 .form-field input { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--line); background: rgba(255,255,255,.06); color: var(--ink); }
+body.light-theme .form-field input { background: rgba(0,0,0,.06); }
 .auth-btn { width: 100%; padding: 12px; background: var(--fg); color: var(--bg); border: none; border-radius: 8px; font-family: "Bebas Neue", sans-serif; font-size: 16px; letter-spacing: .08em; cursor: pointer; }
 #authMessage { margin-top: 15px; text-align: center; font-size: 13px; }
 .error { color: #fca5a5; }
@@ -136,7 +165,8 @@ details[open] > .filter-title::after { transform: rotate(90deg); }
 @media (max-width: 768px) { .grid { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 520px) { .grid { grid-template-columns: repeat(1, 1fr); } }
 
-.card{position:relative;background:#171717;border-radius:0;overflow:hidden}
+.card{position:relative;background:var(--card-bg);border-radius:0;overflow:hidden; transition: background-color 0.3s; box-shadow: 0 4px 8px rgba(0,0,0,0.2);}
+body.light-theme .card { box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
 .card::before{content:"";display:block;padding-top:140%}
 .card-inner{position:absolute;inset:0;perspective:1200px}
 .flip{position:absolute;inset:0;transform-style:preserve-3d;transition:transform .6s cubic-bezier(.2,.7,.2,1)}
@@ -147,9 +177,8 @@ details[open] > .filter-title::after { transform: rotate(90deg); }
 .card .back a, .card .back button { pointer-events: auto; }
 .face.front { display: flex; flex-direction: column; justify-content: flex-end; }
 .bg{position:absolute;inset:0;background:#111 center/cover no-repeat}
-.shade{position:absolute;left:0;right:0;bottom:0;height:70%;background:linear-gradient(transparent,rgba(0,0,0,.3) 30%,rgba(0,0,0,.95))}
+.shade{position:absolute;left:0;right:0;bottom:0;height:70%;background:linear-gradient(transparent,rgba(0,0,0,.3) 30%,var(--shade-end))}
 .name{font:400 28px/1 "Indigo","Bebas Neue",sans-serif;letter-spacing:.02em; color: #fff; text-shadow: 1px 1px 3px rgba(0,0,0,.5);}
-.name span { display: block; line-height: .9; }
 .meta-small{font:300 13px/1.2 Oswald;opacity:.9; color: #fff; text-shadow: 1px 1px 3px rgba(0,0,0,.5); margin-top: 4px;}
 .meta-small span { display: block; line-height: 1.1; }
 .front-bottom-content { position: relative; z-index: 2; padding: 16px; display: flex; align-items: flex-end; width: 100%;}
@@ -163,27 +192,25 @@ details[open] > .filter-title::after { transform: rotate(90deg); }
 .game-log { font: 400 10px system-ui, sans-serif; white-space: nowrap; line-height: 1.2; letter-spacing: -0.5px; }
 .varsity-dots { display: flex; gap: 4px; }
 .varsity-dot { width: 22px; height: 22px; border-radius: 50%; background: #fff; color: #111; display: grid; place-items: center; font-weight: 700; font-size: 10px; border: 1px solid rgba(0,0,0,.2); }
-.face.back{transform:rotateY(180deg); background: #fff; color: #111; display: flex; flex-direction: column;}
-.back-top-section { display: flex; padding: 12px; gap: 12px; background: #fff; color: #111; border-bottom: 1px solid #eee;}
+.face.back{transform:rotateY(180deg); background: var(--bg); color: var(--fg); display: flex; flex-direction: column;}
+.back-top-section { display: flex; padding: 12px; gap: 12px; border-bottom: 1px solid var(--line);}
 .back-info-left { flex-grow: 1; }
 .back-player-name { font: 700 22px "Bebas Neue", sans-serif; letter-spacing: .04em; margin-bottom: 4px;}
 .back-player-details { font-size: 12px; opacity: .8; line-height: 1.4; }
 .back-player-details strong { font-weight: 700; }
 .back-photo-right { flex-shrink: 0; }
-.back-player-photo { width: 100px; height: 140px; object-fit: cover; border-radius: 8px; border: 4px solid #fff; box-shadow: 0 2px 5px rgba(0,0,0,.2);}
+.back-player-photo { width: 100px; height: 140px; object-fit: cover; border-radius: 8px; border: 4px solid var(--bg); box-shadow: 0 2px 5px rgba(0,0,0,.2);}
 .fun-zone { flex-grow: 1; overflow-y: auto; }
-.back-nav { display: flex; justify-content: space-around; background: #f7f7f7; border-bottom: 1px solid #eee; }
-.back-nav-link { background: none; border: none; color: #555; font: 700 11px "Bebas Neue", sans-serif; letter-spacing: .05em; cursor: pointer; padding: 8px 6px; border-radius: 0; border-bottom: 2px solid transparent;}
-.back-nav-link.active { color: #111; border-bottom-color: #111; }
-.stats-header-bar { background: #e5e5e5; color: #333; text-align: center; padding: 6px; font: 700 12px "Bebas Neue", sans-serif; letter-spacing: .08em; margin: 12px; }
+.back-nav { display: flex; justify-content: space-around; border-bottom: 1px solid var(--line); }
+.back-nav-link { background: none; border: none; color: var(--muted); font: 700 11px "Bebas Neue", sans-serif; letter-spacing: .05em; cursor: pointer; padding: 8px 6px; border-radius: 0; border-bottom: 2px solid transparent;}
+.back-nav-link.active { color: var(--fg); border-bottom-color: var(--fg); }
+.stats-header-bar { background: var(--line); text-align: center; padding: 6px; font: 700 12px "Bebas Neue", sans-serif; letter-spacing: .08em; margin: 12px; border-radius: 4px;}
 .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; font-family: Oswald, sans-serif; text-align: center; padding: 0 12px 12px;}
-.stat-item { background: #f0f0f0; border-radius: 6px; padding: 5px; }
+.stat-item { background: var(--line); border-radius: 6px; padding: 5px; }
 .stat-value { font-size: 14px; font-weight: 700; }
 .stat-label { font-size: 10px; text-transform: uppercase; opacity: .7; }
-.site-footer{position:fixed;left:0;right:0;bottom:0;height:var(--footerH);background:#0b0b0b;border-top:1px solid var(--line);z-index:40}
-.site-footer .wrap{height:100%;display:flex;align-items:center;justify-content:center;padding:0 var(--containerPad)}
-.sponsor-banner{height:calc(var(--footerH) - 12px); width:100%; display:flex;align-items:center;justify-content:center}
-.sponsor-banner img{ height:100%; width:100%; object-fit:contain; filter: saturate(.95); }
+.site-footer{position:fixed;left:0;right:0;bottom:0;height:var(--footerH);background:var(--bg);border-top:1px solid var(--line);z-index:40}
+.site-footer img{ height:100%; width:100%; object-fit:contain; }
 @media (max-width: 768px) {
     .name { font-size: 22px; line-height: 0.95; }
     .meta-small { font-size: 11px; }
@@ -279,12 +306,6 @@ details[open] > .filter-title::after { transform: rotate(90deg); }
   animation-delay: 1.5s;
 }
 
-.splash-bottom .splash-logo-h {
-  height: clamp(50px, 12vw, 70px);
-  width: auto;
-}
-
-/* This animation makes all bottom logos fade in later */
 .splash-bottom .splash-logo-h,
 .splash-bottom .splash-divider,
 .splash-bottom .splash-logo-ne {
@@ -339,7 +360,7 @@ details[open] > .filter-title::after { transform: rotate(90deg); }
                 <button class="icon-btn" id="btnAccount" aria-label="Account"><i class="ri-user-3-line"></i></button>
                 <button class="icon-btn" id="btnSignOut" style="display: none;"><i class="ri-logout-box-line"></i></button>
             </div>
-             <div class="crumbs">HAMILTON ▸ WHERE THEY YAT?</div>
+            <button class="icon-btn" id="theme-toggle" aria-label="Toggle Theme"><i class="ri-sun-line"></i></button>
         </div>
         <nav class="topnav" aria-label="Top Navigation">
             <a href="index.html" class="nav-pair"><span class="thin">WHERE THEY</span><span class="bold">YAT?</span></a>
@@ -451,7 +472,7 @@ details[open] > .filter-title::after { transform: rotate(90deg); }
     <h3>ACCOUNT</h3>
     <div class="drawer-content">
         <div class="auth-tabs">
-            <button class="auth-tab active" data-tab="signin">Sign In</button>
+            <button class="auth-tab active" data-tab="signIn">Sign In</button>
             <button class="auth-tab" data-tab="register">Register</button>
         </div>
         <div id="auth-forms-container" class="pad">
@@ -477,11 +498,7 @@ details[open] > .filter-title::after { transform: rotate(90deg); }
 </main>
 
 <footer class="site-footer">
-  <div class="wrap">
-    <div class="sponsor-banner">
-      <img src="assets/img/partners/no-errors-banner.jpg" alt="No Errors Sponsor Banner">
-    </div>
-  </div>
+  <img src="assets/img/partners/no-errors-banner.jpg" alt="Sponsor Banner">
 </footer>
 
 <script type="module">
@@ -927,6 +944,38 @@ function setupAuth() {
     });
 }
 
+function setupTheme() {
+    const themeToggle = document.getElementById('theme-toggle');
+    if (!themeToggle) return;
+
+    const body = document.body;
+    const icon = themeToggle.querySelector('i');
+
+    const applyTheme = () => {
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'light') {
+            body.classList.add('light-theme');
+            if(icon) icon.classList.replace('ri-sun-line', 'ri-moon-line');
+        } else {
+            body.classList.remove('light-theme');
+            if(icon) icon.classList.replace('ri-moon-line', 'ri-sun-line');
+        }
+    };
+
+    themeToggle.addEventListener('click', () => {
+        body.classList.toggle('light-theme');
+        if (body.classList.contains('light-theme')) {
+            localStorage.setItem('theme', 'light');
+            if(icon) icon.classList.replace('ri-sun-line', 'ri-moon-line');
+        } else {
+            localStorage.setItem('theme', 'dark');
+            if(icon) icon.classList.replace('ri-moon-line', 'ri-sun-line');
+        }
+    });
+
+    applyTheme();
+}
+
 /* --- GEMINI API --- */
 window.gemini = {
     async generateGeminiText(prompt) {
@@ -950,23 +999,24 @@ window.gemini = {
 document.addEventListener('DOMContentLoaded', () => {
     // --- Splash Screen Logic ---
     const splashScreen = document.querySelector('#splashScreen');
-    if (splashScreen) {
-        // Wait 4.5 seconds then start the fade out
-        setTimeout(() => {
-            splashScreen.classList.add('is-hidden');
-            // Completely hide it after the fade transition ends
-            splashScreen.addEventListener('transitionend', (e) => {
-                // Make sure we are listening for the transition on the splashScreen itself
-                if (e.target === splashScreen) {
-                    splashScreen.style.display = 'none';
-                }
-            }, { once: true });
-        }, 4500); // Time in milliseconds (4500ms = 4.5s)
+    if (sessionStorage.getItem('splashShown')) {
+        if (splashScreen) splashScreen.style.display = 'none';
+    } else {
+        if (splashScreen) {
+            setTimeout(() => {
+                splashScreen.classList.add('is-hidden');
+                splashScreen.addEventListener('transitionend', (e) => {
+                    if (e.target === splashScreen) splashScreen.style.display = 'none';
+                }, { once: true });
+            }, 4500);
+        }
+        sessionStorage.setItem('splashShown', 'true');
     }
     // --- End Splash Screen Logic ---
 
     (async ()=>{
       try{
+        setupTheme();
         setupEventListeners();
         setupAuth();
         const data = await loadCSV(CSV_URL);
