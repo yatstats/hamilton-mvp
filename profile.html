@@ -117,6 +117,13 @@ body.drawer-right-open .drawer-right{transform:translateX(0)}
 .stat-label { font-size: 11px; text-transform: uppercase; opacity: .7; margin-bottom: 4px; }
 .stat-value { font-size: 18px; font-weight: 700; line-height: 1; }
 
+.news-item { background: #222; border-radius: 8px; padding: 15px; margin-bottom: 15px; border: 1px solid var(--line); }
+.news-headline { font-size: 16px; font-weight: bold; margin-bottom: 5px; }
+.news-headline a { color: var(--fg); text-decoration: none; }
+.news-headline a:hover { text-decoration: underline; }
+.news-meta { font-size: 12px; color: var(--muted); margin-bottom: 10px; }
+.news-snippet { font-size: 14px; line-height: 1.4; margin: 0; }
+
 @media (max-width: 992px) { .player-header-details { display: none; } }
 </style>
 </head>
@@ -234,176 +241,17 @@ const $ = s => document.querySelector(s);
 const $$ = s => Array.from(document.querySelectorAll(s));
 const debounce = (fn, ms=300)=>{ let t; return (...a)=>{ clearTimeout(t); t=setTimeout(()=>fn(...a),ms); }; };
 
-async function loadCSV(url){
-  const response = await fetch(url);
-  const text = await response.text();
-  const rows = text.trim().split(/\r?\n/).map(line => line.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/).map(c=>c.replace(/^"|"$/g,'')));
-  const header = rows.shift().map(h => h.trim());
-  const idx=n=>header.indexOf(n);
-  const statKeys = ['avg', 'obp', 'slg', 'ops', 'ab', 'h', 'r', 'rbi', '2b', '3b', 'hr', 'sb', 'bb', 'era', 'k/9', 'k/bb', 'whip', 'ip', 'er', 'ko', 'gp', 'w-l', 'saves', 'fip'];
-  return rows.map(r=>({
-      slug:r[idx('slug')], display_name:r[idx('display_name')],
-      first:r[idx('first')], last:r[idx('last')],
-      grad_class:r[idx('grad_class')], letter_years:r[idx('letter_years')], status:r[idx('status')], level:r[idx('level')], 
-      team:r[idx('team')], org:r[idx('org')],
-      next_game_opponent: r[idx('next_game_opponent')],
-      next_game_datetime: r[idx('next_game_datetime')],
-      last_game_1: r[idx('last_game_1')], last_game_2: r[idx('last_game_2')], last_game_3: r[idx('last_game_3')],
-      stats: statKeys.reduce((obj, key) => {
-          const statIndex = idx(key);
-          if (statIndex > -1 && r[statIndex]) obj[key.toUpperCase()] = r[statIndex];
-          return obj;
-      }, {})
-  }));
-}
-
-function slugOf(p){
-  return (p.slug||'').trim() || (`${p.first || ''}-${p.last || ''}`).trim().toLowerCase().replace(/[^a-z0-9]+/g,'-');
-}
-
-function profileURL(p) { return `./profile.html?player=${slugOf(p)}`; }
-
-function formatStatValue(key, value) {
-    if (!value) return '--';
-    const decimalStats = ['AVG', 'OBP', 'SLG', 'OPS'];
-    if (decimalStats.includes(key) && typeof value === 'string' && value.startsWith('0.')) {
-        return value.substring(1);
-    }
-    return value;
-}
-
-async function loadFunZoneContent(content, player) {
-    const container = $('#funzone-container');
-    let html = '';
-    if (content === 'stats') {
-        const isPitcher = player.stats['ERA'] !== undefined;
-        const batterStats = ['AVG', 'OBP', 'SLG', 'OPS', 'H', 'R', 'HR', 'RBI', 'AB', '2B', '3B', 'SB'];
-        const pitcherStats = ['ERA', 'K/9', 'K/BB', 'WHIP', 'IP', 'ER', 'KO', 'BB', 'GP', 'W-L', 'SAVES', 'FIP'];
-        const statsToShow = isPitcher ? pitcherStats : batterStats;
-        const statsHeader = (player.status || '').toUpperCase().includes('ACTIVE') ? '2025 SEASON STATS' : 'CAREER STATS';
-
-        html = `<div class="funzone-content"><div class="stats-header-bar">${statsHeader}</div><div class="stats-grid">`;
-        html += statsToShow.map(stat => {
-            const formattedValue = formatStatValue(stat, player.stats[stat]);
-            return `<div class="stat-item"><div class="stat-label">${stat}</div><div class="stat-value">${formattedValue}</div></div>`;
-        }).join('');
-        html += `</div></div>`;
-    } else if (content === 'video') {
-        html = `<div class="funzone-content"><iframe width="100%" height="400" src="https://www.youtube.com/embed/ZSoRzk-z35w" title="YouTube video player" frameborder="0" allowfullscreen style="border-radius: 8px; max-width: 710px; display: block; margin: 0 auto;"></iframe></div>`;
-    } else {
-        html = `<div class="funzone-content"><p>Content for ${content} coming soon for ${player.display_name}.</p></div>`;
-    }
-    container.innerHTML = html;
-}
-
-function initializeProfilePage(player) {
-    document.title = `${player.display_name} • Hamilton YATSTATS`;
-    const imageName = (p => `${(p.first||'').toLowerCase()}_${(p.last||'').toLowerCase()}`)(player);
-    $('#playerLogo').src = `assets/img/hs_players/${imageName}.jpg`;
-    $('#playerLogo').onerror = () => { $('#playerLogo').src = `assets/img/hs_players/${imageName}.png`; };
-    $('#playerTeamOrg').textContent = `${player.team || ''} - ${player.org || ''}`;
-    $('#playerFirstName').textContent = player.first;
-    $('#playerLastName').textContent = player.last;
-    $('#breadcrumbs').innerHTML = `<a href="index.html">HAMILTON</a> ▸ ${player.first.toUpperCase()} ${player.last.toUpperCase()} PROFILE`;
-
-    let col1HTML = `<div class="detail-col">${(player.status ? `<span class="front-chip">${player.status}</span>`:'')}${(player.level ? `<span class="front-chip">${player.level}</span>`:'')}</div>`;
-    const letterYears = (player.letter_years || '').split(',').map(y => y.trim().slice(-2)).filter(Boolean);
-    let col2HTML = `<div class="detail-col">${(player.grad_class ? `<span class="front-chip">CLASS OF ${player.grad_class}</span>`:'')}${(letterYears.length > 0 ? `<div class="varsity-dots">${letterYears.map(year => `<div class="varsity-dot">${year}</div>`).join('')}</div>`:'')}</div>`;
-    $('#player-header-left-cols').innerHTML = col1HTML + col2HTML;
-    let col3HTML = ``, col4HTML = ``;
-    if (!(player.status || '').toUpperCase().includes('RETIRED')) {
-         col3HTML = `<div class="detail-col"><div class="game-title-pill">NEXT GAME</div><div class="game-data-text"><span>${player.next_game_datetime||'TBD'}</span><span>@ ${player.next_game_opponent||'TBD'}</span></div></div>`;
-    }
-    col4HTML = `<div class="detail-col align-right"><div class="game-title-pill">LAST 3 GAMES</div><div class="game-data-text"><span class="game-log">${player.last_game_1||'--'}</span><span class="game-log">${player.last_game_2||'--'}</span><span class="game-log">${player.last_game_3||'--'}</span></div></div>`;
-    $('#player-header-right-cols').innerHTML = col3HTML + col4HTML;
-
-    $$('.profile-nav-link').forEach(link => {
-        link.addEventListener('click', () => {
-            $$('.profile-nav-link').forEach(l => l.classList.remove('active'));
-            link.classList.add('active');
-            loadFunZoneContent(link.dataset.content, player);
-        });
-    });
-    loadFunZoneContent('stats', player);
-}
-
-function makeHit(p){
-  const el=document.createElement('div'); el.className='live-hit';
-  const imageName = (p => `${(p.first||'').toLowerCase()}_${(p.last||'').toLowerCase()}`)(p);
-  const hsImgJpg=`assets/img/hs_players/${imageName}.jpg`;
-  el.innerHTML=`<img src="${hsImgJpg}" onerror="this.onerror=null;this.src='assets/img/placeholder.png';">
-                <div><div style="font-weight:700">${p.display_name}</div>
-                <div style="opacity:.7;font-size:.92em">${p.level||''} • Class of ${p.grad_class||''}</div></div>`;
-  el.onclick=()=>window.location.href=profileURL(p);
-  return el;
-}
-function liveSearch(){
-  const q=($('#playerSearch')?.value||'').trim().toLowerCase();
-  const box=$('#liveResults'); if(!box) return;
-  if(!q){ box.innerHTML=''; return; }
-  const hits=(window.ALL_PLAYERS||[]).filter(p=>(p.display_name||'').toLowerCase().includes(q)).slice(0,25);
-  box.innerHTML=''; hits.forEach(p=>box.appendChild(makeHit(p)));
-}
-
-function setupEventListeners() {
-    const closeDrawers = () => document.body.classList.remove('drawer-left-open', 'drawer-right-open', 'drawer-open');
-    $('#btnMenu')?.addEventListener('click', () => { $('#drawerAccount').style.display = 'none'; document.body.classList.add('drawer-left-open', 'drawer-open'); });
-    $('#openSearch')?.addEventListener('click', () => { $('#drawerAccount').style.display = 'none'; document.body.classList.add('drawer-left-open', 'drawer-open'); });
-    $('#btnAccount')?.addEventListener('click', () => { document.body.classList.add('drawer-right-open', 'drawer-open'); });
-    $$('.close-btn, .drawer-mask').forEach(el => el.addEventListener('click', closeDrawers));
-    $('#playerSearch')?.addEventListener('input', debounce(liveSearch));
-
-    const { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } = window.firebaseAuth;
-    const auth = window.auth;
-    const authMessage = $('#authMessage');
-    $('#signInForm')?.addEventListener('submit', async e => {
-        e.preventDefault();
-        try {
-            await signInWithEmailAndPassword(auth, $('#signInEmail').value, $('#signInPassword').value);
-            authMessage.textContent = 'Sign in successful!';
-            setTimeout(() => { closeDrawers(); authMessage.textContent = ''; }, 1500);
-        } catch (error) { authMessage.textContent = error.message; authMessage.className = 'error'; }
-    });
-    $('#registerForm')?.addEventListener('submit', async e => {
-        e.preventDefault();
-        try {
-            await createUserWithEmailAndPassword(auth, $('#registerEmail').value, $('#registerPassword').value);
-            authMessage.textContent = 'Registration successful!';
-            setTimeout(() => { closeDrawers(); authMessage.textContent = ''; }, 1500);
-        } catch (error) { authMessage.textContent = error.message; authMessage.className = 'error'; }
-    });
-    $('#btnSignOut')?.addEventListener('click', () => signOut(auth));
-    document.addEventListener('authStateChanged', ({ detail: { user } }) => {
-        const loggedIn = user && !user.isAnonymous;
-        $('#btnAccount').style.display = loggedIn ? 'none' : 'inline-flex';
-        $('#btnSignOut').style.display = loggedIn ? 'inline-flex' : 'none';
-    });
-    $$('.auth-tab').forEach(tab => {
-        tab.addEventListener('click', () => {
-            const target = tab.dataset.tab;
-            $$('.auth-tab').forEach(t => t.classList.remove('active'));
-            tab.classList.add('active');
-            $$('.auth-form').forEach(form => form.classList.toggle('active', form.id === `${target}Form`));
-            authMessage.textContent = '';
-        });
-    });
-}
-
-document.addEventListener('DOMContentLoaded', async () => {
-    try {
-        setupEventListeners();
-        const playerSlug = new URLSearchParams(window.location.search).get('player');
-        if (!playerSlug) throw new Error("No player specified in the URL.");
-        const allPlayers = await loadCSV(CSV_URL);
-        window.ALL_PLAYERS = allPlayers; // Make players available for search
-        const player = allPlayers.find(p => slugOf(p) === playerSlug);
-        if (!player) throw new Error("Player not found.");
-        initializeProfilePage(player);
-    } catch(err) {
-        console.error('Initialization failed', err);
-        $('#funzone-container').innerHTML = `<p style="color:red; padding:20px;"><strong>Error:</strong> ${err.message}</p>`;
-    }
-});
-</script>
-</body>
-</html>
+const NEWS = [
+    // Shane Anderson
+    {headline: "Shane Anderson - Baseball - Georgia Gwinnett College Athletics", player: "Shane Anderson", source: "ggcathletics.com", date: "2025", url: "https://ggcathletics.com/sports/baseball/roster/shane-anderson/1729", snippet: "Shane Anderson (44) RHP - CAREER: * Made 18 appearances out of the bullpen during the 2025 campaign * Posted a 5-1 record * Struck out 42 batters across 27 innings", player_tags: {grad_class: "2020", letter_years: ["2020"], level: "NAIA", status: "ACTIVE 2025", team: "Georgia Gwinnett College", org: "Continental Athletic Conference"}},
+    // DJ Barrett - No results
+    {headline: "No recent stories found—check back soon!", player: "DJ Barrett", source: "Placeholder", date: "N/A", url: "", snippet: "", player_tags: {grad_class: "2021", letter_years: ["2021"], level: "NCAA-D2", status: "ACTIVE 2025", team: "Northwestern Oklahoma State University", org: "Great American Conference"}},
+    // Cody Bellinger
+    {headline: "Cody Bellinger homers to cap his strong spring camp with Yankees", player: "Cody Bellinger", source: "MLB.com", date: "March 25, 2025", url: "https://www.mlb.com/news/cody-bellinger-spring-camp-yankees-2025", snippet: "MIAMI -- The crack of Cody Bellinger's bat on the first pitch he saw during the Yankees’ exhibition game on Tuesday afternoon echoed throughout loanDepot park with resounding resonance.", player_tags: {grad_class: "2013", letter_years: ["2013", "2012"], level: "MLB", status: "ACTIVE 2025", team: "New York Yankees", org: "MLB"}},
+    {headline: "Yankees’ Cody Bellinger on early struggles: ‘I definitely need to be better’", player: "Cody Bellinger", source: "The Athletic", date: "April 23, 2025", url: "https://www.nytimes.com/athletic/6302364/2025/04/23/yankees-cody-bellinger-early-struggles/", snippet: "Bellinger has hit .173 with two home runs, 12 RBIs and a .520 OPS through his first 21 games with the Yankees.", player_tags: {grad_class: "2013", letter_years: ["2013", "2012"], level: "MLB", status: "ACTIVE 2025", team: "New York Yankees", org: "MLB"}},
+    {headline: "Yankees' Cody Bellinger predicted to make massive decision following 2025 season", player: "Cody Bellinger", source: "Sporting News", date: "September 4, 2025", url: "https://www.sportingnews.com/us/mlb/new-york-yankees/news/yankees-cody-bellinger-predicted-massive-decision-2025-season/2f0385bb2b378dc02be35238", snippet: "Cody Bellinger could be in for a big payday if he decides to opt out of his current contract with the Yankees.", player_tags: {grad_class: "2013", letter_years: ["2013", "2012"], level: "MLB", status: "ACTIVE 2025", team: "New York Yankees", org: "MLB"}},
+    {headline: "MLB Makes Cody Bellinger Announcement Amid Yankees' Surprising Turnaround", player: "Cody Bellinger", source: "Newsweek", date: "September 3, 2025", url: "https://www.newsweek.com/sports/mlb/mlb-makes-cody-bellinger-announcement-after-yankees-surprising-change-2123784", snippet: "Bellinger led the league in total bases with 21 and was tied for the league lead in RBI with eight across the week.", player_tags: {grad_class: "2013", letter_years: ["2013", "2012"], level: "MLB", status: "ACTIVE 2025", team: "New York Yankees", org: "MLB"}},
+    // Beau Berge - No results
+    {headline: "No recent stories found—check back soon!", player: "Beau Berge", source: "Placeholder", date: "N/A", url: "", snippet: "", player_tags: {grad_class: "2025", letter_years: ["2025", "2024"], level: "NCAA-D2", status: "ACTIVE 2025", team: "Southern Wesleyan University", org: "Conference Carolinas"}},
+    // Cole Berge
+    {headline: "Baseball Announces 2025-26 Incoming Class - Tulane University Athletics", player: "Cole Berge", source: "tulanegreenwave.com", date: "August 27, 2025", url: "https://tulanegreenwave.com/news/2025/8/27/baseball-announces-2025-26-incoming-class", snippet: "Cole Berge (INF), Fr., 6'3\", 160, Chandler, AZ / Hamilton Prior to Tulane: Played high school baseball at Hamilton…Played for Coach Mike Woods and aided the program to pair of state championships (2022 and 2023)…Was All-Conference in 2025 after hitting .328 with 12 extra base hit and three ...", player_tags: {grad_class: "2025", letter_years: ["2025", "202
