@@ -160,10 +160,8 @@ body.light-theme .form-field input { background: rgba(0,0,0,.06); }
 .success { color: #86efac; }
 .main{padding:8px 0 calc(var(--footerH) + 12px)}
 .grid{display:grid;gap:14px; grid-template-columns: repeat(1, 1fr);}
-@media (max-width: 1400px) { .grid { grid-template-columns: repeat(1, 1fr); } }
-@media (max-width: 1100px) { .grid { grid-template-columns: repeat(1, 1fr); } }
-@media (max-width: 768px) { .grid { grid-template-columns: repeat(1, 1fr); } }
-@media (max-width: 520px) { .grid { grid-template-columns: repeat(1, 1fr); } }
+@media (min-width: 768px) { .grid { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 1100px) { .grid { grid-template-columns: repeat(3, 1fr); } }
 
 .news-item { background: var(--card-bg); border-radius: 8px; padding: 15px; border: 1px solid var(--line); transition: background-color 0.3s; }
 .news-headline { font-size: 18px; font-weight: bold; margin-bottom: 5px; }
@@ -330,8 +328,8 @@ body.light-theme .form-field input { background: rgba(0,0,0,.06); }
         <div class="container hero-grid">
             <div class="hero-left" aria-live="polite">
                 <div class="tag-duo">
-                    <div class="tag-swap"><span class="tag-grey">ACTIVE</span> <span class="tag-bold">ALUMNI NEWS</span></div>
-                    <div class="tag-swap"><span class="tag-grey">SEARCH FOR</span> <span class="tag-bold">HEADLINES</span></div>
+                    <div class="tag-swap"><span class="tag-grey">ACTIVE</span> <span class="bold">ALUMNI NEWS</span></div>
+                    <div class="tag-swap"><span class="tag-grey">SEARCH FOR</span> <span class="bold">HEADLINES</span></div>
                 </div>
                 <div class="crumbs hero-crumbs">HAMILTON ▸ ACTIVE ALUMNI NEWS</div>
             </div>
@@ -348,9 +346,9 @@ body.light-theme .form-field input { background: rgba(0,0,0,.06); }
 <aside class="drawer" id="drawerLeft" aria-label="Left drawer">
     <button class="icon-btn close-btn"><i class="ri-close-line"></i></button>
     <div class="drawer-content">
-        <h3>NEWS SEARCH</h3>
+        <h3>PLAYER PROFILE SEARCH</h3>
         <div class="pad">
-            <input id="playerSearch" placeholder="Type to search headlines…" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--ink)">
+            <input id="playerSearch" placeholder="Type to search players…" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--ink)">
             <div id="liveResults"></div>
         </div>
         <h3>NAVIGATION</h3>
@@ -371,10 +369,31 @@ body.light-theme .form-field input { background: rgba(0,0,0,.06); }
     <h3>FILTERS</h3>
     <div class="drawer-content" id="filters">
         <details class="filter-group" open>
-            <summary class="filter-title">By Keyword</summary>
+            <summary class="filter-title">By Name</summary>
             <div class="filter-options">
-                <input id="filterName" placeholder="Type a keyword or player name…" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--ink)"/>
+                <input id="filterName" placeholder="Type a name…" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--ink)"/>
             </div>
+        </details>
+        <details class="filter-group">
+            <summary class="filter-title">By Status</summary>
+            <div class="filter-options" id="filterStatus">
+                <label class="select-all-label"><input type="checkbox" class="select-all"> Select All</label>
+                <label><input type="checkbox" value="ACTIVE 2025"> ACTIVE 2025</label>
+            </div>
+        </details>
+        <details class="filter-group">
+            <summary class="filter-title">By Level</summary>
+            <div class="filter-options" id="filterLevels">
+                 <label class="select-all-label"><input type="checkbox" class="select-all"> Select All</label>
+            </div>
+        </details>
+        <details class="filter-group">
+            <summary class="filter-title">By Graduating Class</summary>
+            <div class="filter-options" id="filterGradClass"></div>
+        </details>
+        <details class="filter-group">
+            <summary class="filter-title">By Roster Year</summary>
+            <div class="filter-options" id="filterRosterYear"></div>
         </details>
     </div>
     <div class="drawer-footer">
@@ -421,115 +440,87 @@ body.light-theme .form-field input { background: rgba(0,0,0,.06); }
 <script type="module">
 /* ---- YATSTATS • Hamilton • Alumni News Page ---- */
 
+const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQcWJM6Q6hTdFnES_G5LUy4teCS-sJ5HdAc9F5HSY8DGE9egdGy8yUAe2ShT3tFm-CwUuCYeAYy_YiW/pub?gid=2028135390&single=true&output=csv";
 const $ = s => document.querySelector(s), $$ = s => Array.from(document.querySelectorAll(s));
 const debounce = (fn, ms=300)=>{ let t; return (...a)=>{ clearTimeout(t); t=setTimeout(()=>fn(...a),ms); }; };
 
-const NEWS = [
-    {
-        headline: "Cody Bellinger talks about huge win vs Red Sox",
-        player: "Cody Bellinger",
-        source: "YouTube",
-        date: "2 hours ago",
-        url: "https://www.youtube.com/watch?v=S3hSUr0VZ6U",
-        snippet: "The outfielder talks about Saturday's 5-3 victory in Boston, which included Bellinger winning a 10-pitch at-bat vs Aroldis Chapman with an ..."
-    },
-    {
-        headline: "Yankees' Cody Bellinger gets $182 million contract update ahead of ...",
-        player: "Cody Bellinger",
-        source: "Yahoo Sports",
-        date: "4 days ago",
-        url: "https://sports.yahoo.com/article/yankees-cody-bellinger-gets-182-214446684.html",
-        snippet: "Cody Bellinger could be in for a big payday if he decides to opt out of his current contract with the Yankees."
-    },
-    {
-        headline: "Cody Bellinger Stats, Age, Position, Height, Weight, Fantasy & News",
-        player: "Cody Bellinger",
-        source: "MLB.com",
-        date: "20 hours ago",
-        url: "https://www.mlb.com/yankees/player/cody-bellinger-641355",
-        snippet: "Cody Bellinger Bio · Fullname: Cody James Bellinger · Nickname: Belli · Born: 7/13/1995 in Scottsdale, AZ · Draft: 2013, Los Angeles Dodgers..."
-    },
-    {
-        headline: "Brennen Davis - MLB News, Rumors, & Updates",
-        player: "Brennen Davis",
-        source: "FOX Sports",
-        date: "Recent",
-        url: "https://www.foxsports.com/mlb/brennen-davis-player",
-        snippet: "Cut from major-league camp Davis (concussion) was optioned to Triple-A Iowa by the Cubs on Friday..."
-    },
-    {
-        headline: "Brennen Davis Stats, Age, Position, Height, Weight, Fantasy & News",
-        player: "Brennen Davis",
-        source: "MLB.com",
-        date: "Recent",
-        url: "https://www.mlb.com/player/brennen-davis-680695",
-        snippet: "New York Yankees signed free agent CF Brennen Davis to a minor league contract. December 23, 2024..."
-    },
-    {
-        headline: "Gage Workman lands back with Tigers",
-        player: "Gage Workman",
-        source: "MLB.com",
-        date: "May 16, 2025",
-        url: "https://www.mlb.com/news/gage-workman-lands-back-with-tigers",
-        snippet: "Gage Workman spent most of three seasons at Double-A Erie before the Tigers lost him to the Cubs in the Rule 5 Draft last December."
-    },
-    {
-        headline: "Gage Workman, now a White Sox after trade, sends fiery message to ...",
-        player: "Gage Workman",
-        source: "Marquee Sports Network",
-        date: "Recent",
-        url: "https://www.marqueesportsnetwork.com/gage-workman-white-sox-cubs-trade-bulletin-board-material/",
-        snippet: "Gage Workman flipped sides in Chicago and now has a chip on his shoulder when it comes to his former team, the Cubs."
-    },
-    {
-        headline: "Dustin Crenshaw Stats, Age, Position, Height, Weight, Fantasy & News",
-        player: "Dustin Crenshaw",
-        source: "MiLB.com",
-        date: "Recent",
-        url: "https://www.milb.com/player/dustin-crenshaw-695289",
-        snippet: "Seattle Mariners signed 2B Dustin Crenshaw. January 29, 2024, 2B Dustin Crenshaw assigned to Grand Canyon Antelopes..."
-    },
-    {
-        headline: "Dustin Crenshaw - Baseball - Grand Canyon University Athletics",
-        player: "Dustin Crenshaw",
-        source: "GCU Athletics",
-        date: "Recent",
-        url: "https://gculopes.com/sports/baseball/roster/dustin-crenshaw/11386",
-        snippet: "Dustin Crenshaw (1) Infielder - Signed with the Seattle Mariners as an undrafted free agent in July 2024..."
-    },
-    {
-        headline: "Trevor Hauver Stats, Age, Position, Height, Weight, Fantasy & News",
-        player: "Trevor Hauver",
-        source: "MLB.com",
-        date: "Recent",
-        url: "https://www.mlb.com/player/trevor-hauver-669386",
-        snippet: "Round Rock Express activated 2B Trevor Hauver from the 7-day injured list. May 27, 2025..."
-    },
-    {
-        headline: "Trevor Hauver News - ESPN",
-        player: "Trevor Hauver",
-        source: "ESPN",
-        date: "Recent",
-        url: "https://www.espn.com/mlb/player/news/_/id/4424269",
-        snippet: "Find the latest news about Texas Rangers Right Fielder Trevor Hauver on ESPN. Check out news, rumors, and game highlights."
-    },
-    {
-        headline: "Jamie Westbrook - Wikipedia",
-        player: "Jamie Westbrook",
-        source: "Wikipedia",
-        date: "Recent",
-        url: "https://en.wikipedia.org/wiki/Jamie_Westbrook",
-        snippet: "Jamie Vaughn Westbrook (born June 18, 1995) is an American professional baseball outfielder and second baseman in the Tampa Bay Rays organization."
-    },
-    {
-        headline: "Jamie Westbrook Stats, Age, Position, Height, Weight, Fantasy & News",
-        player: "Jamie Westbrook",
-        source: "MLB.com",
-        date: "Recent",
-        url: "https://www.mlb.com/player/jamie-westbrook-642197",
-        snippet: "Fullname: Jamie Vaughn Westbrook · Born: 6/18/1995 in Springfield, MA · Draft: 2013, Arizona Diamondbacks..."
+// This object defines the sorting hierarchy for player levels. Higher numbers are better.
+const levelOrder = {
+    'MLB': 13,
+    'KBO': 12,
+    'TRIPLE-A': 11,
+    'AAA': 11, // Alias for Triple-A
+    'DOUBLE-A': 10,
+    'AA': 10, // Alias for Double-A
+    'HIGH-A': 9,
+    'A+': 9, // Alias for High-A
+    'LOW-A': 8,
+    'A': 8, // Alias for Low-A
+    'ROOKIE': 7,
+    'ROK': 7, // Alias for Rookie
+    'INDY': 6,
+    'NCAA-D1': 5,
+    'NCAA-D2': 4,
+    'NCAA-D3': 3,
+    'NAIA': 2,
+    'JUCO': 1
+};
+
+async function loadCSV(url){
+  const response = await fetch(url);
+  if(!response.ok) throw new Error(`HTTP ${response.status}`);
+  const text = await response.text();
+  if(!text.trim()) throw new Error('Empty CSV');
+  const rows = text.trim().split(/\r?\n/).map(line => line.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/).map(c=>c.replace(/^"|"$/g,'')));
+  const header = rows.shift().map(h => h.trim());
+  const idx=n=>header.indexOf(n);
+  const statKeys = ['avg', 'obp', 'slg', 'ops', 'ab', 'h', 'r', 'rbi', '2b', '3b', 'hr', 'sb', 'bb', 'era', 'k/9', 'k/bb', 'whip', 'ip', 'er', 'ko', 'gp', 'w-l', 'saves', 'fip'];
+  return rows.map(r=> {
+    const player = {
+      slug:r[idx('slug')], display_name:r[idx('display_name')],
+      first:r[idx('first')], last:r[idx('last')],
+      grad_class:r[idx('grad_class')], letter_years:r[idx('letter_years')], status:r[idx('status')], level:r[idx('level')], 
+      team:r[idx('team')], org:r[idx('org')], position:r[idx('position')],
+      height:r[idx('height')], weight:r[idx('weight')], bats:r[idx('bats')], throws:r[idx('throws')],
+      draft_info:r[idx('Draft_Info')], colleges:r[idx('Colleges')],
+      next_game_opponent: r[idx('next_game_opponent')],
+      next_game_datetime: r[idx('next_game_datetime')],
+      last_game_1: r[idx('last_game_1')],
+      last_game_2: r[idx('last_game_2')],
+      last_game_3: r[idx('last_game_3')],
+      x_handle: r[idx('x_handle')], ig_handle: r[idx('ig_handle')],
+      video_url: r[idx('video_url')],
+      nil_score: r[idx('nil_score')],
+      stats: {}
+    };
+    for (const key of statKeys) {
+        const statIndex = idx(key);
+        if (statIndex > -1 && r[statIndex]) player.stats[key.toUpperCase()] = r[statIndex];
     }
-];
+    return player;
+  });
+}
+
+function populateFilters(players) {
+    // --- Levels ---
+    const levels = [...new Set(players.map(p => p.level).filter(Boolean))];
+    levels.sort((a, b) => (levelOrder[b] ?? -1) - (levelOrder[a] ?? -1)); // Sort using levelOrder
+    const levelsContainer = $('#filterLevels');
+    levelsContainer.innerHTML = '<label class="select-all-label"><input type="checkbox" class="select-all"> Select All</label>' + levels.map(level => `<label><input type="checkbox" value="${level}"> ${level}</label>`).join('');
+    
+    // --- Grad Classes ---
+    const gradClasses = [...new Set(players.map(p => p.grad_class).filter(Boolean))].sort((a,b) => b-a);
+    const gradClassContainer = $('#filterGradClass');
+    gradClassContainer.innerHTML = '<label class="select-all-label"><input type="checkbox" class="select-all"> Select All</label>' + gradClasses.map(year => `<label><input type="checkbox" value="${year}"> ${year}</label>`).join('');
+    
+    // --- Roster Years ---
+    const rosterYears = [...new Set(players.flatMap(p => (p.letter_years || '').split(',').map(y => y.trim())).filter(Boolean))].sort((a,b) => b-a);
+    const rosterYearContainer = $('#filterRosterYear');
+    rosterYearContainer.innerHTML = '<label class="select-all-label"><input type="checkbox" class="select-all"> Select All</label>' + rosterYears.map(year => `<label><input type="checkbox" value="${year}"> ${year}</label>`).join('');
+    
+    // Status - only ACTIVE 2025 for news, but include
+    $$('#filterStatus input[value="ACTIVE 2025"]').forEach(i => i.checked = true);
+}
 
 function newsHTML(item){
     return `
@@ -574,40 +565,87 @@ function setupEventListeners() {
     
     $('#filterName')?.addEventListener('input', debounce(applyFilters));
     $('#playerSearch')?.addEventListener('input', debounce(liveSearch));
+
+    // New, robust event listener for all filter checkboxes
+    $('#filters')?.addEventListener('change', (e) => {
+        // Handle the 'Select All' functionality
+        if (e.target.classList.contains('select-all')) {
+            const isChecked = e.target.checked;
+            const optionsContainer = e.target.closest('.filter-options');
+            if (optionsContainer) {
+                const checkboxes = optionsContainer.querySelectorAll('input[type="checkbox"]:not(.select-all)');
+                checkboxes.forEach(cb => cb.checked = isChecked);
+            }
+        }
+        // Apply filters whenever any checkbox changes
+        applyFilters();
+    });
 }
 
 function applyFilters(){
+  if(!window.NEWS) return;
   const F=readFilters();
-  const filtered = window.NEWS.filter(item => {
-    const text = (item.headline + item.player).toLowerCase();
-    return !F.name || text.includes(F.name);
+  const filtered = window.NEWS.filter(item=>{
+    const text = (item.headline + ' ' + item.player + ' ' + item.snippet + ' ' + item.player_tags.team + ' ' + item.player_tags.org).toLowerCase();
+    const nameOk=!F.name||text.includes(F.name);
+    const lvlOk=!F.levels.length||F.levels.includes(item.player_tags.level);
+    const statOk=!F.status.length||F.status.includes(item.player_tags.status);
+    const classOk=!F.classes.length||F.classes.includes(item.player_tags.grad_class);
+    const rosterOk=!F.rosterYears.length||item.player_tags.letter_years.some(y => F.rosterYears.includes(y));
+    return nameOk && lvlOk && statOk && classOk && rosterOk;
   });
   renderNews(filtered);
 }
 
 function readFilters(){
   const name=($('#filterName')?.value||'').trim().toLowerCase();
-  return {name};
+  const levels=$$('#filterLevels input:checked:not(.select-all)').map(i=>i.value);
+  const status=$$('#filterStatus input:checked:not(.select-all)').map(i=>i.value);
+  const classes=$$('#filterGradClass input:checked:not(.select-all)').map(i=>i.value);
+  const rosterYears=$$('#filterRosterYear input:checked:not(.select-all)').map(i=>i.value);
+  return {name, levels, status, classes, rosterYears};
 }
 
 function resetFilters(){
-  $$('#filters input[type="text"]').forEach(i => i.value = '');
+  $$('#filters input').forEach(i=> {
+    if(i.type === 'checkbox') i.checked = false;
+    if(i.type === 'text') i.value='';
+  });
+  $$('#filterStatus input[value="ACTIVE 2025"]').forEach(i => i.checked = true);
   applyFilters();
 }
 
-function makeHit(item){
+function makeHit(p){
   const el=document.createElement('div'); el.className='live-hit';
-  el.innerHTML=`<div><div style="font-weight:700">${item.headline.substring(0, 50)}...</div>
-                <div style="opacity:.7;font-size:.92em">${item.player} • ${item.source}</div></div>`;
-  el.onclick=()=>window.open(item.url, '_blank');
+  const imageName = imageNameOf(p);
+  const hsImgJpg=`assets/img/hs_players/${imageName}.jpg`;
+  const hsImgPng=`assets/img/hs_players/${imageName}.png`;
+  el.innerHTML=`<img src="${hsImgJpg}" onerror="this.onerror=null;this.src='${hsImgPng}';">
+                <div><div style="font-weight:700">${p.display_name}</div>
+                <div style="opacity:.7;font-size:.92em">${p.level||''} • Class of ${p.grad_class||''}</div></div>`;
+  el.onclick=()=>window.location.href=profileURL(p);
   return el;
 }
 function liveSearch(){
   const q=($('#playerSearch')?.value||'').trim().toLowerCase();
   const box=$('#liveResults'); if(!box) return;
   if(!q){ box.innerHTML=''; return; }
-  const hits=(window.NEWS||[]).filter(item=>(item.headline + item.player).toLowerCase().includes(q)).slice(0,25);
-  box.innerHTML=''; hits.forEach(item=>box.appendChild(makeHit(item)));
+  const hits=(window.PLAYERS||[]).filter(p=>(p.display_name||'').toLowerCase().includes(q)).slice(0,25);
+  box.innerHTML=''; hits.forEach(p=>box.appendChild(makeHit(p)));
+}
+
+function slugOf(p){
+  if (!p) return '';
+  const s=(p.slug||'').trim();
+  if(s) return s;
+  return (p.display_name||'').trim().toLowerCase().replace(/[^a-z0-9]+/g,'-');
+}
+function profileURL(p) { return `./profile.html?player=${slugOf(p)}`; }
+
+function imageNameOf(p) {
+    const first = (p.first || '').toLowerCase();
+    const last = (p.last || '').toLowerCase();
+    return (first && last) ? `${first}_${last}` : slugOf(p);
 }
 
 /* --- FIREBASE AUTHENTICATION --- */
@@ -718,7 +756,61 @@ document.addEventListener('DOMContentLoaded', () => {
         setupTheme();
         setupEventListeners();
         setupAuth();
-        window.NEWS = NEWS; 
+        const data = await loadCSV(CSV_URL);
+        window.PLAYERS = data.filter(p => p.status.includes('ACTIVE'));
+        window.NEWS = [
+            // Cody Bellinger news
+            {headline: "Cody Bellinger's RBI double | 09/13/2025 | New York Yankees", player: "Cody Bellinger", source: "MLB.com", date: "3 hours ago", url: "https://www.mlb.com/yankees/video/aroldis-chapman-in-play-run-s-to-cody-bellinger", snippet: "Pitch Type: Four-Seam Fastball; Pitch Speed: 96.9 mph; Spin Rate: 2471 rpm. Batting NYY. Bellinger. L. Exit Velocity: 93.7 mph ...", player_tags: {grad_class: "2013", letter_years: ["2013", "2012"], level: "MLB", status: "ACTIVE 2025", team: "New York Yankees", org: "MLB"}},
+            {headline: "Cody Bellinger talks about huge win vs Red Sox - YouTube", player: "Cody Bellinger", source: "YouTube", date: "3 hours ago", url: "https://www.youtube.com/watch?v=S3hSUr0VZ6U", snippet: "The outfielder talks about Saturday's 5-3 victory in Boston, which included Bellinger winning a 10-pitch at-bat vs Aroldis Chapman with an ...", player_tags: {grad_class: "2013", letter_years: ["2013", "2012"], level: "MLB", status: "ACTIVE 2025", team: "New York Yankees", org: "MLB"}},
+            {headline: "Cody Bellinger's sacrifice fly | 09/13/2025 | New York Yankees", player: "Cody Bellinger", source: "MLB.com", date: "6 hours ago", url: "https://www.mlb.com/yankees/video/brayan-bello-in-play-run-s-to-cody-bellinger", snippet: "Pitch Type: Sinker; Pitch Speed: 96.2 mph; Spin Rate: 2050 rpm. Batting NYY. Bellinger. L. Exit Velocity: 98.7 mph; Launch Angle: 27° ...", player_tags: {grad_class: "2013", letter_years: ["2013", "2012"], level: "MLB", status: "ACTIVE 2025", team: "New York Yankees", org: "MLB"}},
+            {headline: "Yankees' Cody Bellinger predicted to make massive decision ...", player: "Cody Bellinger", source: "Yahoo Sports", date: "2 days ago", url: "https://ca.sports.yahoo.com/news/yankees-cody-bellinger-predicted-massive-142351712.html", snippet: "Cody Bellinger could be in for a big payday if he decides to opt out of his current contract with the Yankees.", player_tags: {grad_class: "2013", letter_years: ["2013", "2012"], level: "MLB", status: "ACTIVE 2025", team: "New York Yankees", org: "MLB"}},
+            {headline: "Don't run on Belli! Outfielder's laser stops rally in Yankees' win", player: "Cody Bellinger", source: "MLB.com", date: "8 days ago", url: "https://www.mlb.com/news/cody-bellinger-s-great-throw-helps-yankees-beat-blue-jays", snippet: "Outfielder's laser stops rally in Yankees' win. September 6th, 2025 ... Cody Bellinger. Yankees Cap Night Giveaway is Sept. 23! Bellinger ...", player_tags: {grad_class: "2013", letter_years: ["2013", "2012"], level: "MLB", status: "ACTIVE 2025", team: "New York Yankees", org: "MLB"}},
+            // Beau Brieske
+            {headline: "Beau Brieske Injury: Put on MLB 60-day IL", player: "Beau Brieske", source: "RotoWire.com", date: "Recent", url: "https://www.rotowire.com/baseball/headlines/beau-brieske-injury-put-on-mlb-60-day-il-985652", snippet: "Brieske has already been ruled out for the remainder of the 2025 campaign due to an elbow injury, so the Tigers will perform a bit of roster ...", player_tags: {grad_class: "2016", letter_years: ["2016", "2015", "2014"], level: "MLB", status: "ACTIVE 2025", team: "Detroit Tigers", org: "MLB"}},
+            {headline: "Beau Brieske #4 - Detroit Tigers", player: "Beau Brieske", source: "MLB.com", date: "Recent", url: "https://www.mlb.com/tigers/player/beau-brieske-689225", snippet: "Age: 27. Follow Following Watch Story Story. Beau Brieske. #4 P. Summary Stats News Awards Shop. 2025 Regular Season ... September 6 with a left quadriceps strain ...", player_tags: {grad_class: "2016", letter_years: ["2016", "2015", "2014"], level: "MLB", status: "ACTIVE 2025", team: "Detroit Tigers", org: "MLB"}},
+            {headline: "Tigers make several roster moves ahead of Friday's game at Miami", player: "Beau Brieske", source: "Yahoo Sports", date: "1 day ago", url: "https://ca.sports.yahoo.com/news/tigers-several-roster-moves-ahead-224436966.html", snippet: "In a corresponding move, right-hander Beau Brieske was recalled from Triple-A Toledo and placed on the major league 60-day IL with a right ...", player_tags: {grad_class: "2016", letter_years: ["2016", "2015", "2014"], level: "MLB", status: "ACTIVE 2025", team: "Detroit Tigers", org: "MLB"}},
+            {headline: "Tigers' Beau Brieske: Recalled, placed on 60-day IL", player: "Beau Brieske", source: "CBSSports.com", date: "1 day ago", url: "https://www.cbssports.com/fantasy/baseball/news/tigers-beau-brieske-recalled-placed-on-60-day-il/", snippet: "Brieske has already been ruled out for the remainder of the 2025 campaign due to a right forearm strain, so the Tigers will perform a bit of ...", player_tags: {grad_class: "2016", letter_years: ["2016", "2015", "2014"], level: "MLB", status: "ACTIVE 2025", team: "Detroit Tigers", org: "MLB"}},
+            {headline: "Beau Brieske #4 - Minor League Baseball", player: "Beau Brieske", source: "MiLB.com", date: "Recent", url: "https://www.milb.com/player/beau-brieske-689225", snippet: "Detroit Tigers placed RHP Beau Brieske on the 60-day injured list. Right forearm strain. September 12, 2025, Detroit Tigers recalled RHP Beau Brieske from ...", player_tags: {grad_class: "2016", letter_years: ["2016", "2015", "2014"], level: "MLB", status: "ACTIVE 2025", team: "Detroit Tigers", org: "MLB"}},
+            // Dom Hamel
+            {headline: "Mets recall RHP Dom Hamel from Triple-A, option reliever Huascar ...", player: "Dom Hamel", source: "Yahoo Sports", date: "10 hours ago", url: "https://sports.yahoo.com/article/mets-recall-rhp-dom-hamel-162050611.html", snippet: "Right-hander Dom Hamel has been recalled from Triple-A Syracuse, with righty reliever Huascar Brazobán going down in the corresponding move.", player_tags: {grad_class: "2017", letter_years: ["2017", "2016"], level: "Triple-A", status: "ACTIVE 2025", team: "Syracuse Mets", org: "New York Mets"}},
+            {headline: "Dom Hamel News: Back in Queens", player: "Dom Hamel", source: "RotoWire", date: "Recent", url: "https://www.rotowire.com/baseball/headlines/dom-hamel-news-back-in-queens-985785", snippet: "Dom Hamel News: Back in Queens. Written by RotoWire Staff. Published on September 13, 2025. The Mets recalled Hamel from Triple-A Syracuse on Saturday.", player_tags: {grad_class: "2017", letter_years: ["2017", "2016"], level: "Triple-A", status: "ACTIVE 2025", team: "Syracuse Mets", org: "New York Mets"}},
+            {headline: "Dom Hamel Stats, Age, Position, Height, Weight, Fantasy & News", player: "Dom Hamel", source: "MiLB.com", date: "Recent", url: "https://www.milb.com/player/dom-hamel-687589", snippet: "Team, Date, Transaction. September 13, 2025, New York Mets recalled RHP Dom Hamel from Syracuse Mets. August 6, 2025, New York Mets optioned RHP Dom Hamel ...", player_tags: {grad_class: "2017", letter_years: ["2017", "2016"], level: "Triple-A", status: "ACTIVE 2025", team: "Syracuse Mets", org: "New York Mets"}},
+            {headline: "Mets recall RHP Dom Hamel from Triple-A Syracuse", player: "Dom Hamel", source: "Instagram", date: "8 hours ago", url: "https://www.instagram.com/p/DOjVUDIiTYN/", snippet: "1835 likes, 52 comments - nym_news on September 13, 2025: \"The Mets have called up RHP pitching prospect Dom Hamel from Triple-A Syracuse.", player_tags: {grad_class: "2017", letter_years: ["2017", "2016"], level: "Triple-A", status: "ACTIVE 2025", team: "Syracuse Mets", org: "New York Mets"}},
+            {headline: "Dom Hamel Stats, Age, Position, Height, Weight, Fantasy & News", player: "Dom Hamel", source: "MLB.com", date: "Recent", url: "https://www.mlb.com/player/dom-hamel-687589", snippet: "Latest Transactions. Team, Date, Transaction. September 13, 2025, New York Mets recalled RHP Dom Hamel from Syracuse Mets. August 6, 2025, New York Mets ...", player_tags: {grad_class: "2017", letter_years: ["2017", "2016"], level: "Triple-A", status: "ACTIVE 2025", team: "Syracuse Mets", org: "New York Mets"}},
+            // Patrick Murphy (filtered for player, not manager)
+            {headline: "Patrick murphy earns second hold in relief for kt wiz", player: "Patrick Murphy", source: "Chosun.com", date: "1 day ago", url: "https://www.chosun.com/english/sports-en/2025/09/13/GKELRH6UZFG37KD6GFI2IRCIGI/", snippet: "Patrick recorded his second hold of the season by pitching 1 2/3 innings with no hits, one walk, two strikeouts, and no runs allowed on 33 ...", player_tags: {grad_class: "2013", letter_years: ["2013", "2012"], level: "INTERNATIONAL", status: "ACTIVE 2025", team: "KT Wiz Suwon", org: "Korean Baseball Organization"}},
+            // Shane Murphy
+            {headline: "Murphy Deals Five Scoreless in Knights Loss to Storm Chasers", player: "Shane Murphy", source: "MiLB.com", date: "Recent", url: "https://www.milb.com/en/charlotte-knights/news/murphy-deals-five-scoreless-in-knights-loss-to-storm-chasers", snippet: "The Charlotte Knights lost their fourth straight game to the Omaha Storm Chasers with a 10-1 defeat on Friday night.", player_tags: {grad_class: "2019", letter_years: ["2019", "2018", "2017", "2016"], level: "Triple-A", status: "ACTIVE 2025", team: "Charlotte Knights", org: "Chicago White Sox"}},
+            {headline: "White Sox Minor Keys: Sept. 12, 2025", player: "Shane Murphy", source: "SoxMachine.com", date: "16 hours ago", url: "https://soxmachine.com/2025/09/white-sox-minor-keys-sept-12-2025", snippet: "Shane Murphy keeps doing it: 5 IP, 2 H, 0 R, 1 BB, 1 K, 39 of 55 pitches for strikes. Kyle Tyler immediately after: 1.1 IP, 7 H, 7 R, 7 ER ...", player_tags: {grad_class: "2019", letter_years: ["2019", "2018", "2017", "2016"], level: "Triple-A", status: "ACTIVE 2025", team: "Charlotte Knights", org: "Chicago White Sox"}},
+            {headline: "White Sox Minor League Update: September 12, 2025", player: "Shane Murphy", source: "SouthSideSox.com", date: "23 hours ago", url: "https://www.southsidesox.com/chicago-white-sox-prospects-and-minor-leagues/116147/white-sox-minor-league-update-september-12-2025", snippet: "Shane Murphy has extended his stellar 2025 with a sizzling Charlotte audition in September. ... Hannah Filippo has been a die-hard baseball ...", player_tags: {grad_class: "2019", letter_years: ["2019", "2018", "2017", "2016"], level: "Triple-A", status: "ACTIVE 2025", team: "Charlotte Knights", org: "Chicago White Sox"}},
+            {headline: "White Sox Org SP's 9/12/25 - Shane Murphy Shutouts, What New?", player: "Shane Murphy", source: "YouTube", date: "22 hours ago", url: "https://www.youtube.com/watch?v=4EDF9rUJsS4", snippet: "Add a comment... 9:47 · Go to channel · White Sox vs. Guardians Game Highlights (9/12/25) | MLB Highlights. Cleveland Guardians New 19K views.", player_tags: {grad_class: "2019", letter_years: ["2019", "2018", "2017", "2016"], level: "Triple-A", status: "ACTIVE 2025", team: "Charlotte Knights", org: "Chicago White Sox"}},
+            {headline: "Guardians 3, White Sox 1: More like Regressive Field", player: "Shane Murphy", source: "SoxMachine.com", date: "Recent", url: "https://soxmachine.com/2025/09/guardians-3-white-sox-1-more-like-regressive-field", snippet: "September 13, 2025. Shane Murphy · White Sox Game Recaps · Guardians 4, White Sox 0: A Tanner Bibee two-hitter · 7Comments · Jim Margalus.", player_tags: {grad_class: "2019", letter_years: ["2019", "2018", "2017", "2016"], level: "Triple-A", status: "ACTIVE 2025", team: "Charlotte Knights", org: "Chicago White Sox"}},
+            // Brock Selvidge
+            {headline: "Brock Selvidge fans seven over six solid innings | 09/07/2025", player: "Brock Selvidge", source: "MLB.com", date: "7 days ago", url: "https://www.mlb.com/yankees/video/brock-selvidge-fans-seven-over-six-solid-innings", snippet: "Brock Selvidge fans seven over six solid innings. September 7, 2025 | 00:00:32. Reels Share.", player_tags: {grad_class: "2021", letter_years: ["2021", "2020", "2019", "2018"], level: "Double-A", status: "ACTIVE 2025", team: "Somerset Patriots", org: "New York Yankees"}},
+            {headline: "Yankees MILB 9/12: Brock Selvidge Goes 7 Strong Innings", player: "Brock Selvidge", source: "TomKosensky.com", date: "24 hours ago", url: "https://tomkosensky.com/2025/09/12/yankees-milb-9-12-brock-selvidge-goes-7-strong-innings/", snippet: "Spencer Jones increases his hitting streak to 8 for Scranton while Brock Selvidge tosses seven strong innings for Somerset.", player_tags: {grad_class: "2021", letter_years: ["2021", "2020", "2019", "2018"], level: "Double-A", status: "ACTIVE 2025", team: "Somerset Patriots", org: "New York Yankees"}},
+            {headline: "Brock Selvidge fans seven over six solid innings | 09/07/2025 | Patriots", player: "Brock Selvidge", source: "MiLB.com", date: "7 days ago", url: "https://www.milb.com/en/somerset/video/brock-selvidge-fans-seven-over-six-solid-innings", snippet: "Copyright © 2025 Minor League Baseball. Minor League Baseball trademarks and copyrights are the property of Minor League Baseball. All ...", player_tags: {grad_class: "2021", letter_years: ["2021", "2020", "2019", "2018"], level: "Double-A", status: "ACTIVE 2025", team: "Somerset Patriots", org: "New York Yankees"}},
+            {headline: "Brock Selvidge Vs. New Hampshire 9/6/25 - YouTube", player: "Brock Selvidge", source: "YouTube", date: "6 days ago", url: "https://www.youtube.com/watch?v=YCGXTCD2K6o", snippet: "... in Hollywood History. You Won't Believe #2! Legacy News•548K views · 4:50 · Go to channel · Carlos Lagrange Vs. New Hampshire Fisher Cats 9/5/25.", player_tags: {grad_class: "2021", letter_years: ["2021", "2020", "2019", "2018"], level: "Double-A", status: "ACTIVE 2025", team: "Somerset Patriots", org: "New York Yankees"}},
+            {headline: "Brock Selvidge Stats, Age, Position, Height, Weight, Fantasy & News", player: "Brock Selvidge", source: "MLB.com", date: "Recent", url: "https://www.mlb.com/player/brock-selvidge-691795", snippet: "Major League Baseball. News · Probable Pitchers · Starting Lineups · Transactions ... News. 9/06/2025 at 9:02 PM 9/06/2025 at 9:02 PM. Brock Selvidge fans seven ...", player_tags: {grad_class: "2021", letter_years: ["2021", "2020", "2019", "2018"], level: "Double-A", status: "ACTIVE 2025", team: "Somerset Patriots", org: "New York Yankees"}},
+            // Gavin Turley
+            {headline: "Gavin Turley's three-hit, three-RBI game | 08/30/2025 | Ports", player: "Gavin Turley", source: "MiLB.com", date: "Aug 30, 2025", url: "https://www.milb.com/stockton/video/gavin-turley-s-three-hit-three-rbi-game", snippet: "Athletics 2025 draftee Gavin Turley picks up three hits and three RBIs for Single-A Stockton.", player_tags: {grad_class: "2022", letter_years: ["2022", "2021"], level: "LOW-A", status: "ACTIVE 2025", team: "Stockton Ports", org: "Athletics"}},
+            {headline: "Gavin Turley hits first professional home run - Minor League Baseball", player: "Gavin Turley", source: "MiLB.com", date: "Aug 9, 2025", url: "https://www.milb.com/stockton/video/gavin-turley-hits-first-professional-home-run?t=t524-default-vtp", snippet: "2025 Schedule PDF Download 2025 Schedule! 2025 Promotional ... Devin Taylor collects three hits, four RBIs. September 8, 2025 · Devin ...", player_tags: {grad_class: "2022", letter_years: ["2022", "2021"], level: "LOW-A", status: "ACTIVE 2025", team: "Stockton Ports", org: "Athletics"}},
+            {headline: "Gavin Turley made some big plays in 2025.", player: "Gavin Turley", source: "Facebook - Oregon State Baseball", date: "Jul 14, 2025", url: "https://www.facebook.com/OregonStateBaseball/videos/gavin-turley-highlights/1563472508160267/", snippet: "Gavin Turley made some big plays in 2025. Karen Durfee and 247 others · 󰍸. 248 · 󰤦 5. Last viewed on: Sep 7, 2025 ...", player_tags: {grad_class: "2022", letter_years: ["2022", "2021"], level: "LOW-A", status: "ACTIVE 2025", team: "Stockton Ports", org: "Athletics"}},
+            {headline: "Gavin Turley Selected In Fourth Round Of MLB Draft By The Athletics", player: "Gavin Turley", source: "OSUBeavers.com", date: "Recent", url: "https://osubeavers.com/news/2025/7/14/baseball-gavin-turley-selected-in-fourth-round-of-mlb-draft-by-the-athletics", snippet: "– Oregon State outfielder Gavin Turley has been selected in the fourth round, 110th overall by the Athletics in the Major League Baseball Draft ...", player_tags: {grad_class: "2022", letter_years: ["2022", "2021"], level: "LOW-A", status: "ACTIVE 2025", team: "Stockton Ports", org: "Athletics"}},
+            {headline: "Oregon State's Gavin Turley selected by Athletics in fourth round of ...", player: "Gavin Turley", source: "OregonLive.com", date: "Recent", url: "https://www.oregonlive.com/beavers/2025/07/oregon-states-gavin-turley-selected-by-oakland-athletics-in-fourth-round-of-mlb-draft.html", snippet: "Oregon State has its second player off the board in the 2025 MLB draft. Outfielder Gavin Turley was selected No. 110 overall in the fourth ...", player_tags: {grad_class: "2022", letter_years: ["2022", "2021"], level: "LOW-A", status: "ACTIVE 2025", team: "Stockton Ports", org: "Athletics"}},
+            // Roch Cholowsky
+            {headline: "Roch Cholowsky Named Baseball America's 2025 College Baseball ...", player: "Roch Cholowsky", source: "BaseballAmerica.com", date: "Jun 24, 2025", url: "https://www.baseballamerica.com/stories/roch-cholowsky-named-baseball-americas-2025-college-baseball-player-of-the-year/", snippet: "Roch Cholowsky is Baseball America's College Player of the Year after hitting .353/.480/.710 with 23 home runs and 74 RBIs in 66 games.", player_tags: {grad_class: "2023", letter_years: ["2023", "2022", "2021", "2020"], level: "NCAA-D1", status: "ACTIVE 2025", team: "UCLA", org: "Big 10 Conference"}},
+            {headline: "Roch Cholowsky - 2025 Baseball Roster - UCLA Athletics", player: "Roch Cholowsky", source: "UCLABruins.com", date: "Recent", url: "https://uclabruins.com/sports/baseball/roster/roch-cholowsky/14799", snippet: "Roch Cholowsky · Career Highlights. ABCA/Rawlings Player of the Year (2025) · 2025. Enjoyed one of the most decorated seasons in UCLA baseball history... · 2024", player_tags: {grad_class: "2023", letter_years: ["2023", "2022", "2021", "2020"], level: "NCAA-D1", status: "ACTIVE 2025", team: "UCLA", org: "Big 10 Conference"}},
+            {headline: "Scouting the 2025 USA Collegiate National Team Infielders", player: "Roch Cholowsky", source: "PrepBaseballReport.com", date: "Aug 5, 2025", url: "https://www.prepbaseballreport.com/news/PBR/scouting-the-2025-usa-collegiate-national-team-infielders", snippet: "Roch Cholowsky, SS (UCLA)- The current favorite for 1-1 overall in next summer's draft, Cholowsky was D1 Baseball's Player of the Year in ...", player_tags: {grad_class: "2023", letter_years: ["2023", "2022", "2021", "2020"], level: "NCAA-D1", status: "ACTIVE 2025", team: "UCLA", org: "Big 10 Conference"}},
+            {headline: "2025 D1Baseball Player of the Year Roch Cholowsky - Facebook", player: "Roch Cholowsky", source: "Facebook - D1Baseball", date: "Jun 25, 2025", url: "https://www.facebook.com/D1Baseball/videos/2025-d1baseball-player-of-the-year-roch-cholowsky/1093883415925253/", snippet: "... Baseball to Omaha for the first time since 2013, Roch Cholowsky ... Last viewed on: Sep 13, 2025. More videos you may like. 00:37. Chris ...", player_tags: {grad_class: "2023", letter_years: ["2023", "2022", "2021", "2020"], level: "NCAA-D1", status: "ACTIVE 2025", team: "UCLA", org: "Big 10 Conference"}},
+            {headline: "Interview: Roch Cholowsky (UCLA SS, 2026 Draft) - YouTube", player: "Roch Cholowsky", source: "YouTube", date: "Jul 15, 2025", url: "https://www.youtube.com/watch?v=YEgS1XZmaMY", snippet: "How Baseball Prepared Derek Jeter for Business | The Deal. Bloomberg Originals•365K views · 18:55. Go to channel · 2025 26 Season Preview: ...", player_tags: {grad_class: "2023", letter_years: ["2023", "2022", "2021", "2020"], level: "NCAA-D1", status: "ACTIVE 2025", team: "UCLA", org: "Big 10 Conference"}},
+            // General Hamilton HS
+            {headline: "Former Arizona HS baseball players who can impact College World ...", player: "General", source: "AZCentral.com", date: "Jun 11, 2025", url: "https://www.azcentral.com/story/sports/high-school/2025/06/11/arizona-high-school-baseball-players-college-world-series/84152635007/", snippet: "Top 5 former Arizona high school baseball players who could impact College World Series · 1. Roch Cholowsky, UCLA, SS, Chandler Hamilton · 2.", player_tags: {grad_class: "", letter_years: [], level: "", status: "ACTIVE 2025", team: "", org: ""}},
+            {headline: "Hamilton High's Boston Kellner eyes state title, 2025 MLB Draft", player: "Boston Kellner", source: "CronkiteNews.azpbs.org", date: "Feb 26, 2025", url: "https://cronkitenews.azpbs.org/2025/02/26/hamilton-high-boston-kellner-eyes-state-title-mlb-draft/", snippet: "Boston Kellner, a senior at Hamilton High School and a top 90 MLB draft prospect, grew up in Minnesota, then moved to Colorado and is now in ...", player_tags: {grad_class: "2025", letter_years: ["2025", "2024"], level: "NCAA-D1", status: "ACTIVE 2025", team: "Texas A&M", org: "SEC"}},
+            {headline: "Hamilton High School Chandler, Arizona news", player: "General", source: "HamiltonHighSchoolAlumni.com", date: "Recent", url: "https://hamiltonhighschoolalumni.com/chandler-az/news.html", snippet: "We have listed the latest news headlines that include Hamilton HS . This site has been created to offer a place for HHS alumni to reconnect and share memories.", player_tags: {grad_class: "", letter_years: [], level: "", status: "ACTIVE 2025", team: "", org: ""}},
+            {headline: "Hamilton triplets eye careers in MLB", player: "General", source: "ChandlerNews.com", date: "Nov 15, 2024", url: "https://www.chandlernews.com/arizonan/sports/hamilton-triplets-eye-careers-in-mlb/article_ba0581e2-9dfc-11ef-9dcc-73dd5174854d.html", snippet: "Three Hamilton Huskies players have made up the foundation of the Arizona baseball powerhouse team during its most recent seasons.", player_tags: {grad_class: "", letter_years: [], level: "", status: "ACTIVE 2025", team: "", org: ""}},
+            {headline: "News - Hamilton Huskies (Chandler, AZ) Baseball", player: "General", source: "MaxPreps.com", date: "Recent", url: "https://www.maxpreps.com/az/chandler/hamilton-huskies/baseball/media/news/", snippet: "61 articles · Aaron Williams•Jun 11, 2025. CWS: Where players went to high school · Team Reports•May 27, 2025. Baseball Recap: Hamilton Takes a Tough Playoff Loss.", player_tags: {grad_class: "", letter_years: [], level: "", status: "ACTIVE 2025", team: "", org: ""}}
+        ];
+        populateFilters(window.PLAYERS);
         applyFilters(); 
       }catch(err){
         console.error('Initialization failed', err);
