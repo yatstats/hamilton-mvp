@@ -2,79 +2,18 @@
 <html lang="en">
 <head>
   <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>YAT?STATS News</title>
   <link rel="stylesheet" href="styles.css"/>
-  <style>
-    /* Match sharp-edged card style */
-    .news-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill,minmax(280px,1fr));
-      gap: 20px;
-      margin: 20px;
-    }
-    .news-card {
-      background:#111827;
-      border-radius:0; /* no rounded corners */
-      box-shadow:0 4px 10px rgba(0,0,0,.4);
-      overflow:hidden;
-      display:flex;
-      flex-direction:column;
-      transition:transform .2s ease, box-shadow .2s ease;
-    }
-    .news-card:hover {
-      transform:translateY(-4px);
-      box-shadow:0 6px 14px rgba(0,0,0,.6);
-    }
-    .news-card img {
-      width:100%;
-      height:180px;
-      object-fit:cover;
-    }
-    .news-content {
-      padding:15px;
-      flex:1;
-      display:flex;
-      flex-direction:column;
-    }
-    .news-content h3 {
-      font-size:1.1rem;
-      color:#fff;
-      margin:0 0 8px 0;
-    }
-    .news-meta {
-      font-size:0.85rem;
-      color:#9ca3af;
-      margin-bottom:10px;
-    }
-    .news-snippet {
-      flex:1;
-      font-size:0.9rem;
-      color:#d1d5db;
-      margin-bottom:12px;
-    }
-    .news-link {
-      text-decoration:none;
-      color:#3b82f6;
-      font-weight:600;
-      align-self:flex-start;
-    }
-    h2.section-title {
-      grid-column:1/-1;
-      font-size:1.4rem;
-      color:#f9fafb;
-      margin:30px 0 10px;
-      border-bottom:2px solid #3b82f6;
-      padding-bottom:4px;
-    }
-  </style>
 </head>
 <body>
+  <!-- ===== HEADER ===== -->
   <header class="site-header">
     <h1>YAT?STATS</h1>
-    <nav><!-- your nav --></nav>
+    <nav><!-- keep your nav here --></nav>
   </header>
 
+  <!-- ===== FILTERS ===== -->
   <aside class="filters">
     <button id="filterPro">Pros</button>
     <button id="filterCollege">University</button>
@@ -83,26 +22,31 @@
     <input id="searchBox" type="text" placeholder="Search players..."/>
   </aside>
 
+  <!-- ===== MAIN ===== -->
   <main>
-    <div id="newsGrid" class="news-grid"></div>
+    <div id="newsGrid" class="cards-grid"></div>
   </main>
 
+  <!-- ===== FOOTER ===== -->
   <footer class="site-footer">
     <p>&copy; 2025 YAT?STATS</p>
   </footer>
 
+  <!-- ===== SCRIPT ===== -->
   <script>
-    const $ = sel => document.querySelector(sel);
+    const $ = (sel) => document.querySelector(sel);
 
     function newsHTML(item){
       return `
-      <div class="news-card">
-        <img src="${item.image || 'assets/img/default-news.png'}" alt="${item.player} news"/>
-        <div class="news-content">
-          <h3>${item.headline}</h3>
-          <div class="news-meta">${item.source} • ${new Date(item.date).toLocaleDateString()}</div>
-          <p class="news-snippet">${item.snippet}</p>
-          <a href="${item.url}" target="_blank" class="news-link">Read More →</a>
+      <div class="card">
+        <div class="card-front">
+          <img src="${item.image || 'assets/img/default-news.png'}" alt="${item.player} news" class="card-img"/>
+          <div class="card-info">
+            <h3 class="card-title">${item.headline}</h3>
+            <p class="card-meta">${item.source} • ${new Date(item.date).toLocaleDateString()}</p>
+            <p class="card-snippet">${item.snippet}</p>
+            <a href="${item.url}" target="_blank" class="card-link">Read More →</a>
+          </div>
         </div>
       </div>`;
     }
@@ -128,7 +72,7 @@
 
     async function fetchNewsUpdates(){
       try{
-        const resp = await fetch("news.json?_="+Date.now());
+        const resp = await fetch("news.json?_=" + Date.now());
         const items = await resp.json();
         window.NEWS = items.sort((a,b)=>new Date(b.date)-new Date(a.date));
         renderNews(window.NEWS);
