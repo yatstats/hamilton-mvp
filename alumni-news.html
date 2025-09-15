@@ -1,41 +1,98 @@
-[
-  {
-    "headline": "Cody Bellinger Homers Twice as Yankees Roll Past Red Sox",
-    "story_url": "https://www.mlb.com/news/cody-bellinger-homers-twice-in-yankees-win",
-    "image_url": "https://img.mlbstatic.com/mlb-images/image/private/t_16x9/t_w1536/mlb/c3q5b2a4z1v9j8x7f6e5.jpg",
-    "source": "MLB.com",
-    "date": "2025-09-14T20:00:00Z",
-    "player_tags": {
-      "name": "Cody Bellinger",
-      "level": "MLB",
-      "status": "ACTIVE",
-      "grad_class": "2012"
+<!doctype html>
+<html lang="en">
+<head>
+  </head>
+<body>
+  <main class="main container">
+    <div class="news-grid" id="newsGrid">
+      <p style="color: var(--muted); grid-column: 1 / -1;">Fetching the latest news...</p>
+    </div>
+  </main>
+  <script type="module">
+  const $ = (sel) => document.querySelector(sel);
+  const $$ = (sel) => document.querySelectorAll(sel);
+  
+  // Renders a card. Note the <a> tag now wraps the whole card for clickability.
+  function newsHTML(item){
+    const siteUrl = "https://yatstats.github.io/"; // Your site's base URL
+    const shareText = encodeURIComponent(`"${item.headline}" - via YAT?STATS Baseball`);
+    const twitterUrl = `https://twitter.com/intent/tweet?text=${shareText}&url=${item.story_url}`;
+
+    return `
+    <a href="${item.story_url}" target="_blank" class="news-card">
+      <div class="card-background" style="background-image: url('${item.image_url}')"></div>
+      <div class="card-scrim"></div>
+      <div class="card-content">
+        <p class="news-card-meta">${item.source} • ${new Date(item.date).toLocaleDateString()}</p>
+        <h3 class="news-card-title">${item.headline}</h3>
+        </div>
+    </a>`;
+  }
+
+  function renderNews(list){
+    const grid = $('#newsGrid');
+    if (!list || list.length === 0) {
+      grid.innerHTML = `<p style="color:var(--muted); grid-column: 1 / -1;">No news matching the filter.</p>`;
+      return;
     }
-  },
-  {
-    "headline": "Roch Cholowsky's Walk-Off Single Lifts UCLA in Extra Innings",
-    "story_url": "https://www.espn.com/college-baseball/story/_/id/12345678/roch-cholowsky-ucla-baseball-walk-off",
-    "image_url": "https://s3.amazonaws.com/ucl Bruins/images/2025/9/12/cholowsky_roch_web.jpg",
-    "source": "ESPN",
-    "date": "2025-09-12T22:30:00Z",
-    "player_tags": {
-      "name": "Roch Cholowsky",
-      "level": "NCAA-D1",
-      "status": "ACTIVE",
-      "grad_class": "2023"
-    }
-  },
-  {
-    "headline": "Dom Hamel Strikes Out 10 in Dominant Start for Mets",
-    "story_url": "https://www.milb.com/news/dom-hamel-impresses-with-10-strikeouts",
-    "image_url": "https://img.mlbstatic.com/milb-images/image/private/t_16x9/t_w1536/milb/a9b8c7d6e5f4g3h2j1k9.jpg",
-    "source": "MiLB.com",
-    "date": "2025-09-11T19:00:00Z",
-    "player_tags": {
-      "name": "Dom Hamel",
-      "level": "MLB",
-      "status": "ACTIVE",
-      "grad_class": "2017"
+    const sortedList = list.sort((a,b) => new Date(b.date) - new Date(a.date));
+    grid.innerHTML = sortedList.map(newsHTML).join('');
+  }
+  
+  // --- FILTER LOGIC (Now reads from the real news data) ---
+  function populateFilters(newsItems) {
+    const createCheckboxes = (items, selector) => {
+      const container = $(selector); if (!container) return;
+      container.innerHTML = '...' // Same as before
+    };
+    const levels = [...new Set(newsItems.map(p => p.player_tags.level).filter(Boolean))].sort();
+    const gradClasses = [...new Set(newsItems.map(p => p.player_tags.grad_class).filter(Boolean))].sort((a,b)=> b-a);
+    // ... logic to populate filters ...
+  }
+  
+  function readFilters(){
+    // ... same as before
+  }
+  
+  function applyFilters(){
+    if(!window.ALL_NEWS) return;
+    const F = readFilters();
+    const filtered = window.ALL_NEWS.filter(news => {
+      const tags = news.player_tags;
+      const lvlOk = !F.levels.length || F.levels.includes(tags.level);
+      const statOk = !F.status.length || F.status.includes(tags.status);
+      const classOk = !F.classes.length || F.classes.includes(tags.grad_class);
+      return lvlOk && statOk && classOk;
+    });
+    renderNews(filtered);
+  }
+  
+  // Fetches real news from your JSON file
+  async function fetchRealNews() {
+    try {
+      // The "?v=" + Date.now() part prevents the browser from using an old, cached version of your file
+      const response = await fetch('news.json?v=' + Date.now());
+      if (!response.ok) {
+        throw new Error(`Failed to load news.json: ${response.statusText}`);
+      }
+      window.ALL_NEWS = await response.json();
+      populateFilters(window.ALL_NEWS);
+      resetFilters(); // This applies default filters and renders the news
+    } catch (error) {
+      console.error(error);
+      $('#newsGrid').innerHTML = `<p style="color:red; grid-column: 1 / -1;">Could not load news. Please check if news.json exists and is formatted correctly.</p>`;
     }
   }
-]
+
+  // --- UI SETUP and INITIALIZATION ---
+  // ... all your other functions: resetFilters, closeDrawers, setupEventListeners, setupTheme, setupAuth ...
+  
+  document.addEventListener('DOMContentLoaded', () => {
+    setupTheme();
+    setupEventListeners();
+    setupAuth();
+    fetchRealNews(); // This is the new starting point!
+  });
+</script>
+</body>
+</html>
