@@ -952,101 +952,154 @@ function liveSearch(){
   box.innerHTML=''; hits.forEach(p=>box.appendChild(makeHit(p)));
 }
 
+<script type="module">
+/* replace your whole handleFunZone with this */
 async function handleFunZone(button) {
-    const card = button.closest('.card') || document.body;
-    const funZone = card.querySelector('.fun-zone');
-    const player = JSON.parse(card.dataset.playerInfo || '{}');
-    const content = button.dataset.content;
-    card.querySelectorAll('.back-nav-link').forEach(btn => btn.classList.remove('active'));
-    button.classList.add('active');
-    funZone.innerHTML = '<p style="padding: 12px; text-align: center;">Loading...</p>';
-    
-    // --- STATS TAB ---
-    if (content === 'stats') {
-        funZone.innerHTML = generateStatsGridHTML(player);
+  const card = button.closest('.card') || document.body;
+  const funZone = card.querySelector('.fun-zone');
+  const player = JSON.parse(card.dataset.playerInfo || '{}');
+  const content = button.dataset.content;
 
-    // --- VIDEO TAB (NEW) ---
-    } else if (content === 'video') {
-        if (player.video_url) {
-            funZone.innerHTML = `<iframe width="100%" height="215" src="${player.video_url}" title="YouTube video player" frameborder="0" allowfullscreen style="border-radius: 8px; display: block;"></iframe>`;
-        } else {
-            funZone.innerHTML = `<p style="padding: 12px; text-align: center;">No video available for ${player.display_name}.</p>`;
-        }
+  // nav active state
+  card.querySelectorAll('.back-nav-link').forEach(btn => btn.classList.remove('active'));
+  button.classList.add('active');
 
-    // --- NIL PTS TAB (NEW) ---
-    } else if (content === 'nil') {
-        if (player.nil_score) {
-             funZone.innerHTML = `<div class="stats-header-bar">YAT-A-BOY NIL SCORE</div>
-                                  <div class="nil-score-container">
-                                      <div class="nil-score-value">${player.nil_score}</div>
-                                      <div class="nil-score-label">Points</div>
-                                  </div>`;
-        } else {
-            funZone.innerHTML = `<p style="padding: 12px; text-align: center;">NIL Score not available for ${player.display_name}.</p>`;
-        }
-    
-    // --- OTHER TABS (This section now uses Gemini) ---
+  // loading state
+  funZone.innerHTML = '<p style="padding: 12px; text-align: center;">Loading...</p>';
+
+  // --- STATS ---
+  if (content === 'stats') {
+    funZone.innerHTML = generateStatsGridHTML(player);
+    return;
+  }
+
+  // --- VIDEO ---
+  if (content === 'video') {
+    if (player.video_url) {
+      funZone.innerHTML =
+        `<iframe width="100%" height="215" src="${player.video_url}" title="Video"
+                 frameborder="0" allowfullscreen
+                 style="border-radius: 8px; display: block;"></iframe>`;
     } else {
-        const { generateGeminiText } = window.gemini;
-        let prompt = '';
-        if (content === 'bio') {
-            prompt = `Act as an optimistic but knowledgeable high school baseball scout. Write a brief, 2-3 sentence scouting report for ${player.display_name}. Highlight his journey and potential future in a positive, "Yat-A-Boy!" style.`;
-            funZone.innerHTML = await generateGeminiText(prompt);
-        } else if (content === 'news') {
-        // Pull from Alumni News cache written by alumni-news.html
-        const cacheRaw = localStorage.getItem('YAT_NEWS_CACHE_V1');
-        let items = [];
-        try {
-            const cache = cacheRaw ? JSON.parse(cacheRaw) : {};
-            items = (cache.items || []);
-        } catch (e) { items = []; }
-
-        // Match by player name
-        const name = (player.display_name || '').toLowerCase();
-        const mine = items.filter(n => (n.player_display_name || '').toLowerCase() === name)
-                          .sort((a,b) => new Date(b.publishedAt||0) - new Date(a.publishedAt||0))
-                          .slice(0, 3);
-
-        if (!mine.length) {
-            funZone.innerHTML = `<div style="padding:12px;text-align:center;opacity:.8;">
-                No recent headlines yet for ${player.display_name}. Check back soon!
-            </div>`;
-            return;
-        }
-
-        const cards = mine.map(n => {
-            const img = n.image || `https://picsum.photos/seed/${encodeURIComponent(n.id)}/600/400`;
-            const when = n.publishedAt ? new Date(n.publishedAt).toLocaleString() : '';
-            const read = n.url + (n.url.includes('?') ? '&' : '?') + 'utm_source=yatstats&utm_medium=funzone';
-            return `
-              <a href="${read}" target="_blank" rel="noopener noreferrer"
-                 style="display:flex;gap:10px;margin:10px 0;padding:8px;border-radius:10px;
-                        border:1px solid var(--line);text-decoration:none;align-items:center;">
-                <div style="width:84px;height:64px;flex:0 0 84px;background:#000;border-radius:8px;
-                            background-image:url('${img}');background-size:cover;background-position:center;"></div>
-                <div style="flex:1;min-width:0;">
-                  <div style="font-weight:700;line-height:1.2;">${n.title}</div>
-                  <div style="font-size:12px;opacity:.75;margin-top:4px;">${n.source || 'News'} • ${when}</div>
-                </div>
-              </a>`;
-        }).join('');
-
-        funZone.innerHTML = `
-          <div class="stats-header-bar">LATEST HEADLINES</div>
-          <div style="padding:8px 4px;">${cards}</div>
-        `; else if (content === 'social') {
-            let socialHTML = '<div style="padding: 12px;">';
-            if (player.x_handle) socialHTML += `<a href="https://x.com/${player.x_handle}" target="_blank" style="display: block; margin-bottom: 8px;">View on X / Twitter</a>`;
-            if (player.ig_handle) socialHTML += `<a href="https://instagram.com/${player.ig_handle}" target="_blank" style="display: block; margin-bottom: 8px;">View on Instagram</a>`;
-            if (!player.x_handle && !player.ig_handle) socialHTML += 'No social media links available.';
-            socialHTML += '</div>';
-            funZone.innerHTML = socialHTML;
-        } else {
-            funZone.innerHTML = `<p style="padding: 12px; text-align: center;">Content for ${content} coming soon.</p>`;
-        }
+      funZone.innerHTML =
+        `<p style="padding: 12px; text-align: center;">No video available for ${player.display_name}.</p>`;
     }
-}
+    return;
+  }
 
+  // --- NIL ---
+  if (content === 'nil') {
+    if (player.nil_score) {
+      funZone.innerHTML =
+        `<div class="stats-header-bar">YAT-A-BOY NIL SCORE</div>
+         <div class="nil-score-container">
+           <div class="nil-score-value">${player.nil_score}</div>
+           <div class="nil-score-label">Points</div>
+         </div>`;
+    } else {
+      funZone.innerHTML =
+        `<p style="padding: 12px; text-align: center;">NIL Score not available for ${player.display_name}.</p>`;
+    }
+    return;
+  }
+
+  // --- BIO (Gemini stub you already had) ---
+  if (content === 'bio') {
+    const { generateGeminiText } = window.gemini || {};
+    if (typeof generateGeminiText !== 'function') {
+      funZone.innerHTML =
+        `<p style="padding:12px;text-align:center;">AI service unavailable.</p>`;
+      return;
+    }
+    const prompt =
+      `Act as an optimistic but knowledgeable high school baseball scout. `
+      + `Write a brief, 2-3 sentence scouting report for ${player.display_name}. `
+      + `Highlight his journey and potential future in a positive, "Yat-A-Boy!" style.`;
+    try {
+      const text = await generateGeminiText(prompt);
+      funZone.innerHTML = `<div style="padding:12px; line-height:1.4;">${text}</div>`;
+    } catch {
+      funZone.innerHTML =
+        `<p style="padding:12px;text-align:center;">AI service is currently unavailable.</p>`;
+    }
+    return;
+  }
+
+  // --- SOCIAL ---
+  if (content === 'social') {
+    let socialHTML = '<div style="padding: 12px;">';
+    if (player.x_handle) socialHTML +=
+      `<a href="https://x.com/${player.x_handle}" target="_blank" rel="noopener"
+          style="display:block;margin-bottom:8px;">View on X / Twitter</a>`;
+    if (player.ig_handle) socialHTML +=
+      `<a href="https://instagram.com/${player.ig_handle}" target="_blank" rel="noopener"
+          style="display:block;margin-bottom:8px;">View on Instagram</a>`;
+    if (!player.x_handle && !player.ig_handle) socialHTML += 'No social media links available.';
+    socialHTML += '</div>';
+    funZone.innerHTML = socialHTML;
+    return;
+  }
+
+  // --- NEWS (reads what alumni-news.html stored in localStorage) ---
+  if (content === 'news') {
+    // Pull from Alumni News cache written by alumni-news.html
+    const cacheRaw = localStorage.getItem('YAT_NEWS_CACHE_V1');
+    let items = [];
+    try {
+      const cache = cacheRaw ? JSON.parse(cacheRaw) : {};
+      items = Array.isArray(cache.items) ? cache.items : [];
+    } catch {
+      items = [];
+    }
+
+    // Match by player name (exact display_name match, case-insensitive)
+    const nameLc = (player.display_name || '').toLowerCase();
+    const mine = items
+      .filter(n => (String(n.player_display_name || '').toLowerCase() === nameLc))
+      .sort((a, b) => new Date(b.publishedAt || 0) - new Date(a.publishedAt || 0))
+      .slice(0, 3);
+
+    if (!mine.length) {
+      funZone.innerHTML =
+        `<div class="stats-header-bar">LATEST HEADLINES</div>
+         <div style="padding:12px;text-align:center;opacity:.8;">
+           No recent headlines yet for ${player.display_name}. Check back soon!
+         </div>`;
+      return;
+    }
+
+    const cards = mine.map(n => {
+      const img = n.image || ('https://picsum.photos/seed/' + encodeURIComponent(n.id || n.title || 'news') + '/600/400');
+      const when = n.publishedAt ? new Date(n.publishedAt).toLocaleString() : '';
+      const base = String(n.url || '#');
+      const read = base + (base.includes('?') ? '&' : '?') + 'utm_source=yatstats&utm_medium=funzone';
+      const src = n.source || 'News';
+      const ttl = n.title || 'Read more';
+      return (
+        '<a href="' + read + '" target="_blank" rel="noopener noreferrer" ' +
+        '   style="display:flex;gap:10px;margin:10px 0;padding:8px;border-radius:10px;' +
+        '          border:1px solid var(--line);text-decoration:none;align-items:center;">' +
+        '  <div style="width:84px;height:64px;flex:0 0 84px;background:#000;border-radius:8px;' +
+        '              background-image:url(\'' + img + '\');background-size:cover;background-position:center;"></div>' +
+        '  <div style="flex:1;min-width:0;">' +
+        '    <div style="font-weight:700;line-height:1.2;">' + ttl + '</div>' +
+        '    <div style="font-size:12px;opacity:.75;margin-top:4px;">' + src + ' • ' + when + '</div>' +
+        '  </div>' +
+        '</a>'
+      );
+    }).join('');
+
+    funZone.innerHTML =
+      `<div class="stats-header-bar">LATEST HEADLINES</div>
+       <div style="padding:8px 4px;">${cards}</div>`;
+    return;
+  }
+
+  // --- PICS / default placeholder ---
+  funZone.innerHTML =
+    `<p style="padding: 12px; text-align: center;">Content for ${content} coming soon.</p>`;
+}
+</script>
 /* --- FIREBASE AUTHENTICATION --- */
 function setupAuth() {
     // Safety check to prevent crash on Safari
