@@ -1,98 +1,197 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  </head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alumni News | University Name</title>
+    
+    <style>
+        /* Basic CSS Reset & Font */
+        body, h1, h2, p, ul, li {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+        }
+
+        body {
+            background-color: #f4f4f9;
+            color: #333;
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1100px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+
+        /* Header Styling */
+        .site-header {
+            background-color: #003366; /* Classic university blue */
+            color: #ffffff;
+            padding: 20px 0;
+            text-align: center;
+            border-bottom: 5px solid #f9a602; /* Accent color (gold) */
+        }
+        
+        .site-header h1 {
+            margin-bottom: 10px;
+        }
+
+        /* Navigation Bar */
+        .main-nav {
+            background-color: #333;
+            padding: 10px 0;
+        }
+
+        .main-nav ul {
+            list-style: none;
+            display: flex;
+            justify-content: center;
+        }
+
+        .main-nav ul li {
+            margin: 0 15px;
+        }
+
+        .main-nav ul li a {
+            color: #ffffff;
+            text-decoration: none;
+            font-weight: bold;
+            transition: color 0.3s ease;
+        }
+
+        .main-nav ul li a:hover, .main-nav ul li a.active {
+            color: #f9a602; /* Accent color on hover/active */
+        }
+
+        /* News Articles Section */
+        .news-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .news-article {
+            background-color: #ffffff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .news-article:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+        }
+
+        .news-article img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .article-content {
+            padding: 20px;
+        }
+
+        .article-content h2 {
+            font-size: 1.5rem;
+            color: #003366;
+            margin-bottom: 10px;
+        }
+
+        .article-meta {
+            font-size: 0.85rem;
+            color: #777;
+            margin-bottom: 15px;
+        }
+
+        .article-content a.read-more {
+            display: inline-block;
+            margin-top: 15px;
+            background-color: #003366;
+            color: #ffffff;
+            padding: 8px 15px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        
+        .article-content a.read-more:hover {
+            background-color: #002244;
+        }
+
+        /* Footer */
+        .site-footer {
+            text-align: center;
+            padding: 20px;
+            margin-top: 40px;
+            background-color: #333;
+            color: #aaa;
+        }
+    </style>
+</head>
 <body>
-  <main class="main container">
-    <div class="news-grid" id="newsGrid">
-      <p style="color: var(--muted); grid-column: 1 / -1;">Fetching the latest news...</p>
-    </div>
-  </main>
-  <script type="module">
-  const $ = (sel) => document.querySelector(sel);
-  const $$ = (sel) => document.querySelectorAll(sel);
-  
-  // Renders a card. Note the <a> tag now wraps the whole card for clickability.
-  function newsHTML(item){
-    const siteUrl = "https://yatstats.github.io/"; // Your site's base URL
-    const shareText = encodeURIComponent(`"${item.headline}" - via YAT?STATS Baseball`);
-    const twitterUrl = `https://twitter.com/intent/tweet?text=${shareText}&url=${item.story_url}`;
 
-    return `
-    <a href="${item.story_url}" target="_blank" class="news-card">
-      <div class="card-background" style="background-image: url('${item.image_url}')"></div>
-      <div class="card-scrim"></div>
-      <div class="card-content">
-        <p class="news-card-meta">${item.source} • ${new Date(item.date).toLocaleDateString()}</p>
-        <h3 class="news-card-title">${item.headline}</h3>
-        </div>
-    </a>`;
-  }
+    <header class="site-header">
+        <h1>Alumni News & Updates</h1>
+        <p>Keeping you connected with the [Your University Name] community.</p>
+    </header>
 
-  function renderNews(list){
-    const grid = $('#newsGrid');
-    if (!list || list.length === 0) {
-      grid.innerHTML = `<p style="color:var(--muted); grid-column: 1 / -1;">No news matching the filter.</p>`;
-      return;
-    }
-    const sortedList = list.sort((a,b) => new Date(b.date) - new Date(a.date));
-    grid.innerHTML = sortedList.map(newsHTML).join('');
-  }
-  
-  // --- FILTER LOGIC (Now reads from the real news data) ---
-  function populateFilters(newsItems) {
-    const createCheckboxes = (items, selector) => {
-      const container = $(selector); if (!container) return;
-      container.innerHTML = '...' // Same as before
-    };
-    const levels = [...new Set(newsItems.map(p => p.player_tags.level).filter(Boolean))].sort();
-    const gradClasses = [...new Set(newsItems.map(p => p.player_tags.grad_class).filter(Boolean))].sort((a,b)=> b-a);
-    // ... logic to populate filters ...
-  }
-  
-  function readFilters(){
-    // ... same as before
-  }
-  
-  function applyFilters(){
-    if(!window.ALL_NEWS) return;
-    const F = readFilters();
-    const filtered = window.ALL_NEWS.filter(news => {
-      const tags = news.player_tags;
-      const lvlOk = !F.levels.length || F.levels.includes(tags.level);
-      const statOk = !F.status.length || F.status.includes(tags.status);
-      const classOk = !F.classes.length || F.classes.includes(tags.grad_class);
-      return lvlOk && statOk && classOk;
-    });
-    renderNews(filtered);
-  }
-  
-  // Fetches real news from your JSON file
-  async function fetchRealNews() {
-    try {
-      // The "?v=" + Date.now() part prevents the browser from using an old, cached version of your file
-      const response = await fetch('news.json?v=' + Date.now());
-      if (!response.ok) {
-        throw new Error(`Failed to load news.json: ${response.statusText}`);
-      }
-      window.ALL_NEWS = await response.json();
-      populateFilters(window.ALL_NEWS);
-      resetFilters(); // This applies default filters and renders the news
-    } catch (error) {
-      console.error(error);
-      $('#newsGrid').innerHTML = `<p style="color:red; grid-column: 1 / -1;">Could not load news. Please check if news.json exists and is formatted correctly.</p>`;
-    }
-  }
+    <nav class="main-nav">
+        <ul>
+            <li><a href="/index.html">Home</a></li>
+            <li><a href="/alumni_news.html" class="active">News</a></li>
+            <li><a href="/events.html">Events</a></li>
+            <li><a href="/connect.html">Connect</a></li>
+            <li><a href="/donate.html">Donate</a></li>
+        </ul>
+    </nav>
 
-  // --- UI SETUP and INITIALIZATION ---
-  // ... all your other functions: resetFilters, closeDrawers, setupEventListeners, setupTheme, setupAuth ...
-  
-  document.addEventListener('DOMContentLoaded', () => {
-    setupTheme();
-    setupEventListeners();
-    setupAuth();
-    fetchRealNews(); // This is the new starting point!
-  });
-</script>
+    <main class="container">
+        <section class="news-grid">
+            
+            <article class="news-article">
+                <img src="https://placehold.co/600x400/003366/FFFFFF?text=Alumni+Spotlight" alt="Alumni headshot or relevant image">
+                <div class="article-content">
+                    <h2>Alumna Jane Doe ('05) Launches Groundbreaking Tech Startup</h2>
+                    <p class="article-meta">Published on September 15, 2025</p>
+                    <p>Jane Doe, a 2005 graduate from the College of Engineering, has secured $10 million in funding for her new AI-driven sustainability platform...</p>
+                    <a href="#" class="read-more">Read More</a>
+                </div>
+            </article>
+            
+            <article class="news-article">
+                <img src="https://placehold.co/600x400/f9a602/333333?text=Campus+Growth" alt="New building on campus">
+                <div class="article-content">
+                    <h2>New Science & Innovation Center Opens Doors to Students</h2>
+                    <p class="article-meta">Published on September 10, 2025</p>
+                    <p>Thanks to generous contributions from our alumni network, the brand new Science & Innovation Center officially opened this fall semester...</p>
+                    <a href="#" class="read-more">Read More</a>
+                </div>
+            </article>
+
+            <article class="news-article">
+                <img src="https://placehold.co/600x400/CCCCCC/FFFFFF?text=Homecoming+2025" alt="Crowd at a homecoming event">
+                <div class="article-content">
+                    <h2>Save the Date: Homecoming 2025 is Just Around the Corner!</h2>
+                    <p class="article-meta">Published on September 5, 2025</p>
+                    <p>Get ready for a weekend of celebration, reconnection, and school spirit! Homecoming 2025 is scheduled for October 24-26. See the full schedule...</p>
+                    <a href="#" class="read-more">Read More</a>
+                </div>
+            </article>
+
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <p>&copy; 2025 [Your University Name] Alumni Association. All Rights Reserved.</p>
+        <p>123 University Way, Mesa, AZ 85201</p>
+    </footer>
+
 </body>
 </html>
