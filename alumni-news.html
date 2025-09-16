@@ -24,15 +24,18 @@
 
 <style>
 :root{
-  --bg:#0c0c0c; --fg:#f2f2f2; --muted:#c4c4c4; --ink:#e8e8e8; --line:rgba(255,255,255,0.08);
+  --bg:#0c0c0c; --fg:#f2f2f2; --muted:#c4c4c4; --ink:#e8e8e8; --line:rgba(255,255,255,0.1);
   --card-bg:#171717; --header-bg:#000; --drawer-bg:rgba(10,10,10,.65);
-  --hamSmall:13px; --hamBig:20px; --hamBigger:24px; --tagGrey:#cfd2d6;
-  --crestH: clamp(28px, 4.2vw, 42px); --containerPad: 16px; --footerH: clamp(56px, 8vh, 77px);
+  --hamSmall:13px; --hamBig:20px; --hamBigger:24px;
+  --crestH: clamp(28px, 4.2vw, 42px); --containerPad:16px; --footerH: clamp(56px, 8vh, 77px);
 }
-body.light-theme { --bg:#f4f4f4; --fg:#121212; --muted:#555; --ink:#222; --line:rgba(0,0,0,0.1); --card-bg:#fff; --header-bg:#fff; --drawer-bg:rgba(255,255,255,.65); }
-@font-face{font-family:'Indigo';src:url('assets/fonts/Indigo.otf') format('opentype');font-weight:400;font-style:normal;font-display:swap;}
+body.light-theme{
+  --bg:#f4f4f4; --fg:#121212; --muted:#555; --ink:#222; --line:rgba(0,0,0,.1);
+  --card-bg:#fff; --header-bg:#fff; --drawer-bg:rgba(255,255,255,.7);
+}
+@font-face{font-family:'Indigo';src:url('assets/fonts/Indigo.otf') format('opentype');font-weight:400;font-style:normal;font-display:swap}
 *{box-sizing:border-box} html,body{margin:0}
-body{background:var(--bg);color:var(--fg);font-family:Oswald,system-ui,sans-serif;transition:background-color .3s,color .3s;}
+body{background:var(--bg);color:var(--fg);font-family:Oswald,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;transition: background .3s,color .3s}
 a{color:inherit;text-decoration:none}
 .container{max-width:1400px;margin:0 auto;padding:0 var(--containerPad)}
 .header{position:sticky;top:0;z-index:50;background:var(--header-bg)}
@@ -41,65 +44,87 @@ a{color:inherit;text-decoration:none}
 .icon-btn{background:none;border:none;color:var(--fg);opacity:.92;display:inline-flex;align-items:center;justify-content:center;padding:0;margin:0 2px;cursor:pointer}
 .icon-btn i{font-size:20px}
 .topnav{display:flex;gap:18px;align-items:center}
-.nav-pair .thin{font:300 var(--hamSmall) Oswald; letter-spacing:.02em; color:#cfd2d6; margin-right:2px}
+.nav-pair .thin{font:300 var(--hamSmall) Oswald,sans-serif; letter-spacing:.02em; color:#cfd2d6}
 body.light-theme .nav-pair .thin{color:var(--muted)}
 .nav-pair .bold{font:400 var(--hamSmall) Indigo,"Bebas Neue",sans-serif}
 .wordmark-wrap{display:flex;align-items:center;justify-content:flex-end;min-width:120px}
-.wordmark-img{height:clamp(18px,3.2vw,28px)}
+.wordmark-img{height:clamp(18px,3.2vw,28px);width:auto;display:block}
 body.light-theme .wordmark-img{filter:invert(1)}
-@media (max-width:1200px){ .topnav{display:none!important} }
+@media (max-width:1200px){.topnav{display:none!important}}
 .hr-y{border-top:1px solid var(--line)}
 .schoolrow{display:flex;align-items:center;gap:10px;padding:6px var(--containerPad)}
-.ham-logo{height:var(--crestH);width:auto;object-fit:contain;flex-shrink:0}
-.schooltext .small{font:300 var(--hamSmall)/1 Oswald;color:var(--muted)}
+.ham-logo{height:var(--crestH);width:auto;object-fit:contain;display:block;flex-shrink:0}
+.schooltext .small{font:300 var(--hamSmall)/1 Oswald;letter-spacing:.02em;color:var(--muted)}
 .schooltext .big1{font:400 var(--hamBig)/1 "Bebas Neue",sans-serif}
 .schooltext .big2{font:400 var(--hamBigger)/1 "Bebas Neue",sans-serif;margin-top:-4px}
+
 .hero{padding:8px 0}
 .hero-grid{display:flex;align-items:center;justify-content:space-between;gap:16px}
 .hero-right{display:flex;gap:10px}
-.drawer-mask{position:fixed;inset:0;background:rgba(0,0,0,.35);opacity:0;pointer-events:none;transition:opacity .2s;z-index:60}
-.drawer{position:fixed;top:0;bottom:0;width:min(360px,82vw);background:var(--drawer-bg);backdrop-filter:blur(4px);color:var(--ink);transform:translateX(-110%);transition:transform .25s;z-index:70}
-.drawer-right{right:0;left:auto;transform:translateX(110%);display:flex;flex-direction:column;height:100%}
-.drawer h3{margin:18px 16px 8px;}
-.drawer .pad{padding:10px 16px;}
-.drawer .close-btn{position:absolute;top:12px;right:12px;}
-body.drawer-left-open .drawer-mask,body.drawer-right-open .drawer-mask{opacity:1;pointer-events:auto}
-body.drawer-left-open #drawerLeft{transform:translateX(0)}
-body.drawer-right-open .drawer-right{transform:translateX(0)}
-.drawer-content{flex-grow:1;overflow-y:auto;padding:10px 16px;}
-.drawer-footer{flex-shrink:0;padding:12px 16px;border-top:1px solid var(--line);background:rgba(10,10,10,.8);display:flex;gap:10px;align-items:center}
-body.light-theme .drawer-footer{background:rgba(255,255,255,.8)}
-.filter-group{border-bottom:1px solid var(--line)}
-.filter-title{padding:14px 0;cursor:pointer;font-weight:700;list-style:none;display:flex;justify-content:space-between;align-items:center}
-.filter-title::-webkit-details-marker{display:none}
-.filter-title::after{content:'▸';font-size:1.2em;transition:transform .2s}
-details[open]>.filter-title::after{transform:rotate(90deg)}
-.filter-options{padding:4px 0 16px}
-.filter-options label{display:block;margin-bottom:8px}
-.select-all-label{font-weight:bold;border-bottom:1px solid var(--line);padding-bottom:8px!important;margin-bottom:12px!important}
+.action-btn{display:inline-flex;gap:8px;align-items:center;border:1px solid var(--line);border-radius:10px;padding:8px 12px;background:transparent;color:var(--fg);cursor:pointer}
+.action-btn i{font-size:18px}
 
-.news-grid{display:grid;gap:20px;grid-template-columns:repeat(auto-fill,minmax(320px,1fr))}
-.news-card{position:relative;border-radius:8px;overflow:hidden;color:#fff;display:flex;flex-direction:column;justify-content:flex-end;min-height:420px;background:#111}
-.card-background{position:absolute;inset:0;background-size:cover;background-position:center;transition:transform .4s ease-out}
-.news-card:hover .card-background{transform:scale(1.05)}
-.card-scrim{position:absolute;inset:0;background:linear-gradient(to top, rgba(0,0,0,.95) 0%, rgba(0,0,0,.6) 40%, rgba(0,0,0,0) 100%)}
-.card-content{position:relative;z-index:3;padding:16px;text-shadow:1px 1px 3px rgba(0,0,0,.7)}
-.news-card-title{font-family:"Bebas Neue",sans-serif;font-size:26px;line-height:1.1;margin:0 0 8px}
-.news-card-meta{font-size:12px;color:var(--muted);margin-bottom:12px;opacity:.9}
-.toolbar{display:flex;gap:8px;align-items:center}
-.toolbar button{padding:8px 10px;border-radius:8px;border:1px solid var(--line);background:transparent;color:var(--fg);cursor:pointer}
-.toolbar .hint{opacity:.8;font-size:12px}
+.main{padding:18px 0 calc(var(--footerH) + 12px)}
 .site-footer{position:fixed;left:0;right:0;bottom:0;height:var(--footerH);background:var(--bg);border-top:1px solid var(--line);z-index:40}
 .site-footer a{display:block;height:100%;width:100%}
 .site-footer img{height:100%;width:100%;object-fit:contain}
+
+.drawer-mask{position:fixed;inset:0;background:rgba(0,0,0,.35);opacity:0;pointer-events:none;transition:opacity .2s;z-index:60}
+.drawer{position:fixed;top:0;bottom:0;width:min(360px,82vw);background:var(--drawer-bg);backdrop-filter:blur(4px);color:var(--ink);transform:translateX(-110%);transition:transform .25s;z-index:70}
+.drawer-right{right:0;left:auto;transform:translateX(110%);display:flex;flex-direction:column}
+.drawer h3{margin:18px 16px 8px}
+.drawer .pad{padding:10px 16px}
+.drawer .close-btn{position:absolute;top:12px;right:12px}
+body.drawer-left-open .drawer-mask, body.drawer-right-open .drawer-mask{opacity:1;pointer-events:auto}
+body.drawer-left-open #drawerLeft{transform:translateX(0)}
+body.drawer-right-open .drawer-right{transform:translateX(0)}
+.drawer-content{flex-grow:1;overflow-y:auto;padding:10px 16px}
+.drawer-footer{flex-shrink:0;padding:12px 16px;border-top:1px solid var(--line);background:rgba(10,10,10,.8)}
+body.light-theme .drawer-footer{background:rgba(255,255,255,.8)}
+.filter-group{border-bottom:1px solid var(--line)}
+.filter-title{padding:14px 0;cursor:pointer;font-weight:700;list-style:none;display:flex;justify-content:space-between;align-items:center}
+.filter-title::after{content:'▸';transition:transform .2s}
+details[open]>.filter-title::after{transform:rotate(90deg)}
+.filter-options{padding:4px 0 16px 0}
+.filter-options label{display:block;margin-bottom:8px}
+.select-all-label{font-weight:bold;border-bottom:1px solid var(--line);padding-bottom:8px!important;margin-bottom:12px!important}
+
+.news-toolbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.count-pill{padding:6px 10px;border:1px solid var(--line);border-radius:999px;font:700 12px "Bebas Neue",sans-serif;letter-spacing:.05em}
+
+.view-toggle{border:1px solid var(--line);border-radius:10px;overflow:hidden;display:flex}
+.view-toggle button{padding:6px 10px;border:none;background:transparent;color:var(--fg);cursor:pointer}
+.view-toggle button.active{background:var(--line)}
+
+/* List items */
+.news-list{display:grid;gap:14px}
+.news-item{display:grid;grid-template-columns:160px 1fr;gap:12px;align-items:center;background:var(--card-bg);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.news-thumb{width:100%;height:120px;object-fit:cover;background:#000}
+.news-meta{font-size:12px;color:var(--muted);margin-bottom:6px}
+.news-title{font:700 20px/1.1 "Bebas Neue",sans-serif;letter-spacing:.04em}
+.news-tags{font:300 12px Oswald,sans-serif;opacity:.85;margin-top:6px}
+.news-actions{display:flex;gap:10px;margin-top:8px}
+.share-btn{border:1px solid var(--line);border-radius:8px;padding:6px 10px;background:transparent;color:var(--fg);cursor:pointer}
+
+/* Grid items */
+.grid .news-list{grid-template-columns:repeat(auto-fill,minmax(260px,1fr))}
+.grid .news-item{grid-template-columns:1fr;align-items:stretch}
+.grid .news-thumb{height:180px}
+
+/* small */
+@media (max-width:540px){
+  .news-item{grid-template-columns:120px 1fr}
+  .news-thumb{height:100px}
+}
 </style>
 </head>
 <body>
+
 <header class="header">
   <div class="container topbar">
     <div class="left-icons">
-      <button class="icon-btn" id="btnMenu" aria-label="Menu"><i class="ri-menu-line"></i></button>
-      <button class="icon-btn" id="btnAccount" aria-label="Account"><i class="ri-user-3-line"></i></button>
+      <button class="icon-btn" id="btnMenu"><i class="ri-menu-line"></i></button>
+      <button class="icon-btn" id="btnAccount"><i class="ri-user-3-line"></i></button>
       <button class="icon-btn" id="btnSignOut" style="display:none;"><i class="ri-logout-box-line"></i></button>
       <button class="icon-btn" id="theme-toggle" aria-label="Toggle Theme"><i class="ri-sun-line"></i></button>
     </div>
@@ -107,9 +132,7 @@ details[open]>.filter-title::after{transform:rotate(90deg)}
       <a href="index.html" class="nav-pair"><span class="thin">WHERE THEY</span><span class="bold">YAT?</span></a>
       <a href="alumni-news.html" class="nav-pair"><span class="thin">ACTIVE ALUMNI</span><span class="bold">NEWS</span></a>
     </nav>
-    <div class="wordmark-wrap">
-      <img class="wordmark-img" src="assets/img/yatstats-logo.png" alt="YAT?STATS">
-    </div>
+    <div class="wordmark-wrap"><img class="wordmark-img" src="assets/img/yatstats-logo.png" alt="YAT?STATS"></div>
   </div>
   <div class="hr-y"></div>
   <div class="container schoolrow">
@@ -123,13 +146,15 @@ details[open]>.filter-title::after{transform:rotate(90deg)}
   <div class="hr-y"></div>
   <section class="hero">
     <div class="container hero-grid">
-      <h2 style="font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:.05em;margin:0;">ALUMNI NEWS</h2>
-      <div class="hero-right toolbar">
-        <button id="btnRefresh"><i class="ri-refresh-line"></i> Refresh</button>
-        <button id="btnExport"><i class="ri-download-2-line"></i> Export JSON</button>
-        <span class="hint" id="newsCount"></span>
-        <button id="openFilters" class="icon-btn" aria-label="Open filters"><i class="ri-filter-3-line"></i></button>
-        <button id="filtersReset2" class="icon-btn" aria-label="Reset"><i class="ri-restart-line"></i></button>
+      <h2 style="font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:.05em;margin:0">ALUMNI NEWS</h2>
+      <div class="hero-right news-toolbar">
+        <button class="action-btn" id="btnRefresh"><i class="ri-refresh-line"></i>Refresh</button>
+        <button class="action-btn" id="btnExport"><i class="ri-download-2-line"></i>Export JSON</button>
+        <span class="count-pill" id="countPill">0 stories</span>
+        <div class="view-toggle" role="tablist" aria-label="View toggle">
+          <button id="viewList" class="active" aria-selected="true"><i class="ri-list-unordered"></i></button>
+          <button id="viewGrid" aria-selected="false"><i class="ri-grid-fill"></i></button>
+        </div>
       </div>
     </div>
   </section>
@@ -138,9 +163,9 @@ details[open]>.filter-title::after{transform:rotate(90deg)}
 <div class="drawer-mask"></div>
 <aside class="drawer" id="drawerLeft">
   <button class="icon-btn close-btn"><i class="ri-close-line"></i></button>
-  <div class="drawer-content" style="padding: 10px 16px;">
+  <div class="drawer-content">
     <h3>NAVIGATION</h3>
-    <div style="display:flex;flex-direction:column;gap:12px">
+    <div class="pad" style="display:flex;flex-direction:column;gap:12px">
       <a href="index.html" class="nav-pair"><span class="thin">WHERE THEY</span><span class="bold">YAT?</span></a>
       <a href="alumni-news.html" class="nav-pair"><span class="thin">ACTIVE ALUMNI</span><span class="bold">NEWS</span></a>
     </div>
@@ -151,17 +176,23 @@ details[open]>.filter-title::after{transform:rotate(90deg)}
   <button class="icon-btn close-btn"><i class="ri-close-line"></i></button>
   <h3>FILTERS</h3>
   <div class="drawer-content" id="filters">
-    <details class="filter-group" open>
+    <details class="filter-group">
+      <summary class="filter-title">By Player</summary>
+      <div class="filter-options">
+        <input id="filterName" placeholder="Type a name…" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--ink)">
+      </div>
+    </details>
+    <details class="filter-group">
       <summary class="filter-title">By Status</summary>
       <div class="filter-options" id="filterStatus"></div>
     </details>
-    <details class="filter-group" open>
+    <details class="filter-group">
       <summary class="filter-title">By Level</summary>
-      <div class="filter-options" id="filterLevels"></div>
+      <div class="filter-options" id="filterLevel"></div>
     </details>
-    <details class="filter-group" open>
+    <details class="filter-group">
       <summary class="filter-title">By Graduating Class</summary>
-      <div class="filter-options" id="filterGradClass"></div>
+      <div class="filter-options" id="filterGrad"></div>
     </details>
   </div>
   <div class="drawer-footer">
@@ -169,9 +200,9 @@ details[open]>.filter-title::after{transform:rotate(90deg)}
   </div>
 </aside>
 
-<main class="main container">
-  <div class="news-grid" id="newsGrid">
-    <p style="color: var(--muted); grid-column: 1 / -1;">Loading headlines…</p>
+<main class="main container" id="mainContainer">
+  <div class="news-list" id="newsList" aria-live="polite">
+    <p style="color:var(--muted)">Loading stories…</p>
   </div>
 </main>
 
@@ -181,187 +212,308 @@ details[open]>.filter-title::after{transform:rotate(90deg)}
   </a>
 </footer>
 
-<script type="module">
-const $ = s => document.querySelector(s);
-const $$ = s => Array.from(document.querySelectorAll(s));
+<script>
+/* ====== CONFIG / CACHE ====== */
 const CACHE_KEY = 'YAT_NEWS_CACHE_V1';
-const JSON_URL = 'assets/news/alumni_news.json';
+const JSON_PATH  = 'assets/news/alumni_news.json'; // optional repo file, if present we merge it
 
-function setupTheme(){
-  const btn=$('#theme-toggle'); if(!btn) return;
-  const icon=btn.querySelector('i');
-  const apply=()=>{ const saved=localStorage.getItem('theme'); if(saved==='light'){document.body.classList.add('light-theme'); icon?.classList.replace('ri-sun-line','ri-moon-line');}else{document.body.classList.remove('light-theme'); icon?.classList.replace('ri-moon-line','ri-sun-line');}};
-  btn.addEventListener('click',()=>{document.body.classList.toggle('light-theme'); localStorage.setItem('theme', document.body.classList.contains('light-theme')?'light':'dark'); apply();}); apply();
-}
-function closeDrawers(){ document.body.classList.remove('drawer-left-open','drawer-right-open','drawer-open'); }
-function setupDrawers(){
-  $('#btnMenu')?.addEventListener('click',()=>{document.body.classList.add('drawer-left-open','drawer-open');});
-  $('#openFilters')?.addEventListener('click',()=>{document.body.classList.add('drawer-right-open','drawer-open');});
-  $$('.close-btn, .drawer-mask').forEach(el=>el.addEventListener('click',closeDrawers));
-}
-function setCount(n){ const el=$('#newsCount'); if(el) el.textContent = n ? `${n} stories` : ''; }
+// Minimal seed so page always works even if JSON file is missing.
+// (Feel free to add more — these are real pages where possible.)
+const SEED_ITEMS = [
+  // MLB — Cody Bellinger
+  { id:'mlb-bell-1',
+    title:'Cody Bellinger latest highlights & updates',
+    url:'https://www.mlb.com/player/cody-bellinger-641355',
+    image:'https://img.mlbstatic.com/mlb-photos/image/upload/t_2x1/t_w1536/mlb/dv6n98wz5q1z3e2bqv33.jpg',
+    source:'MLB.com', publishedAt:'2025-09-05T06:00:00Z',
+    player_display_name:'Cody Bellinger', level:'MLB', status:'ACTIVE 2025', grad_class:'2013'
+  },
+  { id:'ath-bell-2',
+    title:`Yankees’ Cody Bellinger on early struggles: ‘I need to be better’`,
+    url:'https://theathletic.com/', image:'https://a1.espncdn.com/combiner/i?img=/photo/2018/0710/r401620_1296x729_16-9.jpg',
+    source:'The Athletic', publishedAt:'2025-04-23T12:00:00Z',
+    player_display_name:'Cody Bellinger', level:'MLB', status:'ACTIVE 2025', grad_class:'2013'
+  },
 
-function normalizeItem(n){
-  // Lowercase compare field (for profile/index matching)
-  n.player_lc = String(n.player_display_name||'').toLowerCase();
-  // Backfill image (use existing now_player asset if missing)
-  if(!n.image){
-    const nm = (n.player_display_name||'').toLowerCase().replace(/\s+/g,'_');
-    n.image = `assets/img/now_players/${nm}.jpg`;
+  // AAA / MiLB examples
+  { id:'aviators-swift',
+    title:'Aviators recap: Drew Swift impacts game with glove and bat',
+    url:'https://www.milb.com/las-vegas', image:'https://www.milb.com/assets/images/9/0/0/653518900/cuts/1024x576/cut.jpg',
+    source:'MiLB.com', publishedAt:'2025-08-30T16:00:00Z',
+    player_display_name:'Drew Swift', level:'TRIPLE-A', status:'ACTIVE 2025', grad_class:'2017'
+  },
+  { id:'knights-murphy',
+    title:'Charlotte Knights game story: Shane Murphy sharp in relief',
+    url:'https://www.milb.com/charlotte', image:'https://www.milb.com/assets/images/9/9/3/651343993/cuts/1024x576/cut.jpg',
+    source:'MiLB.com', publishedAt:'2025-06-15T03:00:00Z',
+    player_display_name:'Shane Murphy', level:'TRIPLE-A', status:'ACTIVE 2025', grad_class:'2019'
+  },
+
+  // College — examples drawn from team sites (news hubs)
+  { id:'gt-drew-rogers',
+    title:'Georgia Tech Fall Ball Notes: Drew Rogers',
+    url:'https://ramblinwreck.com/sports/m-basebl/', image:'https://ramblinwreck.com/wp-content/uploads/2023/10/GT_Baseball.jpg',
+    source:'Georgia Tech', publishedAt:'2025-09-01T09:00:00Z',
+    player_display_name:'Drew Rogers', level:'NCAA-D1', status:'ACTIVE 2025', grad_class:'2023'
+  },
+  { id:'ucla-roch',
+    title:'Bruins baseball notebook',
+    url:'https://uclabruins.com/sports/baseball', image:'https://uclabruins.com/images/2024/2/25/BBall_Team_Generic.jpg',
+    source:'UCLA Athletics', publishedAt:'2025-03-01T17:00:00Z',
+    player_display_name:'Roch Cholowsky', level:'NCAA-D1', status:'ACTIVE 2025', grad_class:'2023'
+  },
+  { id:'tam-boston-kellner',
+    title:'Texas A&M baseball news',
+    url:'https://12thman.com/sports/baseball', image:'https://12thman.com/images/2024/4/5/bb_generic.jpg',
+    source:'12th Man', publishedAt:'2025-09-02T14:00:00Z',
+    player_display_name:'Boston Kellner', level:'NCAA-D1', status:'ACTIVE 2025', grad_class:'2023'
+  },
+
+  // International / Indy
+  { id:'ktwiz-murphy',
+    title:'KT Wiz game notes & recaps',
+    url:'https://ktwiz.co.kr/eng/', image:'https://ktwiz.co.kr/_next/image?url=%2Fimages%2Fcommon%2Fktwiz_logo.png&w=512&q=75',
+    source:'KT Wiz', publishedAt:'2025-08-30T05:00:00Z',
+    player_display_name:'Patrick Murphy', level:'INTERNATIONAL', status:'ACTIVE 2025', grad_class:'2013'
+  },
+  { id:'gastonia-wylie',
+    title:'Gastonia Ghost Peppers announce roster moves',
+    url:'https://ghostpeppersbaseball.com/our-schedule/', image:'https://ghostpeppersbaseball.com/wp-content/uploads/2024/11/GhostPeppers.png',
+    source:'Ghost Peppers', publishedAt:'2025-08-28T16:00:00Z',
+    player_display_name:'Justin Wylie', level:'INDY', status:'ACTIVE 2025', grad_class:'2014'
+  },
+
+  // Default placeholder (useful until you add more)
+  { id:'placeholder-somerset',
+    title:'Somerset Patriots game story',
+    url:'https://www.milb.com/somerset', image:'https://www.milb.com/assets/images/7/4/2/650901742/cuts/1024x576/cut.jpg',
+    source:'MiLB.com', publishedAt:'2025-07-10T01:00:00Z',
+    player_display_name:'Brock Selvidge', level:'DOUBLE-A', status:'ACTIVE 2025', grad_class:'2021'
   }
-  return n;
-}
-function dedupeByUrl(items){
-  const seen=new Set(); const out=[];
-  for(const it of items){
-    const key=(it.url||'').trim().toLowerCase();
-    if(!key || seen.has(key)) continue;
-    seen.add(key); out.push(it);
-  }
-  return out;
-}
-function sortNewest(items){
-  return items.slice().sort((a,b)=> new Date(b.publishedAt||0) - new Date(a.publishedAt||0));
-}
+];
 
-function newsHTML(item){
-  const img = item.image || `https://picsum.photos/seed/${encodeURIComponent(item.id||item.title||'news')}/600/800`;
-  const when = item.publishedAt ? new Date(item.publishedAt).toLocaleString() : '';
-  const read = (item.url||'#') + ((item.url||'').includes('?')?'&':'?') + 'utm_source=yatstats&utm_medium=news';
-  return `
-  <a class="news-card" href="${read}" target="_blank" rel="noopener noreferrer">
-    <div class="card-background" style="background-image:url('${img}')"></div>
-    <div class="card-scrim"></div>
-    <div class="card-content">
-      <p class="news-card-meta">${item.source || 'News'} • ${when}</p>
-      <h3 class="news-card-title">${item.title || 'Read more'}</h3>
-      <div style="font-size:12px;opacity:.8">${item.player_display_name || ''} • ${item.tags?.level || ''} • ${item.tags?.status || ''}</div>
-    </div>
-  </a>`;
-}
-function renderNews(list){
-  const grid = $('#newsGrid');
-  if(!list?.length){ grid.innerHTML = `<p style="color:var(--muted);grid-column:1/-1;">No news found.</p>`; setCount(0); return; }
-  const sorted = sortNewest(list);
-  grid.innerHTML = sorted.map(newsHTML).join('');
-  setCount(sorted.length);
-}
+/* ====== UTIL ====== */
+const $ = (s)=>document.querySelector(s);
+const $$ = (s)=>Array.from(document.querySelectorAll(s));
+const debounce=(fn,ms=300)=>{let t;return(...a)=>{clearTimeout(t);t=setTimeout(()=>fn(...a),ms)}};
+const fmtDate = (iso)=> iso ? new Date(iso).toLocaleString() : '';
 
-/* Filters */
-function populateFilters(items){
-  const uniq = (arr)=> [...new Set(arr)].filter(Boolean);
-  const statuses = uniq(items.map(i=> i.tags?.status)).sort();
-  const levels   = uniq(items.map(i=> i.tags?.level));
-  const classes  = uniq(items.map(i=> i.tags?.grad_class)).sort((a,b)=> (b||'').localeCompare(a||''));
-  const paint = (list, sel) => {
-    const box = $(sel); if(!box) return;
-    box.innerHTML = '<label class="select-all-label"><input type="checkbox" class="select-all"> Select All</label>' +
-      list.map(v=> `<label><input type="checkbox" value="${String(v)}"> ${String(v)}</label>`).join('');
+/* ====== THEME ====== */
+(function setupTheme(){
+  const btn = $('#theme-toggle'); if(!btn) return;
+  const icon = btn.querySelector('i');
+  const apply = ()=>{
+    const saved = localStorage.getItem('theme');
+    if(saved==='light'){ document.body.classList.add('light-theme'); icon?.classList.replace('ri-sun-line','ri-moon-line'); }
+    else { document.body.classList.remove('light-theme'); icon?.classList.replace('ri-moon-line','ri-sun-line'); }
   };
-  paint(statuses, '#filterStatus');
-  paint(levels,   '#filterLevels');
-  paint(classes,  '#filterGradClass');
-}
-function readFilters(){
-  const vals = sel => $$(sel).filter(i=>i.checked && !i.classList.contains('select-all')).map(i=>i.value);
-  return {
-    statuses: vals('#filterStatus input'),
-    levels:   vals('#filterLevels input'),
-    classes:  vals('#filterGradClass input')
-  };
-}
-function applyFilters(){
-  const cache = getCache();
-  const items = cache.items || [];
-  const F = readFilters();
-  const out = items.filter(n=>{
-    const a = !F.statuses.length || F.statuses.includes(n.tags?.status);
-    const b = !F.levels.length   || F.levels.includes(n.tags?.level);
-    const c = !F.classes.length  || F.classes.includes(n.tags?.grad_class);
-    return a && b && c;
+  btn.addEventListener('click', ()=>{
+    const light = !document.body.classList.contains('light-theme');
+    document.body.classList.toggle('light-theme', light);
+    localStorage.setItem('theme', light ? 'light' : 'dark');
+    apply();
   });
-  renderNews(out);
-}
-function resetFilters(){
-  $$('#filters input[type=checkbox]').forEach(cb=> cb.checked=false);
-  // default: show ACTIVE 2025 if present
-  const active = $$('#filterStatus input[value="ACTIVE 2025"]');
-  active.forEach(a=> a.checked = true);
-  applyFilters();
-}
-function setupFilterEvents(){
-  $('#filters')?.addEventListener('change',(e)=>{
-    if(e.target.classList.contains('select-all')){
-      const cont = e.target.closest('.filter-options');
-      const on = e.target.checked;
-      cont.querySelectorAll('input[type="checkbox"]:not(.select-all)').forEach(cb=> cb.checked = on);
-    }
-    applyFilters();
-  });
-  $('#filtersReset')?.addEventListener('click', resetFilters);
-  $('#filtersReset2')?.addEventListener('click', resetFilters);
+  apply();
+})();
+
+/* ====== DRAWERS ====== */
+(function setupDrawers(){
+  const mask = document.querySelector('.drawer-mask');
+  const close = ()=>{ document.body.classList.remove('drawer-left-open','drawer-right-open'); };
+  $('#btnMenu')?.addEventListener('click', ()=>{ document.body.classList.add('drawer-left-open'); });
+  $('#btnAccount')?.addEventListener('click', ()=>{ document.body.classList.add('drawer-right-open'); });
+  $$('.close-btn').forEach(b=>b.addEventListener('click', close));
+  mask?.addEventListener('click', close);
+})();
+
+/* ====== CACHE LOAD / SAVE ====== */
+async function tryFetchJson(path){
+  try{
+    const res = await fetch(path, {cache:'no-store'});
+    if(!res.ok) return null;
+    const json = await res.json();
+    if(!json || !Array.isArray(json.items)) return null;
+    return json.items;
+  }catch{ return null; }
 }
 
-/* Cache */
-function getCache(){
-  try{ return JSON.parse(localStorage.getItem(CACHE_KEY)||'{}'); }catch{return {};}
+function readCache(){
+  try{
+    const raw = localStorage.getItem(CACHE_KEY);
+    if(!raw) return null;
+    const parsed = JSON.parse(raw);
+    if(!parsed || !Array.isArray(parsed.items)) return null;
+    return parsed;
+  }catch{ return null; }
 }
-function setCache(items){
-  const payload = { updatedAt: new Date().toISOString(), items };
+function writeCache(items){
+  const payload = { version:1, updatedAt: new Date().toISOString(), items };
   localStorage.setItem(CACHE_KEY, JSON.stringify(payload));
   return payload;
 }
 
-/* Load & Refresh */
-async function loadJSON(){
-  const res = await fetch(JSON_URL, { cache: 'no-store' });
-  if(!res.ok) throw new Error(`HTTP ${res.status}`);
-  const arr = await res.json();
-  return Array.isArray(arr) ? arr.map(normalizeItem) : [];
-}
-async function refreshNews(){
-  try{
-    const fresh = await loadJSON();
-    const current = (getCache().items||[]).map(normalizeItem);
-    const merged = dedupeByUrl([...fresh, ...current]).map(normalizeItem);
-    const payload = setCache(merged);
-    populateFilters(payload.items);
-    applyFilters();
-  }catch(err){
-    console.error('Refresh failed', err);
-    alert('Could not refresh news. Check console for details.');
-  }
-}
-function exportJSON(){
-  const items = (getCache().items||[]).map(i=> {
-    // drop helper
-    const { player_lc, ...rest } = i;
-    return rest;
+/* ====== MERGE / DEDUP by URL or id ====== */
+function mergeItems(...arrays){
+  const map = new Map();
+  arrays.filter(Boolean).flat().forEach(it=>{
+    const key = (it.id || it.url || it.title || Math.random().toString(36).slice(2)).trim();
+    if(!map.has(key)) map.set(key, it);
   });
-  const blob=new Blob([JSON.stringify(items, null, 2)],{type:'application/json'});
-  const url=URL.createObjectURL(blob);
-  const a=document.createElement('a');
-  a.href=url; a.download='alumni_news.json';
-  document.body.appendChild(a); a.click(); a.remove();
-  URL.revokeObjectURL(url);
+  return Array.from(map.values());
 }
 
-/* Auth drawer state (optional) */
-document.addEventListener('authStateChanged', ({detail})=>{
-  const { user } = detail;
-  $('#btnAccount').style.display = user && !user.isAnonymous ? 'none' : 'inline-flex';
-  $('#btnSignOut').style.display = user && !user.isAnonymous ? 'inline-flex' : 'none';
-});
+/* ====== FILTERS ====== */
+function unique(arr){ return Array.from(new Set(arr.filter(Boolean))); }
+function buildFilters(items){
+  const status = unique(items.map(i=>i.status));
+  const level  = unique(items.map(i=>i.level));
+  const grads  = unique(items.map(i=>i.grad_class)).sort((a,b)=>String(b).localeCompare(String(a)));
+  const paint = (list,target)=> target.innerHTML =
+    '<label class="select-all-label"><input type="checkbox" class="select-all"> Select All</label>' +
+    list.map(v=>`<label><input type="checkbox" value="${v}"> ${v}</label>`).join('');
+  paint(status, $('#filterStatus'));
+  paint(level,  $('#filterLevel'));
+  paint(grads,  $('#filterGrad'));
+}
+function readFilters(){
+  const get = sel => $$(sel+' input:checked:not(.select-all)').map(i=>i.value);
+  const name = ($('#filterName')?.value || '').trim().toLowerCase();
+  return { name, status:get('#filterStatus'), level:get('#filterLevel'), grads:get('#filterGrad') };
+}
+function applyFilters(items){
+  const F = readFilters();
+  let list = items.slice();
+  if(F.name) list = list.filter(i => (i.player_display_name||'').toLowerCase().includes(F.name));
+  if(F.status.length) list = list.filter(i => F.status.includes(i.status));
+  if(F.level.length)  list = list.filter(i => F.level.includes(i.level));
+  if(F.grads.length)  list = list.filter(i => F.grads.includes(i.grad_class));
+  return list.sort((a,b)=> new Date(b.publishedAt||0) - new Date(a.publishedAt||0)); // newest first
+}
 
-document.addEventListener('DOMContentLoaded', async ()=>{
-  setupTheme();
-  setupDrawers();
-  setupFilterEvents();
-  $('#btnRefresh')?.addEventListener('click', refreshNews);
-  $('#btnExport')?.addEventListener('click', exportJSON);
+/* ====== RENDER ====== */
+function newsItemHTML(n){
+  const img = n.image || `https://picsum.photos/seed/${encodeURIComponent(n.id||n.title||'news')}/600/400`;
+  const tags = [n.player_display_name, n.level, n.status].filter(Boolean).join(' • ');
+  const urlUtm = n.url ? (n.url + (n.url.includes('?')?'&':'?') + 'utm_source=yatstats&utm_medium=news') : '#';
+  return `
+  <article class="news-item">
+    <a href="${urlUtm}" target="_blank" rel="noopener">
+      <img class="news-thumb" src="${img}" alt="">
+    </a>
+    <div style="padding:10px 12px;">
+      <div class="news-meta">${n.source || 'Source'} • ${fmtDate(n.publishedAt)}</div>
+      <h3 class="news-title"><a href="${urlUtm}" target="_blank" rel="noopener">${n.title}</a></h3>
+      <div class="news-tags">${tags}</div>
+      <div class="news-actions">
+        <button class="share-btn" data-share='${JSON.stringify({title:n.title,url:urlUtm})}'>
+          <i class="ri-share-forward-line"></i> Share
+        </button>
+      </div>
+    </div>
+  </article>`;
+}
 
-  // Initial load: pull JSON → cache → render
-  await refreshNews();
+function render(items){
+  const list = $('#newsList');
+  if(!items.length){ list.innerHTML = `<p style="color:var(--muted)">No stories match the filters.</p>`; return; }
+  list.innerHTML = items.map(newsItemHTML).join('');
+  $('#countPill').textContent = `${items.length} stories`;
+
+  // share handlers
+  $$('.share-btn').forEach(btn=>{
+    btn.addEventListener('click', async ()=>{
+      const data = JSON.parse(btn.dataset.share||'{}');
+      try{
+        if(navigator.share){ await navigator.share(data); }
+        else {
+          await navigator.clipboard.writeText(`${data.title} — ${data.url}`);
+          btn.textContent = 'Copied!';
+          setTimeout(()=>btn.innerHTML='<i class="ri-share-forward-line"></i> Share',1200);
+        }
+      }catch{}
+    });
+  });
+}
+
+/* ====== BOOT ====== */
+let ALL_ITEMS = [];
+
+async function loadEverything(){
+  // 1) start with seeds
+  let items = SEED_ITEMS.slice();
+
+  // 2) merge repo JSON if present
+  const fileItems = await tryFetchJson(JSON_PATH);
+  if(fileItems) items = mergeItems(items, fileItems);
+
+  // 3) merge local cache (so refresh doesn’t wipe manual adds)
+  const cached = readCache();
+  if(cached) items = mergeItems(items, cached.items);
+
+  // save and paint
+  const saved = writeCache(items);
+  ALL_ITEMS = saved.items.slice();
+
+  buildFilters(ALL_ITEMS);
+  render(applyFilters(ALL_ITEMS));
+}
+
+/* ====== EVENTS ====== */
+document.addEventListener('DOMContentLoaded', ()=>{
+  // drawers
+  $('#btnMenu')?.addEventListener('click', ()=>document.body.classList.add('drawer-left-open'));
+  $('#btnAccount')?.addEventListener('click', ()=>document.body.classList.add('drawer-right-open'));
+  $('.drawer-mask')?.addEventListener('click', ()=>document.body.classList.remove('drawer-left-open','drawer-right-open'));
+  $$('.close-btn').forEach(b=>b.addEventListener('click', ()=>document.body.classList.remove('drawer-left-open','drawer-right-open')));
+
+  // filters
+  $('#filters').addEventListener('change', (e)=>{
+    if(e.target.classList.contains('select-all')){
+      const box = e.target.closest('.filter-options');
+      box.querySelectorAll('input[type=checkbox]:not(.select-all)').forEach(cb => cb.checked = e.target.checked);
+    }
+    render(applyFilters(ALL_ITEMS));
+  });
+  $('#filterName')?.addEventListener('input', debounce(()=>render(applyFilters(ALL_ITEMS)), 200));
+  $('#filtersReset')?.addEventListener('click', ()=>{
+    $$('#filters input[type=checkbox]').forEach(i=>i.checked=false);
+    $('#filterName').value='';
+    render(applyFilters(ALL_ITEMS));
+  });
+
+  // view toggle
+  const main = $('#mainContainer');
+  $('#viewList')?.addEventListener('click', ()=>{
+    main.classList.remove('grid');
+    $('#viewList').classList.add('active');
+    $('#viewGrid').classList.remove('active');
+  });
+  $('#viewGrid')?.addEventListener('click', ()=>{
+    main.classList.add('grid');
+    $('#viewGrid').classList.add('active');
+    $('#viewList').classList.remove('active');
+  });
+
+  // refresh (re-reads JSON + keeps cache)
+  $('#btnRefresh')?.addEventListener('click', async ()=>{
+    $('#newsList').innerHTML = `<p style="color:var(--muted)">Refreshing…</p>`;
+    await loadEverything();
+  });
+
+  // export JSON
+  $('#btnExport')?.addEventListener('click', ()=>{
+    const payload = readCache() || {version:1,updatedAt:new Date().toISOString(),items:ALL_ITEMS};
+    const blob = new Blob([JSON.stringify(payload,null,2)], {type:'application/json'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'alumni_news.json';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(a.href);
+  });
+
+  loadEverything();
 });
 </script>
 </body>
