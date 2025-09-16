@@ -596,5 +596,188 @@ document.addEventListener('DOMContentLoaded', async ()=>{
   }
 });
 </script>
+<script type="module">
+/* ========= CONFIG ========= */
+const GAMES_CSV_URL = 'PASTE_YOUR_GAMES_CSV_URL_HERE'; // <-- REQUIRED
+// Your existing Master “published_hamilton_players” CSV (used only to sort players like the flip-cards):
+const MASTER_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQcWJM6Q6hTdFnES_G5LUy4teCS-sJ5HdAc9F5HSY8DGE9egdGy8yUAe2ShT3tFm-CwUuCYeAYy_YiW/pub?gid=2028135390&single=true&output=csv";
+
+/* Flip-card sort order for levels */
+const levelOrder = {
+  'MLB': 13, 'INTERNATIONAL': 12, 'TRIPLE-A': 11, 'AAA': 11,
+  'DOUBLE-A': 10, 'AA': 10, 'HIGH-A': 9, 'A+': 9, 'LOW-A': 8, 'A': 8,
+  'ROOKIE': 7, 'ROK': 7, 'INDY': 6, 'NCAA-D1': 5, 'NCAA-D2': 4, 'NCAA-D3': 3,
+  'NAIA': 2, 'JUCO': 1
+};
+
+/* ========= CSV HELPERS ========= */
+async function fetchCSV(url){
+  const res = await fetch(url, { cache: 'no-store' });
+  if(!res.ok) throw new Error(`HTTP ${res.status} for ${url}`);
+  return res.text();
+}
+function parseCSV(text){
+  const rows = text.trim().split(/\r?\n/).map(l =>
+    l.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/).map(c => c.replace(/^"|"$/g,'')));
+  const header = rows.shift().map(h => h.trim());
+  const idx = name => header.findIndex(h => h.toLowerCase() === name.toLowerCase());
+  return { header, idx, rows };
+}
+
+/* ========= LOAD MASTER (for sort metadata) ========= */
+async function loadMasterMeta(){
+  const text = await fetchCSV(MASTER_CSV_URL);
+  const { header, idx, rows } = parseCSV(text);
+  const colName  = idx('display_name');
+  const colLevel = idx('level');
+  const colGrad  = idx('grad_class');
+  const meta = new Map();
+  for (const r of rows){
+    const name = (r[colName]||'').trim();
+    if(!name) continue;
+    meta.set(name.toLowerCase(), {
+      level: (r[colLevel] || '').toUpperCase().trim(),
+      grad : parseInt(r[colGrad],10) || 0
+    });
+  }
+  return meta;
+}
+
+/* ========= LOAD GAMES (A,B,G,I,J) ========= */
+async function loadGames(){
+  const text = await fetchCSV(GAMES_CSV_URL);
+  const { header, idx, rows } = parseCSV(text);
+  const cPlayer = idx('player_name');       // A
+  const cLine   = idx('daily_line_score');  // B
+  const cDate   = idx('GameDateLocal');     // G
+  const cOpp    = idx('Opponent');          // I
+  const cHA     = idx('HomeAway');          // J
+  if ([cPlayer,cLine,cDate,cOpp,cHA].some(i=>i<0)) {
+    throw new Error('One or more required GAMES columns were not found: player_name, daily_line_score, GameDateLocal, Opponent, HomeAway');
+  }
+  return rows.map(r => {
+    const name = (r[cPlayer]||'').trim();
+    const line = (r[cLine]||'').trim();         // may be blank => DNP
+    const opp  = (r[cOpp]||'').trim();
+    const ha   = (r[cHA]||'').trim();           // values like HOME/AWAY or vs/@ etc.
+    const dateStr = (r[cDate]||'').trim();
+    const date = dateStr ? new Date(dateStr) : null;
+    return { name, line, date, opp, ha };
+  }).filter(g => g.name && g.date instanceof Date && !isNaN(g.date));
+}
+
+/* ========= GROUP BY WEEK + PLAYER ========= */
+function startOfWeek(d){ // Sunday start
+  const dt = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  const day = dt.getDay(); // 0=Sun
+  dt.setDate(dt.getDate() - day);
+  dt.setHours(0,0,0,0);
+  return dt;
+}
+function labelWeek(d){
+  const m = d.toLocaleString(undefined, { month:'long' });
+  return `ALUMNI LINE SCORES — Week of ${m} ${d.getDate()}, ${d.getFullYear()}`;
+}
+function withinLastNWeeks(games, n=4){
+  if(!games.length) return [];
+  const now = new Date(); now.setHours(0,0,0,0);
+  const min = new Date(now); min.setDate(min.getDate() - (7*n) + 1);
+  return games.filter(g => g.date >= min);
+}
+function groupByWeekAndPlayer(games){
+  const filtered = withinLastNWeeks(games, 4);
+  const map = new Map(); // weekStartISO -> Map(player -> game[])
+  for (const g of filtered){
+    const wk = startOfWeek(g.date);
+    const key = wk.toISOString();
+    if(!map.has(key)) map.set(key, { weekStart: wk, players: new Map() });
+    const bucket = map.get(key).players;
+    const k = (g.name||'').toLowerCase();
+    if(!bucket.has(k)) bucket.set(k, []);
+    bucket.get(k).push(g);
+  }
+  // sort each player's games newest → oldest
+  for (const {players} of map.values()){
+    for (const arr of players.values()){
+      arr.sort((a,b)=> b.date - a.date);
+    }
+  }
+  // return newest weeks first
+  return Array.from(map.values()).sort((a,b)=> b.weekStart - a.weekStart);
+}
+
+/* ========= RENDER ========= */
+function resolveVsAt(ha){
+  const s = (ha||'').toUpperCase();
+  if (s.startsWith('HOME') || s==='H' || s==='VS' || s==='VS.') return 'vs.';
+  if (s.startsWith('AWAY') || s==='A' || s==='@') return '@';
+  // if sheet already stores vs./@ in ha, just return it
+  if (s.includes('@')) return '@';
+  if (s.includes('VS')) return 'vs.';
+  return 'vs.'; // default
+}
+function fmtMMDD(d){
+  return `${d.getMonth()+1}/${d.getDate().toString().padStart(2,'0')}`;
+}
+function byFlipCardOrder(playerMeta){
+  return (aNameLc, bNameLc) => {
+    const a = playerMeta.get(aNameLc) || { level:'', grad:0 };
+    const b = playerMeta.get(bNameLc) || { level:'', grad:0 };
+    const la = levelOrder[a.level] ?? -1;
+    const lb = levelOrder[b.level] ?? -1;
+    if (la !== lb) return lb - la;            // higher level first
+    if (a.grad !== b.grad) return a.grad - b.grad; // older class first
+    return aNameLc.localeCompare(bNameLc);
+  };
+}
+function renderLineScores(weeks, playerMeta){
+  const host = document.getElementById('colLineScores');
+  if(!host){ console.warn('#colLineScores not found'); return; }
+  if(!weeks.length){
+    host.innerHTML = `<p style="color:var(--muted)">No recent line scores.</p>`;
+    return;
+  }
+  const pieces = [];
+  for (const wk of weeks){
+    const title = labelWeek(wk.weekStart);
+    const playersSorted = Array.from(wk.players.keys()).sort(byFlipCardOrder(playerMeta));
+    const blocks = playersSorted.map(nameLc => {
+      const games = wk.players.get(nameLc) || [];
+      const displayName = games[0]?.name?.toUpperCase() || nameLc.toUpperCase();
+      const items = games.map(g=>{
+        const vsat = resolveVsAt(g.ha);
+        const date = fmtMMDD(g.date);
+        const line = g.line ? g.line : 'DNP';
+        return `<div class="lines-item">${date} ${vsat} ${g.opp} - ${line}</div>`;
+      }).join('');
+      return `
+        <div class="lines-player">
+          <div class="player-name">${displayName}</div>
+          <div class="lines-list">${items}</div>
+        </div>`;
+    }).join('');
+    pieces.push(`
+      <section class="lines-week">
+        <h3>${title}</h3>
+        ${blocks || `<div class="lines-item" style="opacity:.75">No games recorded.</div>`}
+      </section>
+    `);
+  }
+  host.innerHTML = pieces.join('');
+}
+
+/* ========= BOOT ========= */
+(async function initLineScores(){
+  try{
+    const [playerMeta, games] = await Promise.all([loadMasterMeta(), loadGames()]);
+    const weeks = groupByWeekAndPlayer(games);
+    renderLineScores(weeks, playerMeta);
+  }catch(err){
+    console.error('Line Scores failed:', err);
+    const host = document.getElementById('colLineScores');
+    if (host) host.innerHTML = `<p style="color:#f88">Couldn’t load line scores: ${err.message}</p>`;
+  }
+})();
+</script>
 </body>
 </html>
