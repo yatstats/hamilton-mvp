@@ -24,76 +24,92 @@
 
 <style>
 :root{
-  --bg:#0c0c0c; --fg:#f2f2f2; --muted:#c4c4c4; --ink:#e8e8e8; --line:rgba(255,255,255,0.10);
-  --card:#171717; --header:#000; --pad:16px;
+  --bg:#0c0c0c; --fg:#f2f2f2; --muted:#c4c4c4; --ink:#e8e8e8;
+  --line:rgba(255,255,255,0.10); --card:#171717; --header:#000; --pad:16px;
   --hamSmall:13px; --hamBig:20px; --hamBigger:24px;
 }
 *{box-sizing:border-box}
 html,body{margin:0}
 body{background:var(--bg);color:var(--fg);font-family:Oswald,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
 
-/* header */
-.header{position:sticky;top:0;z-index:40;background:var(--header)}
+/* global links (fix blue) */
+a{color:inherit;text-decoration:none}
+a:link, a:visited{color:var(--fg)}
+a:hover{text-decoration:underline}
+
+/* header + school row */
+.header{position:sticky;top:0;z-index:60;background:var(--header)}
 .container{max-width:1400px;margin:0 auto;padding:0 var(--pad)}
-.topbar{display:flex;align-items:center;gap:10px;justify-content:space-between;padding:10px 0}
-.left{display:flex;align-items:center;gap:8px}
-.right{display:flex;align-items:center;gap:8px}
+.topbar{display:flex;align-items:center;gap:10px;justify-content:space-between;padding:8px 0}
+.left, .right{display:flex;align-items:center;gap:10px}
 .icon-btn{background:none;border:none;color:var(--fg);display:inline-flex;align-items:center;gap:6px;cursor:pointer}
 .icon-btn i{font-size:20px}
-.site-title{font:400 28px/1 "Bebas Neue",sans-serif;letter-spacing:.05em}
-
 .hr{border-top:1px solid var(--line)}
+.schoolrow{display:flex;align-items:center;gap:16px;padding:6px 0}
+.ham-logo{height:clamp(50px,8vw,70px);width:auto;object-fit:contain}
+.schooltext .small{font:300 var(--hamSmall)/1 Oswald;color:var(--muted)}
+.schooltext .big1{font:400 var(--hamBig)/1 "Bebas Neue",sans-serif}
+.schooltext .big2{font:400 var(--hamBigger)/1 "Bebas Neue",sans-serif;margin-top:-4px}
 
-/* date range bar */
+/* range bar */
 .rangebar{display:flex;gap:10px;align-items:center}
-.rangebar input[type=date]{background:#111;border:1px solid var(--line);color:var(--fg);border-radius:10px;padding:8px 10px}
+.rangebar input[type=date]{background:#111;border:1px solid var(--line);color:var(--fg);border-radius:10px;padding:8px 10px;width:180px}
 @media (max-width:720px){ .rangebar{flex-wrap:wrap} }
+
+/* drawers */
+.drawer-mask{position:fixed;inset:0;background:rgba(0,0,0,.35);opacity:0;pointer-events:none;transition:.2s;z-index:70}
+.drawer{position:fixed;top:0;bottom:0;width:min(360px,88vw);background:rgba(10,10,10,.75);backdrop-filter:blur(4px);color:#e8e8e8;
+        transform:translateX(-110%);transition:transform .25s;z-index:80;display:flex;flex-direction:column}
+.drawer.right{left:auto;right:0;transform:translateX(110%)}
+.drawer h3{margin:16px}
+.drawer .pad{padding:10px 16px}
+.drawer .close{position:absolute;top:8px;right:10px}
+.drawer-content{flex:1;overflow:auto}
+.drawer-footer{padding:12px 16px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end}
+body.drawer-left-open .drawer-mask, body.drawer-right-open .drawer-mask{opacity:1;pointer-events:auto}
+body.drawer-left-open #drawerLeft{transform:translateX(0)}
+body.drawer-right-open #drawerFilters{transform:translateX(0)}
+
+/* left drawer content (simple nav) */
+.live-link{display:block;padding:10px 12px;border-radius:8px}
+.live-link:hover{background:rgba(255,255,255,.08)}
+
+/* right filter groups */
+.filter-group{border-bottom:1px solid var(--line)}
+.filter-title{display:flex;justify-content:space-between;align-items:center;cursor:pointer;padding:14px 0;font:700 15px "Bebas Neue"}
+.filter-title::-webkit-details-marker{display:none}
+.filter-title::after{content:'▸';transition:.2s}
+details[open] > .filter-title::after{transform:rotate(90deg)}
+.filter-options label{display:block;margin:8px 0}
+.filter-options input[type=text]{width:100%;padding:10px;border-radius:10px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--ink)}
 
 /* layout */
 .main{padding:12px 0 90px}
 .grid{display:grid;grid-template-columns:2fr 1fr;gap:14px}
 @media (max-width:1100px){ .grid{grid-template-columns:1fr} }
 
-/* cards */
+/* panels */
 .panel{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px}
 .section-title{background:var(--line);border-radius:10px;padding:8px 10px;margin:0 0 10px;font:700 16px "Bebas Neue",sans-serif;letter-spacing:.06em}
 
 /* news list */
 .news-card{display:flex;gap:12px;padding:10px;border-radius:12px;border:1px solid var(--line);margin:10px 0;align-items:center}
 .news-thumb{width:110px;flex:0 0 110px;border-radius:10px;background:#000 center/cover no-repeat;aspect-ratio:5/7}
-.news-meta{font-size:12px;color:var(--muted);margin-top:4px}
 .news-headline{font:700 20px/1.1 "Bebas Neue",sans-serif;letter-spacing:.02em}
-.news-share{margin-left:auto;color:var(--fg);opacity:.8}
+.news-headline a:link, .news-headline a:visited{color:var(--fg)} /* kill blue/visited */
+.news-meta{font-size:12px;color:var(--muted);margin-top:4px}
+.news-player{font:400 16px/1.15 "Bebas Neue",sans-serif;letter-spacing:.02em;text-transform:uppercase;margin-top:2px}
+.news-share{margin-left:auto;color:var(--fg);opacity:.9}
 
-/* line scores (match news headline sizing/weight; tighter groups; no pill borders) */
+/* line scores */
 .week-group{margin-bottom:12px}
-.player-block{border:1px solid var(--line);border-radius:12px;padding:8px 10px;margin:8px 0;background:#121212}
-.player-name{font:700 20px/1 "Bebas Neue",sans-serif;letter-spacing:.02em;margin:2px 0 6px}
-.line-row{display:flex;gap:10px;align-items:baseline;padding:4px 6px;border-radius:8px}
-.line-date{font:400 13px/1 Oswald;color:var(--muted);min-width:40px}
-.line-text{font:400 16px/1.15 "Bebas Neue",sans-serif;letter-spacing:.02em}
-.player-block .line-row + .line-row{margin-top:0} /* tight stack */
 .week-title{background:var(--line);border-radius:10px;padding:8px 10px;font:700 16px "Bebas Neue",sans-serif;margin:12px 0 8px}
-
-/* drawer filters */
-.drawer-mask{position:fixed;inset:0;background:rgba(0,0,0,.35);opacity:0;pointer-events:none;transition:.2s;z-index:60}
-.drawer{position:fixed;top:0;bottom:0;right:0;width:min(360px,88vw);background:rgba(10,10,10,.75);backdrop-filter:blur(4px);color:var(--ink);
-        transform:translateX(110%);transition:transform .25s;z-index:70;display:flex;flex-direction:column}
-.drawer h3{margin:16px}
-.drawer .pad{padding:10px 16px}
-.drawer .close{position:absolute;top:8px;right:10px}
-.drawer-content{flex:1;overflow:auto}
-.filter-group{border-bottom:1px solid var(--line)}
-.filter-title{display:flex;justify-content:space-between;align-items:center;list-style:none;cursor:pointer;padding:14px 0;font:700 15px "Bebas Neue"}
-.filter-title::-webkit-details-marker{display:none}
-.filter-title::after{content:'▸';transition:.2s}
-details[open] > .filter-title::after{transform:rotate(90deg)}
-.filter-options label{display:block;margin:8px 0}
-.filter-options input[type=text]{width:100%;padding:10px;border-radius:10px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--ink)}
-.drawer-footer{padding:12px 16px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end}
-
-/* accessibility focus */
-.icon-btn:focus,button:focus,input:focus,details summary:focus{outline:2px solid var(--fg);outline-offset:2px}
+.player-block{border:1px solid var(--line);border-radius:12px;padding:8px 10px;margin:8px 0;background:#121212}
+.player-name{font:700 16px/1 "Bebas Neue",sans-serif;letter-spacing:.06em;text-transform:uppercase;margin:2px 0 6px} /* same as section size & ALL CAPS */
+.line-row{display:flex;gap:10px;align-items:baseline;padding:2px 2px}
+.line-date{font:400 13px/1 Oswald;color:var(--muted);min-width:40px}
+.line-text{font:400 16px/1.15 "Bebas Neue",sans-serif;letter-spacing:.02em} /* same size/weight as news player name (NOT bold) */
+.player-block .line-row + .line-row{margin-top:2px} /* tight stack */
 </style>
 </head>
 <body>
@@ -101,25 +117,47 @@ details[open] > .filter-title::after{transform:rotate(90deg)}
 <header class="header">
   <div class="container topbar">
     <div class="left">
-      <button id="openFilters" class="icon-btn" aria-label="Filters"><i class="ri-filter-3-line"></i></button>
-      <div class="site-title">ALUMNI NEWS</div>
-    </div>
-    <div class="rangebar">
-      <label for="fromDate" class="sr-only" style="position:absolute;left:-9999px">From</label>
-      <input id="fromDate" type="date">
-      <label for="toDate" class="sr-only" style="position:absolute;left:-9999px">To</label>
-      <input id="toDate" type="date">
-      <button id="btnRefresh" class="icon-btn"><i class="ri-refresh-line"></i>Refresh</button>
+      <button id="btnMenu" class="icon-btn" aria-label="Menu"><i class="ri-menu-line"></i></button>
+      <div class="rangebar">
+        <input id="fromDate" type="date" aria-label="From">
+        <input id="toDate" type="date" aria-label="To">
+        <button id="btnRefresh" class="icon-btn"><i class="ri-refresh-line"></i>Refresh</button>
+      </div>
     </div>
     <div class="right">
-      <button id="btnMenu" class="icon-btn" aria-label="Menu"><i class="ri-menu-line"></i></button>
+      <button id="openFilters" class="icon-btn" aria-label="Filters"><i class="ri-filter-3-line"></i></button>
+    </div>
+  </div>
+  <div class="hr"></div>
+  <div class="container schoolrow">
+    <img class="ham-logo" src="assets/img/crest.png" alt="HHS Crest" onerror="this.style.display='none'">
+    <div class="schooltext">
+      <div class="small">CHANDLER, AZ</div>
+      <div class="big1">HAMILTON HIGH SCHOOL</div>
+      <div class="big2">ACTIVE BASEBALL ALUMNI</div>
     </div>
   </div>
   <div class="hr"></div>
 </header>
 
+<!-- LEFT NAV DRAWER -->
 <div class="drawer-mask"></div>
-<aside class="drawer" id="drawerFilters" aria-label="Filters">
+<aside class="drawer" id="drawerLeft" aria-label="Left drawer">
+  <button class="icon-btn close" id="closeLeft"><i class="ri-close-line"></i></button>
+  <h3 class="pad">NAVIGATION</h3>
+  <div class="drawer-content pad" style="display:flex;flex-direction:column;gap:8px">
+    <a class="live-link" href="index.html">WHERE THEY YAT?</a>
+    <a class="live-link" href="alumni-news.html">ACTIVE ALUMNI NEWS</a>
+    <a class="live-link" href="all-time-list.html">NEXT-LEVEL ALL-TIME LIST</a>
+    <a class="live-link" href="current-team.html">THE CURRENT TEAM</a>
+    <a class="live-link" href="partner-program.html">PCD ACTION PARTNER PROGRAM</a>
+    <a class="live-link" href="faq.html">FAQ’S</a>
+  </div>
+  <div class="drawer-footer"><span style="opacity:.7">© YAT?STATS</span></div>
+</aside>
+
+<!-- RIGHT FILTER DRAWER -->
+<aside class="drawer right" id="drawerFilters" aria-label="Filters">
   <button class="icon-btn close" id="closeFilters"><i class="ri-close-line"></i></button>
   <h3 class="pad">FILTERS</h3>
   <div class="drawer-content" id="filters">
@@ -166,23 +204,20 @@ details[open] > .filter-title::after{transform:rotate(90deg)}
   </div>
 </main>
 
-<footer class="container" style="padding:14px 0 40px;color:var(--muted);text-align:center"></footer>
+<footer class="container" style="padding:14px 0 40px;color:var(--muted);text-align:center">© Hamilton YAT?STATS</footer>
 
 <script type="module">
 /* ---------- CONFIG ---------- */
 const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQcWJM6Q6hTdFnES_G5LUy4teCS-sJ5HdAc9F5HSY8DGE9egdGy8yUAe2ShT3tFm-CwUuCYeAYy_YiW/pub?gid=2028135390&single=true&output=csv";
-const JSON_URL = "assets/news/alumni_news.json";         // seed file you maintain
+const JSON_URL = "assets/news/alumni_news.json";  // seed file you maintain
 const CACHE_KEY = "YAT_NEWS_CACHE_V1";
 
 /* ---------- SHORTCUTS ---------- */
 const $ = s => document.querySelector(s);
 const $$ = s => Array.from(document.querySelectorAll(s));
 
-/* ---------- SORT ORDER (same as index.html) ---------- */
-const levelOrder = {
-  'MLB':13,'INTERNATIONAL':12,'TRIPLE-A':11,'AAA':11,'DOUBLE-A':10,'AA':10,'HIGH-A':9,'A+':9,
-  'LOW-A':8,'A':8,'ROOKIE':7,'ROK':7,'INDY':6,'NCAA-D1':5,'NCAA-D2':4,'NCAA-D3':3,'NAIA':2,'JUCO':1
-};
+/* ---------- SORT ORDER (same as index) ---------- */
+const levelOrder = { 'MLB':13,'INTERNATIONAL':12,'TRIPLE-A':11,'AAA':11,'DOUBLE-A':10,'AA':10,'HIGH-A':9,'A+':9,'LOW-A':8,'A':8,'ROOKIE':7,'ROK':7,'INDY':6,'NCAA-D1':5,'NCAA-D2':4,'NCAA-D3':3,'NAIA':2,'JUCO':1 };
 function defaultSort(a,b){
   const aSponsor=(a.status||'').toUpperCase()==='SPONSOR', bSponsor=(b.status||'').toUpperCase()==='SPONSOR';
   if(aSponsor!==bSponsor) return aSponsor?-1:1;
@@ -193,15 +228,13 @@ function defaultSort(a,b){
     const la=(levelOrder[(a.level||'').toUpperCase().trim()]??-1);
     const lb=(levelOrder[(b.level||'').toUpperCase().trim()]??-1);
     if(la!==lb) return lb-la;
-    const ga=+a.grad_class||0, gb=+b.grad_class||0;
-    if(ga!==gb) return ga-gb;
+    const ga=+a.grad_class||0, gb=+b.grad_class||0; if(ga!==gb) return ga-gb;
     const va=(a.letter_years||'').split(',').filter(Boolean).length;
     const vb=(b.letter_years||'').split(',').filter(Boolean).length;
     if(va!==vb) return vb-va;
     return (a.display_name||'').localeCompare(b.display_name||'');
   }
-  const ca=+a.grad_class||9999, cb=+b.grad_class||9999;
-  if(ca!==cb) return ca-cb;
+  const ca=+a.grad_class||9999, cb=+b.grad_class||9999; if(ca!==cb) return ca-cb;
   return (a.display_name||'').localeCompare(b.display_name||'');
 }
 
@@ -219,7 +252,7 @@ async function loadCSV(url){
       grad_class:r[idx('grad_class')], letter_years:r[idx('letter_years')], status:r[idx('status')], level:r[idx('level')],
       team:r[idx('team')], org:r[idx('org')], position:r[idx('position')],
       last_game_1:r[idx('last_game_1')], last_game_2:r[idx('last_game_2')], last_game_3:r[idx('last_game_3')],
-      x_handle:r[idx('x_handle')], ig_handle:r[idx('ig_handle')], stats:{}
+      stats:{}
     };
     for(const k of statKeys){ const i=idx(k); if(i>-1 && r[i]) p.stats[k.toUpperCase()]=r[i]; }
     return p;
@@ -243,28 +276,20 @@ function fmtWeekTitle(prefix, date){
 }
 function startOfWeek(d){ const r=new Date(d); r.setHours(0,0,0,0); const day=r.getDay(); r.setDate(r.getDate()-day); return r; } // Sunday
 function parseLine(line, yearFallback){
-  // expects like "9/14 @ BOS - 0-4 | 2K" or "9/10 vs.SAC - 1IP, 1H ..."
   if(!line) return null;
   const m = String(line).match(/^\s*(\d{1,2})\/(\d{1,2})\s+(.*)$/);
   if(!m) return null;
   const [_,mm,dd,rest] = m;
   const d=new Date(yearFallback, +mm-1, +dd);
-  // remove long dash between name and venue not needed here (we don't display name in a single line)
   return { date:d, label:`${+mm}/${+dd}`, body:rest.replace(/\s+—\s+/g,' ').trim() };
 }
 function byDateDesc(a,b){ return +b.date - +a.date; }
-
-/* ---------- FILTERS ---------- */
 function readDateInputs(){
   const from = $('#fromDate').value ? new Date($('#fromDate').value+'T00:00:00') : null;
   const to   = $('#toDate').value ? new Date($('#toDate').value+'T23:59:59') : null;
   return {from,to};
 }
-function inRange(d,from,to){
-  if(from && d<from) return false;
-  if(to && d>to) return false;
-  return true;
-}
+function inRange(d,from,to){ if(from && d<from) return false; if(to && d>to) return false; return true; }
 function readDrawerFilters(){
   const name=($('#filterName')?.value||'').trim().toLowerCase();
   const levels=$$('#filterLevels input[type=checkbox]:checked').map(i=>i.value);
@@ -293,14 +318,13 @@ function newsCards(items){
     const when = n.publishedAt ? new Date(n.publishedAt).toLocaleString() : '';
     const base = String(n.url||'#');
     const read = base + (base.includes('?')?'&':'?') + 'utm_source=yatstats&utm_medium=newspage';
-    const share = () => {};
     return `
       <article class="news-card">
         <div class="news-thumb" style="background-image:url('${img}')"></div>
         <div style="flex:1;min-width:0">
           <div class="news-headline"><a href="${read}" target="_blank" rel="noopener">${n.title||'Read more'}</a></div>
           <div class="news-meta">${n.source||'News'} • ${when}</div>
-          <div class="news-meta" style="text-transform:uppercase;opacity:.9">${n.player_display_name||''}</div>
+          <div class="news-player">${(n.player_display_name||'').toUpperCase()}</div>
         </div>
         <a class="news-share" href="${read}" target="_blank" aria-label="Open"><i class="ri-external-link-line"></i></a>
       </article>`;
@@ -308,28 +332,22 @@ function newsCards(items){
 }
 
 function renderLineWeeks(weeks, playersForSort){
-  // playersForSort used to apply defaultSort inside each week
   const weekKeys = [...weeks.keys()].sort((a,b)=> b-a); // newest first
   return weekKeys.map(k=>{
     const weekStart = new Date(Number(k));
     const groups = weeks.get(Number(k)); // Map<playerSlug, {player, lines:[]}>
     // sort players using default order
-    const sortedPlayers = [...groups.values()]
-      .map(v=>v.player)
-      .sort(defaultSort)
-      .map(p=>p.slug);
-
-    const blocks = sortedPlayers.map(slug=>{
+    const ordered = [...groups.values()].map(v=>v.player).sort(defaultSort).map(p=>p.slug);
+    const blocks = ordered.map(slug=>{
       const {player,lines} = groups.get(slug);
       const rows = lines.sort(byDateDesc).map(o=>
         `<div class="line-row"><div class="line-date">${o.label}</div><div class="line-text">${o.body}</div></div>`
       ).join('');
       return `<div class="player-block">
-                <div class="player-name">${player.display_name}</div>
+                <div class="player-name">${(player.display_name||'').toUpperCase()}</div>
                 ${rows}
               </div>`;
     }).join('');
-
     return `<div class="week-group">
               <div class="week-title">${fmtWeekTitle('ALUMNI LINE SCORES', weekStart)}</div>
               ${blocks || '<p style="opacity:.8;padding:6px 4px">No line scores this week.</p>'}
@@ -337,7 +355,7 @@ function renderLineWeeks(weeks, playersForSort){
   }).join('');
 }
 
-/* ---------- RENDER PIPELINE ---------- */
+/* ---------- RENDER ---------- */
 function applyAll(players, newsCache){
   const {from,to} = readDateInputs();
   const F = readDrawerFilters();
@@ -348,31 +366,28 @@ function applyAll(players, newsCache){
       const d = n.publishedAt ? new Date(n.publishedAt) : null;
       const pn = (n.player_display_name||'').toLowerCase();
       const matchName = !F.name || pn.includes(F.name);
-      let matchPlayerMeta = true;
-      if(F.levels.length || F.status.length || F.classes.length){
-        const tags = n.player_tags || {};
-        if(F.levels.length)  matchPlayerMeta = matchPlayerMeta && (!tags.level || F.levels.includes(tags.level));
-        if(F.status.length)  matchPlayerMeta = matchPlayerMeta && (!tags.status || F.status.includes(tags.status));
-        if(F.classes.length) matchPlayerMeta = matchPlayerMeta && (!tags.grad_class || F.classes.includes(String(tags.grad_class)));
-      }
+      let matchMeta = true;
+      const tags = n.player_tags || {};
+      if(F.levels.length)  matchMeta = matchMeta && (!tags.level || F.levels.includes(tags.level));
+      if(F.status.length)  matchMeta = matchMeta && (!tags.status || F.status.includes(tags.status));
+      if(F.classes.length) matchMeta = matchMeta && (!tags.grad_class || F.classes.includes(String(tags.grad_class)));
       const matchDate = !d || inRange(d,from,to);
-      return matchName && matchPlayerMeta && matchDate;
+      return matchName && matchMeta && matchDate;
     })
     .sort((a,b)=> new Date(b.publishedAt||0) - new Date(a.publishedAt||0));
   $('#newsList').innerHTML = newsCards(items);
 
-  // LINE SCORES — build entries from last_game_1/2/3, then group (week -> player -> lines)
+  // LINE SCORES
   const thisYear = (from||new Date()).getFullYear();
-  const entries = [];
+  const entries=[];
   for(const p of players){
-    // filter player by drawer selections first
     if(F.name && !(p.display_name||'').toLowerCase().includes(F.name)) continue;
     if(F.levels.length && !F.levels.includes(p.level)) continue;
     if(F.status.length && !F.status.includes(p.status)) continue;
     if(F.classes.length && !F.classes.includes(p.grad_class)) continue;
     if(F.roster.length){
-      const matchRoster = (p.letter_years||'').split(',').map(s=>s.trim()).some(y=>F.roster.includes(y));
-      if(!matchRoster) continue;
+      const ok = (p.letter_years||'').split(',').map(s=>s.trim()).some(y=>F.roster.includes(y));
+      if(!ok) continue;
     }
     for(const raw of [p.last_game_1,p.last_game_2,p.last_game_3]){
       const parsed = parseLine(raw, thisYear);
@@ -381,7 +396,6 @@ function applyAll(players, newsCache){
       entries.push({ player:p, ...parsed });
     }
   }
-  // group by week then by player
   const weeks = new Map(); // weekStartTS -> Map<slug,{player,lines:[]}>
   for(const e of entries){
     const ws = +startOfWeek(e.date);
@@ -400,7 +414,7 @@ document.addEventListener('DOMContentLoaded', async ()=>{
     const players = await loadCSV(CSV_URL);
     populateFilterLists(players);
 
-    // init dates: default to last 21 days
+    // default: last 21 days
     const today = new Date(); const to = today.toISOString().slice(0,10);
     const from = new Date(today); from.setDate(from.getDate()-21);
     $('#fromDate').value = from.toISOString().slice(0,10);
@@ -409,27 +423,27 @@ document.addEventListener('DOMContentLoaded', async ()=>{
     const cache = await ensureNewsCache();
     applyAll(players, cache);
 
-    // interactions
-    $('#btnRefresh').addEventListener('click', async ()=>{
-      const latest = await ensureNewsCache(); // reads from localStorage (already seeded)
-      applyAll(players, latest);
-    });
+    // buttons
+    $('#btnRefresh').addEventListener('click', ()=> applyAll(players, getCache()));
+    // drawers
+    const openLeft = ()=>{ document.body.classList.add('drawer-left-open'); };
+    const closeLeft = ()=>{ document.body.classList.remove('drawer-left-open'); };
+    const openRight = ()=>{ document.body.classList.add('drawer-right-open'); };
+    const closeRight = ()=>{ document.body.classList.remove('drawer-right-open'); };
+    $('#btnMenu').addEventListener('click', openLeft);
+    $('#closeLeft').addEventListener('click', closeLeft);
+    $('#openFilters').addEventListener('click', openRight);
+    $('#closeFilters').addEventListener('click', closeRight);
+    $('.drawer-mask').addEventListener('click', ()=>{ closeLeft(); closeRight(); });
 
-    // drawer
-    const open=()=>{ $('.drawer-mask').style.opacity=1; $('.drawer-mask').style.pointerEvents='auto'; $('#drawerFilters').style.transform='translateX(0)'; };
-    const close=()=>{ $('.drawer-mask').style.opacity=0; $('.drawer-mask').style.pointerEvents='none'; $('#drawerFilters').style.transform='translateX(110%)'; };
-    $('#openFilters').addEventListener('click', open);
-    $('#closeFilters').addEventListener('click', close);
-    $('.drawer-mask').addEventListener('click', close);
-    $('#filtersDone').addEventListener('click', ()=>{ applyAll(players, getCache()); close(); });
+    // filters live apply
+    $('#filters').addEventListener('change', ()=> applyAll(players, getCache()));
     $('#filtersReset').addEventListener('click', ()=>{
       $('#filterName').value='';
       $$('#filters input[type=checkbox]').forEach(cb=> cb.checked=false);
       applyAll(players, getCache());
     });
-
-    // live apply on change
-    $('#filters').addEventListener('change', ()=> applyAll(players, getCache()));
+    $('#filtersDone').addEventListener('click', ()=>{ applyAll(players, getCache()); closeRight(); });
     $('#fromDate').addEventListener('change', ()=> applyAll(players, getCache()));
     $('#toDate').addEventListener('change', ()=> applyAll(players, getCache()));
 
