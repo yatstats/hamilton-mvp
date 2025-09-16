@@ -7,387 +7,94 @@
 <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400&family=Bebas+Neue&display=swap" rel="stylesheet">
 
+<!-- Firebase (same pattern as index) -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-  import { getAuth, signInWithCustomToken, signInAnonymously, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-  window.firebaseAuth = { getAuth, onAuthStateChanged, signInWithCustomToken, signInAnonymously, signOut };
+  import { getAuth, onAuthStateChanged, signInWithCustomToken, signInAnonymously, signOut,
+  createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+  window.firebaseAuth = { getAuth, onAuthStateChanged, signInWithCustomToken, signInAnonymously, signOut, createUserWithEmailAndPassword, signInWithEmailAndPassword };
+
   try {
     const firebaseConfig = JSON.parse(window.__firebase_config || '{}');
     const app = initializeApp(firebaseConfig);
     window.auth = getAuth(app);
-    onAuthStateChanged(window.auth, user => { document.dispatchEvent(new CustomEvent('authStateChanged', { detail: { user } })); });
+
+    onAuthStateChanged(window.auth, user => {
+      document.dispatchEvent(new CustomEvent('authStateChanged', { detail: { user } }));
+    });
+
     if (window.__initial_auth_token) {
       await signInWithCustomToken(window.auth, window.__initial_auth_token);
     } else {
       await signInAnonymously(window.auth);
     }
-  } catch (e) { console.error("Firebase initialization error:", e); }
+  } catch (e) {
+    console.error("Firebase initialization error:", e);
+  }
 </script>
 
 <style>
-:root{ --bg:#0c0c0c; --fg:#f2f2f2; --muted:#c4c4c4; --ink:#e8e8e8; --line:rgba(255,255,255,0.08);
-  --hamSmall:13px; --hamBig:20px; --hamBigger:24px; --crestH: clamp(50px,8vw,70px);
-  --pairGap:16px; --containerPad:16px; --footerH:clamp(56px,8vh,77px);
+:root{
+  --bg:#0c0c0c; --fg:#f2f2f2; --muted:#c4c4c4; --ink:#e8e8e8; --line:rgba(255,255,255,0.08);
+  --card-bg:#171717; --header-bg:#000; --drawer-bg:rgba(10,10,10,.65);
+  --hamSmall:13px; --hamBig:20px; --hamBigger:24px; --tagGrey:#cfd2d6;
+  --crestH: clamp(50px, 8vw, 70px);
+  --containerPad: 16px; --footerH: clamp(56px, 8vh, 77px);
 }
-body{background:var(--bg);color:var(--fg);font-family:Oswald,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;margin:0}
+body.light-theme{ --bg:#f4f4f4; --fg:#121212; --muted:#555; --ink:#222; --line:rgba(0,0,0,0.1); --card-bg:#ffffff; --header-bg:#ffffff; --drawer-bg:rgba(255,255,255,.65); }
+@font-face{ font-family:'Indigo'; src:url('assets/fonts/Indigo.otf') format('opentype'); font-weight:400; font-style:normal; font-display:swap; }
+*{box-sizing:border-box} html,body{margin:0}
+body{background:var(--bg);color:var(--fg);font-family:Oswald,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif; transition:background-color .3s,color .3s}
 a{color:inherit;text-decoration:none}
 .container{max-width:1400px;margin:0 auto;padding:0 var(--containerPad)}
-.header{position:sticky;top:0;z-index:50;background:#000}
-.topbar{display:flex;align-items:center;justify-content:space-between;padding:8px 0;gap:12px}
+.header{position:sticky;top:0;z-index:50;background:var(--header-bg)}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:8px 0; gap: 12px;}
 .left-icons,.right-icons{display:flex;align-items:center;gap:8px}
-.icon-btn{background:none;border:none;color:var(--fg);opacity:.92;display:inline-flex;align-items:center;justify-content:center;padding:0;margin:0 2px;cursor:pointer}
+.icon-btn{background:none;border:none;color:var(--fg);opacity:.92;display:inline-flex;align-items:center;justify-content:center;padding:0;margin:0 2px; cursor:pointer}
 .icon-btn i{font-size:20px}
-.topnav{display:flex;gap:18px;align-items:center;flex-grow:1;justify-content:center}
+.topnav{display:flex;gap:18px;align-items:center; flex-grow: 1; justify-content: center;}
 .nav-pair .thin{font:300 var(--hamSmall) Oswald;letter-spacing:.02em;color:#cfd2d6;margin-right:2px}
-.nav-pair .bold{font:400 var(--hamSmall) "Bebas Neue",Indigo,sans-serif}
+body.light-theme .nav-pair .thin{color:var(--muted)}
+.nav-pair .bold{font:400 var(--hamSmall) Indigo,"Bebas Neue",sans-serif}
 @media (max-width:1200px){ .topnav{display:none !important} }
 .hr-y{border-top:1px solid var(--line)}
-.schoolrow{display:flex;align-items:center;gap:var(--pairGap);padding:8px 0}
-.ham-logo{height:var(--crestH);width:auto;object-fit:contain;flex-shrink:0}
-.schooltext .small{font:300 var(--hamSmall)/1 Oswald;letter-spacing:.02em;color:var(--muted)}
+
+.schoolrow{display:flex;align-items:center;gap:16px;padding:8px 0}
+.ham-logo{height:var(--crestH);width:auto;object-fit:cover;border-radius:10px;background:#111}
+.schooltext .small{font:300 var(--hamSmall)/1 Oswald;color:var(--muted)}
 .schooltext .big1{font:400 var(--hamBig)/1 "Bebas Neue",sans-serif}
 .schooltext .big2{font:400 var(--hamBigger)/1 "Bebas Neue",sans-serif;margin-top:-4px}
-.crumbs{font:300 calc(var(--hamSmall)*.8)/1 Oswald;letter-spacing:.02em;color:var(--muted);text-transform:uppercase;white-space:nowrap}
-.main{padding:8px 0 calc(var(--footerH)+12px)}
-.site-footer{position:fixed;left:0;right:0;bottom:0;height:var(--footerH);background:#0b0b0b;border-top:1px solid var(--line);z-index:40}
-.site-footer .wrap{height:100%;display:flex;align-items:center;justify-content:center;padding:0 var(--containerPad)}
-.site-footer img{height:100%;width:100%;object-fit:contain}
+.crumbs{font:300 calc(var(--hamSmall)*.8)/1 Oswald;color:var(--muted);text-transform:uppercase; white-space: nowrap;}
+.crumbs a:hover{text-decoration:underline}
+.hero{padding:2px 0}
+
+.main{padding:8px 0 calc(var(--footerH) + 12px)}
+.site-footer{position:fixed;left:0;right:0;bottom:0;height:var(--footerH);background:var(--bg);border-top:1px solid var(--line);z-index:40;display:flex;align-items:center;justify-content:center}
+.site-footer img{ height:100%; width:100%; object-fit:contain; }
+
 .drawer-mask{position:fixed;inset:0;background:rgba(0,0,0,.35);opacity:0;pointer-events:none;transition:opacity .2s;z-index:60}
-.drawer{position:fixed;top:0;bottom:0;width:min(360px,82vw);background:rgba(10,10,10,.65);backdrop-filter:blur(4px);color:#e8e8e8;transform:translateX(-110%);transition:transform .25s;z-index:70}
-.drawer-right{right:0;left:auto;transform:translateX(110%);display:flex;flex-direction:column;height:100%}
+.drawer{position:fixed;top:0;bottom:0;width:min(360px,82vw);background:var(--drawer-bg);backdrop-filter:blur(4px);color:var(--ink);transform:translateX(-110%);transition:transform .25s;z-index:70}
+.drawer-right{right:0;left:auto;transform:translateX(110%); display:flex;flex-direction:column;height:100%}
 .drawer h3{margin:18px 16px 8px}
 .drawer .pad{padding:10px 16px}
 .drawer .close-btn{position:absolute;top:12px;right:12px}
+.drawer-content{flex-grow:1;overflow-y:auto;padding:10px 16px}
 body.drawer-left-open .drawer-mask,body.drawer-right-open .drawer-mask{opacity:1;pointer-events:auto}
 body.drawer-left-open #drawerLeft{transform:translateX(0)}
 body.drawer-right-open .drawer-right{transform:translateX(0)}
-.drawer-content{flex-grow:1;overflow-y:auto;padding:10px 16px}
 .live-hit{padding:10px 12px;display:flex;align-items:center;gap:10px;border-radius:10px;cursor:pointer}
-.live-hit:hover{background:rgba(255,255,255,.08)}
+.live-hit:hover{background:var(--line)}
 .live-hit img{width:36px;height:36px;border-radius:6px;object-fit:cover}
 
-.profile-nav{display:flex;justify-content:space-around;background:transparent;border-bottom:1px solid var(--line);padding:4px 0}
-.profile-nav-link{background:none;border:none;color:var(--muted);font:700 14px "Bebas Neue",sans-serif;letter-spacing:.08em;cursor:pointer;padding:8px 10px;border-bottom:2px solid transparent}
-.profile-nav-link.active{color:var(--fg);border-bottom-color:var(--fg)}
-#funzone-container{padding-top:24px;background:#111;border-radius:12px;margin-top:16px;min-height:50vh;color:var(--ink)}
-.funzone-content{animation:fadeIn .5s;padding:16px}
-@keyframes fadeIn{from{opacity:0}to{opacity:1}}
-.stats-header-bar{background:#333;color:#fff;text-align:center;padding:6px;font:700 12px "Bebas Neue",sans-serif;margin:0 0 12px;border-radius:6px}
-.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;text-align:center}
-.stat-item{background:#222;border-radius:8px;padding:8px 5px}
-.stat-label{font-size:11px;text-transform:uppercase;opacity:.7;margin-bottom:4px}
-.stat-value{font-size:18px;font-weight:700;line-height:1}
-.news-item{background:#222;border-radius:8px;padding:15px;margin-bottom:15px;border:1px solid var(--line)}
-.news-headline{font-size:16px;font-weight:700;margin-bottom:5px}
-.news-meta{font-size:12px;color:var(--muted);margin-bottom:10px}
-.news-snippet{font-size:14px;line-height:1.4;margin:0}
-.player-header-details{flex-grow:1;display:flex;justify-content:space-between;align-items:flex-start;gap:16px}
-.player-header-left-cols,.player-header-right-cols{display:flex;align-items:flex-start;gap:16px}
-.front-chip{background:rgba(255,255,255,.1);color:#fff;border-radius:6px;padding:2px 6px;font-size:10px;font-family:Oswald;text-transform:uppercase}
-.varsity-dots{display:flex;gap:4px}
-.varsity-dot{width:22px;height:22px;border-radius:50%;background:#fff;color:#111;display:grid;place-items:center;font-weight:700;font-size:10px}
-.game-title-pill{background:rgba(255,255,255,.1);color:#fff;border-radius:20px;padding:3px 10px;font-size:10px;font-family:Oswald;font-weight:700;display:inline-block;margin-bottom:4px}
-.game-data-text{font:300 13px/1.2 Oswald}
-.game-log{font:400 10px system-ui, sans-serif;white-space:nowrap}
-@media (max-width:992px){ .player-header-details{display:none} }
-</style>
-</head>
-
-<body>
-<header class="header">
-  <div class="container topbar">
-    <div class="left-icons">
-      <button class="icon-btn" id="btnMenu" aria-label="Menu"><i class="ri-menu-line"></i></button>
-      <div id="breadcrumbs" class="crumbs"><a href="index.html">HAMILTON</a> ▸ LOADING...</div>
-    </div>
-    <nav class="topnav" aria-label="Top Navigation">
-      <a href="index.html" class="nav-pair"><span class="thin">WHERE THEY</span><span class="bold">YAT?</span></a>
-      <a href="alumni-news.html" class="nav-pair"><span class="thin">ACTIVE ALUMNI</span><span class="bold">NEWS</span></a>
-      <a href="all-time-list.html" class="nav-pair"><span class="thin">NEXT-LEVEL</span><span class="bold">ALL-TIME LIST</span></a>
-    </nav>
-    <div class="right-icons">
-      <button class="icon-btn" id="openSearch" aria-label="Search"><i class="ri-search-line"></i></button>
-      <div id="auth-container">
-        <button class="icon-btn" id="btnAccount" aria-label="Account"><i class="ri-user-3-line"></i></button>
-        <button class="icon-btn" id="btnSignOut" style="display:none;"><i class="ri-logout-box-line"></i></button>
-      </div>
-      <button class="icon-btn" onclick="history.back()" aria-label="Go back"><i class="ri-arrow-left-line"></i></button>
-    </div>
-  </div>
-  <div class="hr-y"></div>
-  <div class="container schoolrow">
-    <img id="playerLogo" class="ham-logo" src="assets/img/placeholder.png" alt="Player Photo">
-    <div class="schooltext">
-      <div id="playerTeamOrg" class="small">LOADING PLAYER...</div>
-      <div id="playerFirstName" class="big1"></div>
-      <div id="playerLastName" class="big2"></div>
-    </div>
-    <div class="player-header-details">
-      <div class="player-header-left-cols" id="player-header-left-cols"></div>
-      <div class="player-header-right-cols" id="player-header-right-cols"></div>
-    </div>
-  </div>
-  <div class="hr-y"></div>
-  <section class="hero">
-    <div class="container">
-      <nav id="profileNav" class="profile-nav">
-        <button class="profile-nav-link active" data-content="stats">STATS</button>
-        <button class="profile-nav-link" data-content="bio">BIO</button>
-        <button class="profile-nav-link" data-content="news">NEWS</button>
-        <button class="profile-nav-link" data-content="social">SOCIAL</button>
-        <button class="profile-nav-link" data-content="nil">NIL PTS</button>
-        <button class="profile-nav-link" data-content="video">VIDEO</button>
-        <button class="profile-nav-link" data-content="pics">FAN PICS</button>
-      </nav>
-    </div>
-  </section>
-</header>
-
-<div class="drawer-mask"></div>
-<aside class="drawer" id="drawerLeft" aria-label="Left drawer">
-  <button class="icon-btn close-btn"><i class="ri-close-line"></i></button>
-  <div class="drawer-content">
-    <h3>PLAYER PROFILE SEARCH</h3>
-    <div class="pad">
-      <input id="playerSearch" placeholder="Type to search…" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--ink)">
-      <div id="liveResults"></div>
-    </div>
-  </div>
-</aside>
-<aside class="drawer drawer-right" id="drawerAccount">
-  <button class="icon-btn close-btn"><i class="ri-close-line"></i></button>
-  <h3>ACCOUNT</h3>
-  <div class="drawer-content">
-    <div class="pad">
-      <p style="opacity:.8">Sign in / register coming soon.</p>
-    </div>
-  </div>
-</aside>
-
-<main class="main container">
-  <div id="funzone-container" aria-live="polite">
-    <p style="color: var(--muted); padding: 20px;">Loading player data...</p>
-  </div>
-</main>
-
-<footer class="site-footer">
-  <div class="wrap">
-    <img src="assets/img/sponsor-1200x120.jpg" alt="Sponsor Banner">
-  </div>
-</footer>
-
-<script type="module">
-/* ---- CONFIG ---- */
-const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQcWJM6Q6hTdFnES_G5LUy4teCS-sJ5HdAc9F5HSY8DGE9egdGy8yUAe2ShT3tFm-CwUuCYeAYy_YiW/pub?gid=2028135390&single=true&output=csv";
-const NEWS_CACHE_KEY = 'YAT_NEWS_CACHE_V1';
-
-/* ---- UTIL ---- */
-const $ = s => document.querySelector(s);
-const $$ = s => Array.from(document.querySelectorAll(s));
-const debounce = (fn, ms=300)=>{ let t; return (...a)=>{ clearTimeout(t); t=setTimeout(()=>fn(...a),ms); }; };
-
-function slugOf(p){
-  const s=(p.slug||'').trim();
-  if(s) return s;
-  return (p.display_name||'').trim().toLowerCase().replace(/[^a-z0-9]+/g,'-');
-}
-function imageNameOf(p) {
-  const first = (p.first || '').toLowerCase();
-  const last = (p.last || '').toLowerCase();
-  return (first && last) ? `${first}_${last}` : slugOf(p);
-}
-function formatStatValue(key, value) {
-  if (!value || value === '--') return '--';
-  const decimalStats = ['AVG','OBP','SLG','OPS'];
-  if (decimalStats.includes(key.toUpperCase())) {
-    const num = parseFloat(value); if (isNaN(num)) return value;
-    const s = num.toFixed(3); return (num < 1 && num > -1) ? s.substring(1) : s;
-  }
-  return value;
-}
-function makeHit(p){
-  const el=document.createElement('div'); el.className='live-hit';
-  const imageName = imageNameOf(p);
-  const hsImgJpg=`assets/img/hs_players/${imageName}.jpg`;
-  const hsImgPng=`assets/img/hs_players/${imageName}.png`;
-  el.innerHTML=`<img src="${hsImgJpg}" onerror="this.onerror=null;this.src='${hsImgPng}';">
-                <div><div style="font-weight:700">${p.display_name}</div>
-                <div style="opacity:.7;font-size:.92em">${p.level||''} • Class of ${p.grad_class||''}</div></div>`;
-  el.onclick=()=>window.location.href=`./profile.html?player=${slugOf(p)}`;
-  return el;
-}
-function liveSearch(){
-  const q=($('#playerSearch')?.value||'').trim().toLowerCase();
-  const box=$('#liveResults'); if(!box) return;
-  if(!q){ box.innerHTML=''; return; }
-  const hits=(window.PLAYERS||[]).filter(p=>(p.display_name||'').toLowerCase().includes(q)).slice(0,25);
-  box.innerHTML=''; hits.forEach(p=>box.appendChild(makeHit(p)));
-}
-
-/* ---- CSV ---- */
-async function loadCSV(url){
-  const res = await fetch(url); if(!res.ok) throw new Error(`CSV HTTP ${res.status}`);
-  const text = await res.text(); if(!text.trim()) throw new Error('Empty CSV');
-  const rows = text.trim().split(/\r?\n/).map(line => line.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/).map(c=>c.replace(/^"|"$/g,'')));
-  const header = rows.shift().map(h => h.trim());
-  const idx=n=>header.indexOf(n);
-  const statKeys=['avg','obp','slg','ops','ab','h','r','rbi','2b','3b','hr','sb','bb','era','k/9','k/bb','whip','ip','er','ko','gp','w-l','saves','fip'];
-  return rows.map(r=>{
-    const player = {
-      slug:r[idx('slug')], display_name:r[idx('display_name')], first:r[idx('first')], last:r[idx('last')],
-      grad_class:r[idx('grad_class')], letter_years:r[idx('letter_years')], status:r[idx('status')], level:r[idx('level')],
-      team:r[idx('team')], org:r[idx('org')], position:r[idx('position')], height:r[idx('height')], weight:r[idx('weight')], bats:r[idx('bats')], throws:r[idx('throws')],
-      draft_info:r[idx('Draft_Info')], colleges:r[idx('Colleges')],
-      next_game_opponent:r[idx('next_game_opponent')], next_game_datetime:r[idx('next_game_datetime')],
-      last_game_1:r[idx('last_game_1')], last_game_2:r[idx('last_game_2')], last_game_3:r[idx('last_game_3')],
-      x_handle:r[idx('x_handle')], ig_handle:r[idx('ig_handle')], video_url:r[idx('video_url')], nil_score:r[idx('nil_score')], stats:{}
-    };
-    for (const key of statKeys) {
-      const si=idx(key); if (si > -1 && r[si]) player.stats[key.toUpperCase()] = r[si];
-    }
-    return player;
-  });
-}
-
-/* ---- RENDER ---- */
-function statsHTML(p){
-  const isPitcher = p.stats['ERA'] !== undefined;
-  const batterStats = ['AVG','OBP','SLG','OPS','H','R','HR','RBI','AB','2B','3B','SB'];
-  const pitcherStats = ['ERA','K/9','K/BB','WHIP','IP','ER','KO','BB','GP','W-L','SAVES','FIP'];
-  const statsToShow = isPitcher ? pitcherStats : batterStats;
-  let grid = `<div class="stats-header-bar">${(p.status||'').includes('ACTIVE') ? '2025 SEASON STATS' : 'CAREER STATS'}</div><div class="stats-grid">`;
-  grid += statsToShow.map(s=>`<div class="stat-item"><div class="stat-label">${s}</div><div class="stat-value">${formatStatValue(s, p.stats[s])}</div></div>`).join('');
-  grid += '</div>';
-  return grid;
-}
-function socialHTML(p){
-  let s = '<div class="funzone-content">';
-  if (p.x_handle) s += `<p><a href="https://x.com/${p.x_handle}" target="_blank" rel="noopener">View on X / Twitter</a></p>`;
-  if (p.ig_handle) s += `<p><a href="https://instagram.com/${p.ig_handle}" target="_blank" rel="noopener">View on Instagram</a></p>`;
-  if (!p.x_handle && !p.ig_handle) s += '<p>No social links yet.</p>';
-  return s + '</div>';
-}
-function videoHTML(p){
-  return p.video_url
-    ? `<div class="funzone-content"><iframe width="100%" height="360" src="${p.video_url}" title="Video" frameborder="0" allowfullscreen style="border-radius:8px;display:block;"></iframe></div>`
-    : `<div class="funzone-content"><p>No video available.</p></div>`;
-}
-function nilHTML(p){
-  return p.nil_score
-    ? `<div class="funzone-content"><div class="stats-header-bar">YAT-A-BOY NIL SCORE</div><div style="text-align:center;font-size:36px;font-weight:800;">${p.nil_score}</div></div>`
-    : `<div class="funzone-content"><p>NIL score not available.</p></div>`;
-}
-function bioHTML(p){
-  const blurb = `${p.display_name} • ${p.team||''} — ${p.level||''}. ${p.position||''} • B/T: ${p.bats||'--'}/${p.throws||'--'}. Class of ${p.grad_class||'--'}.`;
-  return `<div class="funzone-content"><p>${blurb}</p></div>`;
-}
-function newsHTMLFor(p){
-  // Read from cache
-  let items=[];
-  try{
-    const cacheRaw = localStorage.getItem(NEWS_CACHE_KEY);
-    const cache = cacheRaw ? JSON.parse(cacheRaw) : null;
-    items = cache?.items?.filter(n => (n.player_display_name||'').toLowerCase() === (p.display_name||'').toLowerCase()) || [];
-  }catch{}
-  if (!items.length){
-    return `<div class="funzone-content"><div class="stats-header-bar">LATEST HEADLINES</div><p>No recent headlines for ${p.display_name}. Try opening <a href="alumni-news.html">Alumni News</a> once to build the cache.</p></div>`;
-  }
-  const list = items.slice(0,6).map(n=>{
-    const img = n.image || `https://picsum.photos/seed/${encodeURIComponent(n.id)}/600/400`;
-    const when = n.publishedAt ? new Date(n.publishedAt).toLocaleString() : '';
-    const read = n.url + (n.url.includes('?')?'&':'?') + 'utm_source=yatstats&utm_medium=profile';
-    return `
-      <div class="news-item">
-        <div class="news-headline"><a href="${read}" target="_blank" rel="noopener noreferrer">${n.title}</a></div>
-        <div class="news-meta">${n.source||'News'} • ${when}</div>
-        <img src="${img}" alt="" style="width:100%;max-height:220px;object-fit:cover;border-radius:8px;margin:8px 0;">
-        <div><a class="icon-btn" href="${read}" target="_blank" rel="noopener"><i class="ri-external-link-line"></i> Read</a></div>
-      </div>`;
-  }).join('');
-  return `<div class="funzone-content"><div class="stats-header-bar">LATEST HEADLINES</div>${list}</div>`;
-}
-
-/* ---- PAGE WIRING ---- */
-function setupDrawers(){
-  $('#btnMenu')?.addEventListener('click',()=>{ document.body.classList.add('drawer-left-open'); document.querySelector('.drawer-mask').style.opacity=1; document.querySelector('.drawer-mask').style.pointerEvents='auto'; });
-  $$('.close-btn, .drawer-mask').forEach(el=>el.addEventListener('click',()=>{ document.body.classList.remove('drawer-left-open','drawer-right-open'); document.querySelector('.drawer-mask').style.opacity=0; document.querySelector('.drawer-mask').style.pointerEvents='none'; }));
-  $('#playerSearch')?.addEventListener('input', debounce(liveSearch));
-}
-function attachNavHandlers(p){
-  const nav = $('#profileNav');
-  nav.addEventListener('click', (e)=>{
-    const btn = e.target.closest('.profile-nav-link'); if(!btn) return;
-    nav.querySelectorAll('.profile-nav-link').forEach(b=>b.classList.remove('active'));
-    btn.classList.add('active');
-    const area = $('#funzone-container'); area.innerHTML = '<p class="funzone-content" style="opacity:.8">Loading…</p>';
-    const which = btn.dataset.content;
-    if (which==='stats') area.innerHTML = `<div class="funzone-content">${statsHTML(p)}</div>`;
-    else if (which==='bio') area.innerHTML = bioHTML(p);
-    else if (which==='news') area.innerHTML = newsHTMLFor(p);
-    else if (which==='social') area.innerHTML = socialHTML(p);
-    else if (which==='nil') area.innerHTML = nilHTML(p);
-    else if (which==='video') area.innerHTML = videoHTML(p);
-    else area.innerHTML = `<div class="funzone-content"><p>Coming soon.</p></div>`;
-  });
-}
-
-/* ---- BOOT ---- */
-(async function init(){
-  setupDrawers();
-
-  // Load players
-  let players=[];
-  try{ players = await loadCSV(CSV_URL); window.PLAYERS = players; }catch(e){ console.error(e); }
-
-  // Find by ?player=slug
-  const url = new URL(location.href);
-  const want = (url.searchParams.get('player')||'').trim().toLowerCase();
-  const match = players.find(p => slugOf(p) === want) || players.find(p => (p.slug||'').toLowerCase() === want);
-
-  if(!match){
-    $('#funzone-container').innerHTML = `<p style="padding:20px;color:#fca5a5">Player not found.</p>`;
-    $('#breadcrumbs').innerHTML = `<a href="index.html">HAMILTON</a> ▸ PLAYER NOT FOUND`;
-    return;
-  }
-
-  // Header
-  $('#breadcrumbs').innerHTML = `<a href="index.html">HAMILTON</a> ▸ ${match.display_name}`;
-  $('#playerFirstName').textContent = match.first || '';
-  $('#playerLastName').textContent = match.last || '';
-  $('#playerTeamOrg').textContent = `${match.team || ''} • ${match.org || match.level || ''}`;
-  const imgName = imageNameOf(match);
-  const hsJpg = `assets/img/hs_players/${imgName}.jpg`;
-  const hsPng = `assets/img/hs_players/${imgName}.png`;
-  const logoEl = $('#playerLogo');
-  logoEl.src = hsJpg;
-  logoEl.onerror = () => { logoEl.onerror = null; logoEl.src = hsPng; };
-
-  // Header detail chips
-  const left = $('#player-header-left-cols'), right = $('#player-header-right-cols');
-  const letters = (match.letter_years||'').split(',').map(y=>y.trim().slice(-2)).filter(Boolean);
-  left.innerHTML = `
-    <div class="detail-col">
-      ${match.grad_class?`<span class="front-chip">CLASS OF ${match.grad_class}</span>`:''}
-      ${match.status?`<span class="front-chip">${match.status}</span>`:''}
-      ${match.level?`<span class="front-chip">${match.level}</span>`:''}
-      <div class="varsity-dots">${letters.map(y=>`<div class="varsity-dot">${y}</div>`).join('')}</div>
-    </div>`;
-  right.innerHTML = `
-    <div class="detail-col align-right">
-      ${match.next_game_datetime?`<div><span class="game-title-pill">NEXT GAME</span><div class="game-data-text">${match.next_game_datetime} ${match.next_game_opponent?('• '+match.next_game_opponent):''}</div></div>`:''}
-      <div><span class="game-title-pill">LAST 3 GAMES</span>
-        <div class="game-data-text">
-          <span class="game-log">${match.last_game_1||'--'}</span>
-          <span class="game-log">${match.last_game_2||'--'}</span>
-          <span class="game-log">${match.last_game_3||'--'}</span>
-        </div>
-      </div>
-    </div>`;
-
-  // Default content
-  $('#funzone-container').innerHTML = `<div class="funzone-content">${statsHTML(match)}</div>`;
-  attachNavHandlers(match);
-})();
-</script>
-</body>
-</html>
+.auth-tabs{display:flex;border-bottom:1px solid var(--line)}
+.auth-tab{flex:1;text-align:center;padding:10px;cursor:pointer;background:transparent;border:none;color:var(--muted);font-family:"Bebas Neue",sans-serif;font-size:16px;letter-spacing:.05em}
+.auth-tab.active{color:var(--fg);border-bottom:2px solid var(--fg)}
+.auth-form{display:none}
+.auth-form.active{display:block}
+.form-field{margin-bottom:15px}
+.form-field label{display:block;margin-bottom:5px;font-size:12px}
+.form-field input{width:100%;padding:10px;border-radius:8px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--ink)}
+body.light-theme .form-field input{background:rgba(0,0,0,.06)}
+.auth-btn{width:100%;padding:12px;background:var(--fg);color:var(--bg);border:none;border-radius:8px;font-family:"Bebas Neue",sans-serif;font-size:16px;letter-spacing:.08em;cursor:pointer}
+#authMessage{margin-top:15px;text-align:center;font
