@@ -4,780 +4,525 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Alumni News • Hamilton YATSTATS</title>
+
 <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400&family=Bebas+Neue&display=swap" rel="stylesheet">
 
-<!-- Firebase (same pattern as index.html) -->
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-  import { getAuth, onAuthStateChanged, signInWithCustomToken, signInAnonymously, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-  window.firebaseAuth = { getAuth, onAuthStateChanged, signInWithCustomToken, signInAnonymously, signOut };
-  try{
-    const firebaseConfig = JSON.parse(window.__firebase_config || '{}');
-    const app = initializeApp(firebaseConfig);
-    window.auth = getAuth(app);
-    onAuthStateChanged(window.auth, user => { document.dispatchEvent(new CustomEvent('authStateChanged', { detail: { user } })); });
-    if (window.__initial_auth_token) { await signInWithCustomToken(window.auth, window.__initial_auth_token); }
-    else { await signInAnonymously(window.auth); }
-  }catch(e){ console.error('Firebase init error:', e); }
-</script>
-
 <style>
-/* ===== THEME & BASE (matches flip-cards page) ===== */
 :root{
-  --bg:#0c0c0c; --fg:#f2f2f2; --muted:#c4c4c4; --ink:#e8e8e8; --line:rgba(255,255,255,0.08);
-  --card-bg:#171717; --header-bg:#000; --drawer-bg:rgba(10,10,10,.65);
-  --shade-end: rgba(0, 0, 0, .95);
-  --containerPad:16px; --footerH:clamp(56px,8vh,77px);
+  --bg:#0c0c0c; --header:#000; --fg:#f2f2f2; --muted:#c4c4c4; --ink:#e8e8e8; --line:rgba(255,255,255,.08);
+  --card:#151515; --chip:#232323; --accent:#ffffff;
+  --pad:16px; --radius:12px;
   --hamSmall:13px; --hamBig:20px; --hamBigger:24px;
 }
-body.light-theme{
-  --bg:#f4f4f4; --fg:#121212; --muted:#555; --ink:#222; --line:rgba(0,0,0,0.1);
-  --card-bg:#fff; --header-bg:#fff; --drawer-bg:rgba(255,255,255,.65);
-}
-@font-face{ font-family:'Indigo'; src:url('assets/fonts/Indigo.otf') format('opentype'); font-weight:400; font-style:normal; font-display:swap; }
-
 *{box-sizing:border-box}
 html,body{margin:0}
-body{background:var(--bg);color:var(--fg);font-family:Oswald,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif; transition: background-color .3s, color .3s;}
-a{color:inherit;text-decoration:none}
+body{background:var(--bg);color:var(--fg);font-family:Oswald,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
 
-/* ===== HEADER (copied from index) ===== */
-.container{max-width:1400px;margin:0 auto;padding:0 var(--containerPad)}
-.header{position:sticky;top:0;z-index:50;background:var(--header-bg); transition: background-color .3s;}
-.topbar{display:flex;align-items:center;justify-content:space-between;padding:8px 0}
-.left-icons{display:flex;align-items:center;gap:8px}
-.icon-btn{background:none;border:none;color:var(--fg);opacity:.92;display:inline-flex;align-items:center;justify-content:center;padding:0;margin:0 2px; cursor:pointer;}
+/* Header / topbar like flip-cards */
+.header{position:sticky;top:0;z-index:60;background:var(--header);border-bottom:1px solid var(--line)}
+.container{max-width:1400px;margin:0 auto;padding:0 var(--pad)}
+.topbar{display:flex;align-items:center;gap:10px;padding:10px 0}
+.left-icons,.right-icons{display:flex;align-items:center;gap:8px}
+.icon-btn{background:none;border:0;color:var(--fg);opacity:.92;display:inline-flex;align-items:center;justify-content:center;padding:6px;cursor:pointer}
 .icon-btn i{font-size:20px}
-.topnav{display:flex;gap:18px;align-items:center}
-.nav-pair .thin{font:300 var(--hamSmall) Oswald, sans-serif; letter-spacing:.02em; color:#cfd2d6; margin-right:2px}
-body.light-theme .nav-pair .thin { color: var(--muted); }
-.nav-pair .bold{font:400 var(--hamSmall) Indigo, "Bebas Neue", sans-serif}
-.wordmark-wrap{display:flex;align-items:center;justify-content:flex-end;min-width:120px}
-.wordmark-img{height:clamp(18px,3.2vw,28px);width:auto;display:block}
-body.light-theme .wordmark-img { filter: invert(1); }
-@media (max-width:1200px){ .topnav{display:none !important} }
-.hr-y{border-top:1px solid var(--line)}
-.schoolrow{display:flex;align-items:center;gap:10px;padding:6px var(--containerPad)}
-.ham-logo{height:clamp(28px, 4.2vw, 42px); width:auto; object-fit:contain; flex-shrink:0}
-.schooltext .small{font:300 var(--hamSmall)/1 Oswald;letter-spacing:.02em;color:var(--muted)}
-.schooltext .big1{font:400 var(--hamBig)/1 "Bebas Neue",sans-serif}
-.schooltext .big2{font:400 var(--hamBigger)/1 "Bebas Neue",sans-serif;margin-top:-4px}
-.crumbs{font:300 calc(var(--hamSmall)*.5)/1 Oswald;letter-spacing:.02em;color:var(--muted);text-transform:uppercase}
+h1.brand{margin:0;font:400 28px/1 "Bebas Neue",sans-serif;letter-spacing:.02em}
 
-/* ===== DRAWERS ===== */
-.drawer-mask{position:fixed;inset:0;background:rgba(0,0,0,.35);opacity:0;pointer-events:none;transition:opacity .2s;z-index:60}
-.drawer{position:fixed;top:0;bottom:0;width:min(360px,82vw);background:var(--drawer-bg);backdrop-filter:blur(4px);color:var(--ink);transform:translateX(-110%);transition:transform .25s;z-index:70}
-.drawer-right{right:0;left:auto;transform:translateX(110%); display:flex; flex-direction:column; height:100%;}
-.drawer h3{margin:18px 16px 8px; padding-right:30px;}
-.drawer .pad{padding:10px 16px}
-.drawer .close-btn{position:absolute; top:12px; right:12px;}
-.drawer a{color:var(--ink)}
-.drawer a:hover{color:var(--fg)}
-body.drawer-left-open .drawer-mask,body.drawer-right-open .drawer-mask{opacity:1;pointer-events:auto}
-body.drawer-left-open #drawerLeft{transform:translateX(0)}
-body.drawer-right-open .drawer-right{transform:translateX(0)}
-.drawer-content { flex-grow: 1; overflow-y: auto; padding: 10px 16px;}
-.drawer-footer { flex-shrink: 0; padding: 12px 16px; border-top: 1px solid var(--line); background: rgba(10,10,10,.8); display:flex; gap: 10px; align-items: center;}
-body.light-theme .drawer-footer { background: rgba(255,255,255,.8); }
+/* title row */
+.title-row{display:flex;align-items:center;gap:12px;padding:10px 0 6px}
+.page-title{font:700 28px/1 "Bebas Neue",sans-serif;letter-spacing:.06em;text-transform:uppercase}
 
-/* Filters content */
-.filter-group { border-bottom: 1px solid var(--line); }
-.filter-group:last-of-type { border-bottom: none; }
-.filter-title { padding: 14px 0; cursor: pointer; font-weight: 700; font-family: "Bebas Neue", sans-serif; letter-spacing: .05em; list-style: none; display: flex; justify-content: space-between; align-items: center; }
-.filter-title::-webkit-details-marker { display: none; }
-.filter-title::after { content: '▸'; font-size: 1.2em; transition: transform 0.2s; }
-details[open] > .filter-title::after { transform: rotate(90deg); }
-.filter-options { padding: 4px 0 16px 0; }
-.filter-options label { display: block; margin-bottom: 8px; padding-left: 4px;}
-.filter-options input[type=checkbox] { margin-right: 8px; transform: scale(1.1); }
-.select-all-label { font-weight: bold; border-bottom: 1px solid var(--line); padding-bottom: 8px !important; margin-bottom: 12px !important;}
+/* controls */
+.controls{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.controls .date{display:flex;gap:8px}
+input[type="date"]{background:#0f0f0f;border:1px solid var(--line);color:var(--fg);padding:8px 10px;border-radius:10px;font:400 14px Oswald}
+.controls .refresh{display:inline-flex;gap:8px;align-items:center}
+.hr{border-top:1px solid var(--line)}
 
-/* ===== MAIN LAYOUT ===== */
-.main{padding:8px 0 calc(var(--footerH) + 12px)}
-.controls{display:flex;align-items:center;gap:10px; padding:8px 0;}
-.controls .date { display:flex; gap:8px; }
-.controls input[type=date]{ background:transparent; color:var(--fg); border:1px solid var(--line); border-radius:12px; padding:10px 12px; font-family:Oswald, sans-serif; }
-.controls input[type=date]::-webkit-calendar-picker-indicator{ filter: invert(1); opacity:.75; }
-.controls .right{ margin-left:auto; display:flex; gap:8px; }
+/* layout */
+.layout{display:grid;grid-template-columns:2fr 2fr 1.4fr;gap:14px;align-items:start;margin:14px 0 80px}
+.section-card{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.section-title{background:#222;border-bottom:1px solid var(--line);padding:10px 12px;font:700 18px "Bebas Neue",sans-serif;letter-spacing:.06em;text-transform:uppercase}
+.section-body{padding:10px}
 
-/* 3→2→1 layout like cards */
-.news-layout{display:grid; gap:14px; grid-template-columns: 1fr 1fr 1fr;}
-@media (max-width: 1100px){ .news-layout{ grid-template-columns: 1fr 1fr; } .col-pro,.col-college{ display:none; } .col-combined{ display:block; } }
-@media (min-width: 1101px){ .col-combined{ display:none; } }
-@media (max-width: 768px){ .news-layout{ grid-template-columns: 1fr; } }
+/* weekly grouping */
+.week-group{border:1px solid var(--line);border-radius:12px;overflow:hidden;margin-bottom:14px;background:#121212}
+.week-title{background:#1e1e1e;padding:8px 10px;font:700 16px "Bebas Neue",sans-serif;letter-spacing:.06em}
+.week-pad{padding:8px 10px}
 
-.section-box{ background:var(--card-bg); border:1px solid var(--line); border-radius:14px; overflow:hidden; }
-.section-title{ background:var(--line); padding:10px 14px; font:700 16px "Bebas Neue",sans-serif; letter-spacing:.06em; }
+/* news card (5:7 portrait thumb) */
+.news-card{display:flex;gap:12px;background:#141414;border:1px solid var(--line);border-radius:12px;padding:10px;margin-bottom:10px;align-items:center}
+.thumb{width:110px;aspect-ratio:5/7;background:#000;border-radius:8px;overflow:hidden;flex:0 0 110px}
+.thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.news-main{min-width:0;flex:1}
+.news-hl{font:700 18px/1.1 "Bebas Neue",sans-serif;margin:0 0 4px}
+.news-meta{font:300 12px/1 Oswald;color:var(--muted);margin-bottom:4px}
+.news-player{font:400 13px/1 Oswald;color:#e9e9e9;letter-spacing:.02em}
+.news-open{opacity:.9}
 
-/* ===== NEWS CARDS ===== */
-.news-card{ display:grid; grid-template-columns: 120px 1fr 24px; gap:12px; padding:12px; border-top:1px solid var(--line); align-items:center; }
-.news-card:first-child{ border-top:none; }
-.news-thumb{ width:100%; aspect-ratio:5/7; background:#000 center/cover no-repeat; border-radius:10px; }
-@media (min-width:1101px){ .news-card{ grid-template-columns: 140px 1fr 24px; } }
+/* line scores */
+.player-block{border:1px solid var(--line);border-radius:10px;margin:10px 0;background:#151515}
+.player-name{padding:10px 10px 6px;font:700 18px "Bebas Neue",sans-serif;letter-spacing:.06em; text-transform:uppercase}
+.line-row{display:flex;gap:10px;align-items:center;padding:6px 10px 8px}
+.date-pill{background:var(--chip);border:1px solid var(--line);border-radius:999px;padding:4px 10px;font:700 12px "Bebas Neue",sans-serif;letter-spacing:.06em}
+.line-text{font:400 13px/1.15 Oswald;color:var(--ink)} /* same size/weight as news player row (non-bold) */
 
-.news-meta{ font:300 11px/1 Oswald, sans-serif; color:var(--muted); letter-spacing:.02em; margin-bottom:4px; }
-.news-title{ font:700 16px/1.1 "Bebas Neue", sans-serif; letter-spacing:.04em; text-transform:uppercase; }
-.news-player{ font:400 14px/1.1 "Bebas Neue", sans-serif; letter-spacing:.02em; margin-top:6px; text-transform:uppercase; }
-.news-open{ display:inline-grid; place-items:center; opacity:.85; }
+/* drawers */
+.drawer-mask{position:fixed;inset:0;background:rgba(0,0,0,.35);opacity:0;pointer-events:none;transition:opacity .2s;z-index:80}
+.drawer{position:fixed;top:0;bottom:0;right:0;width:min(360px,86vw);background:rgba(12,12,12,.9);backdrop-filter:blur(4px);transform:translateX(110%);transition:transform .25s;border-left:1px solid var(--line);z-index:90;color:var(--ink)}
+.drawer.open{transform:translateX(0)}
+.drawer .drawer-head{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;border-bottom:1px solid var(--line)}
+.drawer .drawer-body{padding:12px 14px;overflow:auto;height:calc(100% - 52px)}
+.frow{margin-bottom:14px}
+.frow .label{font:700 14px "Bebas Neue",sans-serif;letter-spacing:.06em;margin-bottom:6px}
+.chk{display:flex;align-items:center;gap:8px;margin:6px 0}
+.chk input{accent-color:#fff}
 
-/* ===== LINE SCORES ===== */
-.week-group{ padding:10px 12px 12px; }
-.player-block{ padding:10px 10px 6px; }
-.player-name{ font:700 16px/1 "Bebas Neue", sans-serif; letter-spacing:.06em; text-transform:uppercase; margin:4px 0 6px; }
-.line-row{ display:flex; align-items:center; gap:10px; padding:6px 10px; border-radius:10px; margin:2px 0; }
-.date-pill{ font:700 12px/1 "Bebas Neue", sans-serif; letter-spacing:.05em; background:transparent; color:var(--muted); padding:3px 8px; border-radius:999px; }
-.line-text{ font:400 14px/1.1 "Bebas Neue", sans-serif; letter-spacing:.02em; } /* not bold */
+/* responsive layout changes */
+@media (max-width:1199px){
+  .layout{grid-template-columns:1.6fr 1fr;gap:12px}
+  #colPro,#colCollege{display:none}
+  #colNewsAll{display:block}
+}
+@media (min-width:1200px){
+  #colNewsAll{display:none}
+}
+@media (max-width:900px){
+  .layout{grid-template-columns:1fr}
+  #colPro,#colCollege,#colNewsAll,#colLineScores{display:block}
+}
 
-/* ===== FOOTER ===== */
-.site-footer{position:fixed;left:0;right:0;bottom:0;height:var(--footerH);background:var(--bg);border-top:1px solid var(--line);z-index:40}
-.site-footer a { display:block; height:100%; width:100%; }
-.site-footer img{ height:100%; width:100%; object-fit:contain; }
-
-/* A11y */
-.icon-btn:focus, button:focus, input:focus, details summary:focus { outline: 2px solid var(--fg); outline-offset: 2px; }
+/* small utilities */
+a{color:inherit;text-decoration:none}
+a.underline:hover{text-decoration:underline}
+.hidden{display:none}
 </style>
 </head>
-
 <body>
-<header class="header">
-  <div class="container topbar">
-    <div class="left-icons">
-      <button class="icon-btn" id="btnMenu" aria-label="Menu"><i class="ri-menu-line"></i></button>
-      <div id="auth-container">
-        <button class="icon-btn" id="btnAccount" aria-label="Account"><i class="ri-user-3-line"></i></button>
-        <button class="icon-btn" id="btnSignOut" style="display:none"><i class="ri-logout-box-line"></i></button>
-      </div>
-      <button class="icon-btn" id="theme-toggle" aria-label="Toggle Theme"><i class="ri-sun-line"></i></button>
-    </div>
-    <nav class="topnav" aria-label="Top Navigation">
-      <a href="index.html" class="nav-pair"><span class="thin">WHERE THEY</span><span class="bold">YAT?</span></a>
-      <a href="alumni-news.html" class="nav-pair"><span class="thin">ACTIVE ALUMNI</span><span class="bold">NEWS</span></a>
-      <a href="all-time-list.html" class="nav-pair"><span class="thin">NEXT-LEVEL</span><span class="bold">ALL-TIME LIST</span></a>
-      <a href="marketplace.html" class="nav-pair"><span class="thin">NIL & YAT-A-BOY</span><span class="bold">MARKETPLACE</span></a>
-      <a href="current-team.html" class="nav-pair"><span class="thin">THE</span><span class="bold">CURRENT TEAM</span></a>
-      <a href="partner-program.html" class="nav-pair"><span class="thin">PCD ACTION</span><span class="bold">PARTNER PROGRAM</span></a>
-      <a href="faq.html" class="nav-pair"><span class="bold">FAQ’S</span></a>
-    </nav>
-    <div class="wordmark-wrap">
-      <img class="wordmark-img" src="assets/img/yatstats-logo.png" alt="YAT?STATS">
-    </div>
-  </div>
-  <div class="hr-y"></div>
-  <div class="container schoolrow">
-    <img class="ham-logo" src="assets/img/hamilton-logo.png" alt="Hamilton H">
-    <div class="schooltext">
-      <div class="small">CHANDLER, AZ</div>
-      <div class="big1">HAMILTON HIGH SCHOOL</div>
-      <div class="big2">ACTIVE BASEBALL ALUMNI</div>
-    </div>
-  </div>
-  <div class="hr-y"></div>
 
-  <!-- Controls -->
-  <div class="container controls">
-    <div class="date">
-      <input type="date" id="dateFrom" />
-      <input type="date" id="dateTo" />
-    </div>
-    <div class="right">
-      <button class="icon-btn" id="btnRefresh" title="Refresh"><i class="ri-refresh-line"></i> <span style="font:300 14px Oswald; margin-left:6px">Refresh</span></button>
-      <button class="icon-btn" id="btnFilters" title="Filters"><i class="ri-filter-3-line"></i></button>
+<header class="header">
+  <div class="container">
+    <div class="topbar">
+      <button class="icon-btn" id="btnOpenFilters" title="Filters"><i class="ri-menu-3-line"></i></button>
+      <h1 class="brand">ALUMNI NEWS</h1>
+      <div class="controls" style="margin-left:auto">
+        <div class="date">
+          <input id="fromDate" type="date">
+          <input id="toDate" type="date">
+        </div>
+        <button class="icon-btn refresh" id="btnRefresh" title="Refresh"><i class="ri-refresh-line"></i><span style="font:400 14px Oswald">Refresh</span></button>
+      </div>
     </div>
   </div>
+  <div class="hr"></div>
 </header>
 
-<!-- Drawers -->
-<div class="drawer-mask"></div>
-
-<aside class="drawer" id="drawerLeft" aria-label="Left drawer">
-  <button class="icon-btn close-btn"><i class="ri-close-line"></i></button>
-  <div class="drawer-content">
-    <h3>PLAYER PROFILE SEARCH</h3>
-    <div class="pad">
-      <input id="playerSearch" placeholder="Type to search…" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--ink)">
-      <div id="liveResults"></div>
-    </div>
-  </div>
-</aside>
-
-<aside class="drawer drawer-right" id="drawerFilters" style="display:flex;">
-  <button class="icon-btn close-btn"><i class="ri-close-line"></i></button>
-  <h3>FILTERS</h3>
-  <div class="drawer-content" id="filters">
-    <details class="filter-group" open>
-      <summary class="filter-title">By Name</summary>
-      <div class="filter-options">
-        <input id="filterName" placeholder="Type a name…" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--ink)"/>
-      </div>
-    </details>
-    <details class="filter-group">
-      <summary class="filter-title">By Status</summary>
-      <div class="filter-options" id="filterStatus">
-        <label class="select-all-label"><input type="checkbox" class="select-all"> Select All</label>
-        <label><input type="checkbox" value="ACTIVE 2025"> ACTIVE 2025</label>
-        <label><input type="checkbox" value="ACTIVE 2024"> ACTIVE 2024</label>
-        <label><input type="checkbox" value="FREE AGENT"> FREE AGENT</label>
-        <label><input type="checkbox" value="INJURED"> INJURED</label>
-        <label><input type="checkbox" value="RETIRED"> RETIRED</label>
-        <label><input type="checkbox" value="SPONSOR"> SPONSOR</label>
-      </div>
-    </details>
-    <details class="filter-group">
-      <summary class="filter-title">By Level</summary>
-      <div class="filter-options" id="filterLevels">
-        <label class="select-all-label"><input type="checkbox" class="select-all"> Select All</label>
-      </div>
-    </details>
-    <details class="filter-group">
-      <summary class="filter-title">By Graduating Class</summary>
-      <div class="filter-options" id="filterGradClass"></div>
-    </details>
-    <details class="filter-group">
-      <summary class="filter-title">By Roster Year</summary>
-      <div class="filter-options" id="filterRosterYear"></div>
-    </details>
-  </div>
-  <div class="drawer-footer">
-    <button id="filtersReset" class="icon-btn" style="padding:10px 14px;border:1px solid var(--line);border-radius:12px"><i class="ri-restart-line"></i>&nbsp;Reset</button>
-    <button id="filtersDone" class="icon-btn" style="padding:10px 14px;border:1px solid var(--line);border-radius:12px"><i class="ri-check-line"></i>&nbsp;Done</button>
-  </div>
-</aside>
-
-<main class="main container">
-  <h1 class="crumbs" style="margin:6px 0 12px;">ALUMNI NEWS</h1>
-
-  <div class="news-layout" id="newsLayout">
-    <section class="col col-pro">
-      <div class="section-box">
-        <div class="section-title">ALUMNI HEADLINES (PROS)</div>
-        <div id="colPro"></div>
-      </div>
+<main class="container">
+  <div class="layout" id="layout">
+    <!-- Left: PRO -->
+    <section id="colPro" class="section-card" aria-live="polite">
+      <div class="section-title">ALUMNI HEADLINES (Pros)</div>
+      <div class="section-body" id="proNews"></div>
     </section>
 
-    <section class="col col-college">
-      <div class="section-box">
-        <div class="section-title">ALUMNI HEADLINES (COLLEGE)</div>
-        <div id="colCollege"></div>
-      </div>
+    <!-- Middle: COLLEGE -->
+    <section id="colCollege" class="section-card" aria-live="polite">
+      <div class="section-title">ALUMNI HEADLINES (College)</div>
+      <div class="section-body" id="collegeNews"></div>
     </section>
 
-    <section class="col col-lines">
-      <div class="section-box">
-        <div class="section-title">ALUMNI LINE SCORES</div>
-        <div id="colLines"></div>
-      </div>
+    <!-- Tablet single news column -->
+    <section id="colNewsAll" class="section-card" aria-live="polite">
+      <div class="section-title">ALUMNI HEADLINES</div>
+      <div class="section-body" id="allNews"></div>
     </section>
 
-    <!-- Combined news (used on 2-col & 1-col) -->
-    <section class="col col-combined">
-      <div class="section-box">
-        <div class="section-title">ALUMNI HEADLINES</div>
-        <div id="colNewsCombined"></div>
-      </div>
+    <!-- Right: LINE SCORES -->
+    <section id="colLineScores" class="section-card" aria-live="polite">
+      <div class="section-title">ALUMNI LINE SCORES</div>
+      <div class="section-body" id="lineScores"></div>
     </section>
   </div>
 </main>
 
-<footer class="site-footer">
-  <a href="https://no-errors.com/collections/all-webgems" target="_blank" rel="noopener noreferrer">
-    <img src="assets/img/partners/no-errors-banner.jpg" alt="Sponsor Banner">
-  </a>
+<!-- Filters Drawer -->
+<div class="drawer-mask" id="drawerMask"></div>
+<aside class="drawer" id="filtersDrawer" aria-label="Filters">
+  <div class="drawer-head">
+    <div class="label" style="font:700 18px 'Bebas Neue',sans-serif;letter-spacing:.06em">FILTERS</div>
+    <button class="icon-btn" id="btnCloseFilters"><i class="ri-close-line"></i></button>
+  </div>
+  <div class="drawer-body">
+    <div class="frow">
+      <div class="label">By Status</div>
+      <label class="chk"><input type="checkbox" class="f-status" value="ACTIVE 2025"> ACTIVE 2025</label>
+      <label class="chk"><input type="checkbox" class="f-status" value="ACTIVE 2024"> ACTIVE 2024</label>
+      <label class="chk"><input type="checkbox" class="f-status" value="FREE AGENT"> FREE AGENT</label>
+      <label class="chk"><input type="checkbox" class="f-status" value="INJURED"> INJURED</label>
+    </div>
+
+    <div class="frow">
+      <div class="label">By Level</div>
+      <div id="levelChecks"></div>
+    </div>
+
+    <div class="frow">
+      <div class="label">By Graduating Class</div>
+      <div id="classChecks"></div>
+    </div>
+
+    <div class="frow">
+      <div class="label">Search by name</div>
+      <input id="nameFilter" type="text" placeholder="Type a name…" style="width:100%;background:#0f0f0f;border:1px solid var(--line);color:var(--fg);padding:8px 10px;border-radius:10px;font:400 14px Oswald">
+    </div>
+
+    <div class="frow" style="display:flex;gap:10px;justify-content:flex-end">
+      <button class="icon-btn" id="btnReset"><i class="ri-restart-line"></i><span style="font:400 14px Oswald">Reset</span></button>
+      <button class="icon-btn" id="btnApply"><i class="ri-check-line"></i><span style="font:400 14px Oswald">Done</span></button>
+    </div>
+  </div>
+</aside>
+
+<footer style="position:fixed;left:0;right:0;bottom:0;background:#0b0b0b;border-top:1px solid var(--line);height:64px;display:flex;align-items:center;justify-content:center;z-index:50">
+  <img src="assets/img/sponsor-1200x120.jpg" alt="Sponsor Banner" style="height:100%;object-fit:contain">
 </footer>
 
-<script type="module">
-/* ==== CONFIG & HELPERS ==== */
-const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQcWJM6Q6hTdFnES_G5LUy4teCS-sJ5HdAc9F5HSY8DGE9egdGy8yUAe2ShT3tFm-CwUuCYeAYy_YiW/pub?gid=2028135390&single=true&output=csv";
-const JSON_URL = "assets/news/alumni_news.json";
-const CACHE_KEY = "YAT_NEWS_CACHE_V1";
+<script>
+/* ========== CONFIG ==========
+   Master roster CSV is the same you already publish.
+   ⚠️ TODO: Paste your **GAMES TAB** published CSV URL below.
+*/
+const ROSTER_CSV_URL = "https://docs.google.com/spreadsheets/d/1yUNQH9NbpKwOOwH9blf5ZqQfmft796sQl1dqghXP4uA/edit?usp=drivesdk";
 
+/* >>>>> PASTE YOUR GAMES TAB CSV URL HERE <<<<< */
+const GAMES_CSV_URL =
+  (window.__GAMES_CSV || "")
+  || "PUT-YOUR-GAMES-TAB-PUBLISHED-CSV-URL-HERE";
+
+/* Alumni news cache file (seeded JSON with headlines) */
+const NEWS_JSON_URL = "assets/news/alumni_news.json";
+
+/* desktop/mobile breakpoints are handled in CSS */
+
+/* ===== utilities ===== */
 const $ = s => document.querySelector(s);
 const $$ = s => Array.from(document.querySelectorAll(s));
-const debounce = (fn, ms=300)=>{ let t; return (...a)=>{ clearTimeout(t); t=setTimeout(()=>fn(...a),ms); }; };
 
-const levelOrder = {
-  'MLB':13,'INTERNATIONAL':12,'TRIPLE-A':11,'AAA':11,'DOUBLE-A':10,'AA':10,'HIGH-A':9,'A+':9,'LOW-A':8,'A':8,'ROOKIE':7,'ROK':7,'INDY':6,
-  'NCAA-D1':5,'NCAA-D2':4,'NCAA-D3':3,'NAIA':2,'JUCO':1
+function csvToRows(text){
+  const lines = text.replace(/\r/g,'').split('\n').filter(Boolean);
+  return lines.map(l=>{
+    const out=[]; let cur='',q=false;
+    for(let i=0;i<l.length;i++){
+      const c=l[i];
+      if(c==='"'){ if(q && l[i+1]==='"'){cur+='"'; i++;} else q=!q; }
+      else if(c===',' && !q){ out.push(cur); cur=''; }
+      else cur+=c;
+    }
+    out.push(cur);
+    return out;
+  });
+}
+function parseCSV(text){
+  const rows = csvToRows(text);
+  const head = rows.shift().map(h=>h.trim());
+  return rows.map(r=>{
+    const o={}; head.forEach((h,i)=>o[h]=r[i]??""); return o;
+  });
+}
+function dFmt(d){ return d.toLocaleDateString(undefined,{month:'long',day:'numeric',year:'numeric'}); }
+function shortMD(d){ return d.toLocaleDateString(undefined,{month:'numeric',day:'numeric'}); }
+function weekStart(d){
+  const x=new Date(d); const dow=x.getDay(); // 0 Sun
+  const diff = (dow+6)%7; // make Monday week start
+  x.setDate(x.getDate()-diff); x.setHours(0,0,0,0); return x;
+}
+function weekKey(d){ return weekStart(d).toISOString().slice(0,10); }
+function isPro(level){ return ['MLB','INTERNATIONAL','TRIPLE-A','DOUBLE-A','HIGH-A','LOW-A','INDY'].includes((level||'').toUpperCase()); }
+function isCollege(level){ return (level||'').toUpperCase().startsWith('NCAA') || (level||'').toUpperCase()==='NAIA' || (level||'').toUpperCase()==='JUCO'; }
+
+const LEVEL_ORDER = {
+  "MLB":0, "INTERNATIONAL":1, "TRIPLE-A":2, "DOUBLE-A":3, "HIGH-A":4, "LOW-A":5, "INDY":6,
+  "NCAA-D1":7, "NCAA-D2":8, "NCAA-D3":9, "NAIA":10, "JUCO":11
 };
-const proLevels = new Set(['MLB','INTERNATIONAL','TRIPLE-A','AAA','DOUBLE-A','AA','HIGH-A','A+','LOW-A','A','ROOKIE','ROK','INDY']);
-const collegeLevels = new Set(['NCAA-D1','NCAA-D2','NCAA-D3','NAIA','JUCO']);
-
-function isPro(level){ return proLevels.has((level||'').toUpperCase()); }
-function isCollege(level){ return collegeLevels.has((level||'').toUpperCase()); }
-
-function defaultSort(a, b){
-  const aIsSponsor = (a.status||'').toUpperCase()==='SPONSOR';
-  const bIsSponsor = (b.status||'').toUpperCase()==='SPONSOR';
-  if (aIsSponsor && !bIsSponsor) return -1; if (!aIsSponsor && bIsSponsor) return 1;
-
-  const aPri = (a.status||'').toUpperCase().includes('ACTIVE') || (a.status||'').toUpperCase()==='FREE AGENT';
-  const bPri = (b.status||'').toUpperCase().includes('ACTIVE') || (b.status||'').toUpperCase()==='FREE AGENT';
-  if (aPri && !bPri) return -1; if (!aPri && bPri) return 1;
-
-  if (aPri && bPri){
-    const LA=(levelOrder[(a.level||'').toUpperCase().trim()] ?? -1);
-    const LB=(levelOrder[(b.level||'').toUpperCase().trim()] ?? -1);
-    if (LA!==LB) return LB-LA;
-    const GA= parseInt(a.grad_class,10)||0, GB=parseInt(b.grad_class,10)||0;
-    if (GA!==GB) return GA-GB;
-    const LAmt=(a.letter_years||'').split(',').filter(Boolean).length;
-    const LBmt=(b.letter_years||'').split(',').filter(Boolean).length;
-    if (LAmt!==LBmt) return LBmt-LAmt;
-    return (a.display_name||'').localeCompare(b.display_name||'');
-  }
-  const cA=+a.grad_class||9999, cB=+b.grad_class||9999;
-  if (cA!==cB) return cA-cB;
+function defaultPlayerSort(a,b){
+  const la=(LEVEL_ORDER[(a.level||'').toUpperCase()] ?? 99);
+  const lb=(LEVEL_ORDER[(b.level||'').toUpperCase()] ?? 99);
+  if(la!==lb) return la-lb;
+  const ga=parseInt(a.grad_class||'9999',10);
+  const gb=parseInt(b.grad_class||'9999',10);
+  if(ga!==gb) return ga-gb; // older class first (like your grid)
   return (a.display_name||'').localeCompare(b.display_name||'');
 }
 
-function slugOf(p){ const s=(p.slug||'').trim(); if(s) return s; return (p.display_name||'').trim().toLowerCase().replace(/[^a-z0-9]+/g,'-'); }
-function imageNameOf(p){ return `${(p.first||'').toLowerCase()}_${(p.last||'').toLowerCase()}`.replace(/[^a-z0-9_]+/g,''); }
-
-async function loadCSV(url){
-  const res = await fetch(url); if(!res.ok) throw new Error('CSV HTTP '+res.status);
-  const text = await res.text(); const rows=text.trim().split(/\r?\n/).map(l=>l.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/).map(c=>c.replace(/^"|"$/g,'')));
-  const header=rows.shift().map(h=>h.trim()); const idx=n=>header.indexOf(n);
-  const statKeys=['avg','obp','slg','ops','ab','h','r','rbi','2b','3b','hr','sb','bb','era','k/9','k/bb','whip','ip','er','ko','gp','w-l','saves','fip'];
-  return rows.map(r=>{
-    const p={
-      slug:r[idx('slug')], display_name:r[idx('display_name')],
-      first:r[idx('first')], last:r[idx('last')],
-      grad_class:r[idx('grad_class')], letter_years:r[idx('letter_years')], status:r[idx('status')], level:r[idx('level')],
-      team:r[idx('team')], org:r[idx('org')], position:r[idx('position')],
-      x_handle:r[idx('x_handle')], ig_handle:r[idx('ig_handle')],
-      last_game_1:r[idx('last_game_1')], last_game_2:r[idx('last_game_2')], last_game_3:r[idx('last_game_3')],
-      next_game_datetime:r[idx('next_game_datetime')], next_game_opponent:r[idx('next_game_opponent')],
-      stats:{}
-    };
-    for(const key of statKeys){ const si=idx(key); if(si>-1 && r[si]) p.stats[key.toUpperCase()]=r[si]; }
-    return p;
-  });
+/* ===== fetchers ===== */
+async function loadRoster(){
+  const r = await fetch(ROSTER_CSV_URL,{cache:'no-store'});
+  const text = await r.text();
+  const rows = parseCSV(text);
+  return rows.map(x=>({
+    display_name: x.display_name || `${x.first||''} ${x.last||''}`.trim(),
+    first:x.first||'', last:x.last||'',
+    grad_class:x.grad_class||'',
+    letter_years:x.letter_years||'',
+    status:x.status||'',
+    level:x.level||'',
+    team:x.team||'',
+    org:x.org||'',
+  }));
 }
-
-function getCache(){ try{ return JSON.parse(localStorage.getItem(CACHE_KEY)||'{}'); }catch{ return {}; } }
-function setCache(items){ localStorage.setItem(CACHE_KEY, JSON.stringify({updatedAt:new Date().toISOString(),items})); }
-async function ensureNewsCache(){
-  const cache = getCache();
-  if(Array.isArray(cache.items) && cache.items.length) return cache;
+async function loadGames(){
+  if(!GAMES_CSV_URL || GAMES_CSV_URL.startsWith('PUT-')){
+    console.warn("GAMES_CSV_URL missing. Line scores will show only if last_game_* fields exist in roster JSON (fallback).");
+    return [];
+  }
+  const r = await fetch(GAMES_CSV_URL,{cache:'no-store'});
+  if(!r.ok){ console.warn("Games CSV fetch failed", r.status); return []; }
+  const text = await r.text();
+  const rows = parseCSV(text);
+  // expected columns: player_name(A), daily_line_score(B), GameDateLocal(G), Opponent(I), HomeAway(J)
+  return rows.map(x=>{
+    const name = x.player_name || x['player_name'] || x['Player'] || '';
+    const line = (x.daily_line_score||'').trim();
+    const dt = new Date(x.GameDateLocal || x['GameDateLocal'] || x.Date || x['Date'] || '');
+    if(String(dt)==='Invalid Date') return null;
+    const opp = x.Opponent || x['Opponent'] || '';
+    const ha  = (x.HomeAway||'').toUpperCase();
+    const atvs = ha==='H' || ha==='HOME' ? 'vs.' : '@';
+    const textLine = line ? `${atvs} ${opp} - ${line}` : `${atvs} ${opp} - DNP`;
+    return { name, date:dt, text:textLine };
+  }).filter(Boolean);
+}
+async function loadNews(){
+  // array of: {title,url,image,publishedAt,player_display_name, player_tags:{ level, status, grad_class, team, org}}
   try{
-    const res=await fetch(JSON_URL,{cache:'no-store'}); if(!res.ok) throw new Error('JSON HTTP '+res.status);
-    const arr=await res.json(); setCache(Array.isArray(arr)?arr:[]);
-  }catch(e){ console.warn('Could not seed news cache:', e); }
-  return getCache();
+    const r = await fetch(NEWS_JSON_URL,{cache:'no-store'});
+    return await r.json();
+  }catch(e){ console.warn("News JSON missing/invalid", e); return []; }
 }
 
-/* ==== FILTERS ==== */
-function populateFilters(players){
-  // levels
-  const levels=[...new Set(players.map(p=>p.level).filter(Boolean))];
-  levels.sort((a,b)=>(levelOrder[(b||'').toUpperCase()]??-1)-(levelOrder[(a||'').toUpperCase()]??-1));
-  const lv=$('#filterLevels'); lv.innerHTML='<label class="select-all-label"><input type="checkbox" class="select-all"> Select All</label>'+levels.map(l=>`<label><input type="checkbox" value="${l}"> ${l}</label>`).join('');
-  // grad class
-  const classes=[...new Set(players.map(p=>p.grad_class).filter(Boolean))].sort((a,b)=>b-a);
-  $('#filterGradClass').innerHTML='<label class="select-all-label"><input type="checkbox" class="select-all"> Select All</label>'+classes.map(y=>`<label><input type="checkbox" value="${y}"> ${y}</label>`).join('');
-  // roster years
-  const roster=[...new Set(players.flatMap(p=>(p.letter_years||'').split(',')).map(y=>y.trim()).filter(Boolean))].sort((a,b)=>b-a);
-  $('#filterRosterYear').innerHTML='<label class="select-all-label"><input type="checkbox" class="select-all"> Select All</label>'+roster.map(y=>`<label><input type="checkbox" value="${y}"> ${y}</label>`).join('');
+/* ===== filters state ===== */
+const F = {
+  from:null, to:null,
+  status: new Set(),
+  levels: new Set(),
+  classes: new Set(),
+  name: ''
+};
+function setDefaultDates(){
+  const to = new Date(); to.setHours(23,59,59,999);
+  const from = new Date(); from.setDate(to.getDate()-21); from.setHours(0,0,0,0);
+  $('#fromDate').value = from.toISOString().slice(0,10);
+  $('#toDate').value   = to.toISOString().slice(0,10);
+}
+function readDates(){
+  F.from = $('#fromDate').value ? new Date($('#fromDate').value+'T00:00:00') : null;
+  F.to   = $('#toDate').value   ? new Date($('#toDate').value+'T23:59:59') : null;
 }
 
-function readFilters(){
-  const name=($('#filterName')?.value||'').trim().toLowerCase();
-  const levels=$$('#filterLevels input:checked:not(.select-all)').map(i=>i.value);
-  const status=$$('#filterStatus input:checked:not(.select-all)').map(i=>i.value);
-  const classes=$$('#filterGradClass input:checked:not(.select-all)').map(i=>i.value);
-  const rosterYears=$$('#filterRosterYear input:checked:not(.select-all)').map(i=>i.value);
-  const from = $('#dateFrom').value ? new Date($('#dateFrom').value) : null;
-  const to = $('#dateTo').value ? new Date($('#dateTo').value) : null;
-  if (to) { to.setHours(23,59,59,999); }
-  return {name,levels,status,classes,rosterYears,from,to};
+/* ===== renderers ===== */
+function newsCard(n, playerMeta){
+  const img = n.image || `https://picsum.photos/seed/${encodeURIComponent(n.title||'news')}/400/560`;
+  const when = n.publishedAt ? new Date(n.publishedAt) : null;
+  const metaLine = [
+    playerMeta?.team || n.player_tags?.team || '',
+    when ? '• '+dFmt(when) : ''
+  ].join(' ').trim();
+  const url = n.url ? n.url + (n.url.includes('?')?'&':'?')+'utm_source=yatstats' : '#';
+  return `
+    <a class="news-card" href="${url}" target="_blank" rel="noopener">
+      <div class="thumb"><img src="${img}" alt=""></div>
+      <div class="news-main">
+        <h3 class="news-hl">${n.title||'Read more'}</h3>
+        <div class="news-meta">${metaLine}</div>
+        <div class="news-player">${n.player_display_name || ''}</div>
+      </div>
+      <i class="ri-external-link-line news-open"></i>
+    </a>
+  `;
 }
 
-/* ==== DATE HELPERS ==== */
-function weekStart(d){ const x=new Date(d); const day=x.getDay(); x.setHours(0,0,0,0); x.setDate(x.getDate()-day); return x; } // Sunday
-function fmtLong(d){ return d.toLocaleDateString(undefined,{year:'numeric',month:'long',day:'numeric'}); }
+function buildNewsColumns(allNews, players){
+  // attach meta for filtering
+  const byName = new Map(players.map(p=>[p.display_name.toLowerCase(),p]));
 
-/* ==== RENDER NEWS ==== */
-function newsCard(n){
-  const img = n.image || `https://picsum.photos/seed/${encodeURIComponent(n.id||n.title||'news')}/500/700`;
-  const when = n.publishedAt ? new Date(n.publishedAt).toLocaleString() : '';
-  const read = (n.url||'#') + ((n.url||'').includes('?')?'&':'?') + 'utm_source=yatstats&utm_medium=news';
-  const player = n.player_display_name || '';
-  return `<div class="news-card">
-    <div class="news-thumb" style="background-image:url('${img}')"></div>
-    <div>
-      <div class="news-meta">${n.source||'News'} • ${when}</div>
-      <div class="news-title"><a href="${read}" target="_blank" rel="noopener">${n.title||'Read more'}</a></div>
-      ${player? `<div class="news-player">${player}</div>`:''}
-    </div>
-    <a class="news-open" href="${read}" target="_blank" rel="noopener" aria-label="Open"><i class="ri-external-link-line"></i></a>
-  </div>`;
-}
+  const filtered = allNews.filter(n=>{
+    const p = byName.get((n.player_display_name||'').toLowerCase());
+    const level = (n.player_tags?.level) || (p?.level) || '';
+    const status = (n.player_tags?.status) || (p?.status) || '';
+    const grad = (n.player_tags?.grad_class) || (p?.grad_class) || '';
 
-/* ==== LINE SCORES (parse & group) ==== */
-function parseLine(line, yearHint, playerName=''){
-  if(!line) return null;
-  // expect like "9/14 @ BOS - 0-4 | 2K" (may start with date)
-  const m = String(line).trim().match(/^(\d{1,2})\/(\d{1,2})\s+(.*)$/);
-  if(!m) return null;
-  const [_,mm,dd,restRaw]=m;
-  const d = new Date(yearHint, Number(mm)-1, Number(dd));
-  let rest = restRaw.trim();
-  // remove leading name and dash if present
-  if (playerName){
-    const nm = playerName.replace(/\./g,'\\.'); // escape dot
-    const re = new RegExp(`^\\s*${nm}\\s*[-—–]\\s*`,`i`);
-    rest = rest.replace(re,'').trim();
-  }
-  return { date:d, text:rest };
-}
+    // date range
+    const d = n.publishedAt ? new Date(n.publishedAt) : null;
+    if(F.from && d && d < F.from) return false;
+    if(F.to && d && d > F.to) return false;
 
-function buildLineScores(players, F){
-  // collect all lines -> objects with player & date within range
-  const endYear = (F.to||new Date()).getFullYear();
-  const items = [];
-  for (const p of players){
-    const lines=[p.last_game_1,p.last_game_2,p.last_game_3];
-    for (const ln of lines){
-      const obj = parseLine(ln, endYear, p.display_name);
-      if(!obj) continue;
-      if (F.from && obj.date < F.from) continue;
-      if (F.to && obj.date > F.to) continue;
-      items.push({ player:p, date:obj.date, text:obj.text });
-    }
-  }
-  // group by week start then by player
-  const byWeek = new Map();
-  for (const it of items){
-    const w = weekStart(it.date).toISOString();
-    if(!byWeek.has(w)) byWeek.set(w, new Map());
-    const byPlayer = byWeek.get(w);
-    const key = pKey(it.player);
-    if(!byPlayer.has(key)) byPlayer.set(key, []);
-    byPlayer.get(key).push(it);
-  }
-  // sort players within week by defaultSort; lines newest first
-  const weeks = Array.from(byWeek.entries()).sort((a,b)=> new Date(b[0]) - new Date(a[0]));
-  const out = weeks.map(([w, byPlayer])=>{
-    const playersInWeek = Array.from(byPlayer.values()).map(arr=>arr[0].player);
-    playersInWeek.sort(defaultSort);
-    const htmlPlayers = playersInWeek.map(pl=>{
-      const arr = byPlayer.get(pKey(pl)).sort((a,b)=> b.date - a.date);
-      const rows = arr.map(x=>`<div class="line-row"><span class="date-pill">${x.date.toLocaleDateString(undefined,{month:'numeric',day:'numeric'})}</span><span class="line-text">${x.text}</span></div>`).join('');
-      return `<div class="player-block"><div class="player-name">${pl.display_name}</div>${rows}</div>`;
-    }).join('');
-    return `<div class="week-group">
-      <div class="section-title">ALUMNI LINE SCORES — WEEK OF ${fmtLong(new Date(w))}</div>
-      ${htmlPlayers || `<div style="opacity:.7;padding:8px 12px">No line scores this week.</div>`}
-    </div>`;
-  }).join('');
+    // filters
+    if(F.status.size && !F.status.has(status)) return false;
+    if(F.levels.size && !F.levels.has(level)) return false;
+    if(F.classes.size && !F.classes.has(String(grad))) return false;
+    if(F.name && !(n.player_display_name||'').toLowerCase().includes(F.name)) return false;
 
-  return out || `<div style="opacity:.7;padding:12px">No line scores in range.</div>`;
-}
-const pKey = p => (p.display_name||'').toLowerCase();
-
-/* ==== APPLY FILTERS & RENDER ==== */
-function applyFilters(data){
-  const F = readFilters();
-
-  // name filter / level / status / class / rosterYear
-  const want = p=>{
-    const nm=(p.display_name||'').toLowerCase();
-    const nameOk=!F.name||nm.includes(F.name);
-    const lvlOk=!F.levels.length||F.levels.includes(p.level);
-    const statOk=!F.status.length||F.status.includes(p.status);
-    const classOk=!F.classes.length||F.classes.includes(p.grad_class);
-    const rosterOk=!F.rosterYears.length||(p.letter_years||'').split(',').some(y=>F.rosterYears.includes(y.trim()));
-    return nameOk && lvlOk && statOk && classOk && rosterOk;
-  };
-  const players = data.players.filter(want);
-
-  // news cache → items in range → tag with matched player (so we know level)
-  const cache = getCache();
-  let items = Array.isArray(cache.items)? cache.items.slice(): [];
-  // date filter
-  items = items.filter(n=>{
-    const t = n.publishedAt ? new Date(n.publishedAt) : null;
-    if (!t) return false;
-    if (F.from && t < F.from) return false;
-    if (F.to && t > F.to) return false;
+    // stash meta back for rendering
+    n.__meta = {level,status,grad,p};
     return true;
   });
 
-  // attach player object if matched & passes player filters
-  const mapByName = new Map(players.map(p=> [p.display_name.toLowerCase(), p]));
-  items = items.map(n=>{
-    const pl = mapByName.get(String(n.player_display_name||'').toLowerCase());
-    return {...n, _player: pl };
-  });
-
-  // split pro vs college using matched player's level (fallback: keep in pro)
-  const pro = items.filter(n=> n._player ? isPro(n._player.level) : true)
-                   .sort((a,b)=> new Date(b.publishedAt)-new Date(a.publishedAt));
-  const college = items.filter(n=> n._player && isCollege(n._player.level))
-                       .sort((a,b)=> new Date(b.publishedAt)-new Date(a.publishedAt));
-
-  // render columns
-  $('#colPro').innerHTML = pro.length? pro.map(newsCard).join('') : `<div style="opacity:.7;padding:12px">No pro headlines in this range.</div>`;
-  $('#colCollege').innerHTML = college.length? college.map(newsCard).join('') : `<div style="opacity:.7;padding:12px">No college headlines in this range.</div>`;
-  // combined (pro then college, grouped by week titles)
-  $('#colNewsCombined').innerHTML = (pro.concat(college)).length ? pro.map(newsCard).join('') + college.map(newsCard).join('') : `<div style="opacity:.7;padding:12px">No headlines in this range.</div>`;
-
-  // line scores → grouped by week, then by player (with player order = defaultSort)
-  $('#colLines').innerHTML = buildLineScores(players, F);
-}
-
-/* ==== EVENT WIRING ==== */
-function setupTheme(){
-  const btn=$('#theme-toggle'); const icon=btn?.querySelector('i'); const body=document.body;
-  const apply=()=>{ const t=localStorage.getItem('theme'); if(t==='light'){ body.classList.add('light-theme'); icon?.classList.replace('ri-sun-line','ri-moon-line'); } else { body.classList.remove('light-theme'); icon?.classList.replace('ri-moon-line','ri-sun-line'); } };
-  btn?.addEventListener('click',()=>{ body.classList.toggle('light-theme'); if(body.classList.contains('light-theme')){ localStorage.setItem('theme','light'); icon?.classList.replace('ri-sun-line','ri-moon-line'); } else { localStorage.setItem('theme','dark'); icon?.classList.replace('ri-moon-line','ri-sun-line'); } });
-  apply();
-}
-function setupDrawers(){
-  $('#btnMenu')?.addEventListener('click',()=>{ document.body.classList.add('drawer-left-open','drawer-open'); });
-  $('#btnFilters')?.addEventListener('click',()=>{ document.body.classList.add('drawer-right-open','drawer-open'); });
-  $$('.close-btn').forEach(b=> b.addEventListener('click',()=>{ document.body.classList.remove('drawer-left-open','drawer-right-open','drawer-open'); }));
-  $('.drawer-mask')?.addEventListener('click',()=>{ document.body.classList.remove('drawer-left-open','drawer-right-open','drawer-open'); });
-
-  // filter behavior
-  $('#filters').addEventListener('change', e=>{
-    if (e.target.classList.contains('select-all')){
-      const cont = e.target.closest('.filter-options'); if(!cont) return;
-      const on = e.target.checked; cont.querySelectorAll('input[type=checkbox]:not(.select-all)').forEach(cb=> cb.checked=on);
-    }
-  });
-  $('#filtersReset').addEventListener('click', ()=>{
-    $$('#filters input').forEach(i=>{ if(i.type==='checkbox') i.checked=false; if(i.type==='text') i.value=''; });
-  });
-  $('#filtersDone').addEventListener('click', ()=>{ document.body.classList.remove('drawer-right-open','drawer-open'); window.__render && window.__render(); });
-}
-function makeHit(p){
-  const nm=imageNameOf(p); const jp=`assets/img/hs_players/${nm}.jpg`, png=`assets/img/hs_players/${nm}.png`;
-  const el=document.createElement('div'); el.className='live-hit';
-  el.innerHTML=`<img src="${jp}" onerror="this.onerror=null;this.src='${png}';"><div><div style="font-weight:700">${p.display_name}</div><div style="opacity:.7;font-size:.92em">${p.level||''} • Class of ${p.grad_class||''}</div></div>`;
-  el.onclick=()=> location.href=`profile.html?player=${slugOf(p)}`;
-  return el;
-}
-
-/* ==== BOOT ==== */
-document.addEventListener('DOMContentLoaded', async ()=>{
-  try{
-    setupTheme(); setupDrawers();
-    // dates default: last 21 days
-    const to = new Date(); const from = new Date(); from.setDate(to.getDate()-21);
-    $('#dateFrom').value = from.toISOString().slice(0,10);
-    $('#dateTo').value = to.toISOString().slice(0,10);
-
-    const players = await loadCSV(CSV_URL);
-    window.PLAYERS = players;
-    populateFilters(players);
-
-    // Live search
-    $('#playerSearch')?.addEventListener('input', debounce(()=>{
-      const q=($('#playerSearch').value||'').trim().toLowerCase(); const box=$('#liveResults'); if(!box) return;
-      if(!q){ box.innerHTML=''; return; }
-      const hits=players.filter(p=>(p.display_name||'').toLowerCase().includes(q)).slice(0,25);
-      box.innerHTML=''; hits.forEach(p=> box.appendChild(makeHit(p)));
-    },150));
-
-    await ensureNewsCache();
-
-    window.__render = ()=> applyFilters({ players });
-    $('#btnRefresh').addEventListener('click', ()=> window.__render());
-    $('#dateFrom').addEventListener('change', ()=> window.__render());
-    $('#dateTo').addEventListener('change', ()=> window.__render());
-    $('#filterName').addEventListener('input', debounce(()=> window.__render(), 250));
-    $('#filters').addEventListener('change', debounce(()=> window.__render(), 50));
-
-    window.__render();
-  }catch(err){
-    console.error(err);
-    $('#colPro').innerHTML = `<div style="color:#f88;padding:12px"><strong>Error:</strong> Could not load page. ${err.message}</div>`;
+  // group by week + pro/college
+  const byWeek = new Map();
+  for(const n of filtered){
+    const d = new Date(n.publishedAt||Date.now());
+    const wk = weekKey(d);
+    if(!byWeek.has(wk)) byWeek.set(wk,{pro:[],college:[],all:[]});
+    const bin = isPro(n.__meta.level) ? 'pro' : (isCollege(n.__meta.level) ? 'college' : 'pro');
+    byWeek.get(wk)[bin].push(n);
+    byWeek.get(wk).all.push(n);
   }
-});
-</script>
-<script type="module">
-/* ========= CONFIG ========= */
-const GAMES_CSV_URL = 'PASTE_YOUR_GAMES_CSV_URL_HERE'; // <-- REQUIRED
-// Your existing Master “published_hamilton_players” CSV (used only to sort players like the flip-cards):
-const MASTER_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQcWJM6Q6hTdFnES_G5LUy4teCS-sJ5HdAc9F5HSY8DGE9egdGy8yUAe2ShT3tFm-CwUuCYeAYy_YiW/pub?gid=2028135390&single=true&output=csv";
 
-/* Flip-card sort order for levels */
-const levelOrder = {
-  'MLB': 13, 'INTERNATIONAL': 12, 'TRIPLE-A': 11, 'AAA': 11,
-  'DOUBLE-A': 10, 'AA': 10, 'HIGH-A': 9, 'A+': 9, 'LOW-A': 8, 'A': 8,
-  'ROOKIE': 7, 'ROK': 7, 'INDY': 6, 'NCAA-D1': 5, 'NCAA-D2': 4, 'NCAA-D3': 3,
-  'NAIA': 2, 'JUCO': 1
-};
+  // sort newest week first
+  const weeks = Array.from(byWeek.entries()).sort((a,b)=> new Date(b[0]) - new Date(a[0]));
 
-/* ========= CSV HELPERS ========= */
-async function fetchCSV(url){
-  const res = await fetch(url, { cache: 'no-store' });
-  if(!res.ok) throw new Error(`HTTP ${res.status} for ${url}`);
-  return res.text();
-}
-function parseCSV(text){
-  const rows = text.trim().split(/\r?\n/).map(l =>
-    l.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/).map(c => c.replace(/^"|"$/g,'')));
-  const header = rows.shift().map(h => h.trim());
-  const idx = name => header.findIndex(h => h.toLowerCase() === name.toLowerCase());
-  return { header, idx, rows };
-}
-
-/* ========= LOAD MASTER (for sort metadata) ========= */
-async function loadMasterMeta(){
-  const text = await fetchCSV(MASTER_CSV_URL);
-  const { header, idx, rows } = parseCSV(text);
-  const colName  = idx('display_name');
-  const colLevel = idx('level');
-  const colGrad  = idx('grad_class');
-  const meta = new Map();
-  for (const r of rows){
-    const name = (r[colName]||'').trim();
-    if(!name) continue;
-    meta.set(name.toLowerCase(), {
-      level: (r[colLevel] || '').toUpperCase().trim(),
-      grad : parseInt(r[colGrad],10) || 0
-    });
-  }
-  return meta;
-}
-
-/* ========= LOAD GAMES (A,B,G,I,J) ========= */
-async function loadGames(){
-  const text = await fetchCSV(GAMES_CSV_URL);
-  const { header, idx, rows } = parseCSV(text);
-  const cPlayer = idx('player_name');       // A
-  const cLine   = idx('daily_line_score');  // B
-  const cDate   = idx('GameDateLocal');     // G
-  const cOpp    = idx('Opponent');          // I
-  const cHA     = idx('HomeAway');          // J
-  if ([cPlayer,cLine,cDate,cOpp,cHA].some(i=>i<0)) {
-    throw new Error('One or more required GAMES columns were not found: player_name, daily_line_score, GameDateLocal, Opponent, HomeAway');
-  }
-  return rows.map(r => {
-    const name = (r[cPlayer]||'').trim();
-    const line = (r[cLine]||'').trim();         // may be blank => DNP
-    const opp  = (r[cOpp]||'').trim();
-    const ha   = (r[cHA]||'').trim();           // values like HOME/AWAY or vs/@ etc.
-    const dateStr = (r[cDate]||'').trim();
-    const date = dateStr ? new Date(dateStr) : null;
-    return { name, line, date, opp, ha };
-  }).filter(g => g.name && g.date instanceof Date && !isNaN(g.date));
-}
-
-/* ========= GROUP BY WEEK + PLAYER ========= */
-function startOfWeek(d){ // Sunday start
-  const dt = new Date(d.getFullYear(), d.getMonth(), d.getDate());
-  const day = dt.getDay(); // 0=Sun
-  dt.setDate(dt.getDate() - day);
-  dt.setHours(0,0,0,0);
-  return dt;
-}
-function labelWeek(d){
-  const m = d.toLocaleString(undefined, { month:'long' });
-  return `ALUMNI LINE SCORES — Week of ${m} ${d.getDate()}, ${d.getFullYear()}`;
-}
-function withinLastNWeeks(games, n=4){
-  if(!games.length) return [];
-  const now = new Date(); now.setHours(0,0,0,0);
-  const min = new Date(now); min.setDate(min.getDate() - (7*n) + 1);
-  return games.filter(g => g.date >= min);
-}
-function groupByWeekAndPlayer(games){
-  const filtered = withinLastNWeeks(games, 4);
-  const map = new Map(); // weekStartISO -> Map(player -> game[])
-  for (const g of filtered){
-    const wk = startOfWeek(g.date);
-    const key = wk.toISOString();
-    if(!map.has(key)) map.set(key, { weekStart: wk, players: new Map() });
-    const bucket = map.get(key).players;
-    const k = (g.name||'').toLowerCase();
-    if(!bucket.has(k)) bucket.set(k, []);
-    bucket.get(k).push(g);
-  }
-  // sort each player's games newest → oldest
-  for (const {players} of map.values()){
-    for (const arr of players.values()){
-      arr.sort((a,b)=> b.date - a.date);
-    }
-  }
-  // return newest weeks first
-  return Array.from(map.values()).sort((a,b)=> b.weekStart - a.weekStart);
-}
-
-/* ========= RENDER ========= */
-function resolveVsAt(ha){
-  const s = (ha||'').toUpperCase();
-  if (s.startsWith('HOME') || s==='H' || s==='VS' || s==='VS.') return 'vs.';
-  if (s.startsWith('AWAY') || s==='A' || s==='@') return '@';
-  // if sheet already stores vs./@ in ha, just return it
-  if (s.includes('@')) return '@';
-  if (s.includes('VS')) return 'vs.';
-  return 'vs.'; // default
-}
-function fmtMMDD(d){
-  return `${d.getMonth()+1}/${d.getDate().toString().padStart(2,'0')}`;
-}
-function byFlipCardOrder(playerMeta){
-  return (aNameLc, bNameLc) => {
-    const a = playerMeta.get(aNameLc) || { level:'', grad:0 };
-    const b = playerMeta.get(bNameLc) || { level:'', grad:0 };
-    const la = levelOrder[a.level] ?? -1;
-    const lb = levelOrder[b.level] ?? -1;
-    if (la !== lb) return lb - la;            // higher level first
-    if (a.grad !== b.grad) return a.grad - b.grad; // older class first
-    return aNameLc.localeCompare(bNameLc);
+  // render
+  const renderWeek = (label, arr, idPrefix) => {
+    if(!arr.length) return '';
+    // newest first
+    arr.sort((a,b)=> new Date(b.publishedAt||0) - new Date(a.publishedAt||0));
+    const htmlCards = arr.map(n=> newsCard(n, n.__meta?.p)).join('');
+    return `
+      <div class="week-group">
+        <div class="week-title">${label}</div>
+        <div class="week-pad">${htmlCards || `<div style="opacity:.7">No ${idPrefix} headlines this week.</div>`}</div>
+      </div>
+    `;
   };
-}
-function renderLineScores(weeks, playerMeta){
-  const host = document.getElementById('colLineScores');
-  if(!host){ console.warn('#colLineScores not found'); return; }
-  if(!weeks.length){
-    host.innerHTML = `<p style="color:var(--muted)">No recent line scores.</p>`;
-    return;
+
+  const proHTML = [];
+  const collegeHTML = [];
+  const allHTML = [];
+  for(const [wk,v] of weeks){
+    const label = `ALUMNI HEADLINES (${v.pro.length && v.college.length ? 'Pro/College' : (v.pro.length?'Pros':'College')}) – WEEK OF ${dFmt(new Date(wk))}`;
+    proHTML.push( renderWeek(`ALUMNI HEADLINES (Pros) – WEEK OF ${dFmt(new Date(wk))}`, v.pro, 'pro') );
+    collegeHTML.push( renderWeek(`ALUMNI HEADLINES (College) – WEEK OF ${dFmt(new Date(wk))}`, v.college, 'college') );
+    allHTML.push( renderWeek(label, v.all, 'news') );
   }
-  const pieces = [];
-  for (const wk of weeks){
-    const title = labelWeek(wk.weekStart);
-    const playersSorted = Array.from(wk.players.keys()).sort(byFlipCardOrder(playerMeta));
-    const blocks = playersSorted.map(nameLc => {
-      const games = wk.players.get(nameLc) || [];
-      const displayName = games[0]?.name?.toUpperCase() || nameLc.toUpperCase();
-      const items = games.map(g=>{
-        const vsat = resolveVsAt(g.ha);
-        const date = fmtMMDD(g.date);
-        const line = g.line ? g.line : 'DNP';
-        return `<div class="lines-item">${date} ${vsat} ${g.opp} - ${line}</div>`;
-      }).join('');
-      return `
-        <div class="lines-player">
-          <div class="player-name">${displayName}</div>
-          <div class="lines-list">${items}</div>
-        </div>`;
-    }).join('');
-    pieces.push(`
-      <section class="lines-week">
-        <h3>${title}</h3>
-        ${blocks || `<div class="lines-item" style="opacity:.75">No games recorded.</div>`}
-      </section>
-    `);
-  }
-  host.innerHTML = pieces.join('');
+
+  $('#proNews').innerHTML = proHTML.join('') || `<div class="week-pad" style="opacity:.7">No pro headlines in range.</div>`;
+  $('#collegeNews').innerHTML = collegeHTML.join('') || `<div class="week-pad" style="opacity:.7">No college headlines in range.</div>`;
+  $('#allNews').innerHTML = allHTML.join('') || `<div class="week-pad" style="opacity:.7">No headlines in range.</div>`;
 }
 
-/* ========= BOOT ========= */
-(async function initLineScores(){
-  try{
-    const [playerMeta, games] = await Promise.all([loadMasterMeta(), loadGames()]);
-    const weeks = groupByWeekAndPlayer(games);
-    renderLineScores(weeks, playerMeta);
-  }catch(err){
-    console.error('Line Scores failed:', err);
-    const host = document.getElementById('colLineScores');
-    if (host) host.innerHTML = `<p style="color:#f88">Couldn’t load line scores: ${err.message}</p>`;
+function buildLineScores(players, games){
+  // map display_name -> meta
+  const byName = new Map(players.map(p=>[p.display_name.toLowerCase(),p]));
+  // filter by dates & name filter & level/status/class
+  const items = games.filter(g=>{
+    const p = byName.get((g.name||'').toLowerCase());
+    if(!p) return false;
+    if(F.from && g.date < F.from) return false;
+    if(F.to && g.date > F.to) return false;
+    if(F.name && !p.display_name.toLowerCase().includes(F.name)) return false;
+    if(F.status.size && !F.status.has(p.status)) return false;
+    if(F.levels.size && !F.levels.has(p.level)) return false;
+    if(F.classes.size && !F.classes.has(String(p.grad_class))) return false;
+    g.__p = p;
+    return true;
+  });
+
+  // group -> week -> player
+  const byWeek = new Map();
+  for(const it of items){
+    const wk = weekKey(it.date);
+    if(!byWeek.has(wk)) byWeek.set(wk, new Map());
+    const m = byWeek.get(wk);
+    const key = it.__p.display_name.toLowerCase();
+    if(!m.has(key)) m.set(key, []);
+    m.get(key).push(it);
   }
-})();
+
+  // render weeks newest first; players sorted by defaultPlayerSort
+  const weeks = Array.from(byWeek.entries()).sort((a,b)=> new Date(b[0]) - new Date(a[0]));
+  const outWeeks = weeks.map(([wk,byPlayer])=>{
+    const playersInWeek = Array.from(byPlayer.values()).map(arr=>arr[0].__p);
+    playersInWeek.sort(defaultPlayerSort);
+
+    const htmlPlayers = playersInWeek.map(p=>{
+      const arr = byPlayer.get(p.display_name.toLowerCase()).sort((a,b)=> b.date - a.date);
+      const rows = arr.map(x=>`
+        <div class="line-row">
+          <span class="date-pill">${shortMD(x.date)}</span>
+          <span class="line-text">${x.text.replace(/\s+—\s+/g,' ').replace(/\s+-\s+/g,' - ')}</span>
+        </div>
+      `).join('');
+      return `<div class="player-block">
+        <div class="player-name">${p.display_name}</div>
+        ${rows}
+      </div>`;
+    }).join('');
+
+    return `
+      <div class="week-group">
+        <div class="section-title">ALUMNI LINE SCORES – WEEK OF ${dFmt(new Date(wk))}</div>
+        <div class="week-pad">
+          ${htmlPlayers || `<div style="opacity:.7">No line scores this week.</div>`}
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  $('#lineScores').innerHTML = outWeeks || `<div class="week-pad" style="opacity:.7">No line scores in range.</div>`;
+}
+
+/* ===== filters drawer ===== */
+function openFilters(){ $('#drawerMask').style.opacity=1; $('#drawerMask').style.pointerEvents='auto'; $('#filtersDrawer').classList.add('open'); }
+function closeFilters(){ $('#drawerMask').style.opacity=0; $('#drawerMask').style.pointerEvents='none'; $('#filtersDrawer').classList.remove('open'); }
+
+function buildFilterLists(players){
+  // levels
+  const levels = Array.from(new Set(players.map(p=>p.level))).filter(Boolean).sort((a,b)=>{
+    const da=LEVEL_ORDER[a.toUpperCase()]??99, db=LEVEL_ORDER[b.toUpperCase()]??99; return da-db;
+  });
+  $('#levelChecks').innerHTML = levels.map(l=>`<label class="chk"><input type="checkbox" class="f-level" value="${l}"> ${l}</label>`).join('');
+
+  // classes
+  const classes = Array.from(new Set(players.map(p=>String(p.grad_class)))).filter(Boolean).sort();
+  $('#classChecks').innerHTML = classes.map(c=>`<label class="chk"><input type="checkbox" class="f-class" value="${c}"> ${c}</label>`).join('');
+}
+
+function readFilterUI(){
+  F.status = new Set($$('.f-status:checked').map(x=>x.value));
+  F.levels = new Set($$('.f-level:checked').map(x=>x.value));
+  F.classes = new Set($$('.f-class:checked').map(x=>x.value));
+  F.name = ($('#nameFilter').value||'').trim().toLowerCase();
+  readDates();
+}
+
+/* ===== boot ===== */
+let ROSTER=[], GAMES=[], NEWS=[];
+
+async function boot(){
+  setDefaultDates();
+  // UI wiring
+  $('#btnOpenFilters').onclick = openFilters;
+  $('#btnCloseFilters').onclick = closeFilters;
+  $('#drawerMask').onclick = closeFilters;
+  $('#btnReset').onclick = () => { $$('.drawer input[type=checkbox]').forEach(c=>c.checked=false); $('#nameFilter').value=''; };
+  $('#btnApply').onclick = ()=>{ closeFilters(); renderAll(); };
+  $('#btnRefresh').onclick = ()=> renderAll();
+  $('#fromDate').onchange = $('#toDate').onchange = ()=> renderAll();
+
+  // data
+  ROSTER = await loadRoster();
+  buildFilterLists(ROSTER);
+  [NEWS, GAMES] = await Promise.all([loadNews(), loadGames()]);
+  renderAll();
+}
+
+function renderAll(){
+  readFilterUI();
+  buildNewsColumns(NEWS, ROSTER);
+  buildLineScores(ROSTER, GAMES);
+}
+
+boot();
 </script>
 </body>
 </html>
