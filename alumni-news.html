@@ -6,7 +6,6 @@
 <title>Alumni News • Hamilton YATSTATS</title>
 <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400&family=Bebas+Neue&display=swap" rel="stylesheet">
-
 <style>
 :root{
   --bg:#0c0c0c; --fg:#f2f2f2; --muted:#b8bcc2; --ink:#e8e8e8; --line:rgba(255,255,255,.08);
@@ -26,7 +25,7 @@ a{color:inherit;text-decoration:none}
 .topnav{display:flex;gap:18px;align-items:center}
 .nav-pair .thin{font:300 var(--hamSmall) Oswald;letter-spacing:.02em;color:#cfd2d6}
 .nav-pair .bold{font:400 var(--hamSmall) "Bebas Neue",sans-serif}
-.wordmark-img{height:clamp(18px,3.2vw,28px);width:auto}
+.wordmark-img{height:clamp(18px,3.2vw,28px)}
 .hr-y{border-top:1px solid var(--line)}
 .schoolrow{display:flex;align-items:center;gap:10px;padding:6px var(--containerPad)}
 .ham-logo{height:clamp(28px,4.2vw,42px)}
@@ -41,21 +40,16 @@ a{color:inherit;text-decoration:none}
 .main{padding:18px 0 calc(var(--footerH) + 12px)}
 .news-layout{display:grid;gap:18px}
 @media (min-width:1200px){ .news-layout{grid-template-columns: 2fr 1fr;} }
-
 .news-stream{ display:grid; gap:14px; grid-template-columns: 1fr; }
 @media (min-width:720px){ .news-stream{ grid-template-columns: 1fr 1fr; } }
-@media (min-width:1200px){ .news-stream{ grid-template-columns: 1fr 1fr; } }
 
 /*** NEWS CARD ***/
-.news-card{
-  display:flex; gap:12px; background:var(--card); border:1px solid var(--line);
-  border-radius:12px; overflow:hidden; min-height:136px;
-}
+.news-card{ display:flex; gap:12px; background:var(--card); border:1px solid var(--line);
+  border-radius:12px; overflow:hidden; min-height:136px; }
 .news-thumb{ width:170px; flex:0 0 170px; background:#000 center/cover no-repeat; }
 .news-body{ padding:12px 12px 12px 0; display:flex; flex-direction:column; gap:6px; overflow:hidden; }
 .news-meta{ font-size:12px; color:var(--muted) }
 .news-title{ font:400 20px/1.05 "Bebas Neue",sans-serif; letter-spacing:.03em }
-.news-title a{ text-decoration:none }
 .news-actions{ margin-top:auto; display:flex; align-items:center; gap:10px }
 .share-btn{ padding:6px 10px; border:1px solid var(--line); border-radius:10px; background:transparent; color:var(--fg); cursor:pointer; font:700 12px "Bebas Neue"; letter-spacing:.05em }
 .source-chip{ font:700 10px "Bebas Neue"; opacity:.85 }
@@ -77,7 +71,6 @@ body.drawer-open{overflow:hidden}
 .drawer-content{overflow:auto;height:100%;padding:10px 16px}
 body.drawer-right-open .drawer-mask{opacity:1;pointer-events:auto}
 body.drawer-right-open #drawerFilters{transform:translateX(0)}
-
 .filter-group{border-bottom:1px solid var(--line)}
 .filter-title{padding:14px 0;cursor:pointer;font-weight:700;display:flex;justify-content:space-between}
 .filter-options{padding:0 0 12px}
@@ -197,7 +190,7 @@ const $$ = s => Array.from(document.querySelectorAll(s));
 const CACHE_KEY = 'YAT_NEWS_CACHE_V1';
 const SEED_URL  = 'assets/news/alumni_news.json';
 
-/* Built-in micro-seed so page never blanks if file/cache missing */
+/* Tiny built-in fallback so page never blanks if file/cache missing */
 const FALLBACK_ITEMS = [
   {
     id:"bellinger-mlb-clip",
@@ -226,35 +219,40 @@ const FALLBACK_ITEMS = [
 ];
 
 /* ----------------- data load ----------------- */
-async function loadSeedJSON(){
+function validCache(obj){
+  return obj && Array.isArray(obj.items) && obj.items.length > 0;
+}
+async function fetchSeed(){
   try{
     const res = await fetch(SEED_URL, {cache:'no-store'});
     if(!res.ok) throw new Error(res.status);
     const json = await res.json();
-    return Array.isArray(json.items) ? json : { items: [] };
+    const data = Array.isArray(json.items) ? json : { items: [] };
+    if (!data.items.length) data.items = FALLBACK_ITEMS.slice();
+    try{ localStorage.setItem(CACHE_KEY, JSON.stringify(data)); }catch(_){}
+    return data;
   }catch(_){
-    return { items: FALLBACK_ITEMS.slice() }; // never empty
+    const data = { items: FALLBACK_ITEMS.slice() };
+    try{ localStorage.setItem(CACHE_KEY, JSON.stringify(data)); }catch(_){}
+    return data;
   }
 }
 async function loadNews(){
+  // prefer good cache; otherwise fetch seed; also repair bad/empty cache
   try{
     const raw = localStorage.getItem(CACHE_KEY);
-    if(raw){
-      const parsed = JSON.parse(raw);
-      if(Array.isArray(parsed.items)) return parsed;
-    }
+    const parsed = raw ? JSON.parse(raw) : null;
+    if (validCache(parsed)) return parsed;
   }catch(_){}
-  const seed = await loadSeedJSON();
-  try{ localStorage.setItem(CACHE_KEY, JSON.stringify(seed)); }catch(_){}
-  return seed;
+  return await fetchSeed();
 }
 
 /* ----------------- filters ----------------- */
-function uniq(arr){ return [...new Set(arr.filter(Boolean))]; }
+const uniq = a => [...new Set(a.filter(Boolean))];
 
 function populateFilters(items){
   const levels = uniq(items.map(x=>x.player_level)).sort();
-  const classes= uniq(items.map(x=>x.player_grad_class)).sort((a,b)=>b-a);
+  const classes= uniq(items.map(x=>String(x.player_grad_class||''))).sort((a,b)=>b.localeCompare(a));
 
   $('#filterLevels').innerHTML =
     '<label class="select-all-label"><input type="checkbox" class="select-all"> Select All</label>'+
@@ -264,7 +262,7 @@ function populateFilters(items){
     '<label class="select-all-label"><input type="checkbox" class="select-all"> Select All</label>'+
     classes.map(v=>`<label><input type="checkbox" value="${v}"> ${v}</label>`).join('');
 
-  // default: Select All in every group so there are results
+  // Default: Select All everywhere so results show
   $$('#filters .select-all').forEach(cb => { cb.checked = true; toggleGroup(cb, true); });
 }
 
@@ -276,14 +274,13 @@ function toggleGroup(selectAllCB, checked){
 function readFilters(){
   const statuses = $$('#filterStatus input:checked:not(.select-all)').map(i=>i.value);
   const levels   = $$('#filterLevels input:checked:not(.select-all)').map(i=>i.value);
-  const classes  = $$('#filterGradClass input:checked:not(.select-all)').map(i=>i.value);
+  const classes  = $$('#filterGradClass input:checked:not(.select-all)').map(i=>String(i.value));
   return {statuses, levels, classes};
 }
 
 function normalizeStatus(s){
-  // Accept 'ACTIVE', 'ACTIVE 2025', etc.
   const up = String(s||'').toUpperCase();
-  if (up.startsWith('ACTIVE')) return up;     // keep the year if present
+  if (up.startsWith('ACTIVE')) return up; // “ACTIVE 2025” or just “ACTIVE”
   return up;
 }
 
@@ -291,21 +288,21 @@ function applyFilters(all){
   const F = readFilters();
   return all.filter(n=>{
     const st = normalizeStatus(n.player_status);
-    const okS = !F.statuses.length || F.statuses.includes(st) || (st === 'ACTIVE' && F.statuses.some(v=>v.startsWith('ACTIVE')));
+    const okS = !F.statuses.length || F.statuses.includes(st) || (st==='ACTIVE' && F.statuses.some(v=>v.startsWith('ACTIVE')));
     const okL = !F.levels.length   || F.levels.includes(n.player_level);
-    const okC = !F.classes.length  || F.classes.includes(n.player_grad_class);
+    const okC = !F.classes.length  || F.classes.includes(String(n.player_grad_class||''));
     return okS && okL && okC;
   });
 }
 
 /* ----------------- render ----------------- */
-function fmtDate(iso){ try{ return new Date(iso).toLocaleString(); }catch{ return ''; } }
+const fmtDate = iso => { try{ return new Date(iso).toLocaleString(); }catch{ return ''; } };
+
 function newsCardHTML(n){
   const img = n.image || `https://picsum.photos/seed/${encodeURIComponent(n.id||n.title)}/600/400`;
   const url = n.url || '#';
-  const shareData = encodeURIComponent(JSON.stringify({title:n.title,url, text:n.title}));
   return `
-  <article class="news-card" data-share='${shareData}'>
+  <article class="news-card">
     <div class="news-thumb" style="background-image:url('${img}')"></div>
     <div class="news-body">
       <div class="news-meta">${n.source || 'News'} • ${fmtDate(n.publishedAt)}</div>
@@ -317,6 +314,7 @@ function newsCardHTML(n){
     </div>
   </article>`;
 }
+
 function renderNews(list){
   const grid = $('#newsGrid');
   if(!list.length){
@@ -326,13 +324,15 @@ function renderNews(list){
   list.sort((a,b)=>new Date(b.publishedAt||0)-new Date(a.publishedAt||0));
   grid.innerHTML = list.map(newsCardHTML).join('');
 
-  // share handlers
-  $$('#newsGrid .share-btn').forEach(btn=>{
+  // share handlers (Web Share API + clipboard fallback)
+  $$('.share-btn').forEach(btn=>{
     btn.addEventListener('click', async (e)=>{
-      const data = JSON.parse(decodeURIComponent(e.currentTarget.closest('.news-card').dataset.share||'%7B%7D'));
+      const card = e.currentTarget.closest('.news-card');
+      const title = card.querySelector('.news-title')?.textContent?.trim() || 'YATSTATS';
+      const link  = card.querySelector('.news-title a')?.href || location.href;
       try{
-        if (navigator.share) await navigator.share(data);
-        else { await navigator.clipboard.writeText(data.url || ''); btn.textContent = 'Link Copied!'; setTimeout(()=>btn.innerHTML='<i class="ri-share-forward-line"></i>&nbsp;Share',1200); }
+        if (navigator.share) await navigator.share({ title, url: link, text: title });
+        else { await navigator.clipboard.writeText(link); btn.textContent='Link Copied!'; setTimeout(()=>btn.innerHTML='<i class="ri-share-forward-line"></i>&nbsp;Share',1000); }
       }catch(_){}
     });
   });
@@ -348,7 +348,6 @@ function wireUI(allItems){
   $('#drawerFilters .close-btn').addEventListener('click', closeFilters);
   window.addEventListener('keydown', (e)=>{ if(e.key==='Escape') closeFilters(); });
   window.addEventListener('orientationchange', closeFilters);
-  window.addEventListener('resize', ()=>{ /* safety */ if (window.innerWidth>1200) closeFilters(); });
 
   // select-all logic + live filter
   $('#filters').addEventListener('change', (e)=>{
@@ -364,9 +363,10 @@ function wireUI(allItems){
     renderNews(applyFilters(allItems));
   });
 
-  // refresh: re-read cache/seed and repaint
+  // refresh: nuke cache → fetch seed → repaint
   $('#btnRefresh').addEventListener('click', async ()=>{
-    const data = await loadNews();
+    try{ localStorage.removeItem(CACHE_KEY); }catch(_){}
+    const data = await fetchSeed();
     window.ALL_NEWS = data.items || [];
     populateFilters(window.ALL_NEWS);
     renderNews(applyFilters(window.ALL_NEWS));
@@ -387,7 +387,7 @@ function wireUI(allItems){
 (async function boot(){
   const data = await loadNews();           // { items: [...] }
   window.ALL_NEWS = data.items || [];
-  populateFilters(window.ALL_NEWS);        // also selects-all by default
+  populateFilters(window.ALL_NEWS);        // selects-all by default
   wireUI(window.ALL_NEWS);
   renderNews(applyFilters(window.ALL_NEWS));
 })();
