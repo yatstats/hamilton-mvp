@@ -7,72 +7,135 @@
 <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400&family=Bebas+Neue&display=swap" rel="stylesheet">
 
+<!-- Firebase (same pattern as index) -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-  import { getAuth, onAuthStateChanged, signInWithCustomToken, signInAnonymously, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-  window.firebaseAuth = { getAuth, onAuthStateChanged, signInWithCustomToken, signInAnonymously, signOut };
-  try{
+  import { getAuth, onAuthStateChanged, signInWithCustomToken, signInAnonymously, signOut,
+  createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+  window.firebaseAuth = { getAuth, onAuthStateChanged, signInWithCustomToken, signInAnonymously, signOut, createUserWithEmailAndPassword, signInWithEmailAndPassword };
+
+  try {
     const firebaseConfig = JSON.parse(window.__firebase_config || '{}');
     const app = initializeApp(firebaseConfig);
     window.auth = getAuth(app);
-    onAuthStateChanged(window.auth, user => { document.dispatchEvent(new CustomEvent('authStateChanged', { detail: { user } })); });
-    if (window.__initial_auth_token) { await signInWithCustomToken(window.auth, window.__initial_auth_token); }
-    else { await signInAnonymously(window.auth); }
-  }catch(e){ console.error('Firebase init error:', e); }
+
+    onAuthStateChanged(window.auth, user => {
+      document.dispatchEvent(new CustomEvent('authStateChanged', { detail: { user } }));
+    });
+
+    if (window.__initial_auth_token) {
+      await signInWithCustomToken(window.auth, window.__initial_auth_token);
+    } else {
+      await signInAnonymously(window.auth);
+    }
+  } catch (e) {
+    console.error("Firebase initialization error:", e);
+  }
 </script>
 
 <style>
-:root{ --bg:#0c0c0c; --fg:#f2f2f2; --muted:#c4c4c4; --ink:#e8e8e8; --line:rgba(255,255,255,.08); --card-bg:#171717; --header-bg:#000; --containerPad:16px; --footerH:clamp(56px,8vh,77px); --hamSmall:13px; --hamBig:20px; --hamBigger:24px; }
-body{background:var(--bg);color:var(--fg);font-family:Oswald,system-ui,sans-serif;margin:0}
+:root{
+  --bg:#0c0c0c; --fg:#f2f2f2; --muted:#c4c4c4; --ink:#e8e8e8; --line:rgba(255,255,255,0.08);
+  --card-bg:#171717; --header-bg:#000; --drawer-bg:rgba(10,10,10,.65);
+  --hamSmall:13px; --hamBig:20px; --hamBigger:24px; --tagGrey:#cfd2d6;
+  --crestH: clamp(50px, 8vw, 70px);
+  --containerPad: 16px; --footerH: clamp(56px, 8vh, 77px);
+}
+body.light-theme{ --bg:#f4f4f4; --fg:#121212; --muted:#555; --ink:#222; --line:rgba(0,0,0,0.1); --card-bg:#ffffff; --header-bg:#ffffff; --drawer-bg:rgba(255,255,255,.65); }
+@font-face{ font-family:'Indigo'; src:url('assets/fonts/Indigo.otf') format('opentype'); font-weight:400; font-style:normal; font-display:swap; }
+*{box-sizing:border-box} html,body{margin:0}
+body{background:var(--bg);color:var(--fg);font-family:Oswald,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif; transition:background-color .3s,color .3s}
 a{color:inherit;text-decoration:none}
 .container{max-width:1400px;margin:0 auto;padding:0 var(--containerPad)}
 .header{position:sticky;top:0;z-index:50;background:var(--header-bg)}
-.topbar{display:flex;align-items:center;justify-content:space-between;padding:8px 0}
-.left-icons,.right-icons{display:flex;gap:8px;align-items:center}
-.icon-btn{background:none;border:none;color:var(--fg);opacity:.92;display:inline-flex;align-items:center;justify-content:center;padding:0;margin:0 2px;cursor:pointer}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:8px 0; gap: 12px;}
+.left-icons,.right-icons{display:flex;align-items:center;gap:8px}
+.icon-btn{background:none;border:none;color:var(--fg);opacity:.92;display:inline-flex;align-items:center;justify-content:center;padding:0;margin:0 2px; cursor:pointer}
 .icon-btn i{font-size:20px}
-.topnav{display:flex;gap:18px;align-items:center}
-.nav-pair .thin{font:300 var(--hamSmall) Oswald; letter-spacing:.02em; color:#cfd2d6; margin-right:2px}
+.topnav{display:flex;gap:18px;align-items:center; flex-grow: 1; justify-content: center;}
+.nav-pair .thin{font:300 var(--hamSmall) Oswald;letter-spacing:.02em;color:#cfd2d6;margin-right:2px}
+body.light-theme .nav-pair .thin{color:var(--muted)}
 .nav-pair .bold{font:400 var(--hamSmall) Indigo,"Bebas Neue",sans-serif}
-@media (max-width:1200px){ .topnav{display:none!important} }
+@media (max-width:1200px){ .topnav{display:none !important} }
 .hr-y{border-top:1px solid var(--line)}
-.schoolrow{display:flex;align-items:center;gap:16px;padding:6px var(--containerPad)}
-.ham-logo{height:clamp(50px,8vw,70px);width:auto;object-fit:contain;flex-shrink:0}
+
+.schoolrow{display:flex;align-items:center;gap:16px;padding:8px 0}
+.ham-logo{height:var(--crestH);width:auto;object-fit:cover;border-radius:10px;background:#111}
 .schooltext .small{font:300 var(--hamSmall)/1 Oswald;color:var(--muted)}
 .schooltext .big1{font:400 var(--hamBig)/1 "Bebas Neue",sans-serif}
 .schooltext .big2{font:400 var(--hamBigger)/1 "Bebas Neue",sans-serif;margin-top:-4px}
-.crumbs{font:300 calc(var(--hamSmall)*.8)/1 Oswald;color:var(--muted);text-transform:uppercase;white-space:nowrap}
+.crumbs{font:300 calc(var(--hamSmall)*.8)/1 Oswald;color:var(--muted);text-transform:uppercase; white-space: nowrap;}
+.crumbs a:hover{text-decoration:underline}
 .hero{padding:2px 0}
-.profile-nav{display:flex;justify-content:space-around;border-bottom:1px solid var(--line);padding:4px 0}
-.profile-nav-link{background:none;border:none;color:var(--muted);font:700 14px "Bebas Neue",sans-serif;letter-spacing:.08em;cursor:pointer;padding:8px 10px;border-bottom:2px solid transparent}
-.profile-nav-link.active{color:var(--fg);border-bottom-color:var(--fg)}
+
 .main{padding:8px 0 calc(var(--footerH) + 12px)}
-.site-footer{position:fixed;left:0;right:0;bottom:0;height:var(--footerH);background:#0b0b0b;border-top:1px solid var(--line);z-index:40}
-.site-footer .wrap{height:100%;display:flex;align-items:center;justify-content:center;padding:0 var(--containerPad)}
-.site-footer img{height:100%;width:100%;object-fit:contain}
+.site-footer{position:fixed;left:0;right:0;bottom:0;height:var(--footerH);background:var(--bg);border-top:1px solid var(--line);z-index:40;display:flex;align-items:center;justify-content:center}
+.site-footer img{ height:100%; width:100%; object-fit:contain; }
+
 .drawer-mask{position:fixed;inset:0;background:rgba(0,0,0,.35);opacity:0;pointer-events:none;transition:opacity .2s;z-index:60}
-.drawer{position:fixed;top:0;bottom:0;width:min(360px,82vw);background:rgba(10,10,10,.65);backdrop-filter:blur(4px);color:#e8e8e8;transform:translateX(-110%);transition:transform .25s;z-index:70}
-.drawer-right{right:0;left:auto;transform:translateX(110%);display:flex;flex-direction:column;height:100%}
+.drawer{position:fixed;top:0;bottom:0;width:min(360px,82vw);background:var(--drawer-bg);backdrop-filter:blur(4px);color:var(--ink);transform:translateX(-110%);transition:transform .25s;z-index:70}
+.drawer-right{right:0;left:auto;transform:translateX(110%); display:flex;flex-direction:column;height:100%}
 .drawer h3{margin:18px 16px 8px}
 .drawer .pad{padding:10px 16px}
 .drawer .close-btn{position:absolute;top:12px;right:12px}
+.drawer-content{flex-grow:1;overflow-y:auto;padding:10px 16px}
 body.drawer-left-open .drawer-mask,body.drawer-right-open .drawer-mask{opacity:1;pointer-events:auto}
 body.drawer-left-open #drawerLeft{transform:translateX(0)}
 body.drawer-right-open .drawer-right{transform:translateX(0)}
-.drawer-content{flex-grow:1;overflow-y:auto;padding:10px 16px}
 .live-hit{padding:10px 12px;display:flex;align-items:center;gap:10px;border-radius:10px;cursor:pointer}
-.live-hit:hover{background:rgba(255,255,255,.08)}
+.live-hit:hover{background:var(--line)}
 .live-hit img{width:36px;height:36px;border-radius:6px;object-fit:cover}
-#funzone{background:#111;border-radius:12px;margin-top:16px;min-height:50vh;color:var(--ink);padding:16px}
+
+.auth-tabs{display:flex;border-bottom:1px solid var(--line)}
+.auth-tab{flex:1;text-align:center;padding:10px;cursor:pointer;background:transparent;border:none;color:var(--muted);font-family:"Bebas Neue",sans-serif;font-size:16px;letter-spacing:.05em}
+.auth-tab.active{color:var(--fg);border-bottom:2px solid var(--fg)}
+.auth-form{display:none}
+.auth-form.active{display:block}
+.form-field{margin-bottom:15px}
+.form-field label{display:block;margin-bottom:5px;font-size:12px}
+.form-field input{width:100%;padding:10px;border-radius:8px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--ink)}
+body.light-theme .form-field input{background:rgba(0,0,0,.06)}
+.auth-btn{width:100%;padding:12px;background:var(--fg);color:var(--bg);border:none;border-radius:8px;font-family:"Bebas Neue",sans-serif;font-size:16px;letter-spacing:.08em;cursor:pointer}
+#authMessage{margin-top:15px;text-align:center;font-size:13px}
+.error{color:#fca5a5}
+.success{color:#86efac}
+
+/* Header details */
+.player-header-details{flex-grow:1;display:flex;justify-content:space-between;align-items:flex-start;gap:16px}
+.detail-col{display:flex;flex-direction:column;gap:6px}
+.front-chip{background:rgba(255,255,255,.1);color:#fff;border-radius:6px;padding:2px 6px;font-size:10px;font-family:Oswald;text-transform:uppercase}
+.varsity-dots{display:flex;gap:4px}
+.varsity-dot{width:22px;height:22px;border-radius:50%;background:#fff;color:#111;display:grid;place-items:center;font-weight:700;font-size:10px}
+.game-title-pill{background:rgba(255,255,255,.1);color:#fff;border-radius:20px;padding:3px 10px;font-size:10px;font-family:Oswald;font-weight:700;display:inline-block;margin-bottom:4px}
+.game-data-text{font:300 13px/1.2 Oswald}
+.game-log{font:400 10px system-ui, sans-serif; white-space:nowrap}
+
+/* Tab bar + funzone */
+.profile-nav{display:flex;justify-content:space-around;border-bottom:1px solid var(--line);padding:4px 0}
+.profile-nav-link{background:none;border:none;color:var(--muted);font:700 14px "Bebas Neue",sans-serif;letter-spacing:.08em;cursor:pointer;padding:8px 10px;border-bottom:2px solid transparent}
+.profile-nav-link.active{color:var(--fg);border-bottom-color:var(--fg)}
+#funzone-container{padding-top:16px;background:#111;border-radius:12px;margin-top:16px;min-height:50vh;color:var(--ink)}
+.funzone-content{animation:fadeIn .3s; padding:12px}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
 .stats-header-bar{background:#333;color:#fff;text-align:center;padding:6px;font:700 12px "Bebas Neue",sans-serif;margin:0 0 12px;border-radius:6px}
 .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;text-align:center}
 .stat-item{background:#222;border-radius:8px;padding:8px 5px}
 .stat-label{font-size:11px;text-transform:uppercase;opacity:.7;margin-bottom:4px}
 .stat-value{font-size:18px;font-weight:700;line-height:1}
-.news-card{display:flex;gap:10px;margin:10px 0;padding:8px;border-radius:10px;border:1px solid var(--line);align-items:center;text-decoration:none}
-.news-card-thumb{width:84px;height:64px;flex:0 0 84px;background:#000;border-radius:8px;background-size:cover;background-position:center}
+.nil-score-container{background:#222;border-radius:8px;padding:16px;text-align:center}
+.nil-score-value{font-size:36px;font-weight:700}
+.nil-score-label{font-size:14px;opacity:.7;margin-top:4px}
+
+.news-item{background:#222;border-radius:10px;padding:10px;display:flex;gap:10px;border:1px solid var(--line);margin-bottom:10px}
+.news-thumb{width:92px;height:68px;border-radius:8px;background:#000;background-size:cover;background-position:center;flex:0 0 92px}
+.news-title{font-weight:700;line-height:1.2}
+.news-meta{font-size:12px;opacity:.75;margin-top:4px}
+
+@media (max-width: 992px){ .player-header-details{display:none} }
 </style>
 </head>
+
 <body>
 <header class="header">
   <div class="container topbar">
@@ -80,24 +143,30 @@ body.drawer-right-open .drawer-right{transform:translateX(0)}
       <button class="icon-btn" id="btnMenu" aria-label="Menu"><i class="ri-menu-line"></i></button>
       <div id="breadcrumbs" class="crumbs"><a href="index.html">HAMILTON</a> ▸ LOADING...</div>
     </div>
-    <nav class="topnav">
+    <nav class="topnav" aria-label="Top Navigation">
       <a href="index.html" class="nav-pair"><span class="thin">WHERE THEY</span><span class="bold">YAT?</span></a>
       <a href="alumni-news.html" class="nav-pair"><span class="thin">ACTIVE ALUMNI</span><span class="bold">NEWS</span></a>
       <a href="all-time-list.html" class="nav-pair"><span class="thin">NEXT-LEVEL</span><span class="bold">ALL-TIME LIST</span></a>
     </nav>
     <div class="right-icons">
       <button class="icon-btn" id="openSearch" aria-label="Search"><i class="ri-search-line"></i></button>
-      <button class="icon-btn" onclick="history.back()" aria-label="Back"><i class="ri-arrow-left-line"></i></button>
+      <div id="auth-container">
+        <button class="icon-btn" id="btnAccount" aria-label="Account"><i class="ri-user-3-line"></i></button>
+        <button class="icon-btn" id="btnSignOut" style="display:none;"><i class="ri-logout-box-line"></i></button>
+      </div>
+      <button class="icon-btn" id="theme-toggle" aria-label="Toggle Theme"><i class="ri-sun-line"></i></button>
+      <button class="icon-btn" onclick="history.back()" aria-label="Go back"><i class="ri-arrow-left-line"></i></button>
     </div>
   </div>
   <div class="hr-y"></div>
   <div class="container schoolrow">
-    <img id="playerLogo" class="ham-logo" src="assets/img/placeholder.png" alt="">
+    <img id="playerLogo" class="ham-logo" src="assets/img/placeholder.png" alt="Player Photo">
     <div class="schooltext">
-      <div id="playerTeamOrg" class="small">LOADING PLAYER…</div>
+      <div id="playerTeamOrg" class="small">LOADING PLAYER...</div>
       <div id="playerFirstName" class="big1"></div>
       <div id="playerLastName" class="big2"></div>
     </div>
+    <div class="player-header-details" id="playerHeaderMeta"></div>
   </div>
   <div class="hr-y"></div>
   <section class="hero">
@@ -124,187 +193,444 @@ body.drawer-right-open .drawer-right{transform:translateX(0)}
       <input id="playerSearch" placeholder="Type to search…" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--ink)">
       <div id="liveResults"></div>
     </div>
+    <h3>NAVIGATION</h3>
+    <div class="pad" style="display:flex;flex-direction:column;gap:12px">
+      <a href="index.html" class="nav-pair"><span class="thin">WHERE THEY</span><span class="bold">YAT?</span></a>
+      <a href="alumni-news.html" class="nav-pair"><span class="thin">ACTIVE ALUMNI</span><span class="bold">NEWS</span></a>
+      <a href="all-time-list.html" class="nav-pair"><span class="thin">NEXT-LEVEL</span><span class="bold">ALL-TIME LIST</span></a>
+      <a href="marketplace.html" class="nav-pair"><span class="thin">NIL & YAT-A-BOY</span><span class="bold">MARKETPLACE</span></a>
+      <a href="current-team.html" class="nav-pair"><span class="thin">THE</span><span class="bold">CURRENT TEAM</span></a>
+      <a href="partner-program.html" class="nav-pair"><span class="thin">PCD ACTION</span><span class="bold">PARTNER PROGRAM</span></a>
+      <a href="faq.html" class="nav-pair"><span class="bold">FAQ’S</span></a>
+    </div>
+  </div>
+</aside>
+
+<aside class="drawer drawer-right" id="drawerAccount">
+  <button class="icon-btn close-btn"><i class="ri-close-line"></i></button>
+  <h3>ACCOUNT</h3>
+  <div class="drawer-content">
+    <div class="auth-tabs">
+      <button class="auth-tab active" data-tab="signIn">Sign In</button>
+      <button class="auth-tab" data-tab="register">Register</button>
+    </div>
+    <div id="auth-forms-container" class="pad">
+      <form id="signInForm" class="auth-form active">
+        <div class="form-field"><label for="signInEmail">Email</label><input type="email" id="signInEmail" required></div>
+        <div class="form-field"><label for="signInPassword">Password</label><input type="password" id="signInPassword" required></div>
+        <button type="submit" class="auth-btn">Sign In</button>
+      </form>
+      <form id="registerForm" class="auth-form">
+        <div class="form-field"><label for="registerEmail">Email</label><input type="email" id="registerEmail" required></div>
+        <div class="form-field"><label for="registerPassword">Password</label><input type="password" id="registerPassword" required></div>
+        <button type="submit" class="auth-btn">Create Account</button>
+      </form>
+      <p id="authMessage"></p>
+    </div>
   </div>
 </aside>
 
 <main class="main container">
-  <div id="funzone" aria-live="polite">
-    <p style="color: var(--muted); padding: 20px;">Loading player data…</p>
+  <div id="funzone-container" aria-live="polite">
+    <p style="color: var(--muted); padding: 20px;">Loading player data...</p>
   </div>
 </main>
 
 <footer class="site-footer">
-  <div class="wrap">
-    <img src="assets/img/sponsor-1200x120.jpg" alt="Sponsor Banner">
-  </div>
+  <img src="assets/img/partners/no-errors-banner.jpg" alt="Sponsor Banner">
 </footer>
 
 <script type="module">
+/* -------- CONFIG -------- */
 const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQcWJM6Q6hTdFnES_G5LUy4teCS-sJ5HdAc9F5HSY8DGE9egdGy8yUAe2ShT3tFm-CwUuCYeAYy_YiW/pub?gid=2028135390&single=true&output=csv";
-const JSON_URL = 'assets/news/alumni_news.json';
-const CACHE_KEY = 'YAT_NEWS_CACHE_V1';
+const NEWS_CACHE_KEY = 'YAT_NEWS_CACHE_V1'; // written by alumni-news.html
+/* ------------------------ */
+
 const $ = s => document.querySelector(s);
 const $$ = s => Array.from(document.querySelectorAll(s));
+const debounce = (fn, ms=250)=>{ let t; return (...a)=>{ clearTimeout(t); t=setTimeout(()=>fn(...a),ms); }; };
 
+function setupTheme(){
+  const btn = $('#theme-toggle'); if(!btn) return;
+  const body=document.body, icon=btn.querySelector('i');
+  const apply=()=>{ const t=localStorage.getItem('theme'); if(t==='light'){body.classList.add('light-theme'); icon?.classList.replace('ri-sun-line','ri-moon-line');}else{body.classList.remove('light-theme'); icon?.classList.replace('ri-moon-line','ri-sun-line');}};
+  btn.addEventListener('click',()=>{ body.classList.toggle('light-theme'); localStorage.setItem('theme', body.classList.contains('light-theme')?'light':'dark'); apply();});
+  apply();
+}
+function setupDrawers(){
+  $('#btnMenu')?.addEventListener('click',()=>openLeft());
+  $('#openSearch')?.addEventListener('click',()=>openLeft());
+  $('#btnAccount')?.addEventListener('click',()=>openRight('#drawerAccount'));
+  $$('.close-btn, .drawer-mask').forEach(el=>el.addEventListener('click', closeDrawers));
+  function openLeft(){ document.body.classList.add('drawer-left-open'); $('.drawer-mask').style.opacity=1; $('.drawer-mask').style.pointerEvents='auto'; }
+  function openRight(id){ document.querySelector(id).style.display='block'; document.body.classList.add('drawer-right-open'); $('.drawer-mask').style.opacity=1; $('.drawer-mask').style.pointerEvents='auto'; }
+  function closeDrawers(){ document.body.classList.remove('drawer-left-open','drawer-right-open'); $('.drawer-mask').style.opacity=0; $('.drawer-mask').style.pointerEvents='none'; }
+}
+
+function setupAuth(){
+  if(!window.firebaseAuth){ console.warn('Auth SDK not ready'); return; }
+  const { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } = window.firebaseAuth;
+  const auth = window.auth;
+  const signInForm = $('#signInForm'), registerForm = $('#registerForm'), signOutBtn = $('#btnSignOut'), authMessage = $('#authMessage');
+
+  signInForm?.addEventListener('submit', async (e)=>{
+    e.preventDefault();
+    try{
+      await signInWithEmailAndPassword(auth, $('#signInEmail').value, $('#signInPassword').value);
+      authMessage.textContent='Sign in successful!'; authMessage.className='success';
+      setTimeout(()=>{ authMessage.textContent=''; },1200);
+    }catch(err){ authMessage.textContent=err.message; authMessage.className='error'; }
+  });
+  registerForm?.addEventListener('submit', async (e)=>{
+    e.preventDefault();
+    try{
+      await createUserWithEmailAndPassword(auth, $('#registerEmail').value, $('#registerPassword').value);
+      authMessage.textContent='Registration successful!'; authMessage.className='success';
+      setTimeout(()=>{ authMessage.textContent=''; },1200);
+    }catch(err){ authMessage.textContent=err.message; authMessage.className='error'; }
+  });
+  signOutBtn?.addEventListener('click', async ()=>{ await signOut(auth); });
+
+  document.addEventListener('authStateChanged', ({detail})=>{
+    const { user } = detail;
+    const accountBtn = $('#btnAccount'), outBtn = $('#btnSignOut');
+    if(user && !user.isAnonymous){ accountBtn.style.display='none'; outBtn.style.display='inline-flex'; }
+    else { accountBtn.style.display='inline-flex'; outBtn.style.display='none'; }
+  });
+
+  $$('.auth-tab').forEach(tab=>{
+    tab.addEventListener('click', ()=>{
+      $$('.auth-tab').forEach(t=>t.classList.remove('active'));
+      tab.classList.add('active');
+      const target = tab.dataset.tab;
+      $$('.auth-form').forEach(f=>f.classList.toggle('active', f.id === `${target}Form`));
+      $('#authMessage').textContent='';
+    });
+  });
+}
+
+/* ---- Helpers ---- */
+function getParam(name){ const u=new URL(location.href); return u.searchParams.get(name)||''; }
 function slugOf(p){ const s=(p.slug||'').trim(); if(s) return s; return (p.display_name||'').trim().toLowerCase().replace(/[^a-z0-9]+/g,'-'); }
-function imageNameOf(p){ return `${(p.first||'').toLowerCase()}_${(p.last||'').toLowerCase()}`.replace(/[^a-z0-9_]+/g,''); }
+function imageNameOf(p){ const f=(p.first||'').toLowerCase(), l=(p.last||'').toLowerCase(); return (f&&l)?`${f}_${l}`:slugOf(p); }
 
+function formatStatValue(key, value){
+  if (!value || value === '--') return '--';
+  const decimalStats = ['AVG','OBP','SLG','OPS'];
+  if (decimalStats.includes(key.toUpperCase())) {
+    const num = parseFloat(value);
+    if (isNaN(num)) return value;
+    const s = num.toFixed(3);
+    return (num < 1 && num > -1) ? s.substring(1) : s;
+  }
+  return value;
+}
+function formatNextGame(p){
+  const date = (p.next_game_date||'').trim();
+  const time = (p.next_game_time||'').trim();
+  const opp  = (p.next_game_opponent||'').trim();
+  if (!date && !time && !opp && p.next_game_datetime) return p.next_game_datetime;
+  const when = [date, time].filter(Boolean).join(' ').trim();
+  const text = [when || 'TBD', opp].filter(Boolean).join(' ').trim();
+  return text || 'TBD';
+}
+
+/* CSV loader */
 async function loadCSV(url){
-  const res = await fetch(url); if(!res.ok) throw new Error('CSV HTTP '+res.status);
-  const text = await res.text(); const rows=text.trim().split(/\r?\n/).map(l=>l.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/).map(c=>c.replace(/^"|"$/g,'')));
-  const header=rows.shift().map(h=>h.trim()); const idx=n=>header.indexOf(n);
+  const res = await fetch(url); if(!res.ok) throw new Error(`CSV HTTP ${res.status}`);
+  const text = await res.text(); if(!text.trim()) throw new Error('Empty CSV');
+  const rows = text.trim().split(/\r?\n/).map(line => line.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/).map(c=>c.replace(/^"|"$/g,'')));
+  const header = rows.shift().map(h => h.trim());
+  const idx=n=>header.indexOf(n);
   const statKeys=['avg','obp','slg','ops','ab','h','r','rbi','2b','3b','hr','sb','bb','era','k/9','k/bb','whip','ip','er','ko','gp','w-l','saves','fip'];
   return rows.map(r=>{
     const p={
-      slug:r[idx('slug')], display_name:r[idx('display_name')],
-      first:r[idx('first')], last:r[idx('last')],
+      slug:r[idx('slug')], display_name:r[idx('display_name')], first:r[idx('first')], last:r[idx('last')],
       grad_class:r[idx('grad_class')], letter_years:r[idx('letter_years')], status:r[idx('status')], level:r[idx('level')],
-      team:r[idx('team')], org:r[idx('org')], position:r[idx('position')],
-      height:r[idx('height')], weight:r[idx('weight')], bats:r[idx('bats')], throws:r[idx('throws')],
-      draft_info:r[idx('Draft_Info')], colleges:r[idx('Colleges')],
-      next_game_opponent:r[idx('next_game_opponent')], next_game_datetime:r[idx('next_game_datetime')],
+      team:r[idx('team')], org:r[idx('org')], position:r[idx('position')], height:r[idx('height')], weight:r[idx('weight')],
+      bats:r[idx('bats')], throws:r[idx('throws')], draft_info:r[idx('Draft_Info')], colleges:r[idx('Colleges')],
+      next_game_opponent:r[idx('next_game_opponent')], next_game_date:r[idx('next_game_date')], next_game_time:r[idx('next_game_time')],
+      next_game_datetime:r[idx('next_game_datetime')],
       last_game_1:r[idx('last_game_1')], last_game_2:r[idx('last_game_2')], last_game_3:r[idx('last_game_3')],
-      x_handle:r[idx('x_handle')], ig_handle:r[idx('ig_handle')], video_url:r[idx('video_url')], nil_score:r[idx('nil_score')], stats:{}
+      x_handle:r[idx('x_handle')], ig_handle:r[idx('ig_handle')], video_url:r[idx('video_url')], nil_score:r[idx('nil_score')],
+      stats:{}
     };
-    for(const key of statKeys){ const si=idx(key); if(si>-1 && r[si]) p.stats[key.toUpperCase()]=r[si]; }
+    for(const k of statKeys){ const si=idx(k); if(si>-1 && r[si]) p.stats[k.toUpperCase()]=r[si]; }
     return p;
   });
 }
-function getParam(name){ return new URLSearchParams(location.search).get(name)||''; }
-function getCache(){ try{ return JSON.parse(localStorage.getItem(CACHE_KEY)||'{}'); }catch{ return {}; } }
-function setCache(items){ localStorage.setItem(CACHE_KEY, JSON.stringify({updatedAt:new Date().toISOString(),items})); }
-async function ensureNewsCache(){
-  // If cache empty, load the JSON file once to seed it.
-  const cache = getCache();
-  if(Array.isArray(cache.items) && cache.items.length) return cache;
-  try{
-    const res=await fetch(JSON_URL,{cache:'no-store'}); if(!res.ok) throw new Error('JSON HTTP '+res.status);
-    const arr=await res.json(); setCache(Array.isArray(arr)?arr:[]);
-  }catch(e){ console.warn('Could not seed news cache:', e); }
-  return getCache();
-}
-function formatStatValue(key, value){
-  if(!value||value==='--') return '--';
-  const dec=['AVG','OBP','SLG','OPS']; if(dec.includes(key.toUpperCase())){ const num=parseFloat(value); if(isNaN(num)) return value; const s=num.toFixed(3); return (num> -1 && num<1)? s.substring(1):s; }
-  return value;
-}
-function statsGrid(p){
-  const isPitcher = p.stats['ERA'] !== undefined;
-  const bat=['AVG','OBP','SLG','OPS','H','R','HR','RBI','AB','2B','3B','SB'];
-  const pit=['ERA','K/9','K/BB','WHIP','IP','ER','KO','BB','GP','W-L','SAVES','FIP'];
-  const show = isPitcher ? pit : bat;
-  return `<div class="stats-header-bar">${(p.status||'').includes('ACTIVE')?'2025 SEASON STATS':'CAREER STATS'}</div>
-    <div class="stats-grid">
-      ${show.map(s=> `<div class="stat-item"><div class="stat-label">${s}</div><div class="stat-value">${formatStatValue(s,p.stats[s])}</div></div>`).join('')}
-    </div>`;
-}
-function newsCardsFor(name){
-  const cache = getCache();
-  const items = (cache.items||[]).filter(n=> String(n.player_display_name||'').toLowerCase() === String(name||'').toLowerCase());
-  const sorted = items.sort((a,b)=> new Date(b.publishedAt||0) - new Date(a.publishedAt||0));
-  if(!sorted.length) return `<p style="opacity:.8;text-align:center;">No recent headlines yet. Check back soon.</p>`;
-  return sorted.map(n=>{
-    const img = n.image || `https://picsum.photos/seed/${encodeURIComponent(n.id||n.title||'news')}/600/400`;
-    const when = n.publishedAt ? new Date(n.publishedAt).toLocaleString() : '';
-    const read = (n.url||'#') + ((n.url||'').includes('?')?'&':'?') + 'utm_source=yatstats&utm_medium=profile';
-    return `<a href="${read}" target="_blank" rel="noopener noreferrer" class="news-card">
-      <div class="news-card-thumb" style="background-image:url('${img}')"></div>
-      <div style="flex:1;min-width:0">
-        <div style="font-weight:700;line-height:1.2">${n.title||'Read more'}</div>
-        <div style="font-size:12px;opacity:.75;margin-top:4px">${n.source||'News'} • ${when}</div>
-      </div>
-    </a>`;
-  }).join('');
-}
-function renderTab(p, tab){
-  const zone = $('#funzone'); if(!zone) return;
-  if(tab==='stats'){ zone.innerHTML = statsGrid(p); return; }
-  if(tab==='bio'){
-    zone.innerHTML = `<div class="stats-header-bar">BIO</div>
-      <div>Position: ${p.position||'—'} • B/T: ${p.bats||'—'}/${p.throws||'—'} • H: ${p.height||'—'} • W: ${p.weight||'—'}</div>
-      <div style="margin-top:8px">Team: <strong>${p.team||''}</strong> — ${p.org||''}</div>
-      <div style="margin-top:8px">Draft: ${p.draft_info||'N/A'} | Colleges: ${p.colleges||'N/A'}</div>`;
-    return;
-  }
-  if(tab==='social'){
-    const x = p.x_handle ? `<a href="https://x.com/${p.x_handle}" target="_blank" rel="noopener">X/Twitter</a>` : '';
-    const ig= p.ig_handle? `<a href="https://instagram.com/${p.ig_handle}" target="_blank" rel="noopener">Instagram</a>`: '';
-    zone.innerHTML = `<div class="stats-header-bar">SOCIAL</div><div style="display:flex;gap:12px">${x||ig? (x+ig) : 'No social links yet.'}</div>`;
-    return;
-  }
-  if(tab==='nil'){
-    zone.innerHTML = `<div class="stats-header-bar">YAT-A-BOY NIL SCORE</div>
-      <div style="font-size:40px;font-weight:800;text-align:center">${p.nil_score||'—'}</div>`;
-    return;
-  }
-  if(tab==='video'){
-    if(p.video_url){ zone.innerHTML = `<iframe width="100%" height="260" src="${p.video_url}" frameborder="0" allowfullscreen style="border-radius:8px"></iframe>`; }
-    else { zone.innerHTML = `<p style="text-align:center;opacity:.8">No video available.</p>`; }
-    return;
-  }
-  if(tab==='pics'){ zone.innerHTML = `<p style="text-align:center;opacity:.8">Fan pics coming soon.</p>`; return; }
-  if(tab==='news'){
-    zone.innerHTML = `<div class="stats-header-bar">LATEST HEADLINES</div><div id="newsList" style="padding:8px 4px">Loading…</div>`;
-    // ensure cache, then render
-    ensureNewsCache().then(()=>{ $('#newsList').innerHTML = newsCardsFor(p.display_name); }).catch(()=>{ $('#newsList').innerHTML = `<p style="text-align:center;opacity:.8">No news available.</p>`; });
-    return;
-  }
-  zone.textContent = '…';
-}
 
-function attachNav(p){
-  $('#profileNav')?.addEventListener('click', (e)=>{
-    const btn = e.target.closest('.profile-nav-link'); if(!btn) return;
-    $$('.profile-nav-link').forEach(b=>b.classList.remove('active'));
-    btn.classList.add('active');
-    renderTab(p, btn.dataset.content);
-  });
-}
-
+/* Live search drawer */
+function profileURL(p){ return `./profile.html?player=${slugOf(p)}`; }
 function makeHit(p){
-  const nm=imageNameOf(p);
-  const jp=`assets/img/hs_players/${nm}.jpg`, png=`assets/img/hs_players/${nm}.png`;
   const el=document.createElement('div'); el.className='live-hit';
-  el.innerHTML = `<img src="${jp}" onerror="this.onerror=null;this.src='${png}';"><div><div style="font-weight:700">${p.display_name}</div><div style="opacity:.7;font-size:.92em">${p.level||''} • Class of ${p.grad_class||''}</div></div>`;
-  el.onclick = ()=> location.href = `profile.html?player=${slugOf(p)}`;
+  const nm=imageNameOf(p);
+  const jpg=`assets/img/hs_players/${nm}.jpg`, png=`assets/img/hs_players/${nm}.png`;
+  el.innerHTML = `<img src="${jpg}" onerror="this.onerror=null;this.src='${png}'"><div><div style="font-weight:700">${p.display_name}</div><div style="opacity:.7;font-size:.92em">${p.level||''} • Class of ${p.grad_class||''}</div></div>`;
+  el.onclick=()=>location.href=profileURL(p);
   return el;
 }
-function liveSearch(players){
-  const q=($('#playerSearch')?.value||'').trim().toLowerCase();
-  const box=$('#liveResults'); if(!box) return;
+function liveSearch(){
+  const q=($('#playerSearch')?.value||'').trim().toLowerCase(); const box=$('#liveResults'); if(!box) return;
   if(!q){ box.innerHTML=''; return; }
-  const hits=players.filter(p=>(p.display_name||'').toLowerCase().includes(q)).slice(0,25);
-  box.innerHTML=''; hits.forEach(p=> box.appendChild(makeHit(p)));
+  const hits=(window.PLAYERS||[]).filter(p=>(p.display_name||'').toLowerCase().includes(q)).slice(0,25);
+  box.innerHTML=''; hits.forEach(p=>box.appendChild(makeHit(p)));
 }
 
-document.addEventListener('DOMContentLoaded', async ()=>{
+/* Build header + meta */
+function renderHeader(player){
+  const nm=imageNameOf(player);
+  const jpg=`assets/img/now_players/${nm}.jpg`, png=`assets/img/now_players/${nm}.png`;
+  const hsJ=`assets/img/hs_players/${nm}.jpg`, hsP=`assets/img/hs_players/${nm}.png`;
+
+  const logo = $('#playerLogo');
+  logo.src = hsJ; logo.onerror = () => { logo.onerror=null; logo.src=hsP; };
+
+  $('#playerTeamOrg').textContent = `${player.team || ''} ${player.org ? '— ' + player.org : ''}`.trim() || '—';
+  $('#playerFirstName').textContent = player.first || '';
+  $('#playerLastName').textContent = player.last || '';
+
+  const letters = (player.letter_years||'').split(',').map(y=>y.trim()).filter(Boolean).map(y=>y.slice(-2));
+  const nextGame = formatNextGame(player);
+  const meta = `
+    <div class="detail-col">
+      <div>
+        ${player.grad_class?`<span class="front-chip">CLASS OF ${player.grad_class}</span> `:''}
+        ${player.status?`<span class="front-chip">${player.status}</span> `:''}
+        ${player.level?`<span class="front-chip">${player.level}</span>`:''}
+      </div>
+      <div style="margin-top:6px">${letters.length?`<div class="varsity-dots">${letters.map(y=>`<div class="varsity-dot">${y}</div>`).join('')}</div>`:''}</div>
+    </div>
+    <div class="detail-col">
+      <div class="game-title-pill">NEXT GAME</div>
+      <div class="game-data-text">${nextGame || 'TBD'}</div>
+      <div class="game-title-pill" style="margin-top:8px">LAST 3 GAMES</div>
+      <div class="game-data-text">
+        <span class="game-log">${player.last_game_1 || '--'}</span>
+        <span class="game-log">${player.last_game_2 || '--'}</span>
+        <span class="game-log">${player.last_game_3 || '--'}</span>
+      </div>
+    </div>
+    <div class="detail-col">
+      <div style="font-size:12px;opacity:.85">
+        <div><strong>${player.position || ''}</strong></div>
+        <div>H: ${player.height || '--'} • W: ${player.weight || '--'}</div>
+        <div>B/T: ${player.bats||'--'}/${player.throws||'--'}</div>
+        <div style="margin-top:6px"><strong>Draft:</strong> ${player.draft_info || 'N/A'}</div>
+        <div><strong>Colleges:</strong> ${player.colleges || 'N/A'}</div>
+      </div>
+    </div>
+  `;
+  $('#playerHeaderMeta').innerHTML = meta;
+
+  // breadcrumbs
+  $('#breadcrumbs').innerHTML = `<a href="index.html">HAMILTON</a> ▸ ${player.display_name || 'PLAYER'}`;
+}
+
+/* Funzone sections */
+function generateStatsGridHTML(player){
+  const isPitcher = player.stats['ERA'] !== undefined;
+  const batterStats = ['AVG','OBP','SLG','OPS','H','R','HR','RBI','AB','2B','3B','SB'];
+  const pitcherStats = ['ERA','K/9','K/BB','WHIP','IP','ER','KO','BB','GP','W-L','SAVES','FIP'];
+  const statsToShow = isPitcher ? pitcherStats : batterStats;
+
+  let grid = `<div class="stats-header-bar">${(player.status||'').includes('ACTIVE')?'2025 SEASON STATS':'CAREER STATS'}</div>`;
+  grid += '<div class="stats-grid">';
+  grid += statsToShow.map(stat=>{
+    const v = formatStatValue(stat, player.stats[stat]);
+    return `<div class="stat-item"><div class="stat-label">${stat}</div><div class="stat-value">${v||'--'}</div></div>`;
+  }).join('');
+  grid += '</div>';
+  return grid;
+}
+
+async function buildBio(player){
+  const container = $('#funzone-container');
+  const { generateGeminiText } = window.gemini || {};
+  if (typeof generateGeminiText !== 'function'){
+    container.innerHTML = `<div class="funzone-content">AI service unavailable.</div>`;
+    return;
+  }
+  const prompt = `Act as an optimistic but knowledgeable high school baseball scout. Write a brief 2–3 sentence scouting report for ${player.display_name}. Emphasize journey, strengths, and upbeat "Yat-A-Boy!" tone.`;
   try{
+    const text = await generateGeminiText(prompt);
+    container.innerHTML = `<div class="funzone-content" style="line-height:1.5">${text}</div>`;
+  }catch{
+    container.innerHTML = `<div class="funzone-content">AI service is currently unavailable.</div>`;
+  }
+}
+
+function buildSocial(player){
+  let s = '<div class="funzone-content">';
+  if(player.x_handle) s+= `<p><a href="https://x.com/${player.x_handle}" target="_blank" rel="noopener">View on X / Twitter</a></p>`;
+  if(player.ig_handle) s+= `<p><a href="https://instagram.com/${player.ig_handle}" target="_blank" rel="noopener">View on Instagram</a></p>`;
+  if(!player.x_handle && !player.ig_handle) s+= 'No social links available.';
+  s += '</div>';
+  $('#funzone-container').innerHTML = s;
+}
+
+function buildNil(player){
+  const s = player.nil_score
+    ? `<div class="stats-header-bar">YAT-A-BOY NIL SCORE</div>
+       <div class="nil-score-container">
+         <div class="nil-score-value">${player.nil_score}</div>
+         <div class="nil-score-label">Points</div>
+       </div>`
+    : `<p>No NIL score available for ${player.display_name}.</p>`;
+  $('#funzone-container').innerHTML = `<div class="funzone-content">${s}</div>`;
+}
+
+function buildVideo(player){
+  const s = player.video_url
+    ? `<iframe width="100%" height="260" src="${player.video_url}" title="Video" frameborder="0" allowfullscreen style="border-radius:10px"></iframe>`
+    : `<p>No video available for ${player.display_name}.</p>`;
+  $('#funzone-container').innerHTML = `<div class="funzone-content">${s}</div>`;
+}
+
+function buildPics(){
+  $('#funzone-container').innerHTML = `<div class="funzone-content"><p>Fan pics coming soon.</p></div>`;
+}
+
+/* ---- NEWS (from cache, with live fallback if empty) ---- */
+function readNewsCache(){
+  try{ const raw = localStorage.getItem(NEWS_CACHE_KEY); return raw ? JSON.parse(raw) : null; }catch{ return null; }
+}
+function newsCard(n){
+  const img = n.image || ('https://picsum.photos/seed/' + encodeURIComponent(n.id||n.title||'news') + '/600/400');
+  const when = n.publishedAt ? new Date(n.publishedAt).toLocaleString() : '';
+  const base = String(n.url||'#');
+  const read = base + (base.includes('?') ? '&':'?') + 'utm_source=yatstats&utm_medium=profile_news';
+  return `
+    <a href="${read}" target="_blank" rel="noopener noreferrer" class="news-item">
+      <div class="news-thumb" style="background-image:url('${img}')"></div>
+      <div>
+        <div class="news-title">${n.title}</div>
+        <div class="news-meta">${n.source || 'News'} • ${when}</div>
+      </div>
+    </a>`;
+}
+function renderNewsList(list, player){
+  if(!list.length){
+    $('#funzone-container').innerHTML = `
+      <div class="funzone-content">
+        <div class="stats-header-bar">LATEST HEADLINES</div>
+        <p style="opacity:.8;text-align:center">No recent headlines yet for ${player.display_name}. Check back soon!</p>
+      </div>`;
+    return;
+  }
+  const sorted = list.slice().sort((a,b)=> new Date(b.publishedAt||0) - new Date(a.publishedAt||0));
+  $('#funzone-container').innerHTML = `
+    <div class="funzone-content">
+      <div class="stats-header-bar">LATEST HEADLINES</div>
+      ${sorted.slice(0,8).map(newsCard).join('')}
+    </div>`;
+}
+
+/* Minimal live fallback (Google News RSS via rss2json) */
+function googleNewsRssUrl(q){ return `https://news.google.com/rss/search?q=${encodeURIComponent(q)}&hl=en-US&gl=US&ceid=US:en`; }
+async function fetchRssAsJson(rssUrl){
+  const api = `https://api.rss2json.com/v1/api.json?count=12&rss_url=${encodeURIComponent(rssUrl)}`;
+  const res = await fetch(api,{credentials:'omit'}); if(!res.ok) throw new Error('rss2json error');
+  return res.json();
+}
+const hash = s => (new TextEncoder().encode(s)).reduce((a,c)=>((a<<5)-a)+c,0)>>>0;
+function normalizeItem(raw, playerName){
+  const src = raw?.author || raw?.source || raw?.feed?.title || raw?.source_url || '';
+  const url = raw?.link || raw?.url || '';
+  const img = raw?.thumbnail || '';
+  const id = String(hash(url || raw?.title || (playerName + Math.random())));
+  return { id, title: raw?.title || 'Read more', url, image: img, publishedAt: raw?.pubDate || raw?.published || null, source: src?.replace(/^https?:\/\/(www\.)?/,'').split('/')[0] || 'News', player_display_name: playerName };
+}
+async function buildNews(player){
+  $('#funzone-container').innerHTML = `<div class="funzone-content"><p style="text-align:center;opacity:.8">Loading headlines…</p></div>`;
+
+  // 1) Try local cache written by alumni-news.html
+  const cache = readNewsCache();
+  let mine = [];
+  if(cache?.items?.length){
+    const name = (player.display_name||'').toLowerCase();
+    mine = cache.items.filter(n => String(n.player_display_name||'').toLowerCase() === name);
+  }
+
+  // 2) If none in cache, try a quick live fetch (non-blocking)
+  if(!mine.length){
+    try{
+      const q = `"${player.display_name}" baseball ${player.team?(' "'+player.team+'"') : ''}`;
+      const rss = googleNewsRssUrl(q);
+      const json = await fetchRssAsJson(rss);
+      mine = (json?.items||[]).map(it=>normalizeItem(it, player.display_name));
+      // Optionally merge into cache in-memory so profile works even before alumni-news page is visited
+      const merged = (cache?.items||[]).concat(mine);
+      localStorage.setItem(NEWS_CACHE_KEY, JSON.stringify({ fetchedAt: Date.now(), ttlHours: 6, items: merged }));
+    }catch(e){
+      console.warn('Live news fetch failed', e);
+    }
+  }
+
+  renderNewsList(mine, player);
+}
+
+/* Tabs */
+async function handleTab(content, player){
+  $$('#profileNav .profile-nav-link').forEach(b=>b.classList.toggle('active', b.dataset.content===content));
+  if(content==='stats'){ $('#funzone-container').innerHTML = `<div class="funzone-content">${generateStatsGridHTML(player)}</div>`; return; }
+  if(content==='bio'){ await buildBio(player); return; }
+  if(content==='news'){ await buildNews(player); return; }
+  if(content==='social'){ buildSocial(player); return; }
+  if(content==='nil'){ buildNil(player); return; }
+  if(content==='video'){ buildVideo(player); return; }
+  if(content==='pics'){ buildPics(player); return; }
+  $('#funzone-container').innerHTML = `<div class="funzone-content"><p>Content coming soon.</p></div>`;
+}
+
+/* GEMINI stub (optional) */
+window.gemini = {
+  async generateGeminiText(prompt){
+    const apiKey = ""; // <-- add if you want live BIOs now
+    if(!apiKey) return "Scouting notes coming soon.";
+    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${apiKey}`;
+    const payload = { contents: [{ parts: [{ text: prompt }] }] };
+    try{
+      const r = await fetch(apiUrl,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+      if(!r.ok) return "AI service error.";
+      const j = await r.json();
+      return j.candidates?.[0]?.content?.parts?.[0]?.text || "No response.";
+    }catch{ return "AI service unavailable."; }
+  }
+};
+
+/* ---- BOOTSTRAP ---- */
+document.addEventListener('DOMContentLoaded', async ()=>{
+  setupTheme(); setupDrawers(); setupAuth();
+
+  try{
+    // load players for search + find player by slug
     const all = await loadCSV(CSV_URL);
-    // Find player by slug param
-    const targetSlug = (getParam('player')||'').toLowerCase();
-    const player = all.find(p=> slugOf(p) === targetSlug) || all[0];
-    if(!player){ $('#funzone').innerHTML = `<p style="color:#f88">Player not found.</p>`; return; }
+    window.PLAYERS = all;
 
-    // Header
-    $('#breadcrumbs').innerHTML = `<a href="index.html">HAMILTON</a> ▸ ${player.display_name}`;
-    $('#playerFirstName').textContent = player.first || '';
-    $('#playerLastName').textContent = player.last || '';
-    $('#playerTeamOrg').textContent = `${player.team||''} • ${player.org||''}`;
-    const nm=imageNameOf(player);
-    const nowJ=`assets/img/now_players/${nm}.jpg`, nowP=`assets/img/now_players/${nm}.png`;
-    $('#playerLogo').src = nowJ; $('#playerLogo').onerror = function(){ this.onerror=null; this.src = nowP; };
+    // live search
+    $('#playerSearch')?.addEventListener('input', debounce(liveSearch));
 
-    // Search drawer
-    $('#btnMenu')?.addEventListener('click', ()=> document.body.classList.add('drawer-left-open','drawer-open'));
-    $('.close-btn')?.addEventListener('click', ()=> document.body.classList.remove('drawer-left-open','drawer-open'));
-    $('#playerSearch')?.addEventListener('input', ()=> liveSearch(all));
+    const slug = (getParam('player')||'').toLowerCase();
+    const player = all.find(p => slugOf(p) === slug) || null;
 
-    // Default tab
-    renderTab(player, 'stats');
-    attachNav(player);
+    if(!player){
+      $('#funzone-container').innerHTML = `<div class="funzone-content"><p style="color:#fca5a5">Player not found.</p><p><a href="index.html">Back to gallery</a></p></div>`;
+      $('#breadcrumbs').innerHTML = `<a href="index.html">HAMILTON</a> ▸ NOT FOUND`;
+      return;
+    }
+
+    renderHeader(player);
+    await handleTab('stats', player);
+
+    // tab clicks
+    $$('#profileNav .profile-nav-link').forEach(btn=>{
+      btn.addEventListener('click', ()=>handleTab(btn.dataset.content, player));
+    });
+
   }catch(err){
     console.error(err);
-    $('#funzone').innerHTML = `<p style="color:#f88">Failed to load profile.</p>`;
+    $('#funzone-container').innerHTML = `<div class="funzone-content"><p style="color:#fca5a5"><strong>Error:</strong> Could not load player data. ${err.message}</p></div>`;
   }
 });
 </script>
