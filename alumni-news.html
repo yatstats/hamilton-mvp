@@ -6,13 +6,12 @@
 <title>Alumni News • Hamilton YATSTATS</title>
 <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400&family=Bebas+Neue&display=swap" rel="stylesheet">
-
 <style>
 :root{
-  --bg:#0c0c0c; --fg:#f2f2f2; --muted:#c4c4c4; --ink:#e8e8e8; --line:rgba(255,255,255,0.1);
+  --bg:#0c0c0c; --fg:#f2f2f2; --muted:#c4c4c4; --ink:#e8e8e8; --line:rgba(255,255,255,.1);
   --card:#171717; --hdr:#000; --drawer:rgba(10,10,10,.65);
-  --pad:16px; --hamSmall:13px; --hamBig:20px; --hamBigger:24px;
-  --footerH:clamp(56px,8vh,77px);
+  --pad:16px; --footerH:clamp(56px,8vh,77px);
+  --hamSmall:13px; --hamBig:20px; --hamBigger:24px;
 }
 *{box-sizing:border-box} html,body{margin:0}
 body{background:var(--bg);color:var(--fg);font-family:Oswald,system-ui,sans-serif}
@@ -39,7 +38,7 @@ a{color:inherit;text-decoration:none}
 
 /* Drawers */
 .drawer-mask{position:fixed;inset:0;background:rgba(0,0,0,.35);opacity:0;pointer-events:none;transition:opacity .2s;z-index:60}
-.drawer{position:fixed;top:0;bottom:0;width:min(360px,82vw);background:var(--drawer);backdrop-filter:blur(4px);color:var(--ink);transform:translateX(-110%);transition:transform .25s;z-index:70}
+.drawer{position:fixed;top:0;bottom:0;width:min(380px,86vw);background:var(--drawer);backdrop-filter:blur(4px);color:var(--ink);transform:translateX(-110%);transition:transform .25s;z-index:70}
 .drawer-right{right:0;left:auto;transform:translateX(110%);display:flex;flex-direction:column}
 .drawer h3{margin:18px 16px 8px}
 .drawer .pad{padding:10px 16px}
@@ -59,12 +58,10 @@ details[open]>.filter-title::after{transform:rotate(90deg)}
 .filter-options{padding:4px 0 16px}
 .filter-options label{display:block;margin-bottom:8px}
 .select-all-label{font-weight:700;border-bottom:1px solid var(--line);padding-bottom:8px;margin-bottom:12px}
+.input-like{width:100%;padding:10px;border-radius:10px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--ink)}
 
 /* WEEK BLOCKS */
 .week-block{margin-bottom:22px}
-.week-title{font:700 18px/1 "Bebas Neue",sans-serif;letter-spacing:.06em;margin:0 0 10px;opacity:.9}
-
-/* Three-column grid (Pro, College, Lines) */
 .week-grid{display:grid;grid-template-columns:2fr 2fr 1.25fr;gap:14px}
 @media (max-width: 1100px){ .week-grid{grid-template-columns:1fr 1fr} .col-lines{grid-column:1/-1} }
 @media (max-width: 760px){ .week-grid{grid-template-columns:1fr} }
@@ -76,18 +73,15 @@ details[open]>.filter-title::after{transform:rotate(90deg)}
 /* news item */
 .news-list{display:flex;flex-direction:column;gap:10px}
 .news-row{display:flex;gap:10px;border:1px solid var(--line);border-radius:10px;padding:8px;align-items:center;background:#0f0f0f}
-.news-thumb{width:108px;height:72px;border-radius:8px;background:#000 center/cover no-repeat;flex:0 0 108px}
+.news-thumb{flex:0 0 clamp(80px, 16vw, 120px); aspect-ratio:5/7; border-radius:8px; background:#000 center/cover no-repeat}
 .news-title{font:700 16px/1.1 "Bebas Neue",sans-serif;letter-spacing:.02em}
 .news-meta{font:12px Oswald, sans-serif;opacity:.8;margin-top:4px}
 
-/* line groups (by day) */
-.lines-wrap{display:flex;flex-direction:column;gap:10px}
-.date-group{border:1px solid var(--line);border-radius:10px;padding:8px}
-.day-badge{display:inline-block;background:#222;border:1px solid var(--line);border-radius:999px;padding:4px 10px;font:700 11px Oswald;letter-spacing:.04em;margin-bottom:6px}
-.group-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
-.group-item{display:flex;gap:6px;align-items:flex-start;border-bottom:1px dashed var(--line);padding-bottom:6px}
-.group-item:last-child{border-bottom:none}
-.player-name{font-weight:700}
+/* line scores (weekly flat list) */
+.lines-wrap{display:flex;flex-direction:column;gap:8px}
+.line-item{border:1px solid var(--line);border-radius:10px;padding:10px;background:#0f0f0f}
+.line-head{font:700 16px "Bebas Neue",sans-serif;letter-spacing:.03em}
+.line-text{font:12px Oswald,sans-serif;opacity:.92;margin-top:2px}
 
 /* footer */
 .site-footer{position:fixed;left:0;right:0;bottom:0;height:var(--footerH);background:var(--bg);border-top:1px solid var(--line);z-index:40}
@@ -107,7 +101,6 @@ details[open]>.filter-title::after{transform:rotate(90deg)}
     </nav>
     <div class="left-icons">
       <button id="btnRefresh" class="icon-btn" title="Refresh"><i class="ri-refresh-line"></i> Refresh</button>
-      <button id="btnExport" class="icon-btn" title="Export JSON"><i class="ri-download-2-line"></i> Export JSON</button>
       <button id="openFilters" class="icon-btn" title="Filters"><i class="ri-filter-3-line"></i></button>
     </div>
   </div>
@@ -121,7 +114,7 @@ details[open]>.filter-title::after{transform:rotate(90deg)}
     </div>
   </div>
   <div class="hr-y"></div>
-  <section class="hero"><div class="container"><h2 class="week-title" style="margin:0">ALUMNI NEWS</h2></div></section>
+  <section class="hero"><div class="container"><h2 style="margin:0;font:700 18px 'Bebas Neue',sans-serif;letter-spacing:.06em">ALUMNI NEWS</h2></div></section>
 </header>
 
 <div class="drawer-mask"></div>
@@ -141,6 +134,13 @@ details[open]>.filter-title::after{transform:rotate(90deg)}
   <h3>FILTERS</h3>
   <div class="drawer-content" id="filters">
     <details class="filter-group" open>
+      <summary class="filter-title">By Player</summary>
+      <div class="filter-options">
+        <input id="filterName" class="input-like" placeholder="Type a name…">
+      </div>
+    </details>
+
+    <details class="filter-group" open>
       <summary class="filter-title">By Status</summary>
       <div class="filter-options" id="filterStatus">
         <label class="select-all-label"><input type="checkbox" class="select-all"> Select All</label>
@@ -150,13 +150,34 @@ details[open]>.filter-title::after{transform:rotate(90deg)}
         <label><input type="checkbox" value="INJURED"> INJURED</label>
       </div>
     </details>
+
     <details class="filter-group">
       <summary class="filter-title">By Level</summary>
-      <div class="filter-options" id="filterLevels"><label class="select-all-label"><input type="checkbox" class="select-all"> Select All</label></div>
+      <div class="filter-options" id="filterLevels">
+        <label class="select-all-label"><input type="checkbox" class="select-all"> Select All</label>
+      </div>
     </details>
+
     <details class="filter-group">
       <summary class="filter-title">By Graduating Class</summary>
-      <div class="filter-options" id="filterGradClass"><label class="select-all-label"><input type="checkbox" class="select-all"> Select All</label></div>
+      <div class="filter-options" id="filterGradClass">
+        <label class="select-all-label"><input type="checkbox" class="select-all"> Select All</label>
+      </div>
+    </details>
+
+    <details class="filter-group">
+      <summary class="filter-title">By Roster Year</summary>
+      <div class="filter-options" id="filterRosterYear">
+        <label class="select-all-label"><input type="checkbox" class="select-all"> Select All</label>
+      </div>
+    </details>
+
+    <details class="filter-group" open>
+      <summary class="filter-title">Date Range (affects headlines & line scores)</summary>
+      <div class="filter-options">
+        <label>Start Date <input id="dateStart" type="date" class="input-like" style="margin-top:6px"></label>
+        <label style="margin-top:10px">End Date <input id="dateEnd" type="date" class="input-like" style="margin-top:6px"></label>
+      </div>
     </details>
   </div>
   <div class="drawer-footer">
@@ -179,10 +200,10 @@ details[open]>.filter-title::after{transform:rotate(90deg)}
 /* --------- constants ---------- */
 const CSV_URL  = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQcWJM6Q6hTdFnES_G5LUy4teCS-sJ5HdAc9F5HSY8DGE9egdGy8yUAe2ShT3tFm-CwUuCYeAYy_YiW/pub?gid=2028135390&single=true&output=csv";
 const JSON_URL = "assets/news/alumni_news.json";
-const CACHE_KEY = "YAT_NEWS_CACHE_V1";
+const PRO_LEVELS = new Set(['MLB','INTERNATIONAL','TRIPLE-A','AAA','DOUBLE-A','AA','HIGH-A','A+','LOW-A','A','ROOKIE','ROK','INDY']);
 const $ = s => document.querySelector(s), $$ = s => Array.from(document.querySelectorAll(s));
 
-/* --------- drawers & buttons ---------- */
+/* --------- drawers ---------- */
 function closeDrawers(){ document.body.classList.remove('drawer-left-open','drawer-right-open','drawer-open'); }
 $('#btnMenu')?.addEventListener('click', ()=>{ document.body.classList.add('drawer-left-open','drawer-open'); });
 $('#openFilters')?.addEventListener('click', ()=>{ document.body.classList.add('drawer-right-open','drawer-open'); });
@@ -197,53 +218,42 @@ async function loadCSV(url){
   const rows = text.trim().split(/\r?\n/).map(l=>l.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/).map(c=>c.replace(/^"|"$/g,'')));
   const header = rows.shift().map(h=>h.trim());
   const idx = n => header.indexOf(n);
-  const statKeys = ['avg','obp','slg','ops','ab','h','r','rbi','2b','3b','hr','sb','bb','era','k/9','k/bb','whip','ip','er','ko','gp','w-l','saves','fip'];
-  return rows.map((r,i)=> {
-    const p = {
-      id: r[idx('id')] || String(i+2),
-      display_name:r[idx('display_name')], first:r[idx('first')], last:r[idx('last')],
-      grad_class:r[idx('grad_class')], letter_years:r[idx('letter_years')],
-      status:r[idx('status')], level:r[idx('level')], team:r[idx('team')], org:r[idx('org')],
-      next_game_datetime:r[idx('next_game_datetime')], next_game_opponent:r[idx('next_game_opponent')],
-      last_game_1:r[idx('last_game_1')], last_game_2:r[idx('last_game_2')], last_game_3:r[idx('last_game_3')],
-      stats:{}
-    };
-    for(const k of statKeys){ const j=idx(k); if(j>-1 && r[j]) p.stats[k.toUpperCase()] = r[j]; }
-    return p;
-  });
+  return rows.map((r,i)=> ({
+    id: r[idx('id')] || String(i+2),
+    display_name:r[idx('display_name')], first:r[idx('first')], last:r[idx('last')],
+    grad_class:r[idx('grad_class')], letter_years:r[idx('letter_years')],
+    status:r[idx('status')], level:r[idx('level')], team:r[idx('team')], org:r[idx('org')],
+    last_game_1:r[idx('last_game_1')], last_game_2:r[idx('last_game_2')], last_game_3:r[idx('last_game_3')],
+  }));
 }
 
-/* --------- NEWS cache ---------- */
+/* --------- NEWS ---------- */
 function normalizeNewsData(d){ if(Array.isArray(d)) return d; if(d && Array.isArray(d.items)) return d.items; return []; }
-function getCache(){ try { return JSON.parse(localStorage.getItem(CACHE_KEY) || '{}'); } catch { return {}; } }
-function setCache(items){ localStorage.setItem(CACHE_KEY, JSON.stringify({updatedAt:new Date().toISOString(), items})); }
 async function loadNews(){
   try{
     const res = await fetch(JSON_URL, {cache:'no-store'});
-    if(res.ok){ const data = await res.json(); const items = normalizeNewsData(data); setCache(items); return items; }
+    if(res.ok){ const data = await res.json(); return normalizeNewsData(data); }
   }catch(e){}
-  const cur = getCache(); return Array.isArray(cur.items)? cur.items : [];
+  return [];
 }
-function exportJson(){
-  const blob = new Blob([localStorage.getItem(CACHE_KEY) || '{"items":[]}'], {type:'application/json'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a'); a.href = url; a.download = 'YAT_NEWS_CACHE_V1.json'; a.click();
-  URL.revokeObjectURL(url);
-}
-$('#btnExport')?.addEventListener('click', exportJson);
-$('#btnRefresh')?.addEventListener('click', async ()=>{ NEWS_ITEMS = await loadNews(); buildFilterLists(NEWS_ITEMS); renderWeeks(); });
 
-/* --------- filtering ---------- */
-function buildFilterLists(items){
-  const levels = [...new Set(items.map(i => (i.level || i.player_tags?.level || '').trim()).filter(Boolean))].sort();
-  const classes = [...new Set(items.map(i => (i.grad_class || i.player_tags?.grad_class || '').trim()).filter(Boolean))]
-                  .filter(Boolean).sort((a,b)=> b.localeCompare(a));
+/* --------- filters ---------- */
+function buildFilterLists(news, players){
+  const levels = [...new Set(news.map(i => (i.level || i.player_tags?.level || '').trim()).filter(Boolean))].sort();
+  const classes = [...new Set(news.map(i => (i.grad_class || i.player_tags?.grad_class || '').trim()).filter(Boolean))]
+    .sort((a,b)=> b.localeCompare(a));
+  const rosterYears = [...new Set(players.flatMap(p => (p.letter_years||'').split(',').map(y=>y.trim())).filter(Boolean))]
+    .sort((a,b)=> b.localeCompare(a));
+
   $('#filterLevels').innerHTML =
     '<label class="select-all-label"><input type="checkbox" class="select-all"> Select All</label>' +
     levels.map(v => `<label><input type="checkbox" value="${v}"> ${v}</label>`).join('');
   $('#filterGradClass').innerHTML =
     '<label class="select-all-label"><input type="checkbox" class="select-all"> Select All</label>' +
     classes.map(v => `<label><input type="checkbox" value="${v}"> ${v}</label>`).join('');
+  $('#filterRosterYear').innerHTML =
+    '<label class="select-all-label"><input type="checkbox" class="select-all"> Select All</label>' +
+    rosterYears.map(v => `<label><input type="checkbox" value="${v}"> ${v}</label>`).join('');
 
   $('#filters').onchange = (e)=>{
     if(e.target.classList.contains('select-all')){
@@ -254,177 +264,188 @@ function buildFilterLists(items){
   };
   $('#filtersReset').onclick = ()=>{
     $$('#filters input[type=checkbox]').forEach(cb => cb.checked = false);
+    $('#filterName').value = ''; $('#dateStart').value = ''; $('#dateEnd').value='';
     renderWeeks();
   };
+  $('#filterName').addEventListener('input', ()=> renderWeeks());
+  $('#dateStart').addEventListener('change', ()=> renderWeeks());
+  $('#dateEnd').addEventListener('change', ()=> renderWeeks());
 }
+
 function readFilters(){
   const pick = sel => $$(sel).filter(i=>i.checked && !i.classList.contains('select-all')).map(i=>i.value);
+  const name = ($('#filterName').value||'').trim().toLowerCase();
+  const start = $('#dateStart').value ? new Date($('#dateStart').value) : null;
+  const end   = $('#dateEnd').value   ? new Date($('#dateEnd').value)   : null;
+  if(end){ end.setHours(23,59,59,999); }
   return {
+    name,
     status: pick('#filterStatus input'),
     levels: pick('#filterLevels input'),
     classes: pick('#filterGradClass input'),
+    roster: pick('#filterRosterYear input'),
+    start, end
   };
 }
-function applyNewsFilters(items){
+
+function withinDateRange(dt, F){
+  if(!dt) return true;
+  if(F.start && dt < F.start) return false;
+  if(F.end && dt > F.end) return false;
+  return true;
+}
+
+function applyNewsFilters(items, players){
   const F = readFilters();
+  const rosterSet = new Set(F.roster);
+  const byName = F.name;
+
+  // Build quick player lookup for roster-year filtering + name search
+  const pByName = new Map(players.map(p => [String(p.display_name||'').toLowerCase(), p]));
+
   return items.filter(n=>{
+    const nm = String(n.player_display_name||'').toLowerCase();
+    const p = pByName.get(nm);
+
     const status = (n.status || n.player_tags?.status || '').trim();
     const level  = (n.level  || n.player_tags?.level  || '').trim();
     const klass  = (n.grad_class || n.player_tags?.grad_class || '').trim();
+    const letters= (n.player_tags?.letter_years || (p?.letter_years||'')).split(',').map(y=>y.trim()).filter(Boolean);
+
     const sOK = !F.status.length || F.status.includes(status);
     const lOK = !F.levels.length || F.levels.includes(level);
     const cOK = !F.classes.length || F.classes.includes(klass);
-    return sOK && lOK && cOK;
+    const rOK = !F.roster.length || letters.some(y => rosterSet.has(y));
+    const nOK = !byName || nm.includes(byName);
+
+    const d = n.publishedAt ? new Date(n.publishedAt) : null;
+    const tOK = withinDateRange(d, F);
+
+    return sOK && lOK && cOK && rOK && nOK && tOK;
   });
 }
 
 /* --------- utils ---------- */
-const PRO_LEVELS = new Set(['MLB','INTERNATIONAL','TRIPLE-A','AAA','DOUBLE-A','AA','HIGH-A','A+','LOW-A','A','ROOKIE','ROK','INDY']);
 function isCollege(level){ return /NCAA|NAIA|JUCO/i.test(level||''); }
 function isPro(level){ const L=(level||'').toUpperCase().trim(); return PRO_LEVELS.has(L); }
 function pickLevel(n){ return (n.level || n.player_tags?.level || '').trim(); }
-function parseDate(d){ const t = Date.parse(d); return isNaN(t)? null : new Date(t); }
-
-/* Monday-start week */
 function startOfWeek(date){
   const d = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-  const day = d.getDay();            // 0=Sun..6=Sat
-  const diff = (day === 0 ? -6 : 1) - day; // to Monday
-  d.setDate(d.getDate() + diff);
-  d.setHours(0,0,0,0);
-  return d;
+  const day = d.getDay(); const diff = (day===0?-6:1)-day; d.setDate(d.getDate()+diff); d.setHours(0,0,0,0); return d;
 }
 function weekKey(date){ const s = startOfWeek(date); return `${s.getFullYear()}-${String(s.getMonth()+1).padStart(2,'0')}-${String(s.getDate()).padStart(2,'0')}`; }
-function weekLabel(key){ const d = new Date(key); return `Week of ${d.toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'})}`; }
+function weekLabel(key){ const d = new Date(key); return d.toLocaleDateString(undefined,{month:'long',day:'numeric',year:'numeric'}); }
 
-/* --------- NEWS -> grouped weeks (pro / college) ---------- */
+/* --------- render pieces ---------- */
 function newsRowHTML(n){
-  const img = n.image || `https://picsum.photos/seed/${encodeURIComponent(n.id || n.title || 'news')}/600/400`;
+  const img = n.image || `https://picsum.photos/seed/${encodeURIComponent(n.id || n.title || 'news')}/600/840`;
   const when = n.publishedAt ? new Date(n.publishedAt).toLocaleString() : '';
   const read = (n.url||'#') + ((n.url||'').includes('?')?'&':'?') + 'utm_source=yatstats&utm_medium=news';
   const who = n.player_display_name || '';
   const meta = [n.source||'News', when].filter(Boolean).join(' • ');
   return `<article class="news-row">
-      <a class="news-thumb" style="background-image:url('${img}')" href="${read}" target="_blank" rel="noopener"></a>
+      <a class="news-thumb" style="background-image:url('${img}')" href="${read}" target="_blank" rel="noopener" aria-label="Open story"></a>
       <div style="flex:1;min-width:0">
         <a class="news-title" href="${read}" target="_blank" rel="noopener">${n.title||'Read more'}</a>
         <div class="news-meta">${meta}</div>
-        ${who?`<div style="font:12px Oswald;opacity:.7;margin-top:4px">${who}</div>`:''}
+        ${who?`<div class="news-meta" style="margin-top:4px">${who}</div>`:''}
       </div>
       <a class="icon-btn" title="Share" href="${read}" target="_blank" rel="noopener"><i class="ri-share-forward-line"></i></a>
     </article>`;
 }
 
-function groupNewsByWeek(items){
-  const filtered = applyNewsFilters(items);
-  // newest first overall then grouped
-  filtered.sort((a,b)=> new Date(b.publishedAt||0) - new Date(a.publishedAt||0));
-
-  const map = new Map(); // key -> {pro:[], college:[]}
-  for(const n of filtered){
-    const d = parseDate(n.publishedAt); if(!d) continue;
-    const key = weekKey(d);
-    if(!map.has(key)) map.set(key, {pro:[], college:[]});
-    const L = pickLevel(n);
-    if(isCollege(L)) map.get(key).college.push(n);
-    else map.get(key).pro.push(n);
-  }
-  const weeks = [...map.entries()].map(([key,val])=>({key,label:weekLabel(key),...val}));
-  weeks.sort((a,b)=> new Date(b.key) - new Date(a.key));
-  return weeks;
-}
-
-/* --------- Lines (R/U/X) grouped by week then by day ---------- */
+/* --------- line scores (parse R/U/X) ---------- */
 function parseGameLine(str){
   if(!str) return null;
   const s = String(str).trim();
   // try YYYY-MM-DD
   let m = s.match(/(\d{4}-\d{1,2}-\d{1,2})/);
-  if(m){ const d = new Date(m[1]); return {ts:+d, date:d, text:s.replace(m[1],'').trim()}; }
+  if(m){ const d = new Date(m[1]); return {ts:+d, date:d, raw:s}; }
   // try M/D[/YY]
   m = s.match(/(\d{1,2})[\/\-](\d{1,2})(?:[\/\-](\d{2,4}))?/);
   if(m){
     let y = m[3]? Number(m[3]) : (new Date()).getFullYear();
     if(y < 100) y += 2000;
     const d = new Date(y, Number(m[1])-1, Number(m[2]));
-    return {ts:+d, date:d, text:s.replace(m[0],'').trim()};
+    return {ts:+d, date:d, raw:s};
   }
   return null;
 }
-function groupLinesByWeek(players){
-  const weeks = new Map(); // weekKey -> Map(dayKey -> [{player,text,ts}])
+function cleanLineText(text){
+  // remove leading em/figure dashes before @/vs
+  return String(text).replace(/^\s*[—–\-]+\s*/, '').replace(/\s{2,}/g,' ').trim();
+}
+function collectLines(players){
+  const list = [];
   players.forEach(p=>{
     ['last_game_1','last_game_2','last_game_3'].forEach(k=>{
-      const L = parseGameLine(p[k]); if(!L) return;
-      const wk = weekKey(L.date);
-      const dayKey = L.date.toLocaleDateString(undefined,{year:'numeric',month:'long',day:'numeric'});
-      if(!weeks.has(wk)) weeks.set(wk, new Map());
-      if(!weeks.get(wk).has(dayKey)) weeks.get(wk).set(dayKey, []);
-      weeks.get(wk).get(dayKey).push({player:p.display_name, text:L.text || p[k], ts:L.ts});
+      const L = parseGameLine(p[k]);
+      if(L){ list.push({player:p.display_name, ts:L.ts, week: weekKey(new Date(L.ts)), text: cleanLineText(p[k])}); }
     });
   });
-  // Convert to sorted arrays
-  const out = [...weeks.entries()].map(([wk,dayMap])=>{
-    const days = [...dayMap.entries()].map(([day,list])=>{
-      list.sort((a,b)=> b.ts-a.ts);
-      // ts representative = max in day
-      return {day, ts: Math.max(...list.map(i=>i.ts)), list};
-    }).sort((a,b)=> b.ts - a.ts);
-    return {key:wk,label:weekLabel(wk), days, ts: days[0]?.ts || +new Date(wk)};
-  }).sort((a,b)=> b.ts - a.ts);
-  return out;
-}
-function linesHTMLForWeek(weekObj){
-  if(!weekObj || !weekObj.days.length) return `<div style="opacity:.7">No line scores.</div>`;
-  return `<div class="lines-wrap">
-    ${weekObj.days.map(d => `
-      <div class="date-group">
-        <div class="day-badge">${d.day}</div>
-        <ul class="group-list">
-          ${d.list.map(it => `<li class="group-item"><span class="player-name">${it.player}</span> — ${it.text}</li>`).join('')}
-        </ul>
-      </div>`).join('')}
-  </div>`;
+  // newest first
+  list.sort((a,b)=> b.ts - a.ts);
+  return list;
 }
 
-/* --------- render ---------- */
+/* --------- group & render weeks ---------- */
 let NEWS_ITEMS=[], PLAYERS=[];
+function groupByWeek(items){ const m=new Map(); items.forEach(i=>{ (m.get(i.week)||m.set(i.week,[]).get(i.week)).push(i); }); return m; }
+
 function renderWeeks(){
-  const newsWeeks = groupNewsByWeek(NEWS_ITEMS);
-  const lineWeeks = groupLinesByWeek(PLAYERS);
-  // Merge week keys so every week renders even if one side is empty
-  const keys = new Set([...newsWeeks.map(w=>w.key), ...lineWeeks.map(w=>w.key)]);
-  const allWeeks = [...keys].sort((a,b)=> new Date(b) - new Date(a));
+  const F = readFilters();
+  // filter & bucket headlines
+  const filteredNews = applyNewsFilters(NEWS_ITEMS, PLAYERS).sort((a,b)=> new Date(b.publishedAt||0) - new Date(a.publishedAt||0));
+  const newsByWeek = new Map();
+  filteredNews.forEach(n=>{
+    const d = n.publishedAt? new Date(n.publishedAt) : null;
+    if(!d || !withinDateRange(d,F)) return;
+    const wk = weekKey(d);
+    if(!newsByWeek.has(wk)) newsByWeek.set(wk,{pro:[],college:[]});
+    (isCollege(pickLevel(n)) ? newsByWeek.get(wk).college : newsByWeek.get(wk).pro).push(n);
+  });
 
-  const byKeyNews = Object.fromEntries(newsWeeks.map(w=>[w.key,w]));
-  const byKeyLines = Object.fromEntries(lineWeeks.map(w=>[w.key,w]));
+  // line scores (always constrained by date range)
+  const lineList = collectLines(PLAYERS).filter(x=>{
+    const d = new Date(x.ts); return withinDateRange(d, F);
+  });
+  const linesByWeek = groupByWeek(lineList);
 
-  const html = allWeeks.map(key=>{
-    const nw = byKeyNews[key] || {label:weekLabel(key), pro:[], college:[]};
-    const lw = byKeyLines[key];
+  // All week keys (newest first)
+  const keys = new Set([...newsByWeek.keys(), ...linesByWeek.keys()]);
+  const ordered = [...keys].sort((a,b)=> new Date(b) - new Date(a));
 
-    return `
-      <section class="week-block">
-        <h3 class="week-title">${nw.label}</h3>
-        <div class="week-grid">
-          <div class="col-card">
-            <h4 class="col-title">PRO NEWS</h4>
-            <div class="news-list">
-              ${nw.pro.length ? nw.pro.map(newsRowHTML).join('') : `<div style="opacity:.7">No pro headlines this week.</div>`}
-            </div>
-          </div>
-          <div class="col-card">
-            <h4 class="col-title">COLLEGE NEWS</h4>
-            <div class="news-list">
-              ${nw.college.length ? nw.college.map(newsRowHTML).join('') : `<div style="opacity:.7">No college headlines this week.</div>`}
-            </div>
-          </div>
-          <div class="col-card col-lines">
-            <h4 class="col-title">LINE SCORES</h4>
-            ${linesHTMLForWeek(lw)}
+  const html = ordered.map(key=>{
+    const label = weekLabel(key);
+    const nw = newsByWeek.get(key) || {pro:[],college:[]};
+    const lw = linesByWeek.get(key) || [];
+
+    return `<section class="week-block">
+      <div class="week-grid">
+        <div class="col-card">
+          <h4 class="col-title">ALUMNI HEADLINES (Pros) – Week of ${label}</h4>
+          <div class="news-list">
+            ${nw.pro.length ? nw.pro.map(newsRowHTML).join('') : `<div class="news-meta">No pro headlines this week.</div>`}
           </div>
         </div>
-      </section>`;
+        <div class="col-card">
+          <h4 class="col-title">ALUMNI HEADLINES (College) – Week of ${label}</h4>
+          <div class="news-list">
+            ${nw.college.length ? nw.college.map(newsRowHTML).join('') : `<div class="news-meta">No college headlines this week.</div>`}
+          </div>
+        </div>
+        <div class="col-card col-lines">
+          <h4 class="col-title">ALUMNI LINE SCORES – Week of ${label}</h4>
+          <div class="lines-wrap">
+            ${lw.length ? lw.map(li => `
+              <div class="line-item">
+                <div class="line-head">${li.player}</div>
+                <div class="line-text">${li.text}</div>
+              </div>`).join('') : `<div class="news-meta">No line scores this week.</div>`}
+          </div>
+        </div>
+      </div>
+    </section>`;
   }).join('');
 
   $('#weeksRoot').innerHTML = html || `<p style="opacity:.8">No headlines match the filters.</p>`;
@@ -433,15 +454,21 @@ function renderWeeks(){
 /* --------- boot ---------- */
 (async function(){
   try{
-    NEWS_ITEMS = await loadNews();
-    PLAYERS = await loadCSV(CSV_URL);
-    buildFilterLists(NEWS_ITEMS);
+    $('#weeksRoot').innerHTML = `<p style="opacity:.8">Loading…</p>`;
+    [NEWS_ITEMS, PLAYERS] = await Promise.all([loadNews(), loadCSV(CSV_URL)]);
+    buildFilterLists(NEWS_ITEMS, PLAYERS);
     renderWeeks();
   }catch(e){
     console.error(e);
     $('#weeksRoot').innerHTML = `<p style="color:#f88">Failed to load.</p>`;
   }
 })();
+$('#btnRefresh')?.addEventListener('click', async ()=>{
+  try{
+    [NEWS_ITEMS, PLAYERS] = await Promise.all([loadNews(), loadCSV(CSV_URL)]);
+    renderWeeks();
+  }catch(e){ console.error(e); }
+});
 </script>
 </body>
 </html>
