@@ -37,34 +37,28 @@ a{color:inherit;text-decoration:none}
 .hero-grid{display:flex;align-items:center;justify-content:space-between;gap:16px}
 .hero-right{display:flex;gap:8px}
 
-/*** 3-COLUMN NEWS LAYOUT ***/
+/*** 3-COLUMN LAYOUT ***/
 .main{padding:18px 0 calc(var(--footerH) + 12px)}
 .news-layout{display:grid;gap:18px}
-@media (min-width:1200px){
-  .news-layout{grid-template-columns: 2fr 1fr;}
-}
-.news-stream{
-  display:grid; gap:14px;
-  grid-template-columns: 1fr;
-}
+@media (min-width:1200px){ .news-layout{grid-template-columns: 2fr 1fr;} }
+
+.news-stream{ display:grid; gap:14px; grid-template-columns: 1fr; }
 @media (min-width:720px){ .news-stream{ grid-template-columns: 1fr 1fr; } }
 @media (min-width:1200px){ .news-stream{ grid-template-columns: 1fr 1fr; } }
 
-/*** NEWS CARD (thumb + text) ***/
+/*** NEWS CARD ***/
 .news-card{
   display:flex; gap:12px; background:var(--card); border:1px solid var(--line);
   border-radius:12px; overflow:hidden; min-height:136px;
 }
-.news-thumb{
-  width:170px; flex:0 0 170px; background:#000 center/cover no-repeat;
-}
-.news-body{padding:12px 12px 12px 0; display:flex; flex-direction:column; gap:6px; overflow:hidden}
-.news-meta{font-size:12px;color:var(--muted)}
-.news-title{font:400 20px/1.05 "Bebas Neue",sans-serif; letter-spacing:.03em}
-.news-title a{text-decoration:none}
-.news-actions{margin-top:auto; display:flex; align-items:center; gap:10px}
-.share-btn{padding:6px 10px;border:1px solid var(--line);border-radius:10px;background:transparent;color:var(--fg);cursor:pointer;font:700 12px "Bebas Neue";letter-spacing:.05em}
-.source-chip{font:700 10px "Bebas Neue";opacity:.85}
+.news-thumb{ width:170px; flex:0 0 170px; background:#000 center/cover no-repeat; }
+.news-body{ padding:12px 12px 12px 0; display:flex; flex-direction:column; gap:6px; overflow:hidden; }
+.news-meta{ font-size:12px; color:var(--muted) }
+.news-title{ font:400 20px/1.05 "Bebas Neue",sans-serif; letter-spacing:.03em }
+.news-title a{ text-decoration:none }
+.news-actions{ margin-top:auto; display:flex; align-items:center; gap:10px }
+.share-btn{ padding:6px 10px; border:1px solid var(--line); border-radius:10px; background:transparent; color:var(--fg); cursor:pointer; font:700 12px "Bebas Neue"; letter-spacing:.05em }
+.source-chip{ font:700 10px "Bebas Neue"; opacity:.85 }
 
 /*** SIDEBAR ***/
 .sidebar{display:flex;flex-direction:column;gap:14px}
@@ -74,14 +68,16 @@ a{color:inherit;text-decoration:none}
 .side-item{display:flex;gap:10px;align-items:center}
 .side-item .dot{width:8px;height:8px;border-radius:50%;background:#6ee7b7}
 
-/*** DRAWER / FILTERS ***/
-.drawer-mask{position:fixed;inset:0;background:rgba(0,0,0,.35);opacity:0;pointer-events:none;transition:opacity .2s;z-index:60}
-.drawer{position:fixed;top:0;bottom:0;width:min(360px,82vw);background:var(--drawer);backdrop-filter:blur(4px);color:var(--ink);transform:translateX(110%);transition:transform .25s;z-index:70}
-body.drawer-right-open .drawer-mask{opacity:1;pointer-events:auto}
-body.drawer-right-open #drawerFilters{transform:translateX(0)}
+/*** FILTER DRAWER ***/
+.drawer-mask{position:fixed;inset:0;background:rgba(0,0,0,.45);opacity:0;pointer-events:none;transition:opacity .2s;z-index:80}
+body.drawer-open{overflow:hidden}
+.drawer{position:fixed;top:0;bottom:0;right:0;width:min(360px,82vw);background:var(--drawer);backdrop-filter:blur(4px);color:var(--ink);transform:translateX(110%);transition:transform .25s;z-index:90}
 .drawer h3{margin:18px 16px 8px}
 .drawer .close-btn{position:absolute;top:12px;right:12px}
 .drawer-content{overflow:auto;height:100%;padding:10px 16px}
+body.drawer-right-open .drawer-mask{opacity:1;pointer-events:auto}
+body.drawer-right-open #drawerFilters{transform:translateX(0)}
+
 .filter-group{border-bottom:1px solid var(--line)}
 .filter-title{padding:14px 0;cursor:pointer;font-weight:700;display:flex;justify-content:space-between}
 .filter-options{padding:0 0 12px}
@@ -133,7 +129,7 @@ body.drawer-right-open #drawerFilters{transform:translateX(0)}
 
 <div class="drawer-mask"></div>
 <aside class="drawer" id="drawerFilters" aria-label="Filters">
-  <button class="icon-btn close-btn"><i class="ri-close-line"></i></button>
+  <button class="icon-btn close-btn" aria-label="Close filters"><i class="ri-close-line"></i></button>
   <h3>FILTERS</h3>
   <div class="drawer-content" id="filters">
     <details class="filter-group" open>
@@ -165,7 +161,7 @@ body.drawer-right-open #drawerFilters{transform:translateX(0)}
     <section class="news-stream" id="newsGrid">
       <p style="color:var(--muted);grid-column:1/-1">Loading headlines…</p>
     </section>
-    <aside class="sidebar" id="newsSidebar">
+    <aside class="sidebar">
       <div class="side-card">
         <div class="side-title">Sponsor</div>
         <a href="https://no-errors.com/collections/all-webgems" target="_blank" rel="noopener">
@@ -195,53 +191,86 @@ body.drawer-right-open #drawerFilters{transform:translateX(0)}
 </footer>
 
 <script type="module">
-/* ------------ basics ------------ */
+/* ----------------- helpers ----------------- */
 const $ = s => document.querySelector(s);
 const $$ = s => Array.from(document.querySelectorAll(s));
-
-/* ------------ data sources ------------- */
-/* 1) localStorage cache (preferred)      */
-/* 2) fallback JSON file in repo          */
 const CACHE_KEY = 'YAT_NEWS_CACHE_V1';
-const SEED_URL  = 'assets/news/alumni_news.json'; // keep this in your repo
+const SEED_URL  = 'assets/news/alumni_news.json';
 
+/* Built-in micro-seed so page never blanks if file/cache missing */
+const FALLBACK_ITEMS = [
+  {
+    id:"bellinger-mlb-clip",
+    title:"Cody Bellinger latest highlights & updates",
+    url:"https://www.mlb.com/",
+    source:"MLB.com",
+    publishedAt:"2025-09-05T06:00:00Z",
+    image:"https://picsum.photos/seed/codymlb/800/600",
+    player_display_name:"Cody Bellinger",
+    player_level:"MLB",
+    player_grad_class:"2013",
+    player_status:"ACTIVE 2025"
+  },
+  {
+    id:"kellner-aggies",
+    title:"Texas A&M baseball update: Boston Kellner",
+    url:"https://12thman.com/",
+    source:"12th Man",
+    publishedAt:"2025-09-02T16:00:00Z",
+    image:"https://picsum.photos/seed/kellner/800/600",
+    player_display_name:"Boston Kellner",
+    player_level:"NCAA-D1",
+    player_grad_class:"2023",
+    player_status:"ACTIVE 2025"
+  }
+];
+
+/* ----------------- data load ----------------- */
 async function loadSeedJSON(){
   try{
     const res = await fetch(SEED_URL, {cache:'no-store'});
     if(!res.ok) throw new Error(res.status);
-    return await res.json();
-  }catch(_){ return { items: [] }; }
+    const json = await res.json();
+    return Array.isArray(json.items) ? json : { items: [] };
+  }catch(_){
+    return { items: FALLBACK_ITEMS.slice() }; // never empty
+  }
 }
-
 async function loadNews(){
-  // from cache if present
   try{
     const raw = localStorage.getItem(CACHE_KEY);
     if(raw){
       const parsed = JSON.parse(raw);
-      if (Array.isArray(parsed.items)) return parsed;
+      if(Array.isArray(parsed.items)) return parsed;
     }
   }catch(_){}
-  // else from seed file
   const seed = await loadSeedJSON();
-  // write a soft cache so profile/index can read it immediately
   try{ localStorage.setItem(CACHE_KEY, JSON.stringify(seed)); }catch(_){}
   return seed;
 }
 
-/* ------------ filters ------------- */
+/* ----------------- filters ----------------- */
+function uniq(arr){ return [...new Set(arr.filter(Boolean))]; }
+
 function populateFilters(items){
-  const uniq = (arr)=>[...new Set(arr.filter(Boolean))];
   const levels = uniq(items.map(x=>x.player_level)).sort();
   const classes= uniq(items.map(x=>x.player_grad_class)).sort((a,b)=>b-a);
 
   $('#filterLevels').innerHTML =
-    '<label class="select-all-label"><input type="checkbox" class="select-all"> Select All</label>' +
+    '<label class="select-all-label"><input type="checkbox" class="select-all"> Select All</label>'+
     levels.map(v=>`<label><input type="checkbox" value="${v}"> ${v}</label>`).join('');
 
   $('#filterGradClass').innerHTML =
-    '<label class="select-all-label"><input type="checkbox" class="select-all"> Select All</label>' +
+    '<label class="select-all-label"><input type="checkbox" class="select-all"> Select All</label>'+
     classes.map(v=>`<label><input type="checkbox" value="${v}"> ${v}</label>`).join('');
+
+  // default: Select All in every group so there are results
+  $$('#filters .select-all').forEach(cb => { cb.checked = true; toggleGroup(cb, true); });
+}
+
+function toggleGroup(selectAllCB, checked){
+  const wrap = selectAllCB.closest('.filter-options');
+  wrap.querySelectorAll('input[type=checkbox]:not(.select-all)').forEach(cb => cb.checked = checked);
 }
 
 function readFilters(){
@@ -251,20 +280,26 @@ function readFilters(){
   return {statuses, levels, classes};
 }
 
+function normalizeStatus(s){
+  // Accept 'ACTIVE', 'ACTIVE 2025', etc.
+  const up = String(s||'').toUpperCase();
+  if (up.startsWith('ACTIVE')) return up;     // keep the year if present
+  return up;
+}
+
 function applyFilters(all){
   const F = readFilters();
   return all.filter(n=>{
-    const okS = !F.statuses.length || F.statuses.includes(n.player_status);
+    const st = normalizeStatus(n.player_status);
+    const okS = !F.statuses.length || F.statuses.includes(st) || (st === 'ACTIVE' && F.statuses.some(v=>v.startsWith('ACTIVE')));
     const okL = !F.levels.length   || F.levels.includes(n.player_level);
     const okC = !F.classes.length  || F.classes.includes(n.player_grad_class);
     return okS && okL && okC;
   });
 }
 
-/* ------------ rendering ------------- */
-function fmtDate(iso){
-  try{ return new Date(iso).toLocaleString(); }catch{ return ''; }
-}
+/* ----------------- render ----------------- */
+function fmtDate(iso){ try{ return new Date(iso).toLocaleString(); }catch{ return ''; } }
 function newsCardHTML(n){
   const img = n.image || `https://picsum.photos/seed/${encodeURIComponent(n.id||n.title)}/600/400`;
   const url = n.url || '#';
@@ -282,67 +317,62 @@ function newsCardHTML(n){
     </div>
   </article>`;
 }
-
 function renderNews(list){
   const grid = $('#newsGrid');
   if(!list.length){
     grid.innerHTML = `<p style="color:var(--muted);grid-column:1/-1">No headlines match the filters.</p>`;
     return;
   }
-  // newest first
   list.sort((a,b)=>new Date(b.publishedAt||0)-new Date(a.publishedAt||0));
   grid.innerHTML = list.map(newsCardHTML).join('');
 
   // share handlers
-  $$('#newsGrid .news-card .share-btn').forEach(btn=>{
+  $$('#newsGrid .share-btn').forEach(btn=>{
     btn.addEventListener('click', async (e)=>{
       const data = JSON.parse(decodeURIComponent(e.currentTarget.closest('.news-card').dataset.share||'%7B%7D'));
       try{
         if (navigator.share) await navigator.share(data);
-        else {
-          await navigator.clipboard.writeText(data.url || '');
-          e.currentTarget.textContent = 'Link Copied!';
-          setTimeout(()=> e.currentTarget.innerHTML = '<i class="ri-share-forward-line"></i>&nbsp;Share', 1200);
-        }
+        else { await navigator.clipboard.writeText(data.url || ''); btn.textContent = 'Link Copied!'; setTimeout(()=>btn.innerHTML='<i class="ri-share-forward-line"></i>&nbsp;Share',1200); }
       }catch(_){}
     });
   });
 }
 
-/* ------------ actions ------------- */
+/* ----------------- drawer / UI ----------------- */
+function openFilters(){ document.body.classList.add('drawer-right-open','drawer-open'); }
+function closeFilters(){ document.body.classList.remove('drawer-right-open','drawer-open'); }
+
 function wireUI(allItems){
-  // filters open/close
-  $('#openFilters').addEventListener('click', ()=>{
-    document.body.classList.add('drawer-right-open');
-  });
-  $('.drawer-mask')?.addEventListener('click', ()=>document.body.classList.remove('drawer-right-open'));
-  $('#drawerFilters .close-btn').addEventListener('click', ()=>document.body.classList.remove('drawer-right-open'));
+  $('#openFilters').addEventListener('click', openFilters);
+  $('.drawer-mask').addEventListener('click', closeFilters);
+  $('#drawerFilters .close-btn').addEventListener('click', closeFilters);
+  window.addEventListener('keydown', (e)=>{ if(e.key==='Escape') closeFilters(); });
+  window.addEventListener('orientationchange', closeFilters);
+  window.addEventListener('resize', ()=>{ /* safety */ if (window.innerWidth>1200) closeFilters(); });
 
   // select-all logic + live filter
   $('#filters').addEventListener('change', (e)=>{
     if(e.target.classList.contains('select-all')){
-      const wrap = e.target.closest('.filter-options');
-      wrap.querySelectorAll('input[type=checkbox]:not(.select-all)').forEach(cb=>cb.checked = e.target.checked);
+      toggleGroup(e.target, e.target.checked);
     }
     renderNews(applyFilters(allItems));
   });
 
-  // reset
+  // reset (select all everywhere)
   $('#filtersReset').addEventListener('click', ()=>{
-    $$('#filters input[type=checkbox]').forEach(cb=>cb.checked=false);
-    // default to ACTIVE
-    const act = $('#filterStatus input[value="ACTIVE 2025"]'); if (act) act.checked = true;
+    $$('#filters .select-all').forEach(cb => { cb.checked = true; toggleGroup(cb, true); });
     renderNews(applyFilters(allItems));
   });
 
   // refresh: re-read cache/seed and repaint
   $('#btnRefresh').addEventListener('click', async ()=>{
     const data = await loadNews();
-    populateFilters(data.items);
-    renderNews(applyFilters(data.items));
+    window.ALL_NEWS = data.items || [];
+    populateFilters(window.ALL_NEWS);
+    renderNews(applyFilters(window.ALL_NEWS));
   });
 
-  // export JSON (downloads what the page is showing)
+  // export JSON (downloads what is currently shown)
   $('#btnExport').addEventListener('click', ()=>{
     const showing = applyFilters(window.ALL_NEWS || []);
     const blob = new Blob([JSON.stringify({items:showing}, null, 2)], {type:'application/json'});
@@ -353,13 +383,11 @@ function wireUI(allItems){
   });
 }
 
-/* ------------ boot ------------ */
+/* ----------------- boot ----------------- */
 (async function boot(){
   const data = await loadNews();           // { items: [...] }
   window.ALL_NEWS = data.items || [];
-  populateFilters(window.ALL_NEWS);
-  // default: show ACTIVE 2025
-  const act = $('#filterStatus input[value="ACTIVE 2025"]'); if (act) act.checked = true;
+  populateFilters(window.ALL_NEWS);        // also selects-all by default
   wireUI(window.ALL_NEWS);
   renderNews(applyFilters(window.ALL_NEWS));
 })();
