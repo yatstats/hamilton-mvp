@@ -7,7 +7,7 @@
 <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400&family=Bebas+Neue&display=swap" rel="stylesheet">
 
-<!-- Firebase (same pattern as index) -->
+<!-- Firebase (minimal parity with index) -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
   import { getAuth, signInWithCustomToken, signInAnonymously, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
@@ -95,6 +95,10 @@ body.light-theme .drawer-footer{background:rgba(255,255,255,.8)}
 .share-row{display:flex;gap:10px;margin-top:8px}
 .share-btn{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:8px;border:1px solid var(--line);background:rgba(0,0,0,.45);color:#fff;font-size:12px}
 .share-btn i{font-size:16px}
+
+/* tiny spin helper */
+.ri-spin{animation:ri-spin 1s linear infinite}
+@keyframes ri-spin{to{transform:rotate(360deg)}}
 </style>
 </head>
 <body>
@@ -127,6 +131,7 @@ body.light-theme .drawer-footer{background:rgba(255,255,255,.8)}
     <div class="container hero-grid">
         <h2 style="font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:.05em;margin:0;">LATEST HEADLINES</h2>
         <div class="hero-right">
+            <button id="refreshNews" class="hero-icon icon-btn" aria-label="Refresh news"><i class="ri-refresh-line"></i></button>
             <button id="openFilters" class="hero-icon icon-btn" aria-label="Open filters"><i class="ri-filter-3-line"></i></button>
             <button id="filtersReset2" class="hero-icon icon-btn" aria-label="Reset"><i class="ri-restart-line"></i></button>
         </div>
@@ -149,17 +154,15 @@ body.light-theme .drawer-footer{background:rgba(255,255,255,.8)}
   <button class="icon-btn close-btn"><i class="ri-close-line"></i></button>
   <h3>FILTERS</h3>
   <div class="drawer-content" id="filters">
-    <details class="filter-group">
+    <details class="filter-group" open>
       <summary class="filter-title">By Status</summary>
-      <div class="filter-options" id="filterStatus">
-        <label class="select-all-label"><input type="checkbox" class="select-all"> Select All</label>
-      </div>
+      <div class="filter-options" id="filterStatus"></div>
     </details>
-    <details class="filter-group">
+    <details class="filter-group" open>
       <summary class="filter-title">By Level</summary>
       <div class="filter-options" id="filterLevels"></div>
     </details>
-    <details class="filter-group">
+    <details class="filter-group" open>
       <summary class="filter-title">By Graduating Class</summary>
       <div class="filter-options" id="filterGradClass"></div>
     </details>
@@ -187,13 +190,13 @@ const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQcWJM6Q6hTdFnE
 const NEWS_CACHE_KEY = 'YAT_NEWS_CACHE_V1';
 const NEWS_TTL_HOURS = 6;
 
-/* Players list (display_name + search hints) */
+/* Active players (for queries) */
 const ACTIVE_PLAYERS = [
   { name:"Cody Bellinger", team:"New York Yankees", level:"MLB" },
   { name:"Dom Hamel", team:"New York Mets", level:"MLB" },
   { name:"Patrick Murphy", team:"KT Wiz Suwon", level:"INTERNATIONAL", hints:["KBO","KT Wiz"] },
   { name:"Logan Boyer", team:"Oklahoma City", level:"TRIPLE-A", hints:["Dodgers","AAA"] },
-  { name:"Drew Swift", team:"Las Vegas Aviators", level:"TRIPLE-A", hints:["A's","Athletics"] },
+  { name:"Drew Swift", team:"Las Vegas Aviators", level:"TRIPLE-A", hints:["Athletics"] },
   { name:"Shane Murphy", team:"Charlotte Knights", level:"TRIPLE-A", hints:["White Sox"] },
   { name:"Brock Selvidge", team:"Somerset Patriots", level:"DOUBLE-A", hints:["Yankees"] },
   { name:"Tyler Wilson", team:"Hudson Valley Renegades", level:"HIGH-A", hints:["Yankees"] },
@@ -251,7 +254,7 @@ function setupDrawers(){
   $('#filtersReset2')?.addEventListener('click', resetFilters);
 }
 
-/* CSV loader (same as index flavor) */
+/* CSV loader */
 async function loadCSV(url){
   const res = await fetch(url); if(!res.ok) throw new Error(`CSV HTTP ${res.status}`);
   const text = await res.text(); if(!text.trim()) throw new Error('Empty CSV');
@@ -275,7 +278,6 @@ async function loadCSV(url){
 }
 
 /* ---------- NEWS FETCHING ---------- */
-/* We use Google News RSS via a JSON proxy (rss2json). Rate-limit gently. */
 function googleNewsRssUrl(query){
   return `https://news.google.com/rss/search?q=${encodeURIComponent(query)}&hl=en-US&gl=US&ceid=US:en`;
 }
@@ -289,10 +291,7 @@ function buildQueries(player){
   const qBase = `"${player.name}" baseball`;
   const withTeam = player.team ? ` "${player.team}"` : '';
   const hints = (player.hints||[]).slice(0,2).map(h => ` "${h}"`).join('');
-  return [
-    qBase + withTeam + hints,
-    qBase + hints
-  ];
+  return [ qBase + withTeam + hints, qBase + hints ];
 }
 function normalizeItem(raw, player){
   const src = raw?.author || raw?.source || raw?.feed?.title || raw?.source_url || '';
@@ -360,9 +359,10 @@ function renderNews(list){
     grid.innerHTML = `<p style="color:var(--muted); grid-column:1 / -1;">No news found. Try Reset Filters.</p>`;
     return;
   }
+  // ✅ Most recent first
   const sorted = list.slice().sort((a,b)=> new Date(b.publishedAt||0) - new Date(a.publishedAt||0));
   grid.innerHTML = sorted.map(newsHTML).join('');
-  // Wire share
+  // Share buttons
   $$('.share-btn[data-share]').forEach(btn=>{
     btn.addEventListener('click', async ()=>{
       const payload = JSON.parse(btn.dataset.share||'{}');
@@ -378,18 +378,20 @@ function renderNews(list){
   });
 }
 
-/* Filters */
+/* Filters (from player CSV) */
 function populateFiltersFromPlayers(players){
   const uniq = (arr)=>[...new Set(arr.filter(Boolean))];
   const statuses = uniq(players.map(p=>p.status));
   const levels = uniq(players.map(p=>p.level));
   const grad = uniq(players.map(p=>p.grad_class)).sort((a,b)=> (b||0)-(a||0));
-
   const mk = (items)=>'<label class="select-all-label"><input type="checkbox" class="select-all"> Select All</label>' + items.map(v=>`<label><input type="checkbox" value="${v}"> ${v}</label>`).join('');
-
   $('#filterStatus').innerHTML = mk(statuses);
   $('#filterLevels').innerHTML = mk(levels);
   $('#filterGradClass').innerHTML = mk(grad);
+  // Default: ACTIVE* checked
+  $$('#filterStatus input[type=checkbox]').forEach(cb=>{
+    if (!cb.classList.contains('select-all') && /active/i.test(cb.value)) cb.checked = true;
+  });
 }
 function readFilters(){
   const get = sel => $$(sel).map(i=>i.value);
@@ -414,6 +416,8 @@ function applyFilters(players){
 }
 function resetFilters(){
   $$('#filters input[type=checkbox]').forEach(cb=>cb.checked=false);
+  // default to ACTIVE again
+  $$('#filterStatus input[type=checkbox]:not(.select-all)').forEach(cb=>{ if(/active/i.test(cb.value)) cb.checked=true; });
   applyFilters(window.__players||[]);
 }
 function setupFilterEvents(){
@@ -428,70 +432,88 @@ function setupFilterEvents(){
   $('#filtersReset')?.addEventListener('click', resetFilters);
 }
 
+/* ---------- BUILD NEWS (cache aware) ---------- */
+async function buildNews({force=false} = {}){
+  const grid = $('#newsGrid');
+  if(!force){
+    const cached = readNewsCache();
+    if(cached?.items?.length){
+      renderNews(cached.items);
+      applyFilters(window.__players||[]);
+      return;
+    }
+  }
+  grid.innerHTML = `<p style="color: var(--muted); grid-column: 1 / -1;">Finding fresh stories…</p>`;
+
+  const items = [];
+  const players = window.__players || [];
+  const nameSet = new Set(ACTIVE_PLAYERS.map(p=>p.name.toLowerCase()));
+  const forFetch = players
+    .filter(p=> nameSet.has((p.display_name||'').toLowerCase()))
+    .map(p=> {
+      const base = ACTIVE_PLAYERS.find(a=>a.name.toLowerCase() === (p.display_name||'').toLowerCase());
+      return { name: p.display_name, team: base?.team || p.team, hints: base?.hints||[], level: base?.level||p.level };
+    });
+
+  for (const pl of forFetch){
+    const queries = buildQueries(pl);
+    let got = false;
+    for (const q of queries){
+      try{
+        const rss = googleNewsRssUrl(q);
+        const json = await fetchRssAsJson(rss);
+        const add = (json?.items||[]).slice(0,6).map(it=>normalizeItem(it, {name:pl.name}));
+        items.push(...add);
+        got = add.length > 0 || got;
+      }catch(e){ /* keep going */ }
+      await sleep(250);
+    }
+    if(!got){
+      items.push({
+        id:String(hash(pl.name + '-placeholder')),
+        title:`No recent stories for ${pl.name} — check back soon`,
+        url:'#',
+        image:'',
+        publishedAt: null,
+        source:'News',
+        player_display_name: pl.name
+      });
+    }
+    await sleep(300);
+  }
+
+  const unique = dedupe(items);
+  writeNewsCache(unique);
+  renderNews(unique);         // newest-first inside render
+  applyFilters(players);
+}
+
 /* ---------- MAIN ---------- */
 document.addEventListener('DOMContentLoaded', async ()=>{
+  // theme + drawers + filters UI
   setupTheme(); setupDrawers(); setupFilterEvents();
 
-  // 1) Load player master (for filters + tags)
-  let players=[];
-  try{ players = await loadCSV(CSV_URL); } catch(e){ console.warn('CSV load failed', e); }
-  window.__players = players;
+  // Load player master (for tag filtering)
+  try{ window.__players = await loadCSV(CSV_URL); } catch(e){ console.warn('CSV load failed', e); window.__players = []; }
+  populateFiltersFromPlayers(window.__players);
 
-  // 2) Try cache
-  const cached = readNewsCache();
-  if(cached?.items?.length){
-    populateFiltersFromPlayers(players);
-    renderNews(cached.items);
-    applyFilters(players);
-  } else {
-    $('#newsGrid').innerHTML = `<p style="color:var(--muted); grid-column:1 / -1;">Finding fresh stories…</p>`;
-  }
+  // Initial (cache-aware)
+  await buildNews({force:false});
 
-  // 3) Build + fetch news (if cache missing/expired)
-  if(!cached){
-    const items = [];
-    const nameSet = new Set(ACTIVE_PLAYERS.map(p=>p.name.toLowerCase()));
-    // Only build per player that exists in the Master (safer display_name mapping)
-    const forFetch = players.filter(p=> nameSet.has((p.display_name||'').toLowerCase()))
-      .map(p=> {
-        const base = ACTIVE_PLAYERS.find(a=>a.name.toLowerCase() === (p.display_name||'').toLowerCase());
-        return { name: p.display_name, team: base?.team || p.team, hints: base?.hints||[], level: base?.level||p.level };
-      });
-
-    for (const pl of forFetch){
-      const queries = buildQueries(pl);
-      let got = false;
-      for (const q of queries){
-        try{
-          const rss = googleNewsRssUrl(q);
-          const json = await fetchRssAsJson(rss);
-          const add = (json?.items||[]).slice(0,6).map(it=>normalizeItem(it, {name:pl.name}));
-          items.push(...add);
-          got = add.length > 0;
-        }catch(e){ /* continue */ }
-        await sleep(250); // gentle throttle
-      }
-      // If nothing found for player, push a placeholder so profile/news tabs aren’t empty
-      if(!got){
-        items.push({
-          id:String(hash(pl.name + '-placeholder')),
-          title:`No recent stories for ${pl.name} — check back soon`,
-          url:'#',
-          image:'',
-          publishedAt: null,
-          source:'News',
-          player_display_name: pl.name
-        });
-      }
-      await sleep(300);
+  // Refresh button
+  const btn = $('#refreshNews');
+  btn?.addEventListener('click', async ()=>{
+    try{
+      btn.disabled = true; const icon = btn.querySelector('i');
+      icon?.classList.add('ri-spin'); icon?.classList.replace('ri-refresh-line','ri-loader-4-line');
+      localStorage.removeItem(NEWS_CACHE_KEY);
+      await buildNews({force:true});
+    }finally{
+      const icon = btn.querySelector('i');
+      icon?.classList.remove('ri-spin'); icon?.classList.replace('ri-loader-4-line','ri-refresh-line');
+      btn.disabled = false;
     }
-
-    const unique = dedupe(items);
-    writeNewsCache(unique);
-    populateFiltersFromPlayers(players);
-    renderNews(unique);
-    applyFilters(players);
-  }
+  });
 });
 </script>
 </body>
