@@ -7,24 +7,36 @@
 <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400&family=Bebas+Neue&display=swap" rel="stylesheet">
 
+<!-- Firebase (same pattern you use elsewhere) -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
   import { getAuth, onAuthStateChanged, signInWithCustomToken, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
   window.firebaseAuth = { getAuth, onAuthStateChanged, signInWithCustomToken, signInAnonymously };
-  try{
+  try {
     const firebaseConfig = JSON.parse(window.__firebase_config || '{}');
     const app = initializeApp(firebaseConfig);
     window.auth = getAuth(app);
-    onAuthStateChanged(window.auth, user => { document.dispatchEvent(new CustomEvent('authStateChanged', { detail: { user } })); });
+    onAuthStateChanged(window.auth, user => {
+      document.dispatchEvent(new CustomEvent('authStateChanged', { detail: { user } }));
+    });
     if (window.__initial_auth_token) await signInWithCustomToken(window.auth, window.__initial_auth_token);
     else await signInAnonymously(window.auth);
-  }catch(e){ console.error('Firebase init error:', e); }
+  } catch (e) { console.error('Firebase init error:', e); }
 </script>
 
 <style>
-:root{ --bg:#0c0c0c; --fg:#f2f2f2; --muted:#c4c4c4; --ink:#e8e8e8; --line:rgba(255,255,255,.08); --card-bg:#171717; --header-bg:#000; --containerPad:16px; --footerH:clamp(56px,8vh,77px); --hamSmall:13px; --hamBig:20px; --hamBigger:24px; }
-body{background:var(--bg);color:var(--fg);font-family:Oswald,system-ui,sans-serif;margin:0}
+:root{
+  --bg:#0c0c0c; --fg:#f2f2f2; --muted:#c4c4c4; --ink:#e8e8e8; --line:rgba(255,255,255,.08);
+  --card-bg:#171717; --header-bg:#000; --drawer-bg:rgba(10,10,10,.65);
+  --containerPad:16px; --footerH:clamp(56px,8vh,77px);
+  --hamSmall:13px; --hamBig:20px; --hamBigger:24px;
+}
+@font-face{font-family:'Indigo';src:url('assets/fonts/Indigo.otf') format('opentype');font-display:swap;}
+*{box-sizing:border-box} html,body{margin:0}
+body{background:var(--bg);color:var(--fg);font-family:Oswald,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
 a{color:inherit;text-decoration:none}
+
+/* Header (parity with index top area) */
 .container{max-width:1400px;margin:0 auto;padding:0 var(--containerPad)}
 .header{position:sticky;top:0;z-index:50;background:var(--header-bg)}
 .topbar{display:flex;align-items:center;justify-content:space-between;padding:8px 0}
@@ -34,23 +46,25 @@ a{color:inherit;text-decoration:none}
 .topnav{display:flex;gap:18px;align-items:center}
 .nav-pair .thin{font:300 var(--hamSmall) Oswald; letter-spacing:.02em; color:#cfd2d6; margin-right:2px}
 .nav-pair .bold{font:400 var(--hamSmall) Indigo,"Bebas Neue",sans-serif}
-@media (max-width:1200px){ .topnav{display:none!important} }
+@media (max-width:1200px){ .topnav{display:none !important} }
 .hr-y{border-top:1px solid var(--line)}
 .schoolrow{display:flex;align-items:center;gap:16px;padding:6px var(--containerPad)}
-.ham-logo{height:clamp(50px,8vw,70px);width:auto;object-fit:cover;border-radius:8px}
+/* Profile header photo uses 5:7 portrait aspect */
+.ham-logo{width:auto;height:140px;aspect-ratio:5/7;object-fit:cover;border-radius:10px;background:#000}
 .schooltext .small{font:300 var(--hamSmall)/1 Oswald;color:var(--muted)}
 .schooltext .big1{font:400 var(--hamBig)/1 "Bebas Neue",sans-serif}
 .schooltext .big2{font:400 var(--hamBigger)/1 "Bebas Neue",sans-serif;margin-top:-4px}
 .crumbs{font:300 calc(var(--hamSmall)*.8)/1 Oswald;color:var(--muted);text-transform:uppercase;white-space:nowrap}
+
+/* Tabs */
 .hero{padding:2px 0}
 .profile-nav{display:flex;justify-content:space-around;border-bottom:1px solid var(--line);padding:4px 0}
 .profile-nav-link{background:none;border:none;color:var(--muted);font:700 14px "Bebas Neue",sans-serif;letter-spacing:.08em;cursor:pointer;padding:8px 10px;border-bottom:2px solid transparent}
 .profile-nav-link.active{color:var(--fg);border-bottom-color:var(--fg)}
-.main{padding:8px 0 calc(var(--footerH) + 12px)}
-.site-footer{position:fixed;left:0;right:0;bottom:0;height:var(--footerH);background:#0b0b0b;border-top:1px solid var(--line);z-index:40}
-.site-footer img{height:100%;width:100%;object-fit:contain}
+
+/* Drawers */
 .drawer-mask{position:fixed;inset:0;background:rgba(0,0,0,.35);opacity:0;pointer-events:none;transition:opacity .2s;z-index:60}
-.drawer{position:fixed;top:0;bottom:0;width:min(360px,82vw);background:rgba(10,10,10,.65);backdrop-filter:blur(4px);color:#e8e8e8;transform:translateX(-110%);transition:transform .25s;z-index:70}
+.drawer{position:fixed;top:0;bottom:0;width:min(360px,82vw);background:var(--drawer-bg);backdrop-filter:blur(4px);color:#e8e8e8;transform:translateX(-110%);transition:transform .25s;z-index:70}
 .drawer-right{right:0;left:auto;transform:translateX(110%);display:flex;flex-direction:column;height:100%}
 .drawer h3{margin:18px 16px 8px}
 .drawer .pad{padding:10px 16px}
@@ -59,15 +73,28 @@ body.drawer-open{overflow:hidden}
 body.drawer-left-open .drawer-mask{opacity:1;pointer-events:auto}
 body.drawer-left-open #drawerLeft{transform:translateX(0)}
 .drawer-content{flex:1;overflow:auto;padding:10px 16px}
+.live-hit{padding:10px 12px;display:flex;align-items:center;gap:10px;border-radius:10px;cursor:pointer}
+.live-hit:hover{background:rgba(255,255,255,.08)}
+.live-hit img{width:36px;height:36px;border-radius:6px;object-fit:cover}
 
+/* Main */
+.main{padding:8px 0 calc(var(--footerH) + 12px)}
 #funzone{background:#111;border-radius:12px;margin-top:16px;min-height:50vh;color:var(--ink);padding:16px}
 .stats-header-bar{background:#333;color:#fff;text-align:center;padding:6px;font:700 12px "Bebas Neue",sans-serif;margin:0 0 12px;border-radius:6px}
 .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;text-align:center}
 .stat-item{background:#222;border-radius:8px;padding:8px 5px}
 .stat-label{font-size:11px;text-transform:uppercase;opacity:.7;margin-bottom:4px}
 .stat-value{font-size:18px;font-weight:700;line-height:1}
+
+/* News list in Profile > News */
 .news-card{display:flex;gap:10px;margin:10px 0;padding:8px;border-radius:10px;border:1px solid var(--line);align-items:center}
-.news-card-thumb{width:84px;height:64px;border-radius:8px;background:#000 center/cover no-repeat;flex:0 0 84px}
+.news-card-thumb{width:110px;aspect-ratio:5/7;border-radius:8px;background:#000 center/cover no-repeat;flex:0 0 110px}
+.news-title{font:700 18px "Bebas Neue",sans-serif;letter-spacing:.03em;line-height:1.1;margin-bottom:4px}
+.news-meta{font:300 12px Oswald, sans-serif;opacity:.8}
+
+/* Footer */
+.site-footer{position:fixed;left:0;right:0;bottom:0;height:var(--footerH);background:#0b0b0b;border-top:1px solid var(--line);z-index:40}
+.site-footer img{height:100%;width:100%;object-fit:contain}
 </style>
 </head>
 
@@ -78,7 +105,7 @@ body.drawer-left-open #drawerLeft{transform:translateX(0)}
       <button class="icon-btn" id="btnMenu" aria-label="Menu"><i class="ri-menu-line"></i></button>
       <div id="breadcrumbs" class="crumbs"><a href="index.html">HAMILTON</a> ▸ LOADING…</div>
     </div>
-    <nav class="topnav">
+    <nav class="topnav" aria-label="Top Navigation">
       <a href="index.html" class="nav-pair"><span class="thin">WHERE THEY</span><span class="bold">YAT?</span></a>
       <a href="alumni-news.html" class="nav-pair"><span class="thin">ACTIVE ALUMNI</span><span class="bold">NEWS</span></a>
       <a href="all-time-list.html" class="nav-pair"><span class="thin">NEXT-LEVEL</span><span class="bold">ALL-TIME LIST</span></a>
@@ -89,7 +116,7 @@ body.drawer-left-open #drawerLeft{transform:translateX(0)}
   </div>
   <div class="hr-y"></div>
   <div class="container schoolrow">
-    <img id="playerLogo" class="ham-logo" src="assets/img/placeholder.png" alt="">
+    <img id="playerLogo" class="ham-logo" src="assets/img/placeholder.png" alt="Player Photo">
     <div class="schooltext">
       <div id="playerTeamOrg" class="small">LOADING PLAYER…</div>
       <div id="playerFirstName" class="big1"></div>
@@ -121,6 +148,16 @@ body.drawer-left-open #drawerLeft{transform:translateX(0)}
       <input id="playerSearch" placeholder="Type to search…" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--ink)">
       <div id="liveResults"></div>
     </div>
+    <h3>NAVIGATION</h3>
+    <div class="pad" style="display:flex;flex-direction:column;gap:12px">
+      <a href="index.html" class="nav-pair"><span class="thin">WHERE THEY</span><span class="bold">YAT?</span></a>
+      <a href="alumni-news.html" class="nav-pair"><span class="thin">ACTIVE ALUMNI</span><span class="bold">NEWS</span></a>
+      <a href="all-time-list.html" class="nav-pair"><span class="thin">NEXT-LEVEL</span><span class="bold">ALL-TIME LIST</span></a>
+      <a href="marketplace.html" class="nav-pair"><span class="thin">NIL & YAT-A-BOY</span><span class="bold">MARKETPLACE</span></a>
+      <a href="current-team.html" class="nav-pair"><span class="thin">THE</span><span class="bold">CURRENT TEAM</span></a>
+      <a href="partner-program.html" class="nav-pair"><span class="thin">PCD ACTION</span><span class="bold">PARTNER PROGRAM</span></a>
+      <a href="faq.html" class="nav-pair"><span class="bold">FAQ’S</span></a>
+    </div>
   </div>
 </aside>
 
@@ -135,119 +172,168 @@ body.drawer-left-open #drawerLeft{transform:translateX(0)}
 </footer>
 
 <script type="module">
+/* ----- CONFIG ----- */
 const CSV_URL  = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQcWJM6Q6hTdFnES_G5LUy4teCS-sJ5HdAc9F5HSY8DGE9egdGy8yUAe2ShT3tFm-CwUuCYeAYy_YiW/pub?gid=2028135390&single=true&output=csv";
-const JSON_URL = "assets/news/alumni_news.json";
+const JSON_URL = "assets/news/alumni_news.json";           // seed for news cache (if empty)
 const CACHE_KEY = "YAT_NEWS_CACHE_V1";
-const $ = s => document.querySelector(s), $$ = s => Array.from(document.querySelectorAll(s));
 
-/* ------- utils ------- */
-function slugOf(p){ const s=(p.slug||'').trim(); if(s) return s; return (p.display_name||'').trim().toLowerCase().replace(/[^a-z0-9]+/g,'-'); }
-function imageNameOf(p){ return `${(p.first||'').toLowerCase()}_${(p.last||'').toLowerCase()}`.replace(/[^a-z0-9_]+/g,''); }
-function qs(name){ return new URLSearchParams(location.search).get(name)||''; }
+/* ----- SHORTHANDS ----- */
+const $ = s => document.querySelector(s);
+const $$ = s => Array.from(document.querySelectorAll(s));
+
+/* ----- UTILITIES (robust + identical slugging) ----- */
+const clean = s => String(s||'').trim();
+function normalizeSlugStr(s){
+  return clean(s).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g,'');
+}
+function slugOf(p){
+  const s = clean(p.slug);
+  return s ? normalizeSlugStr(s) : normalizeSlugStr(p.display_name);
+}
+function imageNameOf(p){
+  const f = clean(p.first).toLowerCase(), l = clean(p.last).toLowerCase();
+  const base = (f && l) ? `${f}_${l}` : normalizeSlugStr(p.display_name);
+  return base.replace(/[^a-z0-9_]+/g,'');
+}
+function getParam(name){
+  const v = new URLSearchParams(location.search).get(name);
+  return v ? decodeURIComponent(v) : '';
+}
 function formatStatValue(key, value){
   if(!value||value==='--') return '--';
-  const dec=['AVG','OBP','SLG','OPS']; if(dec.includes(key.toUpperCase())){
+  const dec=['AVG','OBP','SLG','OPS'];
+  if (dec.includes(String(key).toUpperCase())){
     const num=parseFloat(value); if(isNaN(num)) return value;
-    const s=num.toFixed(3); return (num>-1 && num<1)? s.substring(1):s;
+    const s=num.toFixed(3);
+    return (num>-1 && num<1) ? s.substring(1) : s;
   }
   return value;
 }
 
-/* ------- data loaders ------- */
+/* ----- CSV LOADER (case-insensitive headers, safe commas-in-quotes) ----- */
 async function loadCSV(url){
-  const res = await fetch(url, {cache:'no-store'}); if(!res.ok) throw new Error('CSV '+res.status);
+  const res = await fetch(url, {cache:'no-store'});
+  if(!res.ok) throw new Error('CSV '+res.status);
   const text = await res.text();
-  const rows = text.trim().split(/\r?\n/).map(l=>l.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/).map(c=>c.replace(/^"|"$/g,'')));
-  const header = rows.shift().map(h=>h.trim());
-  const idx = n => header.indexOf(n);
+  const rows = text.trim().split(/\r?\n/).map(line =>
+    line.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/).map(c=>c.replace(/^"|"$/g,''))
+  );
+  if (!rows.length) return [];
+  const header = rows.shift();
+  const H = header.map(h=>h.trim());
+  const idxOf = (name)=> H.findIndex(h => h.toLowerCase() === String(name).toLowerCase());
+
   const statKeys = ['avg','obp','slg','ops','ab','h','r','rbi','2b','3b','hr','sb','bb','era','k/9','k/bb','whip','ip','er','ko','gp','w-l','saves','fip'];
-  return rows.map((r,i)=> {
+
+  return rows.map((r,i)=>{
+    const get = (name)=>{ const j=idxOf(name); return j>-1 ? r[j] : ''; };
     const p = {
-      id: r[idx('id')] || String(i+2),
-      slug:r[idx('slug')], display_name:r[idx('display_name')], first:r[idx('first')], last:r[idx('last')],
-      grad_class:r[idx('grad_class')], letter_years:r[idx('letter_years')], status:r[idx('status')], level:r[idx('level')],
-      team:r[idx('team')], org:r[idx('org')], position:r[idx('position')],
-      height:r[idx('height')], weight:r[idx('weight')], bats:r[idx('bats')], throws:r[idx('throws')],
-      draft_info:r[idx('Draft_Info')], colleges:r[idx('Colleges')],
-      next_game_datetime:r[idx('next_game_datetime')], next_game_opponent:r[idx('next_game_opponent')],
-      last_game_1:r[idx('last_game_1')], last_game_2:r[idx('last_game_2')], last_game_3:r[idx('last_game_3')],
-      x_handle:r[idx('x_handle')], ig_handle:r[idx('ig_handle')], video_url:r[idx('video_url')], nil_score:r[idx('nil_score')], stats:{}
+      id: get('id') || String(i+2),
+      slug: get('slug'),
+      display_name: get('display_name'),
+      first: get('first'), last: get('last'),
+      grad_class: get('grad_class'), letter_years:get('letter_years'),
+      status:get('status'), level:get('level'),
+      team:get('team'), org:get('org'), position:get('position'),
+      height:get('height'), weight:get('weight'), bats:get('bats'), throws:get('throws'),
+      draft_info: get('Draft_Info') || get('draft_info'),
+      colleges: get('Colleges') || get('colleges'),
+      next_game_datetime:get('next_game_datetime') || '',
+      next_game_opponent:get('next_game_opponent') || '',
+      last_game_1:get('last_game_1'), last_game_2:get('last_game_2'), last_game_3:get('last_game_3'),
+      x_handle:get('x_handle'), ig_handle:get('ig_handle'),
+      video_url:get('video_url'), nil_score:get('nil_score'),
+      stats:{}
     };
-    for(const k of statKeys){ const j=idx(k); if(j>-1 && r[j]) p.stats[k.toUpperCase()] = r[j]; }
+    for(const k of statKeys){
+      const v = get(k) || get(k.toUpperCase());
+      if (v) p.stats[k.toUpperCase()] = v;
+    }
     return p;
   });
 }
+
+/* ----- NEWS CACHE ----- */
 function getCache(){ try{ return JSON.parse(localStorage.getItem(CACHE_KEY)||'{}'); }catch{ return {}; } }
 function setCache(items){ localStorage.setItem(CACHE_KEY, JSON.stringify({updatedAt:new Date().toISOString(), items})); }
 async function seedNewsIfEmpty(){
   const cur = getCache();
   if(Array.isArray(cur.items) && cur.items.length) return cur;
   try{
-    const res = await fetch(JSON_URL, {cache:'no-store'}); const arr = await res.json(); setCache(Array.isArray(arr)?arr:[]);
-  }catch(e){ setCache([]); }
+    const res = await fetch(JSON_URL, {cache:'no-store'});
+    if (res.ok){
+      const arr = await res.json();
+      setCache(Array.isArray(arr)?arr:[]);
+    } else { setCache([]); }
+  }catch{ setCache([]); }
   return getCache();
 }
 
-/* ------- render ------- */
+/* ----- RENDERERS ----- */
 function statsGrid(p){
   const isPitcher = p.stats['ERA'] !== undefined;
   const bat=['AVG','OBP','SLG','OPS','H','R','HR','RBI','AB','2B','3B','SB'];
   const pit=['ERA','K/9','K/BB','WHIP','IP','ER','KO','BB','GP','W-L','SAVES','FIP'];
   const show = isPitcher ? pit : bat;
   return `<div class="stats-header-bar">${(p.status||'').includes('ACTIVE')?'2025 SEASON STATS':'CAREER STATS'}</div>
-    <div class="stats-grid">${show.map(s=> `<div class="stat-item"><div class="stat-label">${s}</div><div class="stat-value">${formatStatValue(s,p.stats[s])}</div></div>`).join('')}</div>`;
+    <div class="stats-grid">
+      ${show.map(s=> `<div class="stat-item"><div class="stat-label">${s}</div><div class="stat-value">${formatStatValue(s,p.stats[s])}</div></div>`).join('')}
+    </div>`;
 }
-function renderNewsForPlayer(name){
+function bioHTML(p){
+  return `<div class="stats-header-bar">BIO</div>
+    <div>Position: ${p.position||'—'} • B/T: ${p.bats||'—'}/${p.throws||'—'} • H: ${p.height||'—'} • W: ${p.weight||'—'}</div>
+    <div style="margin-top:8px">Team: <strong>${p.team||''}</strong> — ${p.org||''}</div>
+    <div style="margin-top:8px">Draft: ${p.draft_info||'N/A'} | Colleges: ${p.colleges||'N/A'}</div>`;
+}
+function socialHTML(p){
+  const links = [];
+  if (p.x_handle) links.push(`<a href="https://x.com/${p.x_handle}" target="_blank" rel="noopener">X/Twitter</a>`);
+  if (p.ig_handle) links.push(`<a href="https://instagram.com/${p.ig_handle}" target="_blank" rel="noopener">Instagram</a>`);
+  return `<div class="stats-header-bar">SOCIAL</div><div style="display:flex;gap:12px;flex-wrap:wrap">${links.join(' ')||'No social links yet.'}</div>`;
+}
+function nilHTML(p){
+  return `<div class="stats-header-bar">YAT-A-BOY NIL SCORE</div>
+    <div style="font-size:40px;font-weight:800;text-align:center">${p.nil_score||'—'}</div>`;
+}
+function videoHTML(p){
+  return p.video_url
+    ? `<iframe width="100%" height="260" src="${p.video_url}" frameborder="0" allowfullscreen style="border-radius:8px"></iframe>`
+    : `<p style="text-align:center;opacity:.8">No video available.</p>`;
+}
+function picsHTML(){ return `<p style="text-align:center;opacity:.8">Fan pics coming soon.</p>`; }
+
+function newsListForPlayer(name){
   const cache = getCache();
-  const mine = (cache.items||[]).filter(n => String(n.player_display_name||'').toLowerCase() === String(name||'').toLowerCase())
-                .sort((a,b)=> new Date(b.publishedAt||0) - new Date(a.publishedAt||0));
-  if(!mine.length) return `<p style="text-align:center;opacity:.8">No recent headlines yet.</p>`;
-  return mine.map(n => {
-    const img = n.image || `https://picsum.photos/seed/${encodeURIComponent(n.id||n.title||'news')}/600/400`;
+  const mine = (cache.items||[])
+    .filter(n => String(n.player_display_name||'').toLowerCase() === String(name||'').toLowerCase())
+    .sort((a,b)=> new Date(b.publishedAt||0) - new Date(a.publishedAt||0));
+
+  if (!mine.length) return `<p style="text-align:center;opacity:.8">No recent headlines yet.</p>`;
+
+  return mine.map(n=>{
+    const img = n.image || `https://picsum.photos/seed/${encodeURIComponent(n.id||n.title||'news')}/400/560`;
     const when = n.publishedAt ? new Date(n.publishedAt).toLocaleString() : '';
-    const read = (n.url||'#') + ((n.url||'').includes('?')?'&':'?') + 'utm_source=yatstats&utm_medium=profile';
+    const base = String(n.url || '#');
+    const read = base + (base.includes('?')?'&':'?') + 'utm_source=yatstats&utm_medium=profile';
     return `<a class="news-card" href="${read}" target="_blank" rel="noopener">
       <div class="news-card-thumb" style="background-image:url('${img}')"></div>
       <div style="flex:1;min-width:0">
-        <div style="font-weight:700;line-height:1.2">${n.title||'Read more'}</div>
-        <div style="font-size:12px;opacity:.75;margin-top:4px">${n.source||'News'} • ${when}</div>
+        <div class="news-title">${n.title||'Read more'}</div>
+        <div class="news-meta">${n.source||'News'} • ${when}</div>
       </div>
     </a>`;
   }).join('');
 }
-function renderTab(p, tab){
-  const zone = $('#funzone');
-  if(tab==='stats'){ zone.innerHTML = statsGrid(p); return; }
-  if(tab==='bio'){
-    zone.innerHTML = `<div class="stats-header-bar">BIO</div>
-      <div>Position: ${p.position||'—'} • B/T: ${p.bats||'—'}/${p.throws||'—'} • H: ${p.height||'—'} • W: ${p.weight||'—'}</div>
-      <div style="margin-top:8px">Team: <strong>${p.team||''}</strong> — ${p.org||''}</div>
-      <div style="margin-top:8px">Draft: ${p.draft_info||'N/A'} | Colleges: ${p.colleges||'N/A'}</div>`;
-    return;
-  }
-  if(tab==='social'){
-    const parts=[];
-    if(p.x_handle) parts.push(`<a href="https://x.com/${p.x_handle}" target="_blank" rel="noopener">X/Twitter</a>`);
-    if(p.ig_handle) parts.push(`<a href="https://instagram.com/${p.ig_handle}" target="_blank" rel="noopener">Instagram</a>`);
-    zone.innerHTML = `<div class="stats-header-bar">SOCIAL</div><div style="display:flex;gap:12px">${parts.join(' ') || 'No social links yet.'}</div>`;
-    return;
-  }
-  if(tab==='nil'){ zone.innerHTML = `<div class="stats-header-bar">YAT-A-BOY NIL SCORE</div><div style="text-align:center;font-size:40px;font-weight:800">${p.nil_score||'—'}</div>`; return; }
-  if(tab==='video'){ zone.innerHTML = p.video_url ? `<iframe width="100%" height="260" src="${p.video_url}" frameborder="0" allowfullscreen style="border-radius:8px"></iframe>` : `<p style="text-align:center;opacity:.8">No video available.</p>`; return; }
-  if(tab==='pics'){ zone.innerHTML = `<p style="text-align:center;opacity:.8">Fan pics coming soon.</p>`; return; }
-  if(tab==='news'){
-    zone.innerHTML = `<div class="stats-header-bar">LATEST HEADLINES</div><div id="newsList">Loading…</div>`;
-    seedNewsIfEmpty().then(()=> $('#newsList').innerHTML = renderNewsForPlayer(p.display_name));
-    return;
-  }
-}
 
-/* ------- search drawer ------- */
+/* ----- LIVE SEARCH (left drawer) ----- */
 function makeHit(p){
   const nm=imageNameOf(p);
   const jp=`assets/img/hs_players/${nm}.jpg`, png=`assets/img/hs_players/${nm}.png`;
   const el=document.createElement('div'); el.className='live-hit';
-  el.innerHTML = `<img src="${jp}" onerror="this.onerror=null;this.src='${png}';"><div><div style="font-weight:700">${p.display_name}</div><div style="opacity:.7;font-size:.92em">${p.level||''} • Class of ${p.grad_class||''}</div></div>`;
+  el.innerHTML = `<img src="${jp}" onerror="this.onerror=null;this.src='${png}';">
+                  <div><div style="font-weight:700">${p.display_name}</div>
+                  <div style="opacity:.7;font-size:.92em">${p.level||''} • Class of ${p.grad_class||''}</div></div>`;
   el.onclick = ()=> location.href = `profile.html?player=${slugOf(p)}`;
   return el;
 }
@@ -259,47 +345,95 @@ function liveSearch(players){
   box.innerHTML=''; hits.forEach(p=> box.appendChild(makeHit(p)));
 }
 
-/* ------- find player by slug | id | name ------- */
-function resolvePlayer(all){
-  const slug = (qs('player') || qs('slug') || '').toLowerCase();
-  const bySlug = slug && all.find(p => slugOf(p) === slug);
-  if(bySlug) return bySlug;
+/* ----- PLAYER RESOLUTION (robust) ----- */
+function resolvePlayer(players){
+  // Accept ?player= (slug), ?slug=, ?id=, or ?name=
+  const rawPlayer = getParam('player') || getParam('slug');
+  const idParam   = getParam('id');
+  const nameParam = getParam('name');
 
-  const idParam = qs('id');
-  if(idParam){
-    // exact match on id field or row index string
-    const byId = all.find(p => String(p.id||'').toLowerCase() === idParam.toLowerCase());
-    if(byId) return byId;
+  // Try slug first (from cards/search)
+  if (rawPlayer){
+    const want = normalizeSlugStr(rawPlayer);
+    const hit = players.find(p => slugOf(p) === want);
+    if (hit) return hit;
   }
 
-  const nameParam = qs('name');
-  if(nameParam){
-    const lc = nameParam.toLowerCase();
-    const byName = all.find(p => (p.display_name||'').toLowerCase() === lc);
-    if(byName) return byName;
+  // Try id (sheet id or fallback row id)
+  if (idParam){
+    const want = String(idParam).toLowerCase();
+    const byId = players.find(p => String(p.id||'').toLowerCase() === want);
+    if (byId) return byId;
   }
 
-  return all[0]; // fallback
+  // Try name match: exact "First Last" or display_name
+  if (nameParam){
+    const wantName = clean(nameParam).toLowerCase();
+    let hit = players.find(p => clean(p.display_name).toLowerCase() === wantName);
+    if (!hit){
+      const wantSlugish = normalizeSlugStr(wantName.replace(/\s+/g,'-'));
+      hit = players.find(p => slugOf(p) === wantSlugish);
+    }
+    if (hit) return hit;
+  }
+
+  // LAST CHANCE: if query looked like /profile.html?cody-bellinger
+  // (no key, only value), parse location.search manually:
+  if (!rawPlayer && !idParam && !nameParam){
+    const q = location.search.replace(/^\?/,'');
+    if (q && !q.includes('=')){
+      const want = normalizeSlugStr(q);
+      const hit = players.find(p => slugOf(p) === want);
+      if (hit) return hit;
+    }
+  }
+
+  // Fallback: first row (so it never blanks)
+  return players[0];
 }
 
-/* ------- boot ------- */
+/* ----- TABS ----- */
+function renderTab(p, tab){
+  const zone = $('#funzone');
+  switch(tab){
+    case 'stats': zone.innerHTML = statsGrid(p); break;
+    case 'bio':   zone.innerHTML = bioHTML(p); break;
+    case 'social':zone.innerHTML = socialHTML(p); break;
+    case 'nil':   zone.innerHTML = nilHTML(p); break;
+    case 'video': zone.innerHTML = videoHTML(p); break;
+    case 'pics':  zone.innerHTML = picsHTML(); break;
+    case 'news':
+      zone.innerHTML = `<div class="stats-header-bar">LATEST HEADLINES</div><div id="newsList">Loading…</div>`;
+      seedNewsIfEmpty().then(()=>$('#newsList').innerHTML = newsListForPlayer(p.display_name));
+      break;
+    default: zone.textContent='—';
+  }
+}
+
+/* ----- BOOT ----- */
 document.addEventListener('DOMContentLoaded', async ()=>{
   try{
+    // Open/close search drawer
+    $('#btnMenu')?.addEventListener('click', ()=>{ document.body.classList.add('drawer-left-open','drawer-open'); });
+    $('.close-btn')?.addEventListener('click', ()=>{ document.body.classList.remove('drawer-left-open','drawer-open'); });
+    $('.drawer-mask')?.addEventListener('click', ()=>{ document.body.classList.remove('drawer-left-open','drawer-open'); });
+
     const players = await loadCSV(CSV_URL);
+    if (!players.length) throw new Error('No roster rows');
+
+    // Find requested player
     const p = resolvePlayer(players);
 
-    // Header
-    $('#breadcrumbs').innerHTML = `<a href="index.html">HAMILTON</a> ▸ ${p.display_name}`;
-    $('#playerFirstName').textContent = p.first || '';
-    $('#playerLastName').textContent  = p.last  || '';
-    $('#playerTeamOrg').textContent   = `${p.team||''} • ${p.org||''}`;
+    // Header fill
+    $('#breadcrumbs').innerHTML = `<a href="index.html">HAMILTON</a> ▸ ${clean(p.display_name)}`;
+    $('#playerFirstName').textContent = clean(p.first);
+    $('#playerLastName').textContent  = clean(p.last);
+    $('#playerTeamOrg').textContent   = `${clean(p.team)} • ${clean(p.org)}`;
     const nm=imageNameOf(p);
     const nowJ=`assets/img/now_players/${nm}.jpg`, nowP=`assets/img/now_players/${nm}.png`;
     const img = $('#playerLogo'); img.src = nowJ; img.onerror = function(){ this.onerror=null; this.src = nowP; };
 
-    // Drawers
-    $('#btnMenu')?.addEventListener('click', ()=>{ document.body.classList.add('drawer-left-open','drawer-open'); });
-    $('.close-btn')?.addEventListener('click', ()=>{ document.body.classList.remove('drawer-left-open','drawer-open'); });
+    // Search in drawer
     $('#playerSearch')?.addEventListener('input', ()=> liveSearch(players));
 
     // Tabs
@@ -309,10 +443,14 @@ document.addEventListener('DOMContentLoaded', async ()=>{
       renderTab(p, btn.dataset.content);
     });
 
-    renderTab(p, 'stats');
+    // Default tab or deep-link (?tab=news)
+    const tabParam = (getParam('tab')||'stats').toLowerCase();
+    const valid = ['stats','bio','news','social','nil','video','pics'];
+    renderTab(p, valid.includes(tabParam)?tabParam:'stats');
+    $$('.profile-nav-link').forEach(b=> b.classList.toggle('active', b.dataset.content=== (valid.includes(tabParam)?tabParam:'stats')));
   }catch(e){
     console.error(e);
-    $('#funzone').innerHTML = `<p style="color:#f88">Failed to load profile.</p>`;
+    $('#funzone').innerHTML = `<p style="color:#f88">Failed to load profile. ${e.message}</p>`;
   }
 });
 </script>
