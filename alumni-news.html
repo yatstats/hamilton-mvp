@@ -7,7 +7,6 @@
 <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400&family=Bebas+Neue&display=swap" rel="stylesheet">
 
-<!-- Firebase (same pattern as other pages) -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
   import { getAuth, onAuthStateChanged, signInWithCustomToken, signInAnonymously, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
@@ -34,7 +33,7 @@
 *{box-sizing:border-box}
 html,body{margin:0}
 body{background:var(--bg);color:var(--fg);font-family:Oswald,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
-a{color:inherit;text-decoration:none} /* kill blue links */
+a{color:inherit;text-decoration:none}
 .container{max-width:1400px;margin:0 auto;padding:0 var(--containerPad)}
 
 .header{position:sticky;top:0;z-index:50;background:var(--header)}
@@ -46,7 +45,7 @@ a{color:inherit;text-decoration:none} /* kill blue links */
 .topnav{display:flex;gap:18px;align-items:center}
 .nav-pair .thin{font:300 var(--hamSmall) Oswald; letter-spacing:.02em; color:#cfd2d6; margin-right:2px}
 .nav-pair .bold{font:400 var(--hamSmall) Indigo, "Bebas Neue", sans-serif}
-@media (max-width:1200px){ .topnav{display:none !important} }
+@media (max-width:1200px){ .topnav{display:none!important} }
 
 .hr-y{border-top:1px solid var(--line)}
 .schoolrow{display:flex;align-items:center;gap:16px;padding:6px var(--containerPad)}
@@ -73,59 +72,49 @@ body.drawer-left-open .drawer-mask,body.drawer-right-open .drawer-mask{opacity:1
 body.drawer-left-open #drawerLeft{transform:translateX(0)}
 body.drawer-right-open .drawer-right{transform:translateX(0)}
 
-/* Toolbar */
-.toolbar{display:flex;gap:10px;align-items:center}
-.date-input{appearance:none;background:#111;color:var(--fg);border:1px solid var(--line);border-radius:10px;padding:10px 12px;font:300 14px Oswald}
-@media (max-width:560px){ .toolbar{flex-wrap:wrap} }
-
-/* Grid behavior (columns) */
+/* Grid / columns */
 .news-layout{display:grid;gap:14px}
-@media (min-width:1024px){  /* desktop: 3 cols */
-  .news-layout{grid-template-columns: 1fr 1fr 0.8fr}
+@media (min-width:1024px){
+  .news-layout{grid-template-columns: 1fr 1fr 0.85fr}
   .col-pro{order:1} .col-ncaa{order:2} .col-lines{order:3}
+  .col-lines{position:sticky; top:108px; max-height:calc(100vh - 160px); overflow:auto;}
 }
-@media (min-width:768px) and (max-width:1023px){ /* tablet: 2 cols */
+@media (min-width:768px) and (max-width:1023px){
   .news-layout{grid-template-columns: 2fr 1fr}
   .col-merged{grid-column:1} .col-lines{grid-column:2}
 }
-@media (max-width:767px){ /* phone: 1 col, News first */
+@media (max-width:767px){
   .news-layout{grid-template-columns: 1fr}
   .col-merged{order:1} .col-lines{order:2}
 }
 
-/* Cards + thumbs (5:7) */
+/* Sections + cards */
 .section{background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden}
 .section-title{background:#222;color:#fff;padding:10px 14px;font:700 18px "Bebas Neue",sans-serif;letter-spacing:.06em}
 .section-inner{padding:10px}
 
-.news-card{display:grid;grid-template-columns: 110px 1fr;gap:12px;align-items:center;padding:10px;border-radius:10px;transition:background .15s}
+.news-card{display:grid;grid-template-columns:110px 1fr;gap:12px;align-items:center;padding:10px;border-radius:10px;transition:background .15s}
 .news-card:hover{background:rgba(255,255,255,.05)}
 .news-thumb{width:110px;height:154px;border-radius:10px;object-fit:cover;background:#000} /* 5:7 portrait */
 .news-meta{font:300 12px/1.2 Oswald;color:var(--muted);margin-bottom:6px}
 .news-headline{font:700 18px/1.1 "Bebas Neue",sans-serif;letter-spacing:.02em}
-.news-player{font:300 14px/1.2 Oswald;margin-top:4px} /* << keep this size/weight */
+.news-player{font:300 14px/1.2 Oswald;margin-top:4px}
 
 /* Line scores */
 .player-block{border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin-bottom:10px;background:#121212}
-.player-title{font:700 18px "Bebas Neue",sans-serif;letter-spacing:.06em;margin:2px 0 8px 0} /* ALL CAPS same as section title */
+.player-title{font:700 18px "Bebas Neue",sans-serif;letter-spacing:.06em;margin:2px 0 8px 0}
 .line-row{display:flex;gap:8px;align-items:center;border:1px solid #222;border-radius:10px;padding:10px 12px;margin:8px 0;background:#0f0f0f}
 .line-date{background:#1c1c1c;border-radius:999px;padding:6px 10px;font:700 12px "Bebas Neue",sans-serif;letter-spacing:.06em}
-.line-text{font:300 14px/1.2 Oswald} /* << same as news player line (not bold) */
-
-/* Filter drawer content */
+.line-text{font:300 14px/1.2 Oswald}
+.empty{opacity:.7;padding:12px;text-align:center}
+.form-txt{width:100%;padding:10px;border-radius:10px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--ink)}
+.select-all-label{font-weight:bold;border-bottom:1px solid var(--line);padding-bottom:8px;margin-bottom:10px}
 .filter-group{border-bottom:1px solid var(--line)}
 .filter-group:last-of-type{border-bottom:none}
 .filter-title{padding:14px 0;cursor:pointer;font:700 16px "Bebas Neue",sans-serif;letter-spacing:.06em;display:flex;justify-content:space-between;align-items:center}
 .filter-title::after{content:'▸';transition:.2s}
 details[open] > .filter-title::after{transform:rotate(90deg)}
 .filter-options{padding:4px 0 14px}
-.filter-options label{display:block;margin-bottom:8px}
-.select-all-label{font-weight:bold;border-bottom:1px solid var(--line);padding-bottom:8px;margin-bottom:10px}
-.form-txt{width:100%;padding:10px;border-radius:10px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--ink)}
-.drawer-footer{padding:12px 16px;border-top:1px solid var(--line);display:flex;gap:10px;align-items:center}
-
-/* Empty states */
-.empty{opacity:.7;padding:12px;text-align:center}
 </style>
 </head>
 
@@ -143,10 +132,8 @@ details[open] > .filter-title::after{transform:rotate(90deg)}
       <a href="all-time-list.html" class="nav-pair"><span class="thin">NEXT-LEVEL</span><span class="bold">ALL-TIME LIST</span></a>
     </nav>
 
-    <div class="right-icons toolbar">
-      <input type="date" id="dateFrom" class="date-input">
-      <input type="date" id="dateTo" class="date-input">
-      <button class="icon-btn" id="btnRefresh" aria-label="Refresh"><i class="ri-refresh-line"></i>&nbsp;Refresh</button>
+    <div class="right-icons">
+      <button class="icon-btn" id="btnRefresh" aria-label="Refresh"><i class="ri-refresh-line"></i></button>
       <button class="icon-btn" id="btnFilters" aria-label="Filters"><i class="ri-filter-3-line"></i></button>
     </div>
   </div>
@@ -188,6 +175,13 @@ details[open] > .filter-title::after{transform:rotate(90deg)}
   <h3>FILTERS</h3>
   <div class="drawer-content" id="filters">
     <details class="filter-group" open>
+      <summary class="filter-title">By Date Range</summary>
+      <div class="filter-options">
+        <input type="date" id="dateFrom" class="form-txt" style="margin-bottom:8px">
+        <input type="date" id="dateTo" class="form-txt">
+      </div>
+    </details>
+    <details class="filter-group" open>
       <summary class="filter-title">By Name</summary>
       <div class="filter-options"><input id="filterName" placeholder="Type a name…" class="form-txt"></div>
     </details>
@@ -207,7 +201,6 @@ details[open] > .filter-title::after{transform:rotate(90deg)}
       <summary class="filter-title">By Level</summary>
       <div class="filter-options" id="filterLevels">
         <label class="select-all-label"><input type="checkbox" class="select-all"> Select All</label>
-        <!-- filled dynamically from CSV -->
       </div>
     </details>
     <details class="filter-group" open>
@@ -227,7 +220,6 @@ details[open] > .filter-title::after{transform:rotate(90deg)}
 
 <main class="main container">
   <div id="layout" class="news-layout">
-    <!-- Desktop: three columns; Tablet: 2 columns; Phone: 1 column (news first) -->
     <section id="colPro" class="section col-pro" aria-label="Pro news" style="display:none">
       <div class="section-title">ALUMNI HEADLINES (Pros)</div>
       <div class="section-inner" id="proWrap"></div>
@@ -255,22 +247,22 @@ details[open] > .filter-title::after{transform:rotate(90deg)}
 </footer>
 
 <script type="module">
-/* -----------------------------------------------------------
-   CONFIG
------------------------------------------------------------ */
+/* ======================= CONFIG ======================= */
 const CSV_URL =
- "https://docs.google.com/spreadsheets/d/e/2PACX-1vQcWJM6Q6hTdFnES_G5LUy4teCS-sJ5HdAc9F5HSY8DGE9egdGy8yUAe2ShT3tFm-CwUuCYeAYy_YiW/pub?gid=2028135390&single=true&output=csv"; // players
-// 👉 TODO: point this at your GAMES sheet (Publish to web -> CSV):
-const GAMES_CSV_URL = "YOUR-GAMES-SHEET-CSV-URL-HERE"; // see expected columns in the message
+ "https://docs.google.com/spreadsheets/d/e/2PACX-1vQcWJM6Q6hTdFnES_G5LUy4teCS-sJ5HdAc9F5HSY8DGE9egdGy8yUAe2ShT3tFm-CwUuCYeAYy_YiW/pub?gid=2028135390&single=true&output=csv";
 
-const NEWS_JSON_URL = "assets/news/alumni_news.json";  // curated news seed
+/* Your GAMES doc — sheet name is GAMES (case-insensitive) */
+const GAMES_CSV_URL =
+ "https://docs.google.com/spreadsheets/d/1yUNQH9NbpKwOOwH9blf5ZqQfmft796sQ1ldgqhXP4uA/gviz/tq?tqx=out:csv&sheet=GAMES";
+
+const NEWS_JSON_URL = "assets/news/alumni_news.json";
 const NEWS_CACHE_KEY = "YAT_NEWS_CACHE_V1";
 
 const $ = s => document.querySelector(s);
 const $$ = s => Array.from(document.querySelectorAll(s));
 const debounce = (fn,ms=300)=>{let t;return(...a)=>{clearTimeout(t);t=setTimeout(()=>fn(...a),ms);}};
 
-/* ----------- sorting aids (same as flip-cards) ----------- */
+/* ===== sort helpers (same as cards) ===== */
 const levelOrder = {
   'MLB':13,'INTERNATIONAL':12,'TRIPLE-A':11,'AAA':11,'DOUBLE-A':10,'AA':10,
   'HIGH-A':9,'A+':9,'LOW-A':8,'A':8,'ROOKIE':7,'ROK':7,'INDY':6,
@@ -299,9 +291,7 @@ function defaultSort(a,b){
   return (a.display_name||'').localeCompare(b.display_name||'');
 }
 
-/* -----------------------------------------------------------
-   LOADERS
------------------------------------------------------------ */
+/* ======================= LOADERS ======================= */
 async function loadCSV(url){
   const r=await fetch(url,{cache:'no-store'}); if(!r.ok) throw new Error('CSV '+r.status);
   const txt=await r.text();
@@ -325,25 +315,48 @@ async function loadCSV(url){
   });
 }
 
+/* ROBUST games loader for your headers */
 async function loadGames(url){
-  if(!url || url.startsWith('YOUR-GAMES')) return [];
+  if(!url) return [];
   const r=await fetch(url,{cache:'no-store'}); if(!r.ok) throw new Error('GAMES '+r.status);
   const txt=await r.text();
-  const rows=txt.trim().split(/\r?\n/).map(l=>l.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/).map(c=>c.replace(/^"|"$/g,'')));
-  const hd=rows.shift().map(h=>h.trim().toLowerCase()); const idx=n=>hd.indexOf(n);
-  return rows.map(r=>({
-    date: r[idx('date')],
-    player_display_name: r[idx('player_display_name')] || r[idx('player')] || '',
-    ha: r[idx('ha')] || r[idx('home_away')] || '',
-    opponent: r[idx('opponent')] || '',
-    line_score: r[idx('line_score')] || '',
-    level: r[idx('level')] || '',
-    grad_class: r[idx('grad_class')] || '',
-    status: r[idx('status')] || ''
-  })).filter(x=>x.player_display_name && x.date);
+  const splitCSV = s => s.trim().split(/\r?\n/).map(l=>l.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/).map(c=>c.replace(/^"|"$/g,'')));
+  const rows=splitCSV(txt);
+  const norm = h => h.trim().toLowerCase().replace(/\s+/g,'_').replace(/\//g,'_');
+  const hd=rows.shift().map(norm);
+  const find = arr => arr.findIndex(n=> hd.includes(n));
+  const gi = find(['gamedatelocal','game_date_local','gamedate','date']);
+  const pi = find(['player_display_name','player','player_name']);
+  const hai= find(['ha','home_away','home/away','homeaway']);
+  const oi = find(['opponent']);
+  const ti = find(['gametimelocal','game_time_local','gametime','time']);
+  const li = find(['daily_line_score','line_score','linescore']);
+  const lvl= find(['level']);
+  const gc = find(['grad_class']);
+  const st = find(['status']);
+
+  const rowsOut = rows.map(r=>{
+    const rawHA = hai>-1 ? r[hai] : '';
+    const ha = (()=>{ const s=(rawHA||'').toUpperCase();
+      if(s.includes('@')||s.startsWith('A')) return '@';
+      if(s.includes('VS')||s.startsWith('H')) return 'vs.';
+      return '';
+    })();
+    return {
+      date: gi>-1 ? r[gi] : '',
+      time: ti>-1 ? r[ti] : '',
+      player_display_name: pi>-1 ? r[pi] : '',
+      ha, opponent: oi>-1 ? r[oi] : '',
+      line_score: li>-1 ? r[li] : '',
+      level: lvl>-1 ? r[lvl] : '',
+      grad_class: gc>-1 ? r[gc] : '',
+      status: st>-1 ? r[st] : ''
+    };
+  }).filter(x=>x.player_display_name && x.date);
+  return rowsOut;
 }
 
-/* -------- news cache (seed once from file) ---------- */
+/* news cache (seed once from file) */
 function getNewsCache(){ try{ return JSON.parse(localStorage.getItem(NEWS_CACHE_KEY)||'{}'); }catch{return {}} }
 function setNewsCache(items){ localStorage.setItem(NEWS_CACHE_KEY, JSON.stringify({updatedAt:new Date().toISOString(), items})) }
 async function ensureNews(){
@@ -353,13 +366,9 @@ async function ensureNews(){
   catch{ return [] }
 }
 
-/* -----------------------------------------------------------
-   HELPERS
------------------------------------------------------------ */
+/* ======================= HELPERS ======================= */
 function toDate(d){ const x=new Date(d); return isNaN(+x)? null : x; }
-function startOfWeek(d){ // Sunday
-  const x=new Date(d); const day=x.getDay(); x.setHours(0,0,0,0); x.setDate(x.getDate()-day); return x;
-}
+function startOfWeek(d){ const x=new Date(d); const day=x.getDay(); x.setHours(0,0,0,0); x.setDate(x.getDate()-day); return x; }
 function fmtWeekLabel(sunday){
   const end=new Date(sunday); end.setDate(end.getDate()+6);
   const f = (dt)=> dt.toLocaleDateString(undefined,{month:'long', day:'numeric', year:'numeric'});
@@ -375,16 +384,13 @@ function bucketByWeek(items, getDate){
     if(!map.has(sun)) map.set(sun,[]);
     map.get(sun).push(it);
   });
-  // newest week first
   return [...map.entries()].sort((a,b)=> new Date(b[0])-new Date(a[0]));
 }
 
-/* -----------------------------------------------------------
-   RENDER NEWS
------------------------------------------------------------ */
 function isPro(level){ const L=(level||'').toUpperCase(); return ['MLB','INTERNATIONAL','TRIPLE-A','AAA','DOUBLE-A','AA','HIGH-A','A+','LOW-A','A','ROOKIE','ROK','INDY'].includes(L); }
 function isCollege(level){ const L=(level||'').toUpperCase(); return ['NCAA-D1','NCAA-D2','NCAA-D3','NAIA','JUCO'].includes(L); }
 
+/* ======================= RENDER NEWS ======================= */
 function newsCard(n){
   const img = n.image || `https://picsum.photos/seed/${encodeURIComponent(n.id||n.title||'news')}/500/700`;
   const when = n.publishedAt ? new Date(n.publishedAt).toLocaleString() : '';
@@ -409,11 +415,8 @@ function applyNewsFilters(items, players, F, dateFrom, dateTo){
   return items.filter(n=>{
     const nm=(n.player_display_name||'').toLowerCase();
     const p=bySlug.get(nm);
-    // time filter
     const d=toDate(n.publishedAt||n.date||''); if(from&&d && d<from) return false; if(to&&d && d>to) return false;
-    // name search
     if(F.name && !nm.includes(F.name)) return false;
-    // status/level/class filters (if we have player meta)
     if(p){
       if(F.status.length && !F.status.includes(p.status)) return false;
       if(F.levels.length && !F.levels.includes(p.level)) return false;
@@ -428,9 +431,7 @@ function applyNewsFilters(items, players, F, dateFrom, dateTo){
 
 function renderNewsColumns(allNews, players, F, from, to){
   const filtered = applyNewsFilters(allNews, players, F, from, to);
-  // buckets by week
   const weeks = bucketByWeek(filtered, n=> n.publishedAt || n.date);
-  // Build three content strings
   let proHTML='', ncaaHTML='', mergedHTML='';
   weeks.forEach(([sun, items])=>{
     const label = fmtWeekLabel(new Date(sun));
@@ -441,87 +442,66 @@ function renderNewsColumns(allNews, players, F, from, to){
     if(items.length){ mergedHTML += sectionHeader(`ALUMNI HEADLINES — ${label}`) + `<div class="section-inner">` + items.map(newsCard).join('') + `</div>`; }
   });
 
-  // place into columns based on viewport (but we render all and toggle via CSS visibility)
-  const colPro = $('#proWrap'), colNcaa = $('#ncaaWrap'), colMerged = $('#mergedWrap');
-  colPro.innerHTML = proHTML || `<p class="empty">No pro headlines this range.</p>`;
-  colNcaa.innerHTML = ncaaHTML || `<p class="empty">No college headlines this range.</p>`;
-  colMerged.innerHTML = mergedHTML || `<p class="empty">No headlines this range.</p>`;
+  $('#proWrap').innerHTML    = proHTML   || `<p class="empty">No pro headlines this range.</p>`;
+  $('#ncaaWrap').innerHTML   = ncaaHTML  || `<p class="empty">No college headlines this range.</p>`;
+  $('#mergedWrap').innerHTML = mergedHTML|| `<p class="empty">No headlines this range.</p>`;
 
-  // column visibility for breakpoints:
   if (window.matchMedia('(min-width:1024px)').matches){
     $('#colPro').style.display='block'; $('#colNcaa').style.display='block'; $('#colMerged').style.display='none';
-  }else if (window.matchMedia('(min-width:768px)').matches){
-    $('#colPro').style.display='none'; $('#colNcaa').style.display='none'; $('#colMerged').style.display='block';
   }else{
     $('#colPro').style.display='none'; $('#colNcaa').style.display='none'; $('#colMerged').style.display='block';
   }
 }
 
-/* -----------------------------------------------------------
-   RENDER LINE SCORES
------------------------------------------------------------ */
-function renderLineScores(games, players, F, from, to){
+/* ======================= RENDER LINE SCORES ======================= */
+function renderLineScores(games, players, _F, from, to){
   const wrap = $('#linesWrap');
-  if(!games.length){ wrap.innerHTML = `<p class="empty">Wire your GAMES sheet to show line scores (see top of file).</p>`; return; }
+  if(!games.length){ wrap.innerHTML = `<p class="empty">No games loaded.</p>`; return; }
 
-  // Filters
-  const byName=new Map(players.map(p=>[(p.display_name||'').toLowerCase(), p]));
+  const fromD = from ? new Date(from) : null;
+  const toD   = to   ? new Date(to)   : null;
+
+  // Only date range filters apply (independent of name/level/status)
   const filtered = games.filter(g=>{
     const d=toDate(g.date); if(!d) return false;
-    if(from && d<new Date(from)) return false;
-    if(to && d>new Date(to)) return false;
-    const nm=(g.player_display_name||'').toLowerCase(); const p=byName.get(nm);
-    if(F.name && !nm.includes(F.name)) return false;
-    if(p){
-      if(F.status.length && !F.status.includes(p.status)) return false;
-      if(F.levels.length && !F.levels.includes(p.level)) return false;
-      if(F.classes.length && !F.classes.includes(p.grad_class)) return false;
-      if(F.rosterYears.length){
-        const yrs=(p.letter_years||'').split(',').map(s=>s.trim()); if(!yrs.some(y=>F.rosterYears.includes(y))) return false;
-      }
-    }
+    if(fromD && d<fromD) return false;
+    if(toD && d>toD) return false;
     return true;
   });
 
-  // group by week, then within week group by player; order players by defaultSort
   const weeks = bucketByWeek(filtered, g=> g.date);
+  const byName=new Map(players.map(p=>[(p.display_name||'').toLowerCase(), p]));
+  const playersForSort = names => names
+    .map(n=> byName.get(n.toLowerCase()) || {display_name:n})
+    .sort(defaultSort).map(p=> p.display_name);
 
-  const playersForSort = (names)=> names
-     .map(n=> byName.get(n.toLowerCase()) || {display_name:n})
-     .sort(defaultSort)
-     .map(p=> p.display_name);
+  const now = new Date();
 
   let html='';
   weeks.forEach(([sun, items])=>{
     const label = fmtWeekLabel(new Date(sun));
     html += sectionHeader(`ALUMNI LINE SCORES — ${label}`) + `<div class="section-inner">`;
 
-    // group by player
     const byP = new Map();
-    items.forEach(g=>{
-      const key=g.player_display_name;
-      if(!byP.has(key)) byP.set(key,[]);
-      byP.get(key).push(g);
-    });
-    // order players by defaultSort
-    const orderedNames = playersForSort([...byP.keys()]);
-    orderedNames.forEach(name=>{
-      const rows = byP.get(name)
-        .sort((a,b)=> new Date(b.date)-new Date(a.date)); // newest first in the week
-      html += `<div class="player-block">
-                <div class="player-title">${name.toUpperCase()}</div>
-                ${rows.map(r=>{
-                  const dt = new Date(r.date); 
-                  const dlabel = dt.toLocaleDateString(undefined,{month:'numeric',day:'numeric'});
-                  const at = (r.ha||'').trim(); // '@' or 'vs.'
-                  const opp = (r.opponent||'').trim();
-                  const line = r.line_score ? r.line_score : 'DNP';
-                  return `<div class="line-row">
-                            <div class="line-date">${dlabel}</div>
-                            <div class="line-text">${at} ${opp} ${line ? ' - ' + line : ''}</div>
-                          </div>`;
-                }).join('')}
-              </div>`;
+    items.forEach(g=>{ const key=g.player_display_name; if(!byP.has(key)) byP.set(key,[]); byP.get(key).push(g); });
+
+    const ordered = playersForSort([...byP.keys()]);
+    ordered.forEach(name=>{
+      const rows = byP.get(name).sort((a,b)=> new Date(b.date)-new Date(a.date));
+      html += `<div class="player-block"><div class="player-title">${name.toUpperCase()}</div>`;
+      html += rows.map(r=>{
+        const dt = new Date(r.date);
+        const dlabel = dt.toLocaleDateString(undefined,{month:'numeric',day:'numeric'});
+        const ha = (r.ha||'').trim();
+        const opp = (r.opponent||'').trim();
+        const time = (r.time||'').trim();
+        const inFuture = dt > now;
+        const body = inFuture
+          ? `${ha} ${opp}${time?` – ${time}`:''}`
+          : `${ha} ${opp}${r.line_score?` – ${r.line_score}`:' – DNP'}`;
+        return `<div class="line-row"><div class="line-date">${dlabel}</div><div class="line-text">${body}</div></div>`;
+      }).join('');
+      html += `</div>`;
     });
 
     html += `</div>`;
@@ -530,24 +510,19 @@ function renderLineScores(games, players, F, from, to){
   wrap.innerHTML = html || `<p class="empty">No games in this range.</p>`;
 }
 
-/* -----------------------------------------------------------
-   FILTER UI + BOOT
------------------------------------------------------------ */
+/* ======================= FILTER UI + BOOT ======================= */
 function populateFilters(players){
-  // levels
   const levels=[...new Set(players.map(p=>p.level).filter(Boolean))]
     .sort((a,b)=> (levelOrder[b.toUpperCase()]??-1)-(levelOrder[a.toUpperCase()]??-1));
   $('#filterLevels').innerHTML =
     '<label class="select-all-label"><input type="checkbox" class="select-all"> Select All</label>'+
     levels.map(l=>`<label><input type="checkbox" value="${l}"> ${l}</label>`).join('');
 
-  // grad classes
   const years=[...new Set(players.map(p=>p.grad_class).filter(Boolean))].sort((a,b)=>b-a);
   $('#filterGradClass').innerHTML =
     '<label class="select-all-label"><input type="checkbox" class="select-all"> Select All</label>'+
     years.map(y=>`<label><input type="checkbox" value="${y}"> ${y}</label>`).join('');
 
-  // roster years
   const roster=[...new Set(players.flatMap(p=>(p.letter_years||'').split(',').map(y=>y.trim()).filter(Boolean)))].sort((a,b)=>b-a);
   $('#filterRosterYear').innerHTML =
     '<label class="select-all-label"><input type="checkbox" class="select-all"> Select All</label>'+
@@ -564,13 +539,16 @@ function readFilters(){
 }
 
 function resetFilters(){
-  $$('#filters input').forEach(i=>{ if(i.type==='checkbox') i.checked=false; if(i.type==='text') i.value=''; });
-  $$('#filterStatus input[value^="ACTIVE"]').forEach(i=> i.checked=true);
+  $$('#filters input').forEach(i=>{ if(i.type==='checkbox') i.checked=false; if(i.type==='text' || i.type==='date') i.value=''; });
+  // default date range: last 28 days
+  const to = new Date(); const from = new Date(); from.setDate(to.getDate()-28);
+  $('#dateFrom').value = from.toISOString().slice(0,10);
+  $('#dateTo').value = to.toISOString().slice(0,10);
 }
 
 function imageNameOf(p){ return `${(p.first||'').toLowerCase()}_${(p.last||'').toLowerCase()}`.replace(/[^a-z0-9_]+/g,''); }
 function makeHit(p){
-  const el=document.createElement('div'); el.className='news-card'; // reuse layout
+  const el=document.createElement('div'); el.className='news-card';
   const imgJ=`assets/img/hs_players/${imageNameOf(p)}.jpg`, imgP=`assets/img/hs_players/${imageNameOf(p)}.png`;
   el.innerHTML = `<img class="news-thumb" src="${imgJ}" onerror="this.onerror=null;this.src='${imgP}'">
                   <div><div class="news-headline">${p.display_name}</div>
@@ -579,11 +557,8 @@ function makeHit(p){
   return el;
 }
 
-/* -----------------------------------------------------------
-   INIT
------------------------------------------------------------ */
+/* ======================= INIT ======================= */
 document.addEventListener('DOMContentLoaded', async ()=>{
-  // drawers + toolbar wiring
   const mask=$('.drawer-mask');
   const closeAll=()=> document.body.classList.remove('drawer-open','drawer-left-open','drawer-right-open');
   $('#btnMenu')?.addEventListener('click', ()=>{ document.body.classList.add('drawer-open','drawer-left-open'); });
@@ -601,20 +576,13 @@ document.addEventListener('DOMContentLoaded', async ()=>{
     }
     doRender();
   });
-  $('#btnRefresh')?.addEventListener('click', ()=> doRender(true));
 
-  // date defaults: last 28 days
-  const to = new Date(); const from = new Date(); from.setDate(to.getDate()-28);
-  $('#dateFrom').value = from.toISOString().slice(0,10);
-  $('#dateTo').value = to.toISOString().slice(0,10);
-  $('#dateFrom').addEventListener('change', ()=> doRender());
-  $('#dateTo').addEventListener('change', ()=> doRender());
-
-  // load players + populate filters + live search
   let PLAYERS=[];
   try{
     PLAYERS = await loadCSV(CSV_URL);
     populateFilters(PLAYERS);
+    // default date range
+    resetFilters();
     $('#playerSearch')?.addEventListener('input', ()=>{
       const q=($('#playerSearch').value||'').toLowerCase().trim();
       const box=$('#liveResults'); if(!box) return;
@@ -624,22 +592,21 @@ document.addEventListener('DOMContentLoaded', async ()=>{
     });
   }catch(e){ console.error('Players load failed', e); }
 
-  // cache warmed?
   const ALL_NEWS = await ensureNews();
-  let GAMES=[];
-  try{ GAMES = await loadGames(GAMES_CSV_URL); }catch(e){ console.warn('Games load failed:', e); }
 
-  // single render function
-  function doRender(force=false){
+  let GAMES=[];
+  try{ GAMES = await loadGames(GAMES_CSV_URL); }
+  catch(e){ console.warn('Games load failed:', e); }
+
+  function doRender(){
     const F=readFilters();
     const df=$('#dateFrom').value, dt=$('#dateTo').value;
-
     renderNewsColumns(ALL_NEWS, PLAYERS, F, df, dt);
     renderLineScores(GAMES, PLAYERS, F, df, dt);
   }
 
-  // initial
   doRender();
+  $('#btnRefresh')?.addEventListener('click', doRender);
 });
 </script>
 </body>
