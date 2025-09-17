@@ -17,8 +17,11 @@
     const app = initializeApp(firebaseConfig);
     window.auth = getAuth(app);
     onAuthStateChanged(window.auth, user => { document.dispatchEvent(new CustomEvent('authStateChanged', { detail: { user } })); });
-    if (window.__initial_auth_token) { await signInWithCustomToken(window.auth, window.__initial_auth_token); }
-    else { await signInAnonymously(window.auth); }
+    if (window.__initial_auth_token) {
+      await signInWithCustomToken(window.auth, window.__initial_auth_token);
+    } else {
+      await signInAnonymously(window.auth);
+    }
   } catch (e) { console.error("Firebase initialization error:", e); }
 </script>
 
@@ -125,7 +128,7 @@ body.light-theme .form-field input{background:rgba(0,0,0,.06)}
 
 .main{padding:8px 0 calc(var(--footerH) + 12px)}
 
-/* News grid — 3 columns desktop, 2 columns tablet, 1 column mobile */
+/* News grid — 3 columns desktop, 2 columns tablet, 1 column mobile (matches flip-cards breakpoints) */
 .grid{
   display:grid;gap:14px;
   grid-template-columns:repeat(3,1fr);
@@ -250,7 +253,7 @@ body.light-theme .form-field input{background:rgba(0,0,0,.06)}
   </div>
 </aside>
 
-<!-- Right: Filters (date range is back; affects NEWS only) -->
+<!-- Right: Filters (no date inputs here now) -->
 <aside class="drawer drawer-right" id="drawerFilters">
   <button class="icon-btn close-btn"><i class="ri-close-line"></i></button>
   <h3>FILTERS</h3>
@@ -261,15 +264,6 @@ body.light-theme .form-field input{background:rgba(0,0,0,.06)}
         <input id="filterText" placeholder="Type keywords…" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--ink)"/>
       </div>
     </details>
-
-    <details class="filter-group" open>
-      <summary class="filter-title">By Date (news only)</summary>
-      <div class="filter-options">
-        <label>From <input id="filterDateFrom" type="date" style="width:100%;padding:10px;border-radius:8px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--ink)"></label>
-        <label>To <input id="filterDateTo" type="date" style="width:100%;padding:10px;border-radius:8px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--ink)"></label>
-      </div>
-    </details>
-
     <details class="filter-group">
       <summary class="filter-title">By Status</summary>
       <div class="filter-options" id="filterStatus">
@@ -358,7 +352,7 @@ body.light-theme .form-field input{background:rgba(0,0,0,.06)}
 /* ---- CONFIG ---- */
 const ROSTER_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQcWJM6Q6hTdFnES_G5LUy4teCS-sJ5HdAc9F5HSY8DGE9egdGy8yUAe2ShT3tFm-CwUuCYeAYy_YiW/pub?gid=2028135390&single=true&output=csv";
 const NEWS_JSON_URL  = "assets/news/alumni_news.json";
-/* GAMES tab (published CSV link you gave) */
+/* GAMES tab (published CSV link you provided) */
 const GAMES_CSV_URL  = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQcWJM6Q6hTdFnES_G5LUy4teCS-sJ5HdAc9F5HSY8DGE9egdGy8yUAe2ShT3tFm-CwUuCYeAYy_YiW/pub?output=csv";
 
 /* ---- SHORTCUTS ---- */
@@ -434,23 +428,15 @@ async function fetchGames(){
     opp:    idxOf(header, ['opponent','opp']),
     ha:     idxOf(header, ['homeaway','ha'])
   };
-  const parseDate = (s)=>{
-    const t = (s||'').trim();
-    if(!t) return null;
-    // Try common formats
-    const d1 = new Date(t); if(!isNaN(d1)) return d1;
-    const parts = t.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})/);
-    if(parts){ const m=+parts[1]-1, d=+parts[2], y=+parts[3]<100?2000+ +parts[3]:+parts[3]; const d2=new Date(y,m,d); if(!isNaN(d2)) return d2; }
-    return null;
-  };
   return rows.map(r=>{
     const nm  = r[i.player] || '';
     const raw = r[i.line]   || '';
-    const dat = parseDate(r[i.date]);
+    const dat = r[i.date]   || '';
     const opp = r[i.opp]    || '';
     const ha  = r[i.ha]     || '';
-    if (!nm || !dat) return null;
-    return { player_name:nm.trim(), date:dat, opp:opp.trim(), ha:ha.trim(), line_raw:String(raw||'').trim() };
+    const d = new Date(dat);
+    if (!nm || isNaN(d)) return null;
+    return { player_name:nm, date:d, opp, ha, line_raw:raw };
   }).filter(Boolean);
 }
 
@@ -489,18 +475,6 @@ function setupEventListeners(){
   $('#filtersReset')?.addEventListener('click',resetFilters);
   $('#filtersReset2')?.addEventListener('click',resetFilters);
   $('#playerSearch')?.addEventListener('input',debounce(liveSearch));
-
-  // Filter inputs (news only)
-  $('#filters')?.addEventListener('change',e=>{
-    if (e.target.classList.contains('select-all')){
-      const on = e.target.checked;
-      e.target.closest('.filter-options')?.querySelectorAll('input[type="checkbox"]:not(.select-all)').forEach(cb=>cb.checked=on);
-    }
-    applyNewsOnly();
-  });
-  $('#filterText')?.addEventListener('input',debounce(applyNewsOnly,300));
-  $('#filterDateFrom')?.addEventListener('change',applyNewsOnly);
-  $('#filterDateTo')?.addEventListener('change',applyNewsOnly);
 }
 function setupAuth(){
   if (!window.firebaseAuth) return;
@@ -543,12 +517,14 @@ function setupAuth(){
   });
 }
 
-/* ---- ROSTER SEARCH (left drawer) ---- */
+/* ---- ROSTER SEARCH ---- */
 function imageNameOf(p){
   const f=(p.first||'').toLowerCase(), l=(p.last||'').toLowerCase();
   return f&&l ? `${f}_${l}` : (p.display_name||'').toLowerCase().replace(/[^a-z0-9]+/g,'-');
 }
-function slugOf(p){ return (p.display_name||'').trim().toLowerCase().replace(/[^a-z0-9]+/g,'-'); }
+function slugOf(p){
+  return (p.display_name||'').trim().toLowerCase().replace(/[^a-z0-9]+/g,'-');
+}
 function profileURL(p){ return `./profile.html?player=${slugOf(p)}`; }
 function makeHit(p){
   const el=document.createElement('div'); el.className='live-hit';
@@ -569,7 +545,7 @@ function liveSearch(){
   box.innerHTML=''; hits.forEach(p=>box.appendChild(makeHit(p)));
 }
 
-/* ---- FILTERS (news only) ---- */
+/* ---- FILTERS ---- */
 function populateFiltersFromRoster(players){
   const levels = [...new Set(players.map(p=>p.level).filter(Boolean))]
     .sort((a,b)=>(levelOrder[b?.toUpperCase()]??-1)-(levelOrder[a?.toUpperCase()]??-1));
@@ -587,16 +563,29 @@ function populateFiltersFromRoster(players){
     '<label class="select-all-label"><input type="checkbox" class="select-all"> Select All</label>' +
     rosterYears.map(y=>`<label><input type="checkbox" value="${y}"> ${y}</label>`).join('');
 }
-function readNewsFilterState(){
+function readFilterState(){
   const text = ($('#filterText')?.value||'').trim().toLowerCase();
   const status = $$('#filterStatus input:checked:not(.select-all)').map(i=>i.value.toUpperCase());
   const levels = $$('#filterLevels input:checked:not(.select-all)').map(i=>i.value.toUpperCase());
   const classes= $$('#filterGradClass input:checked:not(.select-all)').map(i=>i.value);
   const roster = $$('#filterRosterYear input:checked:not(.select-all)').map(i=>i.value);
-  const dateFrom = $('#filterDateFrom')?.value || '';
-  const dateTo   = $('#filterDateTo')?.value || '';
-  return { text, status, levels, classes, roster, dateFrom, dateTo };
+  return { text, status, levels, classes, roster };
 }
+function resetFilters(){
+  $$('#filters input').forEach(i=>{
+    if(i.type==='checkbox') i.checked=false;
+    if(i.type==='text') i.value='';
+  });
+  applyAll();
+}
+$('#filters')?.addEventListener('change',e=>{
+  if (e.target.classList.contains('select-all')){
+    const on = e.target.checked;
+    e.target.closest('.filter-options')?.querySelectorAll('input[type="checkbox"]:not(.select-all)').forEach(cb=>cb.checked=on);
+  }
+  applyAll();
+});
+$('#filterText')?.addEventListener('input',debounce(applyAll));
 
 /* ---- NEWS ---- */
 const PRO_LEVELS = new Set(['MLB','INTERNATIONAL','TRIPLE-A','AAA','DOUBLE-A','AA','HIGH-A','A+','LOW-A','A','ROOKIE','ROK','INDY']);
@@ -615,6 +604,16 @@ function enrichNewsWithRoster(news, rosterByName){
     }
   }
   return news;
+}
+function passFiltersNews(n, F){
+  if (F.status.length && !F.status.includes((n.status||'').toUpperCase())) return false;
+  if (F.levels.length && !F.levels.includes((n.level||'').toUpperCase())) return false;
+  if (F.classes.length && !F.classes.includes(String(n.grad_class||''))) return false;
+  if (F.text){
+    const t = `${n.title||''} ${n.player_display_name||''} ${n.source||''} ${n.team||''} ${n.org||''}`.toLowerCase();
+    if (!t.includes(F.text)) return false;
+  }
+  return true;
 }
 function cardHTML(n){
   const when = n.publishedAt ? new Date(n.publishedAt).toLocaleString() : '';
@@ -642,31 +641,10 @@ function cardHTML(n){
     </div>
   </article>`;
 }
-function passFiltersNews(n, F){
-  // Date range (news only)
-  if (F.dateFrom){
-    const df = new Date(F.dateFrom+'T00:00:00');
-    const d  = new Date(n.publishedAt||0);
-    if (isNaN(d) || d < df) return false;
-  }
-  if (F.dateTo){
-    const dt = new Date(F.dateTo+'T23:59:59');
-    const d  = new Date(n.publishedAt||0);
-    if (isNaN(d) || d > dt) return false;
-  }
-  if (F.status.length && !F.status.includes((n.status||'').toUpperCase())) return false;
-  if (F.levels.length && !F.levels.includes((n.level||'').toUpperCase())) return false;
-  if (F.classes.length && !F.classes.includes(String(n.grad_class||''))) return false;
-  if (F.text){
-    const t = `${n.title||''} ${n.player_display_name||''} ${n.source||''} ${n.team||''} ${n.org||''}`.toLowerCase();
-    if (!t.includes(F.text)) return false;
-  }
-  return true;
-}
 function renderNewsLists(allNews, roster){
   const rosterByName = new Map((roster||[]).map(p=>[(p.display_name||'').toLowerCase(), p]));
   const enriched = enrichNewsWithRoster([...allNews], rosterByName);
-  const F = readNewsFilterState();
+  const F = readFilterState();
   const items = enriched.filter(n=> passFiltersNews(n, F))
                         .sort((a,b)=> new Date(b.publishedAt||0) - new Date(a.publishedAt||0));
   const pro = items.filter(n=> PRO_LEVELS.has((n.level||'').toUpperCase()));
@@ -676,27 +654,18 @@ function renderNewsLists(allNews, roster){
   $('#listCollege').innerHTML = col.length ? col.map(cardHTML).join('') : `<p style="color:var(--muted)">No college headlines match the filters.</p>`;
 }
 
-/* ---- LINE SCORES (independent of filters) ---- */
+/* ---- LINE SCORES ---- */
 function weekStartSunday(d){ const x=new Date(d); const g=x.getDay(); x.setDate(x.getDate()-g); x.setHours(0,0,0,0); return x; }
 function weekEnd(start){ const e=new Date(start); e.setDate(e.getDate()+6); e.setHours(23,59,59,999); return e; }
 function weekLabel(start){
   const end = weekEnd(start);
+  const fmt = (dt,withMonth=true)=> dt.toLocaleDateString(undefined,{month:withMonth?'long':undefined, day:'numeric'});
   if (start.getMonth()===end.getMonth()){
     return `Week of ${start.toLocaleDateString(undefined,{month:'long',day:'numeric'})} – ${end.getDate()}`;
   }
-  const fmt=(dt)=> dt.toLocaleDateString(undefined,{month:'long',day:'numeric'});
-  return `Week of ${fmt(start)} – ${fmt(end)}`;
-}
-function normalizeLine(ha, opp, raw){
-  const side = (ha||'').toUpperCase().startsWith('H') ? 'vs.' : '@';
-  const oppTxt = opp ? `${side} ${opp}` : '';
-  const stat = raw ? raw.trim() : 'DNP';
-  return `${oppTxt} | ${stat}`;
+  return `Week of ${fmt(start,true)} – ${fmt(end,true)}`;
 }
 function rosterSort(a,b){
-  // Known roster first by level + grad class; unknowns after
-  if (a._unknown && !b._unknown) return 1;
-  if (!a._unknown && b._unknown) return -1;
   const la = LEVEL_ORDER_MAP.get((a.level||'').toUpperCase()) ?? 999;
   const lb = LEVEL_ORDER_MAP.get((b.level||'').toUpperCase()) ?? 999;
   if (la!==lb) return la-lb;
@@ -704,43 +673,61 @@ function rosterSort(a,b){
   const gb = parseInt(b.grad_class||0,10)||0;
   return gb-ga;
 }
+function normalizeLine(ha, opp, raw){
+  const side = (ha||'').toUpperCase().startsWith('H') ? 'vs.' : '@';
+  const oppTxt = opp ? `${side} ${opp}` : '';
+  const stat = raw ? raw.trim() : 'DNP';
+  return `${oppTxt} | ${stat}`;
+}
 function renderLineScores(roster, games){
-  // Build a quick map for enrichment/sorting, but do NOT filter by roster or any UI filters
-  const rosterMap = new Map((roster||[]).map(p=>[(p.display_name||'').toLowerCase(), p]));
+  const F = readFilterState();
+  const rosterMap = new Map(roster.map(p=>[(p.display_name||'').toLowerCase(), p]));
 
-  // Group by week start -> player -> games
+  // Apply roster filters, then only include those players' games
+  const rosterFiltered = roster.filter(p=>{
+    if (F.status.length && !F.status.includes((p.status||'').toUpperCase())) return false;
+    if (F.levels.length && !F.levels.includes((p.level||'').toUpperCase())) return false;
+    if (F.classes.length && !F.classes.includes(String(p.grad_class||''))) return false;
+    return true;
+  });
+  const allowed = new Set(rosterFiltered.map(p=>(p.display_name||'').toLowerCase()));
+
+  const inRange = games.filter(g=>{
+    if (!allowed.has((g.player_name||'').toLowerCase())) return false;
+    if (F.text){
+      const t = `${g.player_name||''} ${g.opp||''} ${g.line_raw||''}`.toLowerCase();
+      if (!t.includes(F.text)) return false;
+    }
+    return true;
+  });
+
+  // Group by week -> player
   const weeks = new Map();
-  for(const g of games){
+  for(const g of inRange){
     const wkStart = weekStartSunday(g.date).toISOString();
     if(!weeks.has(wkStart)) weeks.set(wkStart, new Map());
     const bucket = weeks.get(wkStart);
-    const key = (g.player_name||'').trim().toLowerCase();
-    if(!bucket.has(key)) bucket.set(key, { player: rosterMap.get(key) || {display_name:g.player_name, _unknown:true}, rows: [] });
-    bucket.get(key).rows.push(g);
+    const key = (g.player_name||'').toLowerCase();
+    if(!bucket.has(key)) bucket.set(key, []);
+    bucket.get(key).push(g);
   }
 
-  // Last 4 weeks by start date desc
-  const weekKeys = Array.from(weeks.keys()).sort((a,b)=> new Date(b) - new Date(a)).slice(0,4);
+  const weekKeys = Array.from(weeks.keys()).sort((a,b)=> new Date(b) - new Date(a)).slice(0,4); // last 4 weeks only
   const html = weekKeys.map(wkKey=>{
     const start = new Date(wkKey);
     const byPlayer = weeks.get(wkKey);
 
-    const players = Array.from(byPlayer.values()).map(v=>{
-      const p = v.player;
-      return {
-        display_name: p.display_name || 'Player',
-        level: p.level || '',
-        grad_class: p.grad_class || '',
-        _unknown: !!p._unknown,
-        rows: v.rows
-      };
-    }).sort(rosterSort);
+    const players = Array.from(byPlayer.keys())
+      .map(k=> rosterMap.get(k) || {display_name:k, level:'', grad_class:'0'})
+      .sort(rosterSort);
 
     const blocks = players.map(p=>{
-      const rows = p.rows.sort((a,b)=> b.date - a.date).map(x=>{
-        const d = x.date.toLocaleDateString(undefined,{month:'numeric',day:'numeric'});
-        return `<div class="line">${d} ${normalizeLine(x.ha,x.opp,x.line_raw)}</div>`;
-      }).join('');
+      const rows = byPlayer.get((p.display_name||'').toLowerCase())
+        .sort((a,b)=> b.date - a.date)
+        .map(x=>{
+          const d = x.date.toLocaleDateString(undefined,{month:'numeric',day:'numeric'});
+          return `<div class="line">${d} ${normalizeLine(x.ha,x.opp,x.line_raw)}</div>`;
+        }).join('');
       return `<div class="player-block">
         <div class="player-name">${(p.display_name||'').toUpperCase()}</div>
         <div class="lines">${rows}</div>
@@ -753,16 +740,13 @@ function renderLineScores(roster, games){
     </div>`;
   }).join('');
 
-  $('#linesWrap').innerHTML = html || `<p style="color:var(--muted)">No line scores available.</p>`;
+  $('#linesWrap').innerHTML = html || `<p style="color:var(--muted)">No line scores match the filters.</p>`;
 }
 
 /* ---- APPLY ---- */
-function applyNewsOnly(){
+function applyAll(){
   renderNewsLists(window.__NEWS__||[], window.__ROSTER__||[]);
-}
-function initialRender(){
-  applyNewsOnly(); // news with filters
-  renderLineScores(window.__ROSTER__||[], window.__GAMES__||[]); // line scores ignore filters
+  renderLineScores(window.__ROSTER__||[], window.__GAMES__||[]);
 }
 
 /* ---- BOOT ---- */
@@ -783,10 +767,10 @@ document.addEventListener('DOMContentLoaded', async ()=>{
     window.__GAMES__  = games;
 
     populateFiltersFromRoster(roster);
-    initialRender();
+    applyAll();
   }catch(err){
     console.error('Init error:', err);
-    document.querySelector('#listPro').innerHTML = `<p style="color:#f88">Failed to load.</p>`;
+    $('#listPro').innerHTML = `<p style="color:#f88">Failed to load.</p>`;
   }
 });
 </script>
