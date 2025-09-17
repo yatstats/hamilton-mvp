@@ -2,9 +2,749 @@
 <html lang="en">
 <head>
 <meta charset="utf-8" />
+<meta name="viewport" content="width=<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Active Alumni News • Hamilton YATSTATS</title>
 <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400&family=Bebas+Neue&display=swap" rel="stylesheet">
+
+<!-- Firebase init (same as index) -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, signInWithCustomToken, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+  window.firebaseAuth = { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, signInWithCustomToken, signInAnonymously };
+  try {
+    const firebaseConfig = JSON.parse(window.__firebase_config || '{}');
+    const app = initializeApp(firebaseConfig);
+    window.auth = getAuth(app);
+    onAuthStateChanged(window.auth, user => { document.dispatchEvent(new CustomEvent('authStateChanged', { detail: { user } })); });
+    if (window.__initial_auth_token) {
+      await signInWithCustomToken(window.auth, window.__initial_auth_token);
+    } else {
+      await signInAnonymously(window.auth);
+    }
+  } catch (e) {
+    console.error("Firebase initialization error:", e);
+  }
+</script>
+
+<style>
+:root{
+  --bg:#0c0c0c; --fg:#f2f2f2; --muted:#c4c4c4; --ink:#e8e8e8; --line:rgba(255,255,255,.08);
+  --card-bg:#171717; --header-bg:#000; --drawer-bg:rgba(10,10,10,.65);
+  --shade-end:rgba(0,0,0,.95);
+  --hamSmall:13px; --hamBig:20px; --hamBigger:24px; --tagGrey:#cfd2d6;
+  --crestH:clamp(28px,4.2vw,42px);
+  --containerPad:16px; --footerH:clamp(56px,8vh,77px);
+}
+body.light-theme{
+  --bg:#f4f4f4; --fg:#121212; --muted:#555; --ink:#222; --line:rgba(0,0,0,.1);
+  --card-bg:#fff; --header-bg:#fff; --drawer-bg:rgba(255,255,255,.65);
+}
+@font-face{font-family:'Indigo';src:url('assets/fonts/Indigo.otf') format('opentype');font-weight:400;font-style:normal;font-display:swap;}
+*{box-sizing:border-box} html,body{margin:0}
+body{background:var(--bg);color:var(--fg);font-family:Oswald,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;transition:background-color .3s,color .3s;}
+body.drawer-open{overflow:hidden}
+a{color:inherit;text-decoration:none}
+.container{max-width:1400px;margin:0 auto;padding:0 var(--containerPad)}
+.header{position:sticky;top:0;z-index:50;background:var(--header-bg);transition:background-color .3s;}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:8px 0}
+.left-icons{display:flex;align-items:center;gap:8px}
+.icon-btn{background:none;border:none;color:var(--fg);opacity:.92;display:inline-flex;align-items:center;justify-content:center;padding:0;margin:0 2px;cursor:pointer}
+.icon-btn i{font-size:20px}
+.topnav{display:flex;gap:18px;align-items:center}
+.nav-pair{white-space:nowrap}
+.nav-pair .thin{font:300 var(--hamSmall) Oswald,sans-serif;letter-spacing:.02em;color:#cfd2d6;margin-right:2px}
+body.light-theme .nav-pair .thin{color:var(--muted)}
+.nav-pair .bold{font:400 var(--hamSmall) Indigo,"Bebas Neue",sans-serif}
+.wordmark-wrap{display:flex;align-items:center;justify-content:flex-end;min-width:120px}
+.wordmark-img{height:clamp(18px,3.2vw,28px);width:auto;display:block}
+body.light-theme .wordmark-img{filter:invert(1)}
+@media (max-width:1200px){.topnav{display:none !important}}
+.hr-y{border-top:1px solid var(--line)}
+.schoolrow{display:flex;align-items:center;gap:10px;padding:6px var(--containerPad)}
+.ham-logo{height:var(--crestH);width:auto;object-fit:contain;display:block;flex-shrink:0}
+.schooltext{line-height:1}
+.schooltext .small{font:300 var(--hamSmall)/1 Oswald;letter-spacing:.02em;color:var(--muted)}
+.schooltext .big1{font:400 var(--hamBig)/1 "Bebas Neue",sans-serif}
+.schooltext .big2{font:400 var(--hamBigger)/1 "Bebas Neue",sans-serif;margin-top:-4px}
+.crumbs{font:300 calc(var(--hamSmall)*.5)/1 Oswald;letter-spacing:.02em;color:var(--muted);text-transform:uppercase}
+.hero{padding:2px 0}
+.hero-grid{display:flex;align-items:center;justify-content:space-between;gap:16px}
+.hero-left{display:flex;flex-direction:column;gap:4px}
+.hero-crumbs{margin:0;text-align:left;white-space:nowrap}
+@media (max-width:768px){.topbar .crumbs{display:block}.hero-left .crumbs{display:none}}
+@media (min-width:769px){.topbar .crumbs{display:none}.hero-left .crumbs{display:block}}
+.tag-duo{position:relative;height:1.8em}
+.tag-swap{position:absolute;left:0;top:0;right:0;opacity:0;animation:swap 6s infinite;white-space:nowrap}
+.tag-swap:nth-child(1){animation-delay:0s}
+.tag-swap:nth-child(2){animation-delay:3s}
+.tag-grey{font:300 1em Oswald,sans-serif;letter-spacing:.02em;color:var(--tagGrey)}
+body.light-theme .tag-grey{color:var(--muted)}
+.tag-bold{font:400 1em Indigo,"Bebas Neue",sans-serif}
+@keyframes swap{0%{opacity:0}5%{opacity:1}45%{opacity:1}50%{opacity:0}100%{opacity:0}}
+.hero-right{display:flex;gap:10px}
+.hero-icon i{font-size:20px}
+
+/* DRAWERS (same behavior as index) */
+.drawer-mask{position:fixed;inset:0;background:rgba(0,0,0,.35);opacity:0;pointer-events:none;transition:opacity .2s;z-index:60}
+.drawer{position:fixed;top:0;bottom:0;width:min(360px,82vw);background:var(--drawer-bg);backdrop-filter:blur(4px);color:var(--ink);transform:translateX(-110%);transition:transform .25s,background-color .3s;z-index:70}
+.drawer-right{right:0;left:auto;transform:translateX(110%);display:flex;flex-direction:column;height:100%}
+.drawer h3{margin:18px 16px 8px;padding-right:30px}
+.drawer .pad{padding:10px 16px}
+.drawer .close-btn{position:absolute;top:12px;right:12px}
+.drawer a{color:var(--ink)}
+.drawer a:hover{color:var(--fg)}
+body.drawer-left-open .drawer-mask,body.drawer-right-open .drawer-mask{opacity:1;pointer-events:auto}
+body.drawer-left-open #drawerLeft{transform:translateX(0)}
+body.drawer-right-open .drawer-right{transform:translateX(0)}
+.drawer-content{flex-grow:1;overflow-y:auto;padding:10px 16px}
+.drawer-footer{flex-shrink:0;padding:12px 16px;border-top:1px solid var(--line);background:rgba(10,10,10,.8);display:flex;gap:10px;align-items:center}
+body.light-theme .drawer-footer{background:rgba(255,255,255,.8)}
+
+/* FILTERS */
+.filter-group{border-bottom:1px solid var(--line)}
+.filter-group:last-of-type{border-bottom:none}
+.filter-title{padding:14px 0;cursor:pointer;font-weight:700;font-family:"Bebas Neue",sans-serif;letter-spacing:.05em;list-style:none;display:flex;justify-content:space-between;align-items:center}
+.filter-title::-webkit-details-marker{display:none}
+.filter-title::after{content:'▸';font-size:1.2em;transition:transform .2s}
+details[open]>.filter-title::after{transform:rotate(90deg)}
+.filter-options{padding:4px 0 16px 0}
+.filter-options label{display:block;margin-bottom:8px;padding-left:4px}
+.filter-options input[type=checkbox]{margin-right:8px;transform:scale(1.1)}
+.select-all-label{font-weight:700;border-bottom:1px solid var(--line);padding-bottom:8px !important;margin-bottom:12px !important}
+
+/* LAYOUT */
+.main{padding:8px 0 calc(var(--footerH) + 12px)}
+.grid-news{display:grid;grid-template-columns:3fr 2fr;gap:16px}
+@media (max-width:1100px){ .grid-news{grid-template-columns:1fr} #colLineScores{display:none} #openLinesDrawer{display:inline-flex} }
+@media (min-width:1101px){ #openLinesDrawer{display:none} }
+
+/* NEWS CARDS */
+.card{position:relative;background:var(--card-bg);border-radius:12px;overflow:hidden;box-shadow:0 4px 8px rgba(0,0,0,.2)}
+body.light-theme .card{box-shadow:0 4px 12px rgba(0,0,0,.1)}
+.card-inner{display:flex;gap:14px}
+.card-img{flex:0 0 200px;border-radius:12px;margin:12px;overflow:hidden}
+.card-img .ph{width:100%;aspect-ratio:5/7;background:#111 center/cover no-repeat}
+.card-body{padding:12px 12px 16px 0;display:flex;flex-direction:column;gap:6px}
+.card-title{font:700 28px "Bebas Neue",sans-serif;letter-spacing:.04em;line-height:1}
+.card-meta{font:300 13px Oswald;color:var(--muted)}
+.card-player{font:700 16px "Bebas Neue",sans-serif;letter-spacing:.04em;opacity:.9}
+.actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:8px}
+.btn, .share-btn{display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border:1px solid var(--line);border-radius:12px;background:transparent;color:var(--fg);cursor:pointer;text-decoration:none}
+.share-btn i{font-size:18px;color:currentColor}
+body.light-theme .btn, body.light-theme .share-btn{color:#111}
+.btn:hover, .share-btn:hover{background:var(--line)}
+.readmore{font-weight:700}
+
+/* LINESCORES (column & drawer) */
+.section-h{font:700 28px "Bebas Neue",sans-serif;letter-spacing:.04em;margin-bottom:8px}
+.lines-wrapper{max-height:70vh;overflow:auto;padding-right:2px}
+.section-title{font:700 20px "Bebas Neue",sans-serif;letter-spacing:.04em;padding:10px 12px;border:1px solid var(--line);border-radius:12px;margin:10px 0}
+.player-block{padding:8px 4px}
+.player-name{font:700 18px "Bebas Neue",sans-serif;letter-spacing:.04em;margin:6px 0 2px}
+.player-lines{font:400 16px/1.35 "Oswald",sans-serif}
+.no-lines{opacity:.75;padding:12px}
+
+/* Drawer variant readability in light mode */
+#linesDrawer .drawer-content{ color:var(--ink); }
+body.light-theme #linesDrawer{ background:rgba(255,255,255,.9); color:#111; }
+body.light-theme #linesDrawer .drawer-content{ color:#111; }
+
+/* FOOTER */
+.site-footer{position:fixed;left:0;right:0;bottom:0;height:var(--footerH);background:var(--bg);border-top:1px solid var(--line);z-index:40}
+.site-footer a{display:block;height:100%;width:100%}
+.site-footer img{height:100%;width:100%;object-fit:contain}
+
+.icon-btn:focus,button:focus,input:focus,details summary:focus{outline:2px solid var(--fg);outline-offset:2px}
+</style>
+</head>
+
+<body>
+<header class="header">
+  <div class="container topbar">
+    <div class="left-icons">
+      <button class="icon-btn" id="btnMenu" aria-label="Menu"><i class="ri-menu-line"></i></button>
+      <div id="auth-container">
+        <button class="icon-btn" id="btnAccount" aria-label="Account"><i class="ri-user-3-line"></i></button>
+        <button class="icon-btn" id="btnSignOut" style="display:none;"><i class="ri-logout-box-line"></i></button>
+      </div>
+      <button class="icon-btn" id="theme-toggle" aria-label="Toggle Theme"><i class="ri-sun-line"></i></button>
+    </div>
+    <nav class="topnav" aria-label="Top Navigation">
+      <a href="index.html" class="nav-pair"><span class="thin">WHERE THEY</span><span class="bold">YAT?</span></a>
+      <a href="alumni-news.html" class="nav-pair"><span class="thin">ACTIVE ALUMNI</span><span class="bold">NEWS</span></a>
+      <a href="all-time-list.html" class="nav-pair"><span class="thin">NEXT-LEVEL</span><span class="bold">ALL-TIME LIST</span></a>
+      <a href="marketplace.html" class="nav-pair"><span class="thin">NIL & YAT-A-BOY</span><span class="bold">MARKETPLACE</span></a>
+      <a href="current-team.html" class="nav-pair"><span class="thin">THE</span><span class="bold">CURRENT TEAM</span></a>
+      <a href="partner-program.html" class="nav-pair"><span class="thin">PCD ACTION</span><span class="bold">PARTNER PROGRAM</span></a>
+      <a href="faq.html" class="nav-pair"><span class="bold">FAQ’S</span></a>
+    </nav>
+    <div class="wordmark-wrap">
+      <img class="wordmark-img" src="assets/img/yatstats-logo.png" alt="YAT?STATS">
+    </div>
+  </div>
+  <div class="hr-y"></div>
+  <div class="container schoolrow">
+    <img id="hamLogo" class="ham-logo" src="assets/img/hamilton-logo.png" alt="Hamilton H">
+    <div class="schooltext">
+      <div class="small">CHANDLER, AZ</div>
+      <div class="big1">HAMILTON HIGH SCHOOL</div>
+      <div class="big2">ACTIVE BASEBALL ALUMNI</div>
+    </div>
+  </div>
+  <div class="hr-y"></div>
+  <section class="hero">
+    <div class="container hero-grid">
+      <div class="hero-left" aria-live="polite">
+        <div class="tag-duo">
+          <div class="tag-swap"><span class="tag-grey">ACTIVE</span> <span class="tag-bold">ALUMNI NEWS</span></div>
+          <div class="tag-swap"><span class="tag-grey">WEEKLY</span> <span class="tag-bold">LINE SCORES</span></div>
+        </div>
+        <div class="crumbs hero-crumbs">HAMILTON ▸ ACTIVE ALUMNI NEWS</div>
+      </div>
+      <div class="hero-right">
+        <button id="openSearch" class="hero-icon icon-btn" aria-label="Open search"><i class="ri-search-line"></i></button>
+        <button id="openFilters" class="hero-icon icon-btn" aria-label="Open filters"><i class="ri-filter-3-line"></i></button>
+        <button id="filtersReset2" class="hero-icon icon-btn" aria-label="Reset"><i class="ri-restart-line"></i></button>
+        <button id="openLinesDrawer" class="hero-icon icon-btn" aria-label="Weekly line scores"><i class="ri-list-unordered"></i></button>
+      </div>
+    </div>
+  </section>
+</header>
+
+<div class="drawer-mask"></div>
+<!-- Left drawer: search -->
+<aside class="drawer" id="drawerLeft" aria-label="Left drawer">
+  <button class="icon-btn close-btn"><i class="ri-close-line"></i></button>
+  <div class="drawer-content">
+    <h3>PLAYER PROFILE SEARCH</h3>
+    <div class="pad">
+      <input id="playerSearch" placeholder="Type to search…" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--ink)">
+      <div id="liveResults"></div>
+    </div>
+    <h3>NAVIGATION</h3>
+    <div class="pad" style="display:flex;flex-direction:column;gap:12px">
+      <a href="index.html" class="nav-pair"><span class="thin">WHERE THEY</span><span class="bold">YAT?</span></a>
+      <a href="alumni-news.html" class="nav-pair"><span class="thin">ACTIVE ALUMNI</span><span class="bold">NEWS</span></a>
+      <a href="all-time-list.html" class="nav-pair"><span class="thin">NEXT-LEVEL</span><span class="bold">ALL-TIME LIST</span></a>
+      <a href="marketplace.html" class="nav-pair"><span class="thin">NIL & YAT-A-BOY</span><span class="bold">MARKETPLACE</span></a>
+      <a href="current-team.html" class="nav-pair"><span class="thin">THE</span><span class="bold">CURRENT TEAM</span></a>
+      <a href="partner-program.html" class="nav-pair"><span class="thin">PCD ACTION</span><span class="bold">PARTNER PROGRAM</span></a>
+      <a href="faq.html" class="nav-pair"><span class="bold">FAQ’S</span></a>
+    </div>
+  </div>
+</aside>
+
+<!-- Right drawer: filters -->
+<aside class="drawer drawer-right" id="drawerFilters" style="display:flex;">
+  <button class="icon-btn close-btn"><i class="ri-close-line"></i></button>
+  <h3>FILTERS</h3>
+  <div class="drawer-content" id="filters">
+    <details class="filter-group" open>
+      <summary class="filter-title">By Name</summary>
+      <div class="filter-options">
+        <input id="filterName" placeholder="Type a name…" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--ink)"/>
+      </div>
+    </details>
+    <details class="filter-group">
+      <summary class="filter-title">By Status</summary>
+      <div class="filter-options" id="filterStatus">
+        <label class="select-all-label"><input type="checkbox" class="select-all"> Select All</label>
+        <label><input type="checkbox" value="ACTIVE 2025"> ACTIVE 2025</label>
+        <label><input type="checkbox" value="ACTIVE 2024"> ACTIVE 2024</label>
+        <label><input type="checkbox" value="FREE AGENT"> FREE AGENT</label>
+        <label><input type="checkbox" value="INJURED"> INJURED</label>
+        <label><input type="checkbox" value="RETIRED"> RETIRED</label>
+        <label><input type="checkbox" value="SPONSOR"> SPONSOR</label>
+      </div>
+    </details>
+    <details class="filter-group">
+      <summary class="filter-title">By Level</summary>
+      <div class="filter-options" id="filterLevels">
+        <label class="select-all-label"><input type="checkbox" class="select-all"> Select All</label>
+      </div>
+    </details>
+    <details class="filter-group">
+      <summary class="filter-title">By Graduating Class</summary>
+      <div class="filter-options" id="filterGradClass"></div>
+    </details>
+    <details class="filter-group">
+      <summary class="filter-title">By Roster Year</summary>
+      <div class="filter-options" id="filterRosterYear"></div>
+    </details>
+    <details class="filter-group">
+      <summary class="filter-title">By Date Range</summary>
+      <div class="filter-options">
+        <label>From <input id="filterFrom" type="date" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--ink)"></label>
+        <label style="margin-top:8px">To <input id="filterTo" type="date" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--ink)"></label>
+      </div>
+    </details>
+  </div>
+  <div class="drawer-footer">
+    <button id="filtersReset" class="icon-btn" style="padding:10px 14px;border:1px solid var(--line);border-radius:12px"><i class="ri-restart-line"></i>&nbsp;Reset Filters</button>
+  </div>
+</aside>
+
+<!-- Right drawer: weekly line scores (mobile) -->
+<aside id="linesDrawer" class="drawer drawer-right" style="display:none;">
+  <button class="icon-btn close-btn"><i class="ri-close-line"></i></button>
+  <h3>WEEKLY LINE SCORES</h3>
+  <div id="linesDrawerBody" class="drawer-content"></div>
+</aside>
+
+<main class="main container">
+  <div class="grid-news">
+    <!-- News column -->
+    <section>
+      <h2 class="section-h">ACTIVE ALUMNI NEWS</h2>
+      <div id="newsList" aria-live="polite"><p style="color:var(--muted)">Loading news…</p></div>
+    </section>
+
+    <!-- Weekly line scores column (hidden on small screens) -->
+    <aside id="colLineScores" aria-live="polite">
+      <h2 class="section-h">WEEKLY LINE SCORES</h2>
+      <div class="lines-wrapper" id="linesColumnBody"><p style="color:var(--muted)">Loading line scores…</p></div>
+    </aside>
+  </div>
+</main>
+
+<footer class="site-footer">
+  <a href="https://no-errors.com/collections/all-webgems" target="_blank" rel="noopener noreferrer">
+    <img src="assets/img/partners/no-errors-banner.jpg" alt="Sponsor Banner">
+  </a>
+</footer>
+
+<!-- MAIN APP SCRIPT -->
+<script type="module">
+/* ---- YATSTATS • Alumni News ---- */
+
+/* Config */
+const CSV_URL  = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQcWJM6Q6hTdFnES_G5LUy4teCS-sJ5HdAc9F5HSY8DGE9egdGy8yUAe2ShT3tFm-CwUuCYeAYy_YiW/pub?gid=2028135390&single=true&output=csv"; // players
+const GAMES_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQcWJM6Q6hTdFnES_G5LUy4teCS-sJ5HdAc9F5HSY8DGE9egdGy8yUAe2ShT3tFm-CwUuCYeAYy_YiW/pub?output=csv"; // GAMES tab (published)
+const NEWS_JSON = "assets/news/alumni_news.json";
+const NEWS_CACHE_KEY = "YAT_NEWS_CACHE_V1";
+const WEEKS_TO_SHOW = 4;
+
+/* Shorthand & utils */
+const $ = s => document.querySelector(s);
+const $$ = s => Array.from(document.querySelectorAll(s));
+const debounce = (fn, ms=300)=>{ let t; return (...a)=>{ clearTimeout(t); t=setTimeout(()=>fn(...a),ms); }; };
+
+/* Sort order for defaultSort (same as index) */
+const levelOrder = {
+  'MLB':13,'INTERNATIONAL':12,'TRIPLE-A':11,'AAA':11,'DOUBLE-A':10,'AA':10,'HIGH-A':9,'A+':9,
+  'LOW-A':8,'A':8,'ROOKIE':7,'ROK':7,'INDY':6,'NCAA-D1':5,'NCAA-D2':4,'NCAA-D3':3,'NAIA':2,'JUCO':1
+};
+
+/* CSV loader (players) */
+async function loadCSV(url){
+  const res = await fetch(url, {cache:'no-store'});
+  if(!res.ok) throw new Error(`HTTP ${res.status}`);
+  const text = await res.text();
+  const rows = text.trim().split(/\r?\n/).map(line => line.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/).map(c=>c.replace(/^"|"$/g,'')));
+  const header = rows.shift().map(h => h.trim());
+  const idx = name => header.indexOf(name);
+  const statKeys = ['avg','obp','slg','ops','ab','h','r','rbi','2b','3b','hr','sb','bb','era','k/9','k/bb','whip','ip','r','er','ko','gp','w-l','saves','fip'];
+  return rows.map(r=>{
+    const p = {
+      slug:r[idx('slug')], display_name:r[idx('display_name')],
+      first:r[idx('first')], last:r[idx('last')],
+      grad_class:r[idx('grad_class')], letter_years:r[idx('letter_years')],
+      status:r[idx('status')], level:r[idx('level')],
+      team:r[idx('team')], org:r[idx('org')], position:r[idx('position')],
+      height:r[idx('height')], weight:r[idx('weight')], bats:r[idx('bats')], throws:r[idx('throws')],
+      draft_info:r[idx('Draft_Info')] ?? r[idx('draft_info')],
+      colleges:r[idx('Colleges')] ?? r[idx('colleges')],
+      next_game_date:r[idx('next_game_date')], next_game_time:r[idx('next_game_time')], next_game_opponent:r[idx('next_game_opponent')],
+      next_game_datetime:r[idx('next_game_datetime')],
+      last_game_1:r[idx('last_game_1')], last_game_2:r[idx('last_game_2')], last_game_3:r[idx('last_game_3')],
+      x_handle:r[idx('x_handle')], ig_handle:r[idx('ig_handle')],
+      video_url:r[idx('video_url')], nil_score:r[idx('nil_score')], stats:{}
+    };
+    for(const key of statKeys){ const j=idx(key); if (j>-1 && r[j]) p.stats[key.toUpperCase()] = r[j]; }
+    return p;
+  });
+}
+
+/* Linescores: load GAMES CSV */
+async function loadGamesCSV(url){
+  const res = await fetch(url, {cache:'no-store'});
+  if(!res.ok) throw new Error(`GAMES CSV ${res.status}`);
+  const text = await res.text();
+  const rows = text.trim().split(/\r?\n/).map(l=>l.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/).map(c=>c.replace(/^"|"$/g,'')));
+  const header = rows.shift().map(h=>h.trim());
+  const ix = (n)=> header.findIndex(h=>h.toLowerCase()===String(n).toLowerCase());
+  const iName=ix('player_name'), iLine=ix('daily_line_score'), iDate=ix('GameDateLocal'), iOpp=ix('Opponent'), iHA=ix('HomeAway'), iTime=ix('GameTimeLocal');
+  if([iName,iLine,iDate,iOpp,iHA].some(i=>i<0)) return [];
+  return rows.map(r=>{
+    const d = new Date(r[iDate]);
+    if (isNaN(d)) return null;
+    const ha = (r[iHA]||'').toUpperCase().includes('HOME') ? 'vs.' : '@';
+    return {
+      player_name:r[iName]||'',
+      line:r[iLine]||'',
+      date:d,
+      opp:r[iOpp]||'',
+      ha,
+      time: iTime>-1 ? (r[iTime]||'') : ''
+    };
+  }).filter(Boolean);
+}
+
+/* Helpers */
+function slugOf(p){ const s=(p.slug||'').trim(); if(s) return s; return (p.display_name||'').trim().toLowerCase().replace(/[^a-z0-9]+/g,'-'); }
+function imageNameOf(p){ const first=(p.first||'').toLowerCase(), last=(p.last||'').toLowerCase(); return (first && last) ? `${first}_${last}` : slugOf(p); }
+function defaultSort(a,b){
+  const aIsSponsor = (a.status||'').toUpperCase()==='SPONSOR';
+  const bIsSponsor = (b.status||'').toUpperCase()==='SPONSOR';
+  if (aIsSponsor && !bIsSponsor) return -1;
+  if (!aIsSponsor && bIsSponsor) return 1;
+  const aIsPriority=(a.status||'').toUpperCase().includes('ACTIVE')||(a.status||'').toUpperCase()==='FREE AGENT';
+  const bIsPriority=(b.status||'').toUpperCase().includes('ACTIVE')||(b.status||'').toUpperCase()==='FREE AGENT';
+  if (aIsPriority && !bIsPriority) return -1;
+  if (!aIsPriority && bIsPriority) return 1;
+  if (aIsPriority && bIsPriority){
+    const la=(a.level||'').toUpperCase().trim(), lb=(b.level||'').toUpperCase().trim();
+    const va=levelOrder[la]??-1, vb=levelOrder[lb]??-1; if (va!==vb) return vb-va;
+    const ga=+a.grad_class||0, gb=+b.grad_class||0; if (ga!==gb) return ga-gb;
+    const ca=(a.letter_years||'').split(',').filter(Boolean).length, cb=(b.letter_years||'').split(',').filter(Boolean).length;
+    if (ca!==cb) return cb-ca;
+    return (a.display_name||'').localeCompare(b.display_name||'');
+  }
+  const cA=+a.grad_class||9999, cB=+b.grad_class||9999; if (cA!==cB) return cA-cB;
+  return (a.display_name||'').localeCompare(b.display_name||'');
+}
+
+/* Filters */
+function populateFilters(players){
+  const levels = [...new Set(players.map(p=>p.level).filter(Boolean))]
+    .sort((a,b)=>(levelOrder[b?.toUpperCase()]??-1)-(levelOrder[a?.toUpperCase()]??-1));
+  $('#filterLevels').innerHTML =
+    '<label class="select-all-label"><input type="checkbox" class="select-all"> Select All</label>' +
+    levels.map(level=>`<label><input type="checkbox" value="${level}"> ${level}</label>`).join('');
+  const grad = [...new Set(players.map(p=>p.grad_class).filter(Boolean))].sort((a,b)=>b-a);
+  $('#filterGradClass').innerHTML =
+    '<label class="select-all-label"><input type="checkbox" class="select-all"> Select All</label>' +
+    grad.map(y=>`<label><input type="checkbox" value="${y}"> ${y}</label>`).join('');
+  const rosterYears = [...new Set(players.flatMap(p=>(p.letter_years||'').split(',')).map(y=>y.trim()).filter(Boolean))].sort((a,b)=>b-a);
+  $('#filterRosterYear').innerHTML =
+    '<label class="select-all-label"><input type="checkbox" class="select-all"> Select All</label>' +
+    rosterYears.map(y=>`<label><input type="checkbox" value="${y}"> ${y}</label>`).join('');
+}
+function readFilters(){
+  const name=($('#filterName')?.value||'').trim().toLowerCase();
+  const levels = $$('#filterLevels input:checked:not(.select-all)').map(i=>i.value);
+  const status = $$('#filterStatus input:checked:not(.select-all)').map(i=>i.value);
+  const classes = $$('#filterGradClass input:checked:not(.select-all)').map(i=>i.value);
+  const rosterYears = $$('#filterRosterYear input:checked:not(.select-all)').map(i=>i.value);
+  const from = $('#filterFrom')?.value ? new Date($('#filterFrom').value) : null;
+  const to   = $('#filterTo')?.value ? new Date($('#filterTo').value)   : null;
+  if (to) to.setHours(23,59,59,999);
+  return { name, levels, status, classes, rosterYears, from, to };
+}
+
+/* News cache */
+function getNewsCache(){ try{ return JSON.parse(localStorage.getItem(NEWS_CACHE_KEY)||'{}'); }catch{ return {}; } }
+function setNewsCache(items){ localStorage.setItem(NEWS_CACHE_KEY, JSON.stringify({updatedAt:new Date().toISOString(), items})); }
+async function ensureNews(){
+  const cur = getNewsCache();
+  if (Array.isArray(cur.items) && cur.items.length) return cur.items;
+  try{
+    const res = await fetch(NEWS_JSON, {cache:'no-store'});
+    const arr = await res.json();
+    setNewsCache(Array.isArray(arr)?arr:[]);
+    return Array.isArray(arr)?arr:[];
+  }catch{ setNewsCache([]); return []; }
+}
+
+/* Dates / weeks */
+function startOfWeekSun(d){ const x=new Date(d); x.setHours(0,0,0,0); const delta=x.getDay(); x.setDate(x.getDate()-delta); return x; }
+function endOfWeekSun(d){ const s=startOfWeekSun(d); const e=new Date(s); e.setDate(s.getDate()+6); e.setHours(23,59,59,999); return e; }
+const fmtMD = d => d.toLocaleDateString(undefined,{month:'numeric',day:'numeric'});
+function fmtWeekTitle(s,e){
+  const opt = { month:'long', day:'numeric' };
+  const m1 = s.toLocaleDateString(undefined,{month:'long'}).toUpperCase();
+  const m2 = e.toLocaleDateString(undefined,{month:'long'}).toUpperCase();
+  if (m1===m2) return `WEEK OF ${s.toLocaleDateString(undefined,opt).toUpperCase()} - ${e.toLocaleDateString(undefined,{day:'numeric'}).toUpperCase()}`;
+  return `WEEK OF ${s.toLocaleDateString(undefined,opt).toUpperCase()} - ${e.toLocaleDateString(undefined,opt).toUpperCase()}`;
+}
+
+/* Share helpers */
+function shareTextFor(n){
+  const full = String(n.player_display_name||'').trim();
+  const first = full.split(' ')[0].replace(/[^A-Za-z0-9]/g,'').toUpperCase();
+  const tag = `#YATABOY${first}`;
+  const title = n.title || 'this story';
+  return `I SEE WHERE YAT ${full.toUpperCase()}!\n\nCHECK OUT: ${title} on YATSTATS!\n\n${tag}`;
+}
+function shareToX(url, text){ const u = new URL('https://twitter.com/intent/tweet'); u.searchParams.set('url', url); u.searchParams.set('text', text); window.open(u, '_blank'); }
+function shareToFacebook(url, text){ const u = new URL('https://www.facebook.com/sharer/sharer.php'); u.searchParams.set('u', url); u.searchParams.set('quote', text); window.open(u, '_blank'); }
+function shareToEmail(subject, body, url){ const u = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body+'\n\n'+url)}`; location.href=u; }
+async function shareToInstagram(text){
+  try{ await navigator.clipboard.writeText(text); alert('Caption copied. Instagram will open—paste the caption after you choose your media.'); }catch{}
+  window.open('instagram://camera','_blank') || window.open('https://www.instagram.com/create/details/','_blank');
+}
+
+/* Render: news */
+function newsCardHTML(n){
+  const img = n.image || ('https://picsum.photos/seed/'+encodeURIComponent(n.id||n.title||'news')+'/600/840');
+  const when = n.publishedAt ? new Date(n.publishedAt).toLocaleString() : '';
+  const base = String(n.url || '#');
+  const url  = base + (base.includes('?') ? '&' : '?') + 'utm_source=yatstats&utm_medium=alumni_news';
+  const share = shareTextFor(n);
+  const nm = (n.player_display_name||'').toUpperCase();
+  const src = n.source || '';
+  return `<article class="card">
+    <div class="card-inner">
+      <div class="card-img"><div class="ph" style="background-image:url('${img}')"></div></div>
+      <div class="card-body">
+        <div class="card-title">${n.title||''}</div>
+        <div class="card-meta">${src} • ${when}</div>
+        <div class="card-player">${nm}</div>
+        <div class="actions">
+          <a class="btn readmore" href="${url}" target="_blank" rel="noopener">READ MORE</a>
+          <button class="share-btn" onclick="shareToX('${url}', \`${share}\`)"><i class="ri-twitter-x-line"></i> Share</button>
+          <button class="share-btn" onclick="shareToFacebook('${url}', \`${share}\`)"><i class="ri-facebook-circle-line"></i> Share</button>
+          <button class="share-btn" onclick="shareToEmail('Check this out on YATSTATS', \`${share}\`, '${url}')"><i class="ri-mail-line"></i> Email</button>
+          <button class="share-btn" onclick="shareToInstagram(\`${share}\`)"><i class="ri-instagram-line"></i> Instagram</button>
+          <a class="btn" href="marketplace.html?utm_source=yatstats&utm_medium=alumni_news&utm_campaign=cta" target="_blank" rel="noopener"><i class="ri-store-2-line"></i> YAT-A-BOY</a>
+        </div>
+      </div>
+    </div>
+  </article>`;
+}
+function renderNews(players){
+  const F = readFilters();
+  const items = (getNewsCache().items||[]).slice();
+
+  // Map of allowed players by filter
+  const allowed = new Set((players||[]).filter(p=>{
+    const nm=(p.display_name||'').toLowerCase();
+    const nameOk = !F.name || nm.includes(F.name);
+    const lvlOk  = !F.levels.length || F.levels.includes(p.level);
+    const statOk = !F.status.length || F.status.includes(p.status);
+    const classOk= !F.classes.length || F.classes.includes(p.grad_class);
+    const rosterOk = !F.rosterYears.length || (p.letter_years||'').split(',').some(y=>F.rosterYears.includes(y.trim()));
+    return nameOk && lvlOk && statOk && classOk && rosterOk;
+  }).map(p=> (p.display_name||'').toLowerCase()));
+
+  const filtered = items.filter(n=>{
+    const nameLc = String(n.player_display_name||'').toLowerCase();
+    const dateOk = (!F.from && !F.to) ||
+                   ((F.from ? new Date(n.publishedAt)>=F.from : true) &&
+                    (F.to   ? new Date(n.publishedAt)<=F.to   : true));
+    const playerOk = !allowed.size || allowed.has(nameLc);
+    return dateOk && playerOk;
+  }).sort((a,b)=> new Date(b.publishedAt||0) - new Date(a.publishedAt||0));
+
+  $('#newsList').innerHTML = filtered.length
+    ? filtered.map(newsCardHTML).join('')
+    : `<p style="opacity:.8">No news matches the current filters.</p>`;
+}
+
+/* Render: weekly line scores (column + drawer) */
+async function buildWeeklyLines(players){
+  let games=[];
+  try{ games = await loadGamesCSV(GAMES_CSV); }catch(e){ console.warn('Games load failed', e); return `<p style="color:#f88">Could not load games.</p>`; }
+
+  const F = readFilters();
+  const now = new Date();
+
+  // Build last 4 Sun–Sat weeks (incl. this week)
+  const weeks = [];
+  let cur = startOfWeekSun(new Date());
+  for(let i=0;i<WEEKS_TO_SHOW;i++){
+    const s = startOfWeekSun(cur);
+    const e = endOfWeekSun(cur);
+    weeks.push({start:s, end:e});
+    cur.setDate(cur.getDate()-7);
+  }
+  const inWindow = w=>{
+    if (!F.from && !F.to) return true;
+    const from = F.from || new Date(0);
+    const to   = F.to   || new Date(8640000000000000);
+    return !(w.end < from || w.start > to);
+  };
+
+  // For sort, map players by lowercased name
+  const meta = new Map(players.map(p=>[(p.display_name||'').toLowerCase(), p]));
+
+  const out = weeks.filter(inWindow).map(w=>{
+    const weekGames = games.filter(g => g.date>=w.start && g.date<=w.end);
+
+    // group by player
+    const byP = new Map();
+    for(const g of weekGames){
+      const key=(g.player_name||'').toLowerCase();
+      if(!byP.has(key)) byP.set(key,[]);
+      byP.get(key).push(g);
+    }
+    for(const arr of byP.values()) arr.sort((a,b)=> b.date-a.date);
+
+    // player order by defaultSort
+    const keys = Array.from(byP.keys());
+    keys.sort((ak,bk)=> defaultSort(meta.get(ak)||{}, meta.get(bk)||{}));
+
+    // render
+    const blocks = keys.map(k=>{
+      const p = meta.get(k)||{};
+      const name = (p.display_name || k).toUpperCase();
+      const lines = byP.get(k).map(g=>{
+        if (g.date > now){
+          const tm = g.time ? ` – ${g.time}` : '';
+          return `${fmtMD(g.date)} ${g.ha} ${g.opp}${tm}`;
+        }
+        const text = g.line ? g.line : 'DNP';
+        return `${fmtMD(g.date)} ${g.ha} ${g.opp} | ${text}`;
+      }).join('<br>');
+      if (!lines) return '';
+      return `<div class="player-block">
+        <div class="player-name">${name}</div>
+        <div class="player-lines">${lines}</div>
+      </div>`;
+    }).filter(Boolean).join('');
+
+    return `<div class="week-group">
+      <div class="section-title">${fmtWeekTitle(w.start,w.end)}</div>
+      ${blocks || `<div class="no-lines">No games recorded for this week.</div>`}
+    </div>`;
+  }).join('');
+
+  return out || `<div class="no-lines">No line scores match the date window.</div>`;
+}
+async function renderLineScoresUI(){
+  const players = window.PLAYERS||[];
+  const html = await buildWeeklyLines(players);
+  const col = $('#linesColumnBody'); if (col) col.innerHTML = html;
+  const drw = $('#linesDrawerBody'); if (drw) drw.innerHTML = html;
+}
+
+/* Live search (profiles) */
+function makeHit(p){
+  const el=document.createElement('div'); el.className='live-hit';
+  const nm=imageNameOf(p);
+  const hsImgJ=`assets/img/hs_players/${nm}.jpg`, hsImgP=`assets/img/hs_players/${nm}.png`;
+  el.innerHTML=`<img src="${hsImgJ}" onerror="this.onerror=null;this.src='${hsImgP}';" style="width:36px;height:36px;border-radius:6px;object-fit:cover;margin-right:8px;">
+                <span style="font-weight:700">${p.display_name}</span> <span style="opacity:.7">&nbsp;• ${p.level||''} • ${p.org||''}</span>`;
+  el.style.cssText='padding:8px 10px;border-radius:10px;cursor:pointer;display:flex;align-items:center';
+  el.onmouseenter=()=>el.style.background='var(--line)'; el.onmouseleave=()=>el.style.background='transparent';
+  el.onclick=()=> location.href = `profile.html?player=${slugOf(p)}`;
+  return el;
+}
+function liveSearch(){
+  const q=($('#playerSearch')?.value||'').trim().toLowerCase();
+  const box=$('#liveResults'); if(!box) return;
+  if(!q){ box.innerHTML=''; return; }
+  const hits=(window.PLAYERS||[]).filter(p=>{
+    const hay=[p.display_name,p.team,p.org].map(x=>(x||'').toLowerCase()).join(' ');
+    return hay.includes(q);
+  }).slice(0,25);
+  box.innerHTML=''; hits.forEach(p=>box.appendChild(makeHit(p)));
+}
+
+/* Theme */
+function setupTheme(){
+  const themeToggle=$('#theme-toggle'); if(!themeToggle) return;
+  const body=document.body, icon=themeToggle.querySelector('i');
+  const applyTheme=()=>{
+    const saved=localStorage.getItem('theme');
+    if (saved==='light'){ body.classList.add('light-theme'); icon?.classList.replace('ri-sun-line','ri-moon-line'); }
+    else { body.classList.remove('light-theme'); icon?.classList.replace('ri-moon-line','ri-sun-line'); }
+  };
+  themeToggle.addEventListener('click', ()=>{
+    body.classList.toggle('light-theme');
+    localStorage.setItem('theme', body.classList.contains('light-theme') ? 'light' : 'dark');
+    applyTheme();
+  });
+  applyTheme();
+}
+
+/* Auth UI minimal (show/hide icons) */
+function setupAuth(){
+  if (!window.firebaseAuth) return;
+  const { onAuthStateChanged } = window.firebaseAuth;
+  onAuthStateChanged(window.auth, user => {
+    const accountBtn=$('#btnAccount'), soBtn=$('#btnSignOut');
+    if (user && !user.isAnonymous){ accountBtn.style.display='none'; soBtn.style.display='inline-flex'; }
+    else { accountBtn.style.display='inline-flex'; soBtn.style.display='none'; }
+  });
+}
+
+/* Drawers & events */
+function closeDrawers(){ document.body.classList.remove('drawer-left-open','drawer-right-open','drawer-open'); }
+function setupEvents(){
+  $('#btnMenu')?.addEventListener('click',()=>{ document.body.classList.add('drawer-left-open','drawer-open'); });
+  $('#openSearch')?.addEventListener('click',()=>{ document.body.classList.add('drawer-left-open','drawer-open'); });
+  $('#openFilters')?.addEventListener('click',()=>{
+    $('#drawerFilters').style.display='flex';
+    $('#linesDrawer').style.display='none';
+    document.body.classList.add('drawer-right-open','drawer-open');
+  });
+  $('#openLinesDrawer')?.addEventListener('click',()=>{
+    $('#linesDrawer').style.display='flex';
+    $('#drawerFilters').style.display='none';
+    document.body.classList.add('drawer-right-open','drawer-open');
+  });
+  $$('.close-btn').forEach(b=>b.addEventListener('click',closeDrawers));
+  $('.drawer-mask')?.addEventListener('click',closeDrawers);
+
+  // Filters
+  $('#filtersReset')?.addEventListener('click',()=>{ resetFilters(); renderNews(window.PLAYERS); renderLineScoresUI(); });
+  $('#filtersReset2')?.addEventListener('click',()=>{ resetFilters(); renderNews(window.PLAYERS); renderLineScoresUI(); });
+  $('#filterName')?.addEventListener('input',debounce(()=>renderNews(window.PLAYERS)));
+  $('#playerSearch')?.addEventListener('input',debounce(liveSearch));
+  $('#filters')?.addEventListener('change',e=>{
+    if (e.target.classList.contains('select-all')){
+      const on = e.target.checked;
+      e.target.closest('.filter-options')?.querySelectorAll('input[type="checkbox"]:not(.select-all)').forEach(cb=>cb.checked=on);
+    }
+    renderNews(window.PLAYERS);
+  });
+  $('#filterFrom')?.addEventListener('change', ()=>{ renderNews(window.PLAYERS); renderLineScoresUI(); });
+  $('#filterTo')?.addEventListener('change',   ()=>{ renderNews(window.PLAYERS); renderLineScoresUI(); });
+}
+function resetFilters(){
+  $$('#filters input').forEach(i=>{
+    if(i.type==='checkbox') i.checked=false;
+    if(i.type==='text' || i.type==='date') i.value='';
+  });
+}
+
+/* Boot */
+document.addEventListener('DOMContentLoaded', async ()=>{
+  try{
+    setupTheme();
+    setupEvents();
+    setupAuth();
+
+    const players = await loadCSV(CSV_URL);
+    window.PLAYERS = players;
+    populateFilters(players);
+
+    // Seed news (first time) then render
+    await ensureNews();
+    renderNews(players);
+
+    // Render lines in both column and drawer
+    await renderLineScoresUI();
+  }catch(e){
+    console.error('Init failed', e);
+    $('#newsList').innerHTML = `<p style="color:#f88">Error loading page.</p>`;
+  }
+});
+
+/* expose share funcs to inline handlers */
+window.shareToX = shareToX;
+window.shareToFacebook = shareToFacebook;
+window.shareToEmail = shareToEmail;
+window.shareToInstagram = shareToInstagram;
+</script>
+</body>
+</html>
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400&family=Bebas+Neue&display=swap" rel="stylesheet">
 
 <!-- Firebase init (same as index) -->
