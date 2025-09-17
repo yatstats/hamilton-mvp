@@ -22,9 +22,7 @@
     } else {
       await signInAnonymously(window.auth);
     }
-  } catch (e) {
-    console.error("Firebase initialization error:", e);
-  }
+  } catch (e) { console.error("Firebase initialization error:", e); }
 </script>
 
 <style>
@@ -84,8 +82,6 @@ body.light-theme .tag-grey{color:var(--muted)}
 @keyframes swap{0%{opacity:0}5%{opacity:1}45%{opacity:1}50%{opacity:0}100%{opacity:0}}
 .hero-right{display:flex;gap:10px;align-items:center}
 .hero-icon i{font-size:20px}
-.date-input{background:rgba(255,255,255,.06);border:1px solid var(--line);color:var(--ink);padding:8px 10px;border-radius:10px}
-body.light-theme .date-input{background:rgba(0,0,0,.06)}
 
 .drawer-mask{position:fixed;inset:0;background:rgba(0,0,0,.35);opacity:0;pointer-events:none;transition:opacity .2s;z-index:60}
 .drawer{position:fixed;top:0;bottom:0;width:min(360px,82vw);background:var(--drawer-bg);backdrop-filter:blur(4px);color:var(--ink);transform:translateX(-110%);transition:transform .25s,background-color .3s;z-index:70}
@@ -140,7 +136,7 @@ body.light-theme .form-field input{background:rgba(0,0,0,.06)}
 }
 #colPro{grid-area:pro}
 #colCollege{grid-area:college}
-#colLineScores{grid-area:lines}
+#colLineScores{grid-area:lines;display:flex;flex-direction:column;min-height:40vh}
 @media (max-width:1100px){
   .grid{grid-template-columns:2fr 1fr;grid-template-areas:"pro lines" "college lines";}
 }
@@ -148,7 +144,9 @@ body.light-theme .form-field input{background:rgba(0,0,0,.06)}
   .grid{grid-template-columns:1fr;grid-template-areas:"pro" "college" "lines";}
 }
 
+/* Titles */
 .section-title{background:var(--line);color:var(--fg);text-align:left;padding:8px 10px;font:700 18px "Bebas Neue",sans-serif;border-radius:6px;letter-spacing:.06em}
+.week-subtitle{margin:10px 0 6px;font:700 18px "Bebas Neue",sans-serif;letter-spacing:.06em}
 
 /* News cards */
 .news-list{display:flex;flex-direction:column;gap:12px}
@@ -164,15 +162,15 @@ body.light-theme .form-field input{background:rgba(0,0,0,.06)}
 .icon-link i{font-size:17px}
 .readmore{margin-left:auto;background:rgba(255,255,255,.06);border:1px solid var(--line);padding:6px 10px;border-radius:8px;font:700 13px "Bebas Neue",sans-serif;letter-spacing:.06em}
 
-/* Line scores (font sizes match the .player-line in news) */
-.week-group{background:var(--card-bg);border:1px solid var(--line);border-radius:10px;padding:8px;margin-bottom:12px}
-.player-block{background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:10px;padding:8px 10px;margin:8px 0}
+/* Line scores */
+#linesScroll{overflow:auto;max-height:74vh;padding-right:6px}
+.week-group{background:var(--card-bg);border:1px solid var(--line);border-radius:10px;padding:10px;margin-bottom:12px}
+.player-block{margin:8px 0}
 .player-name{font:700 18px "Bebas Neue",sans-serif;letter-spacing:.08em}
-.line-row{display:flex;gap:8px;align-items:center;padding:6px 8px;border-radius:10px;background:rgba(0,0,0,.18);margin:6px 0}
-.date-pill{background:rgba(255,255,255,.12);padding:3px 8px;border-radius:999px;font:700 12px "Bebas Neue",sans-serif;letter-spacing:.08em}
-.line-text{font:500 13px/1.25 Oswald;color:#ddd}
+.lines{padding-left:6px}
+.line{font:500 13px/1.28 Oswald;color:#ddd;margin:3px 0}
 
-/* Footer (sticky) */
+/* Footer */
 .site-footer{position:fixed;left:0;right:0;bottom:0;height:var(--footerH);background:var(--bg);border-top:1px solid var(--line);z-index:40}
 .site-footer a{display:block;height:100%;width:100%}
 .site-footer img{height:100%;width:100%;object-fit:contain}
@@ -217,14 +215,12 @@ body.light-theme .form-field input{background:rgba(0,0,0,.06)}
     <div class="container hero-grid">
       <div class="hero-left" aria-live="polite">
         <div class="tag-duo">
-          <div class="tag-swap"><span class="tag-grey">ALUMNI</span> <span class="tag-bold">HEADLINES</span></div>
-          <div class="tag-swap"><span class="tag-grey">FLIP FOR</span> <span class="tag-bold">STATS!</span></div>
+          <div class="tag-swap"><span class="tag-grey">ACTIVE</span> <span class="tag-bold">ALUMNI NEWS</span></div>
+          <div class="tag-swap"><span class="tag-grey">WEEKY</span> <span class="tag-bold">LINE SCORES</span></div>
         </div>
         <div class="crumbs hero-crumbs">HAMILTON ▸ ALUMNI NEWS</div>
       </div>
       <div class="hero-right">
-        <input type="date" id="fromDate" class="date-input" />
-        <input type="date" id="toDate" class="date-input" />
         <button id="openSearch" class="hero-icon icon-btn" aria-label="Open search"><i class="ri-search-line"></i></button>
         <button id="openFilters" class="hero-icon icon-btn" aria-label="Open filters"><i class="ri-filter-3-line"></i></button>
         <button id="filtersReset2" class="hero-icon icon-btn" aria-label="Reset"><i class="ri-restart-line"></i></button>
@@ -235,7 +231,7 @@ body.light-theme .form-field input{background:rgba(0,0,0,.06)}
 
 <div class="drawer-mask"></div>
 
-<!-- Left: Player profile search + Nav (identical to index) -->
+<!-- Left: Player search + Nav -->
 <aside class="drawer" id="drawerLeft" aria-label="Left drawer">
   <button class="icon-btn close-btn"><i class="ri-close-line"></i></button>
   <div class="drawer-content">
@@ -257,7 +253,7 @@ body.light-theme .form-field input{background:rgba(0,0,0,.06)}
   </div>
 </aside>
 
-<!-- Right: Filters (extended: text, status, level, grad class, roster year; also date range copy) -->
+<!-- Right: Filters (no date inputs here now) -->
 <aside class="drawer drawer-right" id="drawerFilters">
   <button class="icon-btn close-btn"><i class="ri-close-line"></i></button>
   <h3>FILTERS</h3>
@@ -268,7 +264,6 @@ body.light-theme .form-field input{background:rgba(0,0,0,.06)}
         <input id="filterText" placeholder="Type keywords…" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--ink)"/>
       </div>
     </details>
-
     <details class="filter-group">
       <summary class="filter-title">By Status</summary>
       <div class="filter-options" id="filterStatus">
@@ -281,33 +276,19 @@ body.light-theme .form-field input{background:rgba(0,0,0,.06)}
         <label><input type="checkbox" value="SPONSOR"> SPONSOR</label>
       </div>
     </details>
-
     <details class="filter-group">
       <summary class="filter-title">By Level</summary>
       <div class="filter-options" id="filterLevels">
         <label class="select-all-label"><input type="checkbox" class="select-all"> Select All</label>
-        <!-- built from roster -->
       </div>
     </details>
-
     <details class="filter-group">
       <summary class="filter-title">By Graduating Class</summary>
       <div class="filter-options" id="filterGradClass"></div>
     </details>
-
     <details class="filter-group">
       <summary class="filter-title">By Roster Year</summary>
       <div class="filter-options" id="filterRosterYear"></div>
-    </details>
-
-    <details class="filter-group">
-      <summary class="filter-title">By Date Range (optional)</summary>
-      <div class="filter-options">
-        <div style="display:flex;gap:8px">
-          <input type="date" id="fromDateDrawer" class="date-input" style="flex:1" />
-          <input type="date" id="toDateDrawer"   class="date-input" style="flex:1" />
-        </div>
-      </div>
     </details>
   </div>
   <div class="drawer-footer">
@@ -315,7 +296,7 @@ body.light-theme .form-field input{background:rgba(0,0,0,.06)}
   </div>
 </aside>
 
-<!-- Account drawer (same as index) -->
+<!-- Account drawer -->
 <aside class="drawer drawer-right" id="drawerAccount" style="display:none;">
   <button class="icon-btn close-btn"><i class="ri-close-line"></i></button>
   <h3>ACCOUNT</h3>
@@ -343,18 +324,20 @@ body.light-theme .form-field input{background:rgba(0,0,0,.06)}
 <main class="main container">
   <div class="grid">
     <section id="colPro">
-      <div class="section-title" id="titlePro">ALUMNI HEADLINES (Pros)</div>
+      <div class="section-title" id="titlePro">ACTIVE ALUMNI NEWS (Pros)</div>
       <div class="news-list" id="listPro"><p style="color:var(--muted)">Loading…</p></div>
     </section>
 
     <section id="colCollege">
-      <div class="section-title" id="titleCollege">ALUMNI HEADLINES (College)</div>
+      <div class="section-title" id="titleCollege">ACTIVE ALUMNI NEWS (College)</div>
       <div class="news-list" id="listCollege"><p style="color:var(--muted)">Loading…</p></div>
     </section>
 
     <section id="colLineScores" aria-live="polite">
-      <div class="section-title" id="titleLines">ALUMNI LINE SCORES</div>
-      <div id="linesWrap"><p style="color:var(--muted)">Loading line scores…</p></div>
+      <div class="section-title" id="titleLines">WEEKY LINE SCORES</div>
+      <div id="linesScroll">
+        <div id="linesWrap"><p style="color:var(--muted)">Loading line scores…</p></div>
+      </div>
     </section>
   </div>
 </main>
@@ -369,10 +352,8 @@ body.light-theme .form-field input{background:rgba(0,0,0,.06)}
 /* ---- CONFIG ---- */
 const ROSTER_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQcWJM6Q6hTdFnES_G5LUy4teCS-sJ5HdAc9F5HSY8DGE9egdGy8yUAe2ShT3tFm-CwUuCYeAYy_YiW/pub?gid=2028135390&single=true&output=csv";
 const NEWS_JSON_URL  = "assets/news/alumni_news.json";
-
-/* GAMES tab (A: player_name, B: daily_line_score, G: GameDateLocal, I: Opponent, J: HomeAway) */
-const SHEET_ID = "1yUNQH9NbpKwOOwH9blf5ZqQfmft796sQl1dqghXP4uA";
-const GAMES_CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=GAMES`;
+/* GAMES tab (published CSV link you provided) */
+const GAMES_CSV_URL  = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQcWJM6Q6hTdFnES_G5LUy4teCS-sJ5HdAc9F5HSY8DGE9egdGy8yUAe2ShT3tFm-CwUuCYeAYy_YiW/pub?output=csv";
 
 /* ---- SHORTCUTS ---- */
 const $ = s => document.querySelector(s);
@@ -384,30 +365,48 @@ const levelOrder = {
   'MLB':13,'INTERNATIONAL':12,'TRIPLE-A':11,'AAA':11,'DOUBLE-A':10,'AA':10,'HIGH-A':9,'A+':9,
   'LOW-A':8,'A':8,'ROOKIE':7,'ROK':7,'INDY':6,'NCAA-D1':5,'NCAA-D2':4,'NCAA-D3':3,'NAIA':2,'JUCO':1
 };
-const LEVEL_ORDER_MAP = new Map(Object.entries(levelOrder).map(([k,v])=>[k, 100-v])); // smaller is higher rank for grouping
+const LEVEL_ORDER_MAP = new Map(Object.entries(levelOrder).map(([k,v])=>[k, 100-v]));
 
 /* ---- CSV PARSER ---- */
 function parseCSV(text){
   const rows = text.trim().split(/\r?\n/).map(l =>
     l.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/).map(c=>c.replace(/^"|"$/g,''))
   );
-  const header = rows.shift();
-  const idx = name => header.indexOf(name);
-  return { rows, idx, header };
+  const header = rows.shift().map(h=>h.trim());
+  return { rows, header };
+}
+function idxOf(header, names){
+  const lower=header.map(h=>h.toLowerCase());
+  for(const want of names){
+    const i = lower.indexOf(want.toLowerCase());
+    if(i>-1) return i;
+  }
+  return -1;
 }
 
 /* ---- LOADERS ---- */
 async function fetchRoster(){
   const res = await fetch(ROSTER_CSV_URL, {cache:'no-store'});
   if(!res.ok) throw new Error('Roster CSV HTTP '+res.status);
-  const {rows, idx} = parseCSV(await res.text());
+  const {rows, header} = parseCSV(await res.text());
+  const i = {
+    display_name: idxOf(header, ['display_name']),
+    first: idxOf(header, ['first']),
+    last: idxOf(header, ['last']),
+    grad_class: idxOf(header, ['grad_class']),
+    letter_years: idxOf(header, ['letter_years']),
+    status: idxOf(header, ['status']),
+    level: idxOf(header, ['level']),
+    team: idxOf(header, ['team']),
+    org: idxOf(header, ['org']),
+  };
   return rows.map(r=>({
-    display_name:r[idx('display_name')],
-    first:r[idx('first')], last:r[idx('last')],
-    grad_class:r[idx('grad_class')], letter_years:r[idx('letter_years')],
-    status:(r[idx('status')]||'').toUpperCase(),
-    level:(r[idx('level')]||'').toUpperCase(),
-    team:r[idx('team')], org:r[idx('org')]
+    display_name:r[i.display_name],
+    first:r[i.first], last:r[i.last],
+    grad_class:r[i.grad_class], letter_years:r[i.letter_years],
+    status:(r[i.status]||'').toUpperCase(),
+    level:(r[i.level]||'').toUpperCase(),
+    team:r[i.team], org:r[i.org]
   }));
 }
 
@@ -421,19 +420,27 @@ async function fetchNews(){
 async function fetchGames(){
   const res = await fetch(GAMES_CSV_URL, {cache:'no-store'});
   if(!res.ok) throw new Error('Games CSV HTTP '+res.status);
-  const {rows, idx} = parseCSV(await res.text());
+  const {rows, header} = parseCSV(await res.text());
+  const i = {
+    player: idxOf(header, ['player_name','player']),
+    line:   idxOf(header, ['daily_line_score','line_score','line']),
+    date:   idxOf(header, ['gamedatelocal','gamedate']),
+    opp:    idxOf(header, ['opponent','opp']),
+    ha:     idxOf(header, ['homeaway','ha'])
+  };
   return rows.map(r=>{
-    const nm  = r[idx("player_name")] || r[0] || "";
-    const dat = r[idx("GameDateLocal")] || r[idx("GameDate")] || "";
-    const opp = r[idx("Opponent")] || "";
-    const ha  = r[idx("HomeAway")] || "";
-    const line= r[idx("daily_line_score")] || "";
+    const nm  = r[i.player] || '';
+    const raw = r[i.line]   || '';
+    const dat = r[i.date]   || '';
+    const opp = r[i.opp]    || '';
+    const ha  = r[i.ha]     || '';
     const d = new Date(dat);
-    return (!nm || isNaN(d)) ? null : { player_name:nm, date:d, opp, ha, line_raw:line };
+    if (!nm || isNaN(d)) return null;
+    return { player_name:nm, date:d, opp, ha, line_raw:raw };
   }).filter(Boolean);
 }
 
-/* ---- THEME ---- */
+/* ---- THEME / DRAWERS / AUTH ---- */
 function setupTheme(){
   const themeToggle=$('#theme-toggle'); if(!themeToggle) return;
   const body=document.body, icon=themeToggle.querySelector('i');
@@ -449,8 +456,6 @@ function setupTheme(){
   });
   applyTheme();
 }
-
-/* ---- DRAWERS / AUTH / EVENTS (same behavior as index) ---- */
 function closeDrawers(){ document.body.classList.remove('drawer-left-open','drawer-right-open','drawer-open'); }
 function setupEventListeners(){
   $('#btnMenu')?.addEventListener('click',()=>{ document.body.classList.add('drawer-left-open','drawer-open'); });
@@ -471,8 +476,6 @@ function setupEventListeners(){
   $('#filtersReset2')?.addEventListener('click',resetFilters);
   $('#playerSearch')?.addEventListener('input',debounce(liveSearch));
 }
-
-/* Auth UI (same as index) */
 function setupAuth(){
   if (!window.firebaseAuth) return;
   const { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } = window.firebaseAuth;
@@ -514,14 +517,12 @@ function setupAuth(){
   });
 }
 
-/* ---- ROSTER / LIVE SEARCH ---- */
+/* ---- ROSTER SEARCH ---- */
 function imageNameOf(p){
   const f=(p.first||'').toLowerCase(), l=(p.last||'').toLowerCase();
   return f&&l ? `${f}_${l}` : (p.display_name||'').toLowerCase().replace(/[^a-z0-9]+/g,'-');
 }
 function slugOf(p){
-  const s=(p.slug||'').trim();
-  if(s) return s;
   return (p.display_name||'').trim().toLowerCase().replace(/[^a-z0-9]+/g,'-');
 }
 function profileURL(p){ return `./profile.html?player=${slugOf(p)}`; }
@@ -562,34 +563,21 @@ function populateFiltersFromRoster(players){
     '<label class="select-all-label"><input type="checkbox" class="select-all"> Select All</label>' +
     rosterYears.map(y=>`<label><input type="checkbox" value="${y}"> ${y}</label>`).join('');
 }
-
 function readFilterState(){
   const text = ($('#filterText')?.value||'').trim().toLowerCase();
   const status = $$('#filterStatus input:checked:not(.select-all)').map(i=>i.value.toUpperCase());
   const levels = $$('#filterLevels input:checked:not(.select-all)').map(i=>i.value.toUpperCase());
   const classes= $$('#filterGradClass input:checked:not(.select-all)').map(i=>i.value);
   const roster = $$('#filterRosterYear input:checked:not(.select-all)').map(i=>i.value);
-
-  const fA = $('#fromDate')?.value || '';
-  const tA = $('#toDate')?.value   || '';
-  const fB = $('#fromDateDrawer')?.value || '';
-  const tB = $('#toDateDrawer')?.value   || '';
-
-  const from = (fA||fB) ? new Date((fA||fB)+'T00:00:00') : null;
-  const to   = (tA||tB) ? new Date((tA||tB)+'T23:59:59') : null;
-
-  return { text, status, levels, classes, roster, from, to };
+  return { text, status, levels, classes, roster };
 }
-
 function resetFilters(){
   $$('#filters input').forEach(i=>{
     if(i.type==='checkbox') i.checked=false;
-    if(i.type==='text' || i.type==='date') i.value='';
+    if(i.type==='text') i.value='';
   });
-  $('#fromDate').value = ''; $('#toDate').value = '';
   applyAll();
 }
-
 $('#filters')?.addEventListener('change',e=>{
   if (e.target.classList.contains('select-all')){
     const on = e.target.checked;
@@ -598,12 +586,8 @@ $('#filters')?.addEventListener('change',e=>{
   applyAll();
 });
 $('#filterText')?.addEventListener('input',debounce(applyAll));
-$('#fromDate')?.addEventListener('change',()=>{ $('#fromDateDrawer').value = $('#fromDate').value; applyAll(); });
-$('#toDate')?.addEventListener('change',()=>{ $('#toDateDrawer').value = $('#toDate').value; applyAll(); });
-$('#fromDateDrawer')?.addEventListener('change',()=>{ $('#fromDate').value = $('#fromDateDrawer').value; applyAll(); });
-$('#toDateDrawer')?.addEventListener('change',()=>{ $('#toDate').value = $('#toDateDrawer').value; applyAll(); });
 
-/* ---- NEWS RENDER ---- */
+/* ---- NEWS ---- */
 const PRO_LEVELS = new Set(['MLB','INTERNATIONAL','TRIPLE-A','AAA','DOUBLE-A','AA','HIGH-A','A+','LOW-A','A','ROOKIE','ROK','INDY']);
 const COL_LEVELS = new Set(['NCAA-D1','NCAA-D2','NCAA-D3','NAIA','JUCO']);
 
@@ -621,23 +605,16 @@ function enrichNewsWithRoster(news, rosterByName){
   }
   return news;
 }
-
 function passFiltersNews(n, F){
-  const d = n.publishedAt ? new Date(n.publishedAt) : null;
-  if (F.from && d && d < F.from) return false;
-  if (F.to   && d && d > F.to)   return false;
-
   if (F.status.length && !F.status.includes((n.status||'').toUpperCase())) return false;
   if (F.levels.length && !F.levels.includes((n.level||'').toUpperCase())) return false;
   if (F.classes.length && !F.classes.includes(String(n.grad_class||''))) return false;
-
   if (F.text){
     const t = `${n.title||''} ${n.player_display_name||''} ${n.source||''} ${n.team||''} ${n.org||''}`.toLowerCase();
     if (!t.includes(F.text)) return false;
   }
   return true;
 }
-
 function cardHTML(n){
   const when = n.publishedAt ? new Date(n.publishedAt).toLocaleString() : '';
   const url = n.url ? n.url + (n.url.includes('?')?'&':'?') + 'utm_source=yatstats&utm_medium=news' : '#';
@@ -647,7 +624,6 @@ function cardHTML(n){
   const shareFB = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
   const shareEM = `mailto:?subject=${encodeURIComponent(n.title||'')}&body=${encodeURIComponent(url)}`;
   const playerLine = n.player_display_name ? `<div class="player-line">${n.player_display_name}</div>` : '';
-
   return `<article class="news-card">
     <div class="thumb"><img src="${img}" alt=""></div>
     <div class="card-body">
@@ -665,15 +641,12 @@ function cardHTML(n){
     </div>
   </article>`;
 }
-
 function renderNewsLists(allNews, roster){
   const rosterByName = new Map((roster||[]).map(p=>[(p.display_name||'').toLowerCase(), p]));
   const enriched = enrichNewsWithRoster([...allNews], rosterByName);
-
   const F = readFilterState();
   const items = enriched.filter(n=> passFiltersNews(n, F))
                         .sort((a,b)=> new Date(b.publishedAt||0) - new Date(a.publishedAt||0));
-
   const pro = items.filter(n=> PRO_LEVELS.has((n.level||'').toUpperCase()));
   const col = items.filter(n=> COL_LEVELS.has((n.level||'').toUpperCase()));
 
@@ -682,117 +655,98 @@ function renderNewsLists(allNews, roster){
 }
 
 /* ---- LINE SCORES ---- */
-function normalizeLine(ha, opp, raw){
-  const side = (ha||'').toUpperCase().startsWith('H') ? 'vs.' : '@';
-  const oppTxt = opp ? `${side} ${opp}` : '';
-  const stat = raw ? raw.replace(/\s*—\s*/g,' ').trim() : 'DNP';
-  return `${oppTxt} | ${stat}`; // no long dash
+function weekStartSunday(d){ const x=new Date(d); const g=x.getDay(); x.setDate(x.getDate()-g); x.setHours(0,0,0,0); return x; }
+function weekEnd(start){ const e=new Date(start); e.setDate(e.getDate()+6); e.setHours(23,59,59,999); return e; }
+function weekLabel(start){
+  const end = weekEnd(start);
+  const fmt = (dt,withMonth=true)=> dt.toLocaleDateString(undefined,{month:withMonth?'long':undefined, day:'numeric'});
+  if (start.getMonth()===end.getMonth()){
+    return `Week of ${start.toLocaleDateString(undefined,{month:'long',day:'numeric'})} – ${end.getDate()}`;
+  }
+  return `Week of ${fmt(start,true)} – ${fmt(end,true)}`;
 }
-function weekStart(d){ const x=new Date(d); const g=x.getDay(); x.setDate(x.getDate()-g); x.setHours(0,0,0,0); return x; }
-function fmtWeek(d){ return `WEEK OF ${d.toLocaleDateString(undefined,{month:'long',day:'numeric',year:'numeric'})}`; }
-
 function rosterSort(a,b){
   const la = LEVEL_ORDER_MAP.get((a.level||'').toUpperCase()) ?? 999;
   const lb = LEVEL_ORDER_MAP.get((b.level||'').toUpperCase()) ?? 999;
   if (la!==lb) return la-lb;
   const ga = parseInt(a.grad_class||0,10)||0;
   const gb = parseInt(b.grad_class||0,10)||0;
-  return gb-ga; // newer class first
+  return gb-ga;
 }
-
+function normalizeLine(ha, opp, raw){
+  const side = (ha||'').toUpperCase().startsWith('H') ? 'vs.' : '@';
+  const oppTxt = opp ? `${side} ${opp}` : '';
+  const stat = raw ? raw.trim() : 'DNP';
+  return `${oppTxt} | ${stat}`;
+}
 function renderLineScores(roster, games){
   const F = readFilterState();
   const rosterMap = new Map(roster.map(p=>[(p.display_name||'').toLowerCase(), p]));
 
-  // Filter roster to who passes filters
-  const pick = p=>{
+  // Apply roster filters, then only include those players' games
+  const rosterFiltered = roster.filter(p=>{
     if (F.status.length && !F.status.includes((p.status||'').toUpperCase())) return false;
     if (F.levels.length && !F.levels.includes((p.level||'').toUpperCase())) return false;
     if (F.classes.length && !F.classes.includes(String(p.grad_class||''))) return false;
     return true;
-  };
-  const rosterFiltered = roster.filter(pick);
-  const namesAllowed = new Set(rosterFiltered.map(p=>(p.display_name||'').toLowerCase()));
+  });
+  const allowed = new Set(rosterFiltered.map(p=>(p.display_name||'').toLowerCase()));
 
-  // Filter games to in-range + allowed players
   const inRange = games.filter(g=>{
-    if (!namesAllowed.has((g.player_name||'').toLowerCase())) return false;
-    if (F.from && g.date < F.from) return false;
-    if (F.to   && g.date > F.to)   return false;
-    // text filter: allow search to match player name or opp
+    if (!allowed.has((g.player_name||'').toLowerCase())) return false;
     if (F.text){
-      const t = `${g.player_name||''} ${g.opp||''}`.toLowerCase();
+      const t = `${g.player_name||''} ${g.opp||''} ${g.line_raw||''}`.toLowerCase();
       if (!t.includes(F.text)) return false;
     }
     return true;
   });
 
-  // Group by week -> player; sort weeks desc; players by level+class
+  // Group by week -> player
   const weeks = new Map();
   for(const g of inRange){
-    const wk = weekStart(g.date).toISOString();
-    if(!weeks.has(wk)) weeks.set(wk, new Map());
-    const bucket = weeks.get(wk);
+    const wkStart = weekStartSunday(g.date).toISOString();
+    if(!weeks.has(wkStart)) weeks.set(wkStart, new Map());
+    const bucket = weeks.get(wkStart);
     const key = (g.player_name||'').toLowerCase();
     if(!bucket.has(key)) bucket.set(key, []);
     bucket.get(key).push(g);
   }
 
-  const html = Array.from(weeks.entries())
-    .sort((a,b)=> new Date(b[0]) - new Date(a[0]))
-    .map(([wk, byPlayer])=>{
-      const players = Array.from(byPlayer.keys()).map(k=> rosterMap.get(k) || {display_name:k, level:'', grad_class:'0'});
-      players.sort(rosterSort);
+  const weekKeys = Array.from(weeks.keys()).sort((a,b)=> new Date(b) - new Date(a)).slice(0,4); // last 4 weeks only
+  const html = weekKeys.map(wkKey=>{
+    const start = new Date(wkKey);
+    const byPlayer = weeks.get(wkKey);
 
-      const playerBlocks = players.map(p=>{
-        const rows = (byPlayer.get((p.display_name||'').toLowerCase())||[])
-          .sort((a,b)=> b.date - a.date)
-          .map(x=>{
-            const d = x.date.toLocaleDateString(undefined,{month:'numeric',day:'numeric'});
-            const txt = normalizeLine(x.ha, x.opp, x.line_raw);
-            return `<div class="line-row">
-              <span class="date-pill">${d}</span>
-              <span class="line-text">${txt}</span>
-            </div>`;
-          }).join('');
+    const players = Array.from(byPlayer.keys())
+      .map(k=> rosterMap.get(k) || {display_name:k, level:'', grad_class:'0'})
+      .sort(rosterSort);
 
-        return `<div class="player-block">
-          <div class="player-name">${(p.display_name||'').toUpperCase()}</div>
-          ${rows}
-        </div>`;
-      }).join('');
-
-      return `<div class="week-group">
-        <div class="section-title">ALUMNI LINE SCORES — ${fmtWeek(new Date(wk))}</div>
-        ${playerBlocks || `<div style="opacity:.7;padding:8px">No line scores.</div>`}
+    const blocks = players.map(p=>{
+      const rows = byPlayer.get((p.display_name||'').toLowerCase())
+        .sort((a,b)=> b.date - a.date)
+        .map(x=>{
+          const d = x.date.toLocaleDateString(undefined,{month:'numeric',day:'numeric'});
+          return `<div class="line">${d} ${normalizeLine(x.ha,x.opp,x.line_raw)}</div>`;
+        }).join('');
+      return `<div class="player-block">
+        <div class="player-name">${(p.display_name||'').toUpperCase()}</div>
+        <div class="lines">${rows}</div>
       </div>`;
     }).join('');
+
+    return `<div class="week-group">
+      <div class="week-subtitle">${weekLabel(start)}</div>
+      ${blocks || `<div style="opacity:.7;padding:6px 8px">No line scores.</div>`}
+    </div>`;
+  }).join('');
 
   $('#linesWrap').innerHTML = html || `<p style="color:var(--muted)">No line scores match the filters.</p>`;
 }
 
 /* ---- APPLY ---- */
-async function applyAll(){
-  try{
-    const F = readFilterState();
-    // News
-    renderNewsLists(window.__NEWS__||[], window.__ROSTER__||[]);
-    // Line scores
-    renderLineScores(window.__ROSTER__||[], window.__GAMES__||[]);
-    // Titles (optional week caption if range is set)
-    if(F.from){
-      const wk = fmtWeek(weekStart(F.from));
-      $('#titlePro').textContent = `ALUMNI HEADLINES (Pros) — ${wk}`;
-      $('#titleCollege').textContent = `ALUMNI HEADLINES (College) — ${wk}`;
-      $('#titleLines').textContent = `ALUMNI LINE SCORES — ${wk}`;
-    }else{
-      $('#titlePro').textContent = `ALUMNI HEADLINES (Pros)`;
-      $('#titleCollege').textContent = `ALUMNI HEADLINES (College)`;
-      $('#titleLines').textContent = `ALUMNI LINE SCORES`;
-    }
-  }catch(e){
-    console.error(e);
-  }
+function applyAll(){
+  renderNewsLists(window.__NEWS__||[], window.__ROSTER__||[]);
+  renderLineScores(window.__ROSTER__||[], window.__GAMES__||[]);
 }
 
 /* ---- BOOT ---- */
@@ -802,7 +756,6 @@ document.addEventListener('DOMContentLoaded', async ()=>{
     setupEventListeners();
     setupAuth();
 
-    // Load roster (build filters off this), news, and games
     const [roster, news, games] = await Promise.all([
       fetchRoster().catch(()=>[]),
       fetchNews().catch(()=>[]),
@@ -810,8 +763,8 @@ document.addEventListener('DOMContentLoaded', async ()=>{
     ]);
 
     window.__ROSTER__ = roster;
-    window.__NEWS__   = news;   // all news loads on start
-    window.__GAMES__  = games || [];
+    window.__NEWS__   = news;
+    window.__GAMES__  = games;
 
     populateFiltersFromRoster(roster);
     applyAll();
