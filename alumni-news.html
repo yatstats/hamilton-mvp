@@ -4,31 +4,18 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Alumni News • Hamilton YATSTATS</title>
-
-<!-- Icons & Fonts -->
 <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400&family=Bebas+Neue&display=swap" rel="stylesheet">
-
-<!-- Firebase init (same pattern as index) -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-  import { getAuth, onAuthStateChanged, signInWithCustomToken, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-
+  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
   try {
     const firebaseConfig = JSON.parse(window.__firebase_config || '{}');
     const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    onAuthStateChanged(auth, user => { document.dispatchEvent(new CustomEvent('authStateChanged', { detail: { user } })); });
-
-    if (window.__initial_auth_token) await signInWithCustomToken(auth, window.__initial_auth_token);
-    else await signInAnonymously(auth);
-  } catch (e) {
-    console.warn("Firebase initialization error:", e);
-  }
+    onAuthStateChanged(getAuth(app), user => { document.dispatchEvent(new CustomEvent('authStateChanged', { detail: { user } })); });
+  } catch (e) { console.warn("Firebase initialization error:", e); }
 </script>
-
 <style>
-/* ---------- Theme tokens (mirrors index.html) ---------- */
 :root{
   --bg:#0c0c0c; --fg:#f2f2f2; --muted:#c4c4c4; --ink:#e8e8e8; --line:rgba(255,255,255,.08);
   --card-bg:#171717; --header-bg:#000; --drawer-bg:rgba(10,10,10,.65);
@@ -41,18 +28,16 @@ body.light-theme{
   --card-bg:#fff; --header-bg:#fff; --drawer-bg:rgba(255,255,255,.65);
 }
 *{box-sizing:border-box} html,body{margin:0}
-body{background:var(--bg);color:var(--fg);font-family:Oswald,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;transition:background-color .3s,color .3s}
+body{background:var(--bg);color:var(--fg);font-family:Oswald,system-ui,sans-serif;transition:background-color .3s,color .3s}
 a{color:inherit;text-decoration:none}
 .container{max-width:1400px;margin:0 auto;padding:0 var(--containerPad)}
 .icon-btn{background:none;border:none;color:var(--fg);display:inline-flex;align-items:center;justify-content:center;cursor:pointer}
 .icon-btn i{font-size:20px}
 .hr-y{border-top:1px solid var(--line)}
-/* ---------- Header (copied feel from index) ---------- */
 .header{position:sticky;top:0;z-index:60;background:var(--header-bg)}
 .topbar{display:flex;align-items:center;justify-content:space-between;padding:8px 0}
 .left-icons{display:flex;align-items:center;gap:8px}
 .topnav{display:flex;gap:18px;align-items:center}
-.nav-pair{white-space:nowrap}
 .nav-pair .thin{font:300 var(--hamSmall) Oswald,sans-serif;color:#cfd2d6;letter-spacing:.02em;margin-right:2px}
 body.light-theme .nav-pair .thin{color:var(--muted)}
 .nav-pair .bold{font:400 var(--hamSmall) "Bebas Neue",sans-serif}
@@ -71,7 +56,6 @@ body.light-theme .wordmark-img{filter:invert(1)}
 .hero-left{display:flex;flex-direction:column;gap:4px}
 .crumbs{font:300 calc(var(--hamSmall)*.8)/1 Oswald;color:var(--muted);text-transform:uppercase}
 .hero-right{display:flex;gap:10px}
-/* ---------- Drawers ---------- */
 .drawer-mask{position:fixed;inset:0;background:rgba(0,0,0,.35);opacity:0;pointer-events:none;transition:opacity .2s;z-index:80}
 .drawer{position:fixed;top:0;bottom:0;width:min(360px,82vw);background:var(--drawer-bg);backdrop-filter:blur(4px);color:var(--ink);transform:translateX(-110%);transition:transform .25s;z-index:90}
 .drawer-right{right:0;left:auto;transform:translateX(110%)}
@@ -82,7 +66,6 @@ body.drawer-left-open .drawer-mask,body.drawer-right-open .drawer-mask{opacity:1
 body.drawer-left-open #drawerLeft{transform:translateX(0)}
 body.drawer-right-open .drawer-right.is-open{transform:translateX(0)}
 .form-txt{width:100%;padding:10px;border-radius:10px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--ink)}
-/* ---------- Layout ---------- */
 .main{padding:8px 0 calc(var(--footerH) + 12px)}
 .news-layout{display:grid;gap:14px}
 @media (min-width:1024px){
@@ -90,14 +73,11 @@ body.drawer-right-open .drawer-right.is-open{transform:translateX(0)}
   .col-lines{position:sticky; top:108px; max-height:calc(100vh - 160px); overflow:auto}
 }
 @media (min-width:768px) and (max-width:1023px){ .news-layout{grid-template-columns: 2fr 1fr} }
-@media (max-width:1023px){ /* hide the right column on mobile/tablet; use drawer instead */
-  .col-lines{display:none}
-}
+@media (max-width:1023px){ .col-lines{display:none} }
 .section{background:var(--card-bg);border:1px solid var(--line);border-radius:12px;overflow:hidden}
 .section-title{background:#222;color:#fff;padding:10px 14px;font:700 18px "Bebas Neue",sans-serif;letter-spacing:.06em}
 .section-inner{padding:10px}
 .empty{opacity:.7;text-align:center;padding:12px}
-/* ---------- News cards ---------- */
 .news-list{display:grid;grid-template-columns:1fr;gap:12px}
 .news-card{display:grid;grid-template-columns:120px 1fr;gap:12px;align-items:center;padding:10px;border-radius:12px;border:1px solid var(--line);background:#111}
 .news-thumb{width:120px;height:168px;border-radius:10px;object-fit:cover;background:#000}
@@ -107,18 +87,14 @@ body.drawer-right-open .drawer-right.is-open{transform:translateX(0)}
 .share-row{display:flex;align-items:center;gap:12px;margin-top:8px;opacity:.95}
 .share-row button{background:transparent;border:none;color:var(--fg);display:inline-flex;align-items:center;gap:6px;cursor:pointer}
 .share-row button i{font-size:18px}
-/* ---------- Line scores ---------- */
 .player-block{border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin-bottom:10px;background:#121212}
 .player-title{font:700 18px "Bebas Neue",sans-serif;letter-spacing:.06em;margin:2px 0 8px}
 .line-row{display:flex;gap:8px;align-items:center;border:1px solid #222;border-radius:10px;padding:10px 12px;margin:8px 0;background:#0f0f0f}
 .line-date{background:#1c1c1c;border-radius:999px;padding:6px 10px;font:700 12px "Bebas Neue",sans-serif;letter-spacing:.06em}
 .line-text{font:300 14px/1.2 Oswald}
-/* ---------- Footer ---------- */
 .site-footer{position:fixed;left:0;right:0;bottom:0;height:var(--footerH);background:var(--bg);border-top:1px solid var(--line);z-index:50}
 .site-footer img{height:100%;width:100%;object-fit:contain}
-/* ---------- A11y focus ---------- */
 .icon-btn:focus,button:focus,input:focus{outline:2px solid var(--fg);outline-offset:2px}
-/* ---------- Small helper ---------- */
 .kicker{font:300 12px Oswald;color:var(--muted)}
 .badge{display:inline-flex;align-items:center;gap:6px;padding:4px 8px;border-radius:14px;border:1px solid var(--line);font:700 10px "Bebas Neue"}
 .toast{position:fixed;left:50%;bottom:calc(var(--footerH) + 20px);transform:translateX(-50%);background:#222;color:#fff;padding:8px 12px;border-radius:8px;opacity:0;pointer-events:none;transition:.2s;z-index:200}
@@ -138,10 +114,6 @@ body.drawer-right-open .drawer-right.is-open{transform:translateX(0)}
       <a href="index.html" class="nav-pair"><span class="thin">WHERE THEY</span><span class="bold">YAT?</span></a>
       <a href="alumni-news.html" class="nav-pair"><span class="thin">ACTIVE ALUMNI</span><span class="bold">NEWS</span></a>
       <a href="all-time-list.html" class="nav-pair"><span class="thin">NEXT-LEVEL</span><span class="bold">ALL-TIME LIST</span></a>
-      <a href="marketplace.html" class="nav-pair"><span class="thin">NIL & YAT-A-BOY</span><span class="bold">MARKETPLACE</span></a>
-      <a href="current-team.html" class="nav-pair"><span class="thin">THE</span><span class="bold">CURRENT TEAM</span></a>
-      <a href="partner-program.html" class="nav-pair"><span class="thin">PCD ACTION</span><span class="bold">PARTNER PROGRAM</span></a>
-      <a href="faq.html" class="nav-pair"><span class="bold">FAQ’S</span></a>
     </nav>
     <div class="wordmark-wrap">
       <img class="wordmark-img" src="assets/img/yatstats-logo.png" alt="YAT?STATS">
@@ -171,11 +143,7 @@ body.drawer-right-open .drawer-right.is-open{transform:translateX(0)}
     </div>
   </section>
 </header>
-
-<!-- Drawer mask -->
 <div class="drawer-mask"></div>
-
-<!-- Left: Search + Nav -->
 <aside class="drawer" id="drawerLeft" aria-label="Left drawer">
   <button class="icon-btn close-btn"><i class="ri-close-line"></i></button>
   <div class="pad">
@@ -183,47 +151,31 @@ body.drawer-right-open .drawer-right.is-open{transform:translateX(0)}
     <input id="playerSearch" placeholder="Type to search…" class="form-txt" autocomplete="off">
     <div id="liveResults" style="margin-top:10px"></div>
     <h3 style="margin-top:18px">NAVIGATION</h3>
-    <div class="pad" style="display:flex;flex-direction:column;gap:12px">
+    <div style="display:flex;flex-direction:column;gap:12px; padding-left: 0;">
       <a href="index.html" class="nav-pair"><span class="thin">WHERE THEY</span><span class="bold">YAT?</span></a>
       <a href="alumni-news.html" class="nav-pair"><span class="thin">ACTIVE ALUMNI</span><span class="bold">NEWS</span></a>
       <a href="all-time-list.html" class="nav-pair"><span class="thin">NEXT-LEVEL</span><span class="bold">ALL-TIME LIST</span></a>
-      <a href="current-team.html" class="nav-pair"><span class="thin">THE</span><span class="bold">CURRENT TEAM</span></a>
-      <a href="partner-program.html" class="nav-pair"><span class="thin">PCD ACTION</span><span class="bold">PARTNER PROGRAM</span></a>
-      <a href="marketplace.html" class="nav-pair"><span class="bold">YAT-A-BOY MARKETPLACE</span></a>
-      <a href="faq.html" class="nav-pair"><span class="bold">FAQ’S</span></a>
     </div>
   </div>
 </aside>
-
-<!-- Right: Filters -->
 <aside class="drawer drawer-right" id="drawerFilters" aria-label="Filters drawer">
   <button class="icon-btn close-btn"><i class="ri-close-line"></i></button>
   <div class="pad">
-    <div style="font:700 16px 'Bebas Neue',sans-serif;letter-spacing:.05em;margin-bottom:8px">By Name / School / Org / Conference</div>
-    <input id="filterName" placeholder="Type to filter headlines…" class="form-txt" autocomplete="off">
-    <div style="font:700 16px 'Bebas Neue',sans-serif;letter-spacing:.05em;margin:14px 0 8px">News Date Range</div>
+    <h3 style="margin:0 0 8px">FILTER NEWS</h3>
+    <input id="filterName" placeholder="Filter by Name, School, Org..." class="form-txt" autocomplete="off">
+    <h3 style="margin:14px 0 8px">DATE RANGE</h3>
     <input type="date" id="dateFrom" class="form-txt" style="margin-bottom:8px">
     <input type="date" id="dateTo" class="form-txt">
-    <div style="font:700 16px 'Bebas Neue',sans-serif;letter-spacing:.05em;margin:14px 0 8px">Sort</div>
+    <h3 style="margin:14px 0 8px">SORT</h3>
     <select id="sortOrder" class="form-txt">
       <option value="new">Newest first</option>
       <option value="old">Oldest first</option>
     </select>
-    <p style="opacity:.7;margin-top:10px">(* Line Scores ignore these filters)</p>
+    <p style="opacity:.7;margin-top:10px;font-size:12px">(* Line Scores ignore these filters)</p>
     <button id="filtersReset" class="icon-btn" style="margin-top:12px;padding:10px 14px;border:1px solid var(--line);border-radius:12px"><i class="ri-restart-line"></i>&nbsp;Reset Filters</button>
   </div>
 </aside>
-
-<!-- Right: Account (same placement as index) -->
-<aside class="drawer drawer-right" id="drawerAccount" style="display:none;">
-  <button class="icon-btn close-btn"><i class="ri-close-line"></i></button>
-  <div class="pad">
-    <h3>Account</h3>
-    <p style="opacity:.8">Sign-in coming soon.</p>
-  </div>
-</aside>
-
-<!-- Right: Weekly Line Scores drawer (mobile) -->
+<aside class="drawer drawer-right" id="drawerAccount" style="display:none;"></aside>
 <aside class="drawer drawer-right" id="drawerLines" aria-label="Line scores drawer">
   <button class="icon-btn close-btn"><i class="ri-close-line"></i></button>
   <div class="pad">
@@ -234,17 +186,14 @@ body.drawer-right-open .drawer-right.is-open{transform:translateX(0)}
 
 <main class="main container">
   <div class="news-layout">
-    <!-- Pros -->
     <section class="section">
       <div class="section-title">ALUMNI HEADLINES (Pros)</div>
       <div class="section-inner"><div id="proWrap" class="news-list"><p class="empty">Loading…</p></div></div>
     </section>
-    <!-- College -->
     <section class="section">
       <div class="section-title">ALUMNI HEADLINES (College)</div>
       <div class="section-inner"><div id="ncaaWrap" class="news-list"><p class="empty">Loading…</p></div></div>
     </section>
-    <!-- Weekly Line Scores (desktop/tablet column) -->
     <section class="section col-lines">
       <div class="section-title">WEEKLY LINE SCORES</div>
       <div class="section-inner" id="linesWrap"><p class="empty">Loading…</p></div>
@@ -261,383 +210,192 @@ body.drawer-right-open .drawer-right.is-open{transform:translateX(0)}
 <div id="toast" class="toast" role="status" aria-live="polite">Copied!</div>
 
 <script type="module">
-/* ======== CONFIG ======== */
-/* Players CSV (same as index) */
 const PLAYERS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQcWJM6Q6hTdFnES_G5LUy4teCS-sJ5HdAc9F5HSY8DGE9egdGy8yUAe2ShT3tFm-CwUuCYeAYy_YiW/pub?gid=2028135390&single=true&output=csv";
+const GAMES_CSV_URL = "https://docs.google.com/spreadsheets/d/1yUNQH9NbpKwOOwH9blf5ZqQfmft796sQ1ldgqhXP4uA/gviz/tq?tqx=out:csv&sheet=GAMES";
+const STATS_TOTALS_CSV_URL = "https://docs.google.com/spreadsheets/d/1yUNQH9NbpKwOOwH9blf5ZqQfmft796sQ1ldgqhXP4uA/gviz/tq?tqx=out:csv&sheet=STATS_SEASON_TOTALS";
+const NEWS_JSON_URL = "https://raw.githubusercontent.com/yatstats/hamilton-mvp/main/assets/alumni_news.json";
 
-/* Games sheet for weekly schedule (as in your earlier page) */
-const GAMES_CSV_URL =
- "https://docs.google.com/spreadsheets/d/1yUNQH9NbpKwOOwH9blf5ZqQfmft796sQ1ldgqhXP4uA/gviz/tq?tqx=out:csv&sheet=GAMES";
-
-/* NEW: STATS_SEASON_TOTALS (dates in header; each player has a row) */
-const STATS_TOTALS_CSV_URL =
- "https://docs.google.com/spreadsheets/d/1yUNQH9NbpKwOOwH9blf5ZqQfmft796sQ1ldgqhXP4uA/gviz/tq?tqx=out:csv&sheet=STATS_SEASON_TOTALS";
-
-/* News JSON: try several locations so feed doesn't 404 during prototyping */
-const NEWS_JSON_CANDIDATES = [
-  "assets/alumni_news.json",
-  "assets/news/alumni_news.json",
-  "https://yatstats.github.io/hamilton-mvp/assets/alumni_news.json",
-  "https://raw.githubusercontent.com/yatstats/hamilton-mvp/main/assets/alumni_news.json"
-];
-
-/* ======== SHORTHAND ======== */
-const $  = s => document.querySelector(s);
+const $ = s => document.querySelector(s);
 const $$ = s => Array.from(document.querySelectorAll(s));
 const toast = (msg="Copied!") => { const t=$("#toast"); if(!t) return; t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),1200); };
 const debounce = (fn,ms=300)=>{ let t; return (...a)=>{ clearTimeout(t); t=setTimeout(()=>fn(...a),ms); }; };
 
-/* ======== SORT ORDER FOR PLAYERS ======== */
-const levelOrder = {'MLB':13,'INTERNATIONAL':12,'TRIPLE-A':11,'AAA':11,'DOUBLE-A':10,'AA':10,'HIGH-A':9,'A+':9,'LOW-A':8,'A':8,'ROOKIE':7,'ROK':7,'INDY':6,'NCAA-D1':5,'NCAA-D2':4,'NCAA-D3':3,'NAIA':2,'JUCO':1};
+const levelOrder = {'MLB':13,'INTERNATIONAL':12,'TRIPLE-A':11,'DOUBLE-A':10,'HIGH-A':9,'LOW-A':8,'INDY':6,'NCAA-D1':5,'NCAA-D2':4,'NCAA-D3':3,'NAIA':2,'JUCO':1};
 function defaultSort(a,b){
-  const as=(a.status||'').toUpperCase()==='SPONSOR', bs=(b.status||'').toUpperCase()==='SPONSOR';
-  if(as!==bs) return as?-1:1;
-  const pa=(a.status||'').toUpperCase().includes('ACTIVE')||(a.status||'').toUpperCase()==='FREE AGENT';
-  const pb=(b.status||'').toUpperCase().includes('ACTIVE')||(b.status||'').toUpperCase()==='FREE AGENT';
-  if(pa!==pb) return pa?-1:1;
-  if(pa&&pb){
-    const LA=levelOrder[(a.level||'').toUpperCase()]??-1, LB=levelOrder[(b.level||'').toUpperCase()]??-1;
-    if(LA!==LB) return LB-LA;
-    const GA=+(a.grad_class||0), GB=+(b.grad_class||0); if(GA!==GB) return GA-GB;
-    const lA=(a.letter_years||'').split(',').filter(Boolean).length, lB=(b.letter_years||'').split(',').filter(Boolean).length;
-    if(lA!==lB) return lB-lA;
-    return (a.display_name||'').localeCompare(b.display_name||'');
-  }
-  const GA=+(a.grad_class||9999), GB=+(b.grad_class||9999); if(GA!==GB) return GA-GB;
+  const la=levelOrder[(a.level||'').toUpperCase()]??-1, lb=levelOrder[(b.level||'').toUpperCase()]??-1;
+  if(la!==lb) return lb-la;
   return (a.display_name||'').localeCompare(b.display_name||'');
 }
-
-/* ======== HELPERS ======== */
 const toDate = d => { const x=new Date(d); return isNaN(+x)? null : x; };
-function startOfWeek(d){ const x=new Date(d); x.setHours(0,0,0,0); x.setDate(x.getDate()-x.getDay()); return x; } // Sunday
-function weekLabel(start){ const end=new Date(start); end.setDate(end.getDate()+6);
-  const fmt = (dt,withYear=false)=> dt.toLocaleDateString(undefined,{month:'long',day:'numeric',year:withYear});
-  return `Week of ${fmt(start,true)} – ${fmt(end)}`;
-}
-function recentWeeks(n){
-  const today=new Date(); const first=startOfWeek(today);
-  return Array.from({length:n},(_,i)=>{ const s=new Date(first); s.setDate(s.getDate()-i*7); const e=new Date(s); e.setDate(e.getDate()+6); return {start:s,end:e}; });
-}
+function startOfWeek(d){ const x=new Date(d); x.setHours(0,0,0,0); x.setDate(x.getDate()-x.getDay()); return x; }
 const dateKey = d => `${d.getMonth()+1}/${d.getDate()}`;
-const normKey = s => String(s||'').replace(/^0+/,'').replace(/\/0+/,'/'); // '09/08' -> '9/8'
+const normKey = s => String(s||'').replace(/^0+/,'').replace(/\/0+/,'/');
 
-/* ======== LOADERS ======== */
-async function fetchFirst(urls){
-  for(const u of urls){
-    try{
-      const r=await fetch(u,{cache:'no-store'});
-      if(r.ok){ return await r.json(); }
-    }catch(e){ /* try next */ }
-  }
-  return [];
-}
-async function loadNews(){ return await fetchFirst(NEWS_JSON_CANDIDATES); }
-
-async function loadCSV(url){
-  const r=await fetch(url,{cache:'no-store'}); if(!r.ok) throw new Error(r.status);
-  const txt=await r.text();
-  const rows=txt.trim().split(/\r?\n/).map(line=>line.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/).map(c=>c.replace(/^"|"$/g,'')));
-  const hd=rows.shift().map(h=>h.trim());
-  const idx = n => hd.findIndex(h=>h.toLowerCase()===String(n).toLowerCase());
-  const statKeys=['avg','obp','slg','ops','ab','h','r','rbi','2b','3b','hr','sb','bb','era','k/9','k/bb','whip','ip','er','ko','gp','w-l','saves','fip'];
-  return rows.map(r=>{
-    const p={display_name:r[idx('display_name')], first:r[idx('first')], last:r[idx('last')], status:r[idx('status')], level:r[idx('level')], grad_class:r[idx('grad_class')], letter_years:r[idx('letter_years')]};
-    p.stats={}; statKeys.forEach(k=>{const i=idx(k); if(i>-1 && r[i]) p.stats[k.toUpperCase()]=r[i];});
-    return p;
-  });
-}
-
-async function loadGames(url){
-  const r=await fetch(url,{cache:'no-store'}); if(!r.ok) throw new Error(r.status);
-  const txt=await r.text();
+async function loadData(url) {
+  const r = await fetch(url, { cache: 'no-store' });
+  if (!r.ok) throw new Error(`Failed to fetch ${url}: ${r.status}`);
+  if (url.endsWith('.json')) return r.json();
+  const txt = await r.text();
   const rows=txt.trim().split(/\r?\n/).map(l=>l.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/).map(c=>c.replace(/^"|"$/g,'')));
-  const norm=h=>h.trim().toLowerCase().replace(/\s+/g,'_').replace(/\//g,'_');
-  const hd=rows.shift().map(norm);
-  const f = names => names.map(n=>n.toLowerCase()).findIndex(n=>hd.includes(n));
-  const gi=f(['gamedatelocal','game_date_local','gamedate','date']);
-  const ti=f(['gametimelocal','game_time_local','gametime','time']);
-  const pi=f(['player_display_name','player_name','player']);
-  const hai=f(['home_away','home/away','ha','homeaway']);
-  const oi=f(['opponent']);
-  return rows.map(r=>{
-    const rawHA = hai>-1 ? (r[hai]||'') : '';
-    const ha = /@|away|^a$/i.test(rawHA)?'@':(/vs|home|^h$/i.test(rawHA)?'vs.':'');
-    return {
-      date: gi>-1? r[gi] : '',
-      time: ti>-1? r[ti] : '',
-      player_display_name: pi>-1? r[pi] : '',
-      ha, opponent: oi>-1? r[oi] : ''
-    };
-  }).filter(x=>x.player_display_name && x.date);
+  return { header: rows.shift(), rows };
 }
 
-/* Read STATS_SEASON_TOTALS: first row has dates (M/D or MM/DD). Find a name column too. */
-async function loadStatsTotals(url){
-  const r=await fetch(url,{cache:'no-store'}); if(!r.ok) throw new Error(r.status);
-  const txt=await r.text();
-  const rows=txt.trim().split(/\r?\n/).map(l=>l.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/).map(c=>c.replace(/^"|"$/g,'')));
-  const header=rows.shift().map(h=>h.trim());
-  // name column(s)
-  const nameIdx = (()=> {
-    const candidates = ['player_display_name','display_name','player','name','last, first','first','last'];
-    const lower = header.map(h=>h.toLowerCase());
-    for(const key of candidates){
-      const i = lower.indexOf(key);
-      if(i>-1) return i;
+function parsePlayers({ header, rows }) {
+    const idx = h => header.findIndex(x => x.toLowerCase() === h.toLowerCase());
+    return rows.map(r => ({
+        display_name: r[idx('display_name')], first: r[idx('first')], last: r[idx('last')],
+        level: r[idx('level')], grad_class: r[idx('grad_class')]
+    }));
+}
+function parseGames({ header, rows }) {
+    const norm = h => h.trim().toLowerCase().replace(/\s+/g,'_').replace(/\//g,'_');
+    const hd = header.map(norm);
+    const f = names => names.map(n=>n.toLowerCase()).findIndex(n=>hd.includes(n));
+    const [gi,ti,pi,hai,oi] = [f(['date']),f(['time']),f(['player']),f(['ha']),f(['opponent'])];
+    return rows.map(r => ({
+        date: gi > -1 ? r[gi] : '', time: ti > -1 ? r[ti] : '',
+        player_display_name: pi > -1 ? r[pi] : '',
+        ha: hai > -1 ? (/^@|away|^a$/i.test(r[hai]) ? '@' : 'vs.') : '',
+        opponent: oi > -1 ? r[oi] : ''
+    })).filter(x => x.player_display_name && x.date);
+}
+function parseStatsTotals({ header, rows }) {
+    const nameIdx = header.findIndex(h => h.toLowerCase().includes('name'));
+    const dateCols = header.map((h,i)=>({h,i})).filter(x => /^\d{1,2}\/\d{1,2}/.test(x.h));
+    const colKeys = new Map(dateCols.map(({h,i})=>[normKey(h), i]));
+    const out = new Map();
+    for(const r of rows){
+        const name = (nameIdx > -1 ? r[nameIdx] : '').trim();
+        if(!name) continue;
+        const map = {};
+        for(const [k,i] of colKeys.entries()){ if(r[i]) map[k]=r[i]; }
+        out.set(name.toLowerCase(), map);
     }
-    return -1;
-  })();
-  // map date columns -> index
-  const dateCols = header.map((h,i)=>({h,i})).filter(x => /^\d{1,2}\/\d{1,2}(?:\/\d{2,4})?$/.test(x.h));
-  const colKeys = new Map(dateCols.map(({h,i})=>[normKey(h), i]));
-  // build map: player -> { 'M/D': '3-4 | HR ...', ... }
-  const out = new Map();
-  for(const rline of rows){
-    let name = (nameIdx>-1 ? rline[nameIdx] : '').trim();
-    if(!name && rline.length>=2) name = (rline[0] + ' ' + rline[1]).trim();
-    if(!name) continue;
-    const map = {};
-    for(const [k,i] of colKeys.entries()){
-      const val = (rline[i]||'').trim();
-      if(val) map[k]=val;
-    }
-    out.set(name.toLowerCase(), map);
-  }
-  return out; // Map<nameLc, { 'M/D': line }>
+    return out;
 }
 
-/* ======== RENDER: NEWS ======== */
 function newsCard(n){
-  const img = n.image || `https://picsum.photos/seed/${encodeURIComponent(n.id||n.title||'news')}/480/672`;
-  const when = n.publishedAt ? new Date(n.publishedAt).toLocaleString() : '';
-  const src = n.source || '';
-  const meta = [src, when].filter(Boolean).join(' • ');
-  const url = (n.url||'#') + ((n.url||'').includes('?')?'&':'?') + 'utm_source=yatstats';
-  const player = n.player_display_name || '';
-  const first = String(player).split(' ')[0] || '';
-  const shareText = `We See Where YAT, ${first}! #YATABOY${first}`;
-  const giftURL = 'marketplace.html';
-
+  const img = n.image || `https://picsum.photos/seed/${encodeURIComponent(n.id||n.title)}/480/672`;
+  const meta = [n.source, n.publishedAt ? new Date(n.publishedAt).toLocaleDateString() : ''].filter(Boolean).join(' • ');
+  const url = `${n.url || '#'}${ (n.url || '').includes('?') ? '&' : '?'}utm_source=yatstats`;
   const id = 'n' + Math.random().toString(36).slice(2);
-  const shareButtons = `
-    <div class="share-row" role="group" aria-label="Share">
-      <button title="Share on X" onclick="window.YAT.share('x','${id}')"><i class="ri-twitter-x-line"></i></button>
-      <button title="Share on Facebook" onclick="window.YAT.share('fb','${id}')"><i class="ri-facebook-circle-line"></i></button>
-      <button title="Share via Email" onclick="window.YAT.share('email','${id}')"><i class="ri-mail-line"></i></button>
-      <button title="Copy link" onclick="window.YAT.share('copy','${id}')"><i class="ri-clipboard-line"></i></button>
-      <a href="${giftURL}" class="badge" style="margin-left:auto" title="YAT-A-BOY">YAT-A-BOY</a>
-    </div>`;
-
-  // store minimal payload for share handlers
-  window.YAT.pendingShares[id] = { url, title:(n.title||'YATSTATS'), player, shareText };
-
-  return `
-    <article class="news-card">
-      <img class="news-thumb" src="${img}" alt="">
-      <div>
-        <div class="news-meta">${meta}</div>
-        <div class="news-headline">${n.title||'Read more'}</div>
-        ${player?`<div class="news-player">${player}</div>`:''}
-        ${shareButtons}
-        <div style="margin-top:6px"><a class="badge" href="${url}" target="_blank" rel="noopener">READ&nbsp;MORE</a></div>
-      </div>
-    </article>`;
+  const shareButtons = `<div class="share-row"><button title="Share" onclick="window.YAT.share('native','${id}')"><i class="ri-share-line"></i></button><a href="marketplace.html" class="badge" style="margin-left:auto">YAT-A-BOY</a></div>`;
+  window.YAT.pendingShares[id] = { url, title: n.title };
+  return `<article class="news-card"><a href="${url}" target="_blank" rel="noopener"><img class="news-thumb" src="${img}" alt=""></a><div style="display:flex; flex-direction:column; flex-grow:1;"><div class="news-meta">${meta}</div><div class="news-headline"><a href="${url}" target="_blank" rel="noopener">${n.title}</a></div><div class="news-player">${n.player_display_name || ''}</div><div style="margin-top:auto;">${shareButtons}</div></div></article>`;
 }
 function renderNews(all){
   const nameFilter = ($('#filterName')?.value||'').toLowerCase().trim();
-  const df = $('#dateFrom')?.value ? new Date($('#dateFrom').value) : null;
-  const dt = $('#dateTo')?.value ? new Date($('#dateTo').value) : null;
+  const df = $('#dateFrom')?.value ? toDate($('#dateFrom').value) : null;
+  const dt = $('#dateTo')?.value ? toDate($('#dateTo').value) : null;
   const order = $('#sortOrder')?.value || 'new';
-
   let items = Array.isArray(all)? all.slice() : [];
   items = items.filter(n=>{
-    // text search across common fields
-    const blob = [n.title,n.player_display_name,n.school,n.org,n.conference].filter(Boolean).join(' ').toLowerCase();
+    const blob = [n.title,n.player_display_name,n.school,n.org,n.conference].join(' ').toLowerCase();
     const nameOK = !nameFilter || blob.includes(nameFilter);
-    const when = n.publishedAt ? new Date(n.publishedAt) : null;
-    const dateOK = (!df || (when && when>=df)) && (!dt || (when && when<= new Date(dt.getTime()+24*3600*1000)));
+    const when = n.publishedAt ? toDate(n.publishedAt) : null;
+    const dateOK = (!df || (when && when>=df)) && (!dt || (when && when<= new Date(dt.getTime()+86400000)));
     return nameOK && dateOK;
   });
-  items.sort((a,b)=> (new Date(a.publishedAt||0)) - (new Date(b.publishedAt||0)));
+  items.sort((a,b)=> (toDate(a.publishedAt)||0) - (toDate(b.publishedAt)||0));
   if(order==='new') items.reverse();
-
-  const pro = items.filter(n=>/MLB|AAA|AA|A\+|HIGH-A|LOW-A|A|ROOKIE|INDY|INTERNATIONAL/i.test(n.level||''));
+  const pro = items.filter(n=>/MLB|AAA|AA|A\+|HIGH-A|LOW-A|INDY|INTERNATIONAL/i.test(n.level||''));
   const ncaa= items.filter(n=>/NCAA|JUCO|NAIA/i.test(n.level||''));
-
-  $('#proWrap').innerHTML  = pro.length  ? pro.map(newsCard).join('')  : `<p class="empty">No pro headlines.</p>`;
+  $('#proWrap').innerHTML = pro.length ? pro.map(newsCard).join('') : `<p class="empty">No pro headlines.</p>`;
   $('#ncaaWrap').innerHTML = ncaa.length ? ncaa.map(newsCard).join('') : `<p class="empty">No college headlines.</p>`;
 }
-
-/* ======== RENDER: LINE SCORES ======== */
-function renderLineScores(weeks, games, statsByPlayer, players){
-  const wrapDesk = $('#linesWrap');
-  const wrapDrawer = $('#linesDrawerInner');
-  const byName = new Map(players.map(p=>[(p.display_name||'').toLowerCase(), p]));
-  const now = new Date();
-
-  function buildHTML(){
-    let html='';
-    for(const wk of weeks){
-      // games in this week
-      const rows = games.filter(g=>{ const d=toDate(g.date); return d && d>=wk.start && d<=wk.end; });
-      // group by player
-      const byP = new Map();
-      rows.forEach(g=>{ const k=g.player_display_name; if(!byP.has(k)) byP.set(k,[]); byP.get(k).push(g); });
-
-      html += `<div class="section-title">${weekLabel(wk.start)}</div><div class="section-inner">`;
-
-      if(!byP.size){
-        html += `<p class="empty">No games recorded for this week.</p></div>`;
-        continue;
-      }
-
-      // player render order via defaultSort
-      const orderedNames = [...byP.keys()]
-        .map(n=> byName.get((n||'').toLowerCase()) || {display_name:n})
-        .sort(defaultSort)
-        .map(p=> p.display_name);
-
-      for(const name of orderedNames){
-        const lines = byP.get(name).slice().sort((a,b)=> new Date(b.date)-new Date(a.date));
-        html += `<div class="player-block"><div class="player-title">${(name||'').toUpperCase()}</div>`;
+function renderLineScores(games, statsByPlayer, players){
+    const now = new Date();
+    const thisWeek = startOfWeek(now);
+    const rows = games.filter(g => { const d = toDate(g.date); return d && d >= thisWeek; });
+    const byP = new Map();
+    rows.forEach(g => { const k = g.player_display_name; if(!byP.has(k)) byP.set(k,[]); byP.get(k).push(g); });
+    if (!byP.size) {
+        const msg = `<p class="empty">No games scheduled this week.</p>`;
+        $('#linesWrap').innerHTML = msg; $('#linesDrawerInner').innerHTML = msg; return;
+    }
+    const byName = new Map(players.map(p=>[p.display_name.toLowerCase(), p]));
+    const orderedNames = [...byP.keys()].map(n => byName.get(n.toLowerCase()) || {display_name: n}).sort(defaultSort).map(p => p.display_name);
+    let html = '';
+    for(const name of orderedNames){
+        const lines = byP.get(name).slice().sort((a,b)=> toDate(a.date) - toDate(b.date));
+        html += `<div class="player-block"><div class="player-title">${name.toUpperCase()}</div>`;
         for(const r of lines){
-          const d = new Date(r.date);
-          const dlabel = d.toLocaleDateString(undefined,{month:'numeric',day:'numeric'});
-          const ha = (r.ha||'').trim(); const opp = (r.opponent||'').trim();
-          const time = (r.time||'').trim();
-          // lookup stat line by 'M/D' in stats map
-          const statMap = statsByPlayer.get((name||'').toLowerCase()) || {};
-          const key = normKey(dateKey(d));
-          const statLine = statMap[key];
-
-          const body = (d>now && !statLine)
-            ? `${ha} ${opp} ${time?`• ${time}`:''}`  // future
-            : `${ha} ${opp} • ${statLine || 'DNP'}`; // past/result
-          html += `<div class="line-row"><div class="line-date">${dlabel}</div><div class="line-text">${body}</div></div>`;
+            const d = toDate(r.date);
+            const statMap = statsByPlayer.get(name.toLowerCase()) || {};
+            const statLine = statMap[normKey(dateKey(d))];
+            const body = (d > now && !statLine) ? `${r.ha} ${r.opponent} ${r.time||''}` : `${r.ha} ${r.opponent} • ${statLine || 'DNP'}`;
+            html += `<div class="line-row"><div class="line-date">${d.toLocaleDateString(undefined,{month:'numeric',day:'numeric'})}</div><div class="line-text">${body}</div></div>`;
         }
         html += `</div>`;
-      }
-      html += `</div>`;
     }
-    return html;
-  }
-
-  const html = buildHTML();
-  if(wrapDesk)   wrapDesk.innerHTML   = html || `<p class="empty">No games found.</p>`;
-  if(wrapDrawer) wrapDrawer.innerHTML = html || `<p class="empty">No games found.</p>`;
+    $('#linesWrap').innerHTML = html;
+    $('#linesDrawerInner').innerHTML = html;
 }
-
-/* ======== LIVE SEARCH (left drawer) ======== */
-function makeHit(p){
-  const imageName = ((p.first||'').toLowerCase()+'_'+(p.last||'').toLowerCase()).replace(/[^a-z0-9_]+/g,'') || (p.display_name||'').toLowerCase().replace(/[^a-z0-9]+/g,'-');
-  const hsJpg=`assets/img/hs_players/${imageName}.jpg`, hsPng=`assets/img/hs_players/${imageName}.png`;
-  const el=document.createElement('div'); el.className='live-hit';
-  el.style.cssText='padding:10px 12px;display:flex;align-items:center;gap:10px;border-radius:10px;cursor:pointer';
-  el.innerHTML=`<img src="${hsJpg}" onerror="this.onerror=null;this.src='${hsPng}';" style="width:36px;height:36px;border-radius:6px;object-fit:cover">
-                <div><div style="font-weight:700">${p.display_name}</div>
-                <div style="opacity:.7;font-size:.92em">${p.level||''} • Class of ${p.grad_class||''}</div></div>`;
-  el.onclick=()=>{ window.location.href = `./profile.html?player=${encodeURIComponent((p.display_name||'').toLowerCase().replace(/[^a-z0-9]+/g,'-'))}`; };
+function makeHit(p){ 
+  const imageName = ((p.first||'').toLowerCase()+'_'+(p.last||'').toLowerCase()).replace(/[^a-z0-9_]+/g,'');
+  const hsJpg=`assets/img/hs_players/${imageName}.jpg`;
+  const el=document.createElement('div');
+  el.className='live-hit';
+  el.style.cssText='padding:10px 12px;display:flex;align-items:center;gap:10px;border-radius:10px;cursor:pointer;background:var(--line)';
+  el.innerHTML=`<img src="${hsJpg}" style="width:36px;height:36px;border-radius:6px;object-fit:cover"><div><div style="font-weight:700">${p.display_name}</div><div style="opacity:.7;font-size:.92em">${p.level} • Class of ${p.grad_class}</div></div>`;
+  el.onclick=()=>{ window.location.href = `./profile.html?player=${encodeURIComponent(p.display_name.toLowerCase().replace(/ /g,'-'))}`; };
   return el;
 }
 function liveSearch(){
-  const q=($('#playerSearch')?.value||'').trim().toLowerCase();
-  const box=$('#liveResults'); if(!box) return;
-  if(!q){ box.innerHTML=''; return; }
-  const hits=(window.PLAYERS||[]).filter(p=>(p.display_name||'').toLowerCase().includes(q)).slice(0,25);
-  box.innerHTML=''; hits.forEach(p=>box.appendChild(makeHit(p)));
+    const q = ($('#playerSearch')?.value||'').trim().toLowerCase();
+    const box = $('#liveResults');
+    if(!box) return;
+    if(!q){ box.innerHTML = ''; return; }
+    const hits = (window.PLAYERS || []).filter(p => (p.display_name||'').toLowerCase().includes(q)).slice(0, 10);
+    box.innerHTML = '';
+    hits.forEach(p => box.appendChild(makeHit(p)));
 }
 
-/* ======== THEME & DRAWERS ======== */
 function closeAllRight(){ $$('.drawer-right').forEach(d=>d.classList.remove('is-open')); }
 function closeDrawers(){ document.body.classList.remove('drawer-left-open','drawer-right-open','drawer-open'); closeAllRight(); }
 function setupUI(){
-  $('#btnMenu')?.addEventListener('click',()=>{ document.body.classList.add('drawer-left-open','drawer-open'); });
-  $('#openSearch')?.addEventListener('click',()=>{ document.body.classList.add('drawer-left-open','drawer-open'); });
-  $('#openFilters')?.addEventListener('click',()=>{ document.body.classList.add('drawer-right-open','drawer-open'); closeAllRight(); $('#drawerFilters').classList.add('is-open'); });
-  $('#btnAccount')?.addEventListener('click',()=>{ document.body.classList.add('drawer-right-open','drawer-open'); closeAllRight(); $('#drawerAccount').classList.add('is-open'); });
-  $('#openLines')?.addEventListener('click',()=>{ document.body.classList.add('drawer-right-open','drawer-open'); closeAllRight(); $('#drawerLines').classList.add('is-open'); });
-  $$('.close-btn').forEach(b=>b.addEventListener('click',closeDrawers));
-  $('.drawer-mask')?.addEventListener('click',closeDrawers);
-
-  // filters
-  $('#filtersReset')?.addEventListener('click',()=>{
-    const t = new Date(); const f = new Date(); f.setDate(t.getDate()-28);
+  $('#btnMenu, #openSearch').forEach(el => el?.addEventListener('click',()=>{ document.body.classList.add('drawer-left-open','drawer-open'); }));
+  $('#openFilters').addEventListener('click',()=>{ document.body.classList.add('drawer-right-open','drawer-open'); closeAllRight(); $('#drawerFilters').classList.add('is-open'); });
+  $('#btnAccount').addEventListener('click',()=>{ document.body.classList.add('drawer-right-open','drawer-open'); closeAllRight(); $('#drawerAccount').classList.add('is-open'); });
+  $('#openLines').addEventListener('click',()=>{ document.body.classList.add('drawer-right-open','drawer-open'); closeAllRight(); $('#drawerLines').classList.add('is-open'); });
+  $$('.close-btn, .drawer-mask').forEach(b=>b.addEventListener('click',closeDrawers));
+  $('#filtersReset').addEventListener('click',()=>{
+    const t = new Date(), f = new Date(); f.setDate(t.getDate()-28);
     $('#filterName').value=''; $('#dateFrom').value=f.toISOString().slice(0,10); $('#dateTo').value=t.toISOString().slice(0,10); $('#sortOrder').value='new';
     renderNews(window.NEWS||[]);
   });
-  $('#filterName')?.addEventListener('input',debounce(()=>renderNews(window.NEWS||[]),250));
-  $('#dateFrom')?.addEventListener('change',()=>renderNews(window.NEWS||[]));
-  $('#dateTo')?.addEventListener('change',()=>renderNews(window.NEWS||[]));
-  $('#sortOrder')?.addEventListener('change',()=>renderNews(window.NEWS||[]));
-
-  // theme
+  $$('#filterName, #dateFrom, #dateTo, #sortOrder').forEach(el => el?.addEventListener('input', debounce(()=>renderNews(window.NEWS||[]), 250)));
   const themeToggle=$('#theme-toggle'); if(themeToggle){
-    const body=document.body, icon=themeToggle.querySelector('i');
     const apply=()=>{
       const saved=localStorage.getItem('theme');
-      if (saved==='light'){ body.classList.add('light-theme'); icon?.classList.replace('ri-sun-line','ri-moon-line'); }
-      else { body.classList.remove('light-theme'); icon?.classList.replace('ri-moon-line','ri-sun-line'); }
+      document.body.classList.toggle('light-theme', saved === 'light');
     };
-    themeToggle.addEventListener('click', ()=>{
-      body.classList.toggle('light-theme');
-      localStorage.setItem('theme', body.classList.contains('light-theme') ? 'light' : 'dark');
-      apply();
-    });
+    themeToggle.addEventListener('click', ()=>{ localStorage.setItem('theme', document.body.classList.toggle('light-theme') ? 'light' : 'dark'); apply(); });
     apply();
   }
-
-  // initialize filter dates (last 28 days)
-  const to = new Date(); const from = new Date(); from.setDate(to.getDate()-28);
+  const to = new Date(), from = new Date(); from.setDate(to.getDate()-28);
   $('#dateFrom').value = from.toISOString().slice(0,10);
-  $('#dateTo').value   = to.toISOString().slice(0,10);
-
-  // search input
+  $('#dateTo').value = to.toISOString().slice(0,10);
   $('#playerSearch')?.addEventListener('input',debounce(liveSearch,200));
 }
+window.YAT = { pendingShares:{}, share(platform, id){ const p=this.pendingShares[id]; if(!p) return; const t=`${p.title}\n${p.url}`; if(navigator.share) navigator.share({title:p.title, text:t}); else if(platform==='copy') navigator.clipboard?.writeText(t).then(()=>toast()); }};
 
-/* ======== SHARE HANDLERS ======== */
-window.YAT = {
-  pendingShares:{},
-  share(platform, id){
-    const payload = window.YAT.pendingShares[id]; if(!payload) return;
-    const {url, title, player, shareText} = payload;
-    const fullText = `${shareText}\n${url}`;
-    if(navigator.share && (platform==='native')){
-      navigator.share({ title, text: fullText, url }).catch(()=>{});
-      return;
-    }
-    if(platform==='copy'){ navigator.clipboard?.writeText(fullText).then(()=>toast('Copied!')); return; }
-    if(platform==='fb'){ window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`,'_blank','noopener'); return; }
-    if(platform==='x'){  window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(url)}`,'_blank','noopener'); return; }
-    if(platform==='email'){ window.location.href = `mailto:?subject=${encodeURIComponent(title)}&body=${encodeURIComponent(fullText)}`; return; }
-  }
-};
-
-/* ======== BOOT ======== */
 document.addEventListener('DOMContentLoaded', async ()=>{
   try{
     setupUI();
-
-    // Load data
-    const [PLAYERS, GAMES, STATS_MAP, NEWS] = await Promise.all([
-      loadCSV(PLAYERS_CSV_URL).catch(()=>[]),
-      loadGames(GAMES_CSV_URL).catch(()=>[]),
-      loadStatsTotals(STATS_TOTALS_CSV_URL).catch(()=>new Map()),
-      loadNews().catch(()=>[])
+    const [playersData, gamesData, statsData, newsData] = await Promise.all([
+      loadData(PLAYERS_CSV_URL).then(parsePlayers),
+      loadData(GAMES_CSV_URL).then(parseGames),
+      loadData(STATS_TOTALS_CSV_URL).then(parseStatsTotals),
+      loadData(NEWS_JSON_URL)
     ]);
-    window.PLAYERS = PLAYERS;
-    window.NEWS = Array.isArray(NEWS)? NEWS : [];
-
-    // Render
+    window.PLAYERS = playersData;
+    window.NEWS = Array.isArray(newsData) ? newsData : [];
     renderNews(window.NEWS);
-
-    const weeks = recentWeeks(4);
-    renderLineScores(weeks, GAMES, STATS_MAP, PLAYERS);
+    renderLineScores(gamesData, statsData, playersData);
   }catch(err){
-    console.error('Init error', err);
-    $('#proWrap').innerHTML = `<p class="empty">Could not load news.</p>`;
-    $('#ncaaWrap').innerHTML = `<p class="empty">Could not load news.</p>`;
-    $('#linesWrap').innerHTML = `<p class="empty">Could not load line scores.</p>`;
+    console.error('Initialization error:', err);
+    $$('#proWrap, #ncaaWrap, #linesWrap').forEach(el => el.innerHTML = `<p class="empty">Could not load data.</p>`);
   }
 });
 </script>
