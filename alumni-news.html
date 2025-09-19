@@ -7,7 +7,6 @@
 <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400&family=Bebas+Neue&display=swap" rel="stylesheet">
 
-<!-- Firebase (same pattern as index — anonymous ok) -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
   import { getAuth, onAuthStateChanged, signInWithCustomToken, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
@@ -61,11 +60,7 @@ body.drawer-right-open #drawerFilters{transform:translateX(0)}
   .news-layout{grid-template-columns: 1fr 1fr 0.95fr}
   .col-lines{position:sticky; top:108px; max-height:calc(100vh - 160px); overflow:auto}
 }
-@media (min-width:768px) and (max-width:1023px){ .news-layout{grid-template-columns: 2fr 1fr} }
-@media (max-width:1023px){
-  /* On tablet/mobile, lines live in a right drawer */
-  .col-lines{display:none}
-}
+@media (min-width:768px) and (max-width:1023px){ .news-layout{grid-template-columns: 1fr} }
 @media (max-width:767px){ .news-layout{grid-template-columns: 1fr} }
 
 .section{background:#171717;border:1px solid var(--line);border-radius:12px;overflow:hidden}
@@ -113,7 +108,6 @@ body.drawer-right-open #drawerFilters{transform:translateX(0)}
       <a href="partner-program.html" class="nav-pair"><span class="schooltext big2">YAT-A-BOY</span></a>
     </nav>
     <div class="left-icons">
-      <!-- On mobile/tablet this opens the LINE SCORES drawer -->
       <button class="icon-btn" id="btnFilters" aria-label="Open filters/lines"><i class="ri-filter-3-line"></i></button>
     </div>
   </div>
@@ -131,7 +125,6 @@ body.drawer-right-open #drawerFilters{transform:translateX(0)}
 
 <div class="drawer-mask"></div>
 
-<!-- Left drawer: search + nav -->
 <aside class="drawer" id="drawerLeft">
   <button class="icon-btn" style="position:absolute;top:12px;right:12px"><i class="ri-close-line"></i></button>
   <div class="pad">
@@ -149,7 +142,6 @@ body.drawer-right-open #drawerFilters{transform:translateX(0)}
   </div>
 </aside>
 
-<!-- Right drawer: filters + (on mobile) line scores -->
 <aside class="drawer drawer-right" id="drawerFilters">
   <button class="icon-btn" style="position:absolute;top:12px;right:12px"><i class="ri-close-line"></i></button>
   <div class="pad">
@@ -159,10 +151,6 @@ body.drawer-right-open #drawerFilters{transform:translateX(0)}
     <input type="date" id="dateFrom" class="form-txt" style="margin-bottom:8px">
     <input type="date" id="dateTo" class="form-txt">
     <p style="opacity:.7;margin-top:8px">Line scores ignore these filters.</p>
-  </div>
-  <div class="pad">
-    <div class="section-title">WEEKLY LINE SCORES <span class="badge">MOBILE</span></div>
-    <div id="linesDrawerWrap" class="section-inner"><p class="empty">Loading…</p></div>
   </div>
 </aside>
 
@@ -192,9 +180,9 @@ body.drawer-right-open #drawerFilters{transform:translateX(0)}
 <script type="module">
 /* ===================== CONFIG ===================== */
 const NEWS_JSON_URL = "assets/news/alumni_news.json";
-/* STATS_SEASON_TOTALS AU2:CD100 (published to web) */
+/* DAILYSTATS_SEASON_TOTALS AU2:CD100 (published to web) */
 const SHEET_CSV_URL =
- "Https://docs.google.com/spreadsheets/d/1yUNQH9NbpKwOOwH9blf5ZqQfmft796sQl1dqghXP4uA/edit?usp=drivesdk";
+ "https://docs.google.com/spreadsheets/d/1yUNQH9NbpKwOOwH9blf5ZqQfmft796sQl1dqghXP4uA/gviz/tq?tqx=out:csv&sheet=DAILYSTATS_SEASON_TOTALS";
 
 const $ = s => document.querySelector(s);
 const $$ = s => Array.from(document.querySelectorAll(s));
@@ -267,9 +255,7 @@ async function loadNews(){
 }
 
 /* ===================== LINE SCORES (STATS_SEASON_TOTALS AU2:CD100) ===================== */
-/* We expect first cell each row = player name; first header row = dates like MM/DD across columns */
 function parseCSV(text){
-  // robust CSV split (commas inside quotes)
   const rows = text.trim().split(/\r?\n/).map(l=> l.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/).map(c=>c.replace(/^"|"$/g,'')));
   return rows;
 }
@@ -279,7 +265,6 @@ function weekLabel(start){ const end=new Date(start); end.setDate(end.getDate()+
   return `Week of ${start.toLocaleDateString(undefined,{month:'long',day:'numeric',year:true})} – ${end.toLocaleDateString(undefined,{month:'long',day:'numeric'})}`;
 }
 function toDateFromMD(md){
-  // md like "9/18" → build date in current year, adjust if in future > 30d (assume last year)
   const [m,d]=String(md).split('/').map(x=>+x||0); if(!m||!d) return null;
   const now=new Date(); let y=now.getFullYear(); const guess=new Date(y,m-1,d);
   if(guess>now && (guess-now)>(30*864e5)) guess.setFullYear(y-1);
@@ -288,9 +273,8 @@ function toDateFromMD(md){
 function renderLineScoresFromMatrix(matrix, targetEl){
   const [header, ...rows] = matrix;
   if(!header || header.length<2){ targetEl.innerHTML='<p class="empty">No line score columns found.</p>'; return; }
-  const dateCols = header.slice(1); // MM/DD across AU..CD
+  const dateCols = header.slice(1);
 
-  // Build map of player -> [{date,label}]
   const players = rows
     .filter(r=>r && (r[0]||'').trim())
     .map(r=>{
@@ -301,21 +285,18 @@ function renderLineScoresFromMatrix(matrix, targetEl){
         if(!cell) continue;
         const d = toDateFromMD(dateCols[i-1]);
         if(!d) continue;
-        // normalize: "9/18 @ CHI | 3-4 | 2B, ..." already formatted in the sheet
         entries.push({date:d, text:cell});
       }
       return {name, entries};
     });
 
-  // Group by weeks (newest first, 4 weeks)
   const weeks = recentWeeks(4);
   let html='';
   for(const wk of weeks){
-    // gather all players with at least one entry in week
     const block = players.map(p=>{
       const lines = p.entries
         .filter(e=> e.date>=wk.start && e.date<=wk.end)
-        .sort((a,b)=> b.date-a.date) // newest to oldest
+        .sort((a,b)=> b.date-a.date)
         .map(e=>`<div class="line-row"><div class="line-date">${(e.date.getMonth()+1)}/${e.date.getDate()}</div><div class="line-text">${e.text}</div></div>`)
         .join('');
       return {name:p.name, html:lines};
@@ -325,7 +306,6 @@ function renderLineScoresFromMatrix(matrix, targetEl){
     if(!block.length){
       html += `<p class="empty">No games recorded for this week.</p>`;
     }else{
-      // alphabetical by player for now (your back-end script can later inject priority)
       block.sort((a,b)=> a.name.localeCompare(b.name));
       block.forEach(b=>{
         html += `<div class="player-block"><div class="player-title">${b.name.toUpperCase()}</div>${b.html}</div>`;
@@ -344,21 +324,15 @@ async function loadLineScores(){
     const rows=parseCSV(csv);
     if(!rows.length){ throw new Error('Empty CSV'); }
     renderLineScoresFromMatrix(rows, $('#linesWrap'));
-    // also mirror into drawer on mobile
-    renderLineScoresFromMatrix(rows, $('#linesDrawerWrap'));
   }catch(e){
     console.error('Line score load failed', e);
     $('#linesWrap').innerHTML = '<p class="empty">Could not load line scores.</p>';
-    $('#linesDrawerWrap').innerHTML = '<p class="empty">Could not load line scores.</p>';
   }
 }
 
 /* ===================== BOOT ===================== */
 document.addEventListener('DOMContentLoaded', async ()=>{
-  // default news date range: last 28 days
-  const to = new Date(); const from = new Date(); from.setDate(to.getDate()-28);
-  $('#dateFrom').value = from.toISOString().slice(0,10);
-  $('#dateTo').value   = to.toISOString().slice(0,10);
+  // The default date range has been removed.
   $('#filterName').addEventListener('input', ()=>loadNews());
   $('#dateFrom').addEventListener('change', ()=>loadNews());
   $('#dateTo').addEventListener('change', ()=>loadNews());
