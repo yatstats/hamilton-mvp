@@ -3,99 +3,136 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Alumni News • Hamilton YATSTATS</title>
+<title>Active Alumni News • Hamilton YATSTATS</title>
 <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400&family=Bebas+Neue&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css"/>
 
 <style>
-/* keep your same CSS, but you can delete all .drawer, .drawer-mask, .form-txt styles */
+  body { margin:0; background:var(--bg); color:var(--fg); font-family:Oswald,system-ui; }
+  .news-feed{padding:1rem;max-width:1200px;margin:90px auto 80px;}
+  .news-card{display:flex;flex-direction:row;background:var(--card-bg);border-radius:12px;overflow:hidden;margin-bottom:1rem;box-shadow:0 2px 5px rgba(0,0,0,.2);}
+  .news-card img{width:200px;height:140px;object-fit:cover;}
+  .news-body{padding:1rem;flex:1;display:flex;flex-direction:column;justify-content:space-between}
+  .news-body h4{margin:0 0 .5rem;font-size:1.1rem;font-family:"Bebas Neue",sans-serif;}
+  .meta{font-size:.85rem;opacity:.8;margin-bottom:.5rem}
+  .social-icons{display:flex;gap:10px;margin-top:.5rem;font-size:1.2rem}
+  .social-icons a{color:var(--muted)}
+  @media(max-width:768px){
+    .news-card{flex-direction:column}
+    .news-card img{width:100%;height:180px}
+  }
+  /* Drawer for line scores */
+  #drawerLineScores{position:fixed;top:0;right:-400px;width:400px;height:100%;background:var(--card-bg);box-shadow:-2px 0 6px rgba(0,0,0,.4);transition:right .3s;z-index:1500;display:flex;flex-direction:column}
+  #drawerLineScores.open{right:0}
+  #drawerLineScores h3{margin:1rem}
+  #lineScores{flex:1;overflow-y:auto;padding:0 1rem 1rem}
+  #lineScores div{margin-bottom:1rem}
+  @media(max-width:768px){#drawerLineScores{width:100%}}
 </style>
 </head>
 
 <body>
 <header class="header">
+  <div class="container topbar">
+    <div class="left-icons">
+      <button class="icon-btn" id="btnMenu"><i class="ri-menu-line"></i></button>
+      <button class="icon-btn" id="theme-toggle"><i class="ri-sun-line"></i></button>
+    </div>
+    <nav class="topnav">
+      <a href="index.html" class="nav-pair"><span class="thin">WHERE THEY</span><span class="bold">YAT?</span></a>
+      <a href="alumni-news.html" class="nav-pair"><span class="thin">ACTIVE ALUMNI</span><span class="bold">NEWS</span></a>
+      <a href="all-time-list.html" class="nav-pair"><span class="thin">NEXT-LEVEL</span><span class="bold">ALL-TIME LIST</span></a>
+      <a href="marketplace.html" class="nav-pair"><span class="thin">NIL & YAT-A-BOY</span><span class="bold">MARKETPLACE</span></a>
+      <a href="current-team.html" class="nav-pair"><span class="thin">THE</span><span class="bold">CURRENT TEAM</span></a>
+      <a href="partner-program.html" class="nav-pair"><span class="thin">PCD ACTION</span><span class="bold">PARTNER PROGRAM</span></a>
+      <a href="faq.html" class="nav-pair"><span class="bold">FAQ’S</span></a>
+    </nav>
+    <div class="wordmark-wrap">
+      <img class="wordmark-img" src="assets/img/yatstats-logo.png" alt="YAT?STATS">
+    </div>
+  </div>
+  <div class="hr-y"></div>
   <div class="container schoolrow">
     <img class="ham-logo" src="assets/img/hamilton-logo.png" alt="Hamilton H">
     <div class="schooltext">
       <div class="small">CHANDLER, AZ</div>
       <div class="big1">HAMILTON HIGH SCHOOL</div>
-      <div class="big2">ACTIVE BASEBALL ALUMNI</div>
+      <div class="big2">ACTIVE BASEBALL ALUMNI NEWS</div>
     </div>
+    <button class="icon-btn" id="drawerLineBtn" style="margin-left:auto"><i class="ri-list-unordered"></i></button>
   </div>
-  <div class="hr-y"></div>
 </header>
 
-<main class="main container">
-  <div class="news-layout">
-    <section class="section">
-      <div class="section-title">ALUMNI HEADLINES (Pros)</div>
-      <div class="section-inner" id="proWrap"><p class="empty">Loading…</p></div>
-    </section>
-    <section class="section">
-      <div class="section-title">ALUMNI HEADLINES (College)</div>
-      <div class="section-inner" id="ncaaWrap"><p class="empty">Loading…</p></div>
-    </section>
-    <section class="section col-lines">
-      <div class="section-title">WEEKLY LINE SCORES</div>
-      <div class="section-inner" id="linesWrap"><p class="empty">Loading…</p></div>
-    </section>
-  </div>
+<main class="news-feed" id="newsFeed">
+  <h2 style="font-family:'Bebas Neue';margin-bottom:1rem;">Latest Alumni Headlines</h2>
 </main>
 
-<footer class="site-footer" style="position:fixed;left:0;right:0;bottom:0;height:var(--footerH);background:#0b0b0b;border-top:1px solid var(--line)">
-  <a href="https://no-errors.com/collections/all-webgems" target="_blank" rel="noopener noreferrer">
-    <img src="assets/img/partners/no-errors-banner.jpg" alt="Sponsor Banner" style="width:100%;height:100%;object-fit:contain">
+<!-- Line scores drawer -->
+<aside id="drawerLineScores">
+  <button class="icon-btn close-btn" style="align-self:flex-end;margin:1rem"><i class="ri-close-line"></i></button>
+  <h3>Line Scores</h3>
+  <div id="lineScores"></div>
+</aside>
+
+<footer class="site-footer">
+  <a href="https://no-errors.com/collections/all-webgems" target="_blank" rel="noopener">
+    <img src="assets/img/partners/no-errors-banner.jpg" alt="Sponsor Banner">
   </a>
 </footer>
 
-<script type="module">
-/* ===================== CONFIG ===================== */
-const NEWS_JSON_URL = "assets/news/alumni_news.json";
-const SHEET_CSV_URL =
- "https://docs.google.com/spreadsheets/d/1yUNQH9NbpKwOOwH9blf5ZqQfmft796sQl1dqghXP4uA/gviz/tq?tqx=out:csv&sheet=STATS_SEASON_TOTALS";
+<script>
+// Drawer toggle
+const drawerBtn=document.getElementById('drawerLineBtn');
+const drawer=document.getElementById('drawerLineScores');
+drawerBtn.addEventListener('click',()=>drawer.classList.add('open'));
+drawer.querySelector('.close-btn').addEventListener('click',()=>drawer.classList.remove('open'));
 
-const $ = s => document.querySelector(s);
+// Load news
+fetch('assets/news/alumni_news.json')
+ .then(r=>r.json())
+ .then(items=>{
+   const feed=document.getElementById('newsFeed');
+   items.sort((a,b)=>new Date(b.publishedAt)-new Date(a.publishedAt));
+   items.forEach(item=>{
+     const card=document.createElement('div');
+     card.className='news-card';
+     const img=item.image||'https://picsum.photos/400/200?random='+Math.random();
+     card.innerHTML=`
+       <img src="${img}" alt="${item.player_display_name}">
+       <div class="news-body">
+         <h4>${item.title}</h4>
+         <div class="meta">${item.player_display_name} — ${new Date(item.publishedAt).toLocaleDateString()} | ${item.source}</div>
+         <a href="${item.url}" target="_blank" style="color:var(--fg);">Read More</a>
+         <div class="social-icons">
+           <a href="https://twitter.com/intent/tweet?url=${encodeURIComponent(item.url)}" target="_blank"><i class="ri-twitter-fill"></i></a>
+           <a href="https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(item.url)}" target="_blank"><i class="ri-facebook-fill"></i></a>
+           <a href="https://www.linkedin.com/shareArticle?mini=true&url=${encodeURIComponent(item.url)}" target="_blank"><i class="ri-linkedin-fill"></i></a>
+         </div>
+       </div>`;
+     feed.appendChild(card);
+   });
+ });
 
-/* ===================== NEWS ===================== */
-function newsCard(n){
-  const img = n.image || `https://picsum.photos/seed/${encodeURIComponent(n.id||n.title||'news')}/500/700`;
-  const when = n.publishedAt ? new Date(n.publishedAt).toLocaleString() : '';
-  const src = n.source || '';
-  const meta = [src, when].filter(Boolean).join(' • ');
-  const url = (n.url||'#') + ((n.url||'').includes('?')?'&':'?') + 'utm_source=yatstats';
-  return `<article class="news-card">
-            <img class="news-thumb" src="${img}" alt="">
-            <div>
-              <div class="news-meta">${meta}</div>
-              <div class="news-headline">${n.title||'Read more'}</div>
-              <div class="news-player">${n.player_display_name||''}</div>
-              <a class="readmore" href="${url}" target="_blank" rel="noopener">READ MORE</a>
-            </div>
-          </article>`;
-}
-async function loadNews(){
-  try{
-    const r=await fetch(NEWS_JSON_URL,{cache:'no-store'});
-    const all=await r.json();
-    const sorted = all.sort((a,b)=> new Date(b.publishedAt||0)-new Date(a.publishedAt||0));
-    const pro = sorted.filter(n=>/MLB|AAA|AA|A\+|HIGH-A|LOW-A|A|ROOKIE|INDY|INTERNATIONAL/i.test(n.tags?.level||''));
-    const ncaa= sorted.filter(n=>/NCAA|JUCO|NAIA/i.test(n.tags?.level||''));
-    $('#proWrap').innerHTML  = pro.length  ? pro.map(newsCard).join('')  : `<p class="empty">No pro headlines.</p>`;
-    $('#ncaaWrap').innerHTML = ncaa.length ? ncaa.map(newsCard).join('') : `<p class="empty">No college headlines.</p>`;
-  }catch(e){
-    console.error(e);
-    $('#proWrap').innerHTML='<p class="empty">Could not load news.</p>';
-    $('#ncaaWrap').innerHTML='<p class="empty">Could not load news.</p>';
-  }
-}
-
-/* ===================== LINE SCORES ===================== */
-/* (keep your line score functions here unchanged) */
-
-document.addEventListener('DOMContentLoaded', async ()=>{
-  loadNews();
-  loadLineScores();
-});
+// Load line scores from Google Sheet
+const SHEET_URL='https://docs.google.com/spreadsheets/d/1yUNQH9NbpKwOOwH9blf5ZqQfmft796sQl1dqghXP4uA/gviz/tq?tqx=out:json&sheet=STATS_SEASON_TOTALS';
+fetch(SHEET_URL)
+ .then(res=>res.text())
+ .then(txt=>{
+   const json=JSON.parse(txt.substr(47).slice(0,-2));
+   const rows=json.table.rows;
+   const scoresDiv=document.getElementById('lineScores');
+   rows.forEach(r=>{
+     if(r.c[0]&&r.c[0].v){
+       let player=r.c[0].v;
+       let games=r.c.slice(1).map(c=>c?c.v:null).filter(Boolean).join('<br>');
+       let div=document.createElement('div');
+       div.innerHTML=`<strong>${player}</strong><br>${games}`;
+       scoresDiv.appendChild(div);
+     }
+   });
+ })
+ .catch(e=>console.error("Error loading sheet:",e));
 </script>
 </body>
 </html>
