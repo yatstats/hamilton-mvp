@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>Line Scores Module</title>
+  <title>Line Scores Module (Live)</title>
   <style>
     body { font:16px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial; color:#111; margin:1rem; background:#fafafa; }
     .week { margin-bottom:2rem; }
@@ -15,50 +15,89 @@
   </style>
 </head>
 <body>
-  <div id="lineScores"></div>
+  <div id="lineScores">Loading line scores…</div>
 
   <script>
-    // --- Mock Data (replace later with your Google Sheet script) ---
-    const mockGames = [
-      { week: "Week of September 21-27", player: "CODY BELLINGER", date:"9/21", opp:"@ BAL", status:"Final", stats:"2-3 | 2HR, 6RBI, K, SB" },
-      { week: "Week of September 21-27", player: "CODY BELLINGER", date:"9/23", opp:"vs. CWS", status:"In Progress" },
-      { week: "Week of September 21-27", player: "CODY BELLINGER", date:"9/24", opp:"vs. CWS", status:"Scheduled", time:"4:05PM" },
-      { week: "Week of September 21-27", player: "CODY BELLINGER", date:"9/25", opp:"vs. CWS", status:"Scheduled", time:"4:05PM" },
-      { week: "Week of September 21-27", player: "DREW SWIFT", date:"9/21", opp:"@ SAL", status:"Final", stats:null }, // no stats → DNP
-      { week: "Week of September 21-27", player: "DREW SWIFT", date:"9/23", opp:"vs. CWS", status:"In Progress" },
-      { week: "Week of September 21-27", player: "DREW SWIFT", date:"9/24", opp:"vs. CWS", status:"Scheduled", time:"4:05PM" }
-    ];
+    // Replace with your sheet ID
+    const SHEET_URL =
+      "https://docs.google.com/spreadsheets/d/1yUNQH9NbpKwOOwH9blf5ZqQfmft796sQl1dqghXP4uA/gviz/tq?tqx=out:json&sheet=STATS_SEASON_TOTALS&range=AU2:CD100";
 
-    // --- Render Function ---
+    async function loadLineScores() {
+      try {
+        const res = await fetch(SHEET_URL);
+        const txt = await res.text();
+        const json = JSON.parse(txt.substring(47, txt.length - 2));
+        const rows = json.table.rows;
+
+        // Parse rows → player name + games
+        const games = [];
+        rows.forEach(r => {
+          if (!r.c[0] || !r.c[0].v) return;
+          const player = r.c[0].v;
+          for (let i = 1; i < r.c.length; i++) {
+            const val = r.c[i] ? r.c[i].v : null;
+            if (!val) continue;
+
+            // Expect val like "9/21 @ BAL | 2-3 | 2HR, 6RBI"
+            // or "9/24 vs. CWS 4:05PM", etc.
+            let status = "Scheduled", stats = null, time = null;
+            if (val.includes("GAME IN PROGRESS")) status = "In Progress";
+            else if (val.includes("DNP")) { status = "Final"; stats = null; }
+            else if (val.includes("|")) { status = "Final"; stats = val.split("|").slice(1).join("|").trim(); }
+            else if (val.match(/\d{1,2}:\d{2}/)) { status = "Scheduled"; time = val.match(/\d{1,2}:\d{2}\s?(AM|PM)?/)[0]; }
+
+            const datePart = val.split(" ")[0];
+            const opp = val.replace(datePart, "").split("|")[0].trim();
+
+            games.push({
+              week: "Week of September 21–27", // TODO: script this dynamically
+              player,
+              date: datePart,
+              opp,
+              status,
+              stats,
+              time
+            });
+          }
+        });
+
+        renderLineScores(games);
+      } catch (err) {
+        console.error("Error loading line scores:", err);
+        document.getElementById("lineScores").innerHTML =
+          "<p>Could not load line scores.</p>";
+      }
+    }
+
     function renderLineScores(data) {
       const container = document.getElementById("lineScores");
       container.innerHTML = "";
 
-      // Group by week → then by player
+      // Group by week → player
       const weeks = {};
-      data.forEach(g=>{
-        if(!weeks[g.week]) weeks[g.week] = {};
-        if(!weeks[g.week][g.player]) weeks[g.week][g.player] = [];
+      data.forEach(g => {
+        if (!weeks[g.week]) weeks[g.week] = {};
+        if (!weeks[g.week][g.player]) weeks[g.week][g.player] = [];
         weeks[g.week][g.player].push(g);
       });
 
-      for(const [week, players] of Object.entries(weeks)){
+      for (const [week, players] of Object.entries(weeks)) {
         const weekDiv = document.createElement("div");
         weekDiv.className = "week";
         weekDiv.innerHTML = `<h2>${week}</h2>`;
-        
-        for(const [player, games] of Object.entries(players)){
+
+        for (const [player, games] of Object.entries(players)) {
           const playerDiv = document.createElement("div");
           playerDiv.className = "player";
           playerDiv.innerHTML = `<h3>${player}</h3>`;
-          
-          games.forEach(game=>{
-            let suffix="";
-            if(game.status==="Final"){
+
+          games.forEach(game => {
+            let suffix = "";
+            if (game.status === "Final") {
               suffix = game.stats ? game.stats : "DNP";
-            } else if(game.status==="In Progress"){
+            } else if (game.status === "In Progress") {
               suffix = "GAME IN PROGRESS";
-            } else if(game.status==="Scheduled"){
+            } else if (game.status === "Scheduled") {
               suffix = game.time;
             }
             const gameDiv = document.createElement("div");
@@ -66,13 +105,14 @@
             gameDiv.innerHTML = `${game.date} – ${game.opp} <span class="suffix">| ${suffix}</span>`;
             playerDiv.appendChild(gameDiv);
           });
+
           weekDiv.appendChild(playerDiv);
         }
         container.appendChild(weekDiv);
       }
     }
 
-    renderLineScores(mockGames);
+    loadLineScores();
   </script>
 </body>
 </html>
