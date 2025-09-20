@@ -1,110 +1,370 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Alumni News • Hamilton YATSTATS</title>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Active Alumni News • YAT?STATS</title>
+
+<!-- Icons & fonts -->
 <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400&family=Bebas+Neue&display=swap" rel="stylesheet">
 
 <style>
-:root {
-  --bg:#0c0c0c; --fg:#f2f2f2; --muted:#aaa; --line:rgba(255,255,255,.1);
-  --card-bg:#171717; --footerH:64px;
+/* ---- Theme (match index.html) ---- */
+:root{
+  --bg:#0c0c0c; --fg:#f2f2f2; --muted:#c4c4c4; --ink:#e8e8e8; --line:rgba(255,255,255,.08);
+  --card-bg:#171717; --header-bg:#000; --drawer-bg:rgba(10,10,10,.65);
+  --accent:#7A0019;
+  --containerPad:16px;
 }
-body{margin:0;font-family:Oswald,sans-serif;background:var(--bg);color:var(--fg);}
-header{background:#000;padding:10px;position:sticky;top:0;z-index:50;}
-header .schooltext{line-height:1}
-header .big1{font:400 18px "Bebas Neue",sans-serif}
-header .big2{font:400 22px "Bebas Neue",sans-serif}
-.hero{padding:8px 16px;font:700 16px "Bebas Neue",sans-serif;letter-spacing:.05em}
-.news-grid{display:grid;gap:16px;padding:16px}
-.news-card{background:var(--card-bg);border-radius:8px;overflow:hidden;display:flex;flex-direction:column}
-.news-img{width:100%;height:200px;object-fit:cover}
-.news-content{padding:12px}
-.news-title{font:700 18px "Bebas Neue",sans-serif;margin:0 0 6px}
-.news-meta{font:300 13px Oswald, sans-serif;color:var(--muted);margin-bottom:6px}
-.news-player{font:600 14px Oswald, sans-serif;margin-bottom:6px}
-.read-more{display:inline-block;font:600 13px Oswald;color:#4da3ff;margin-top:4px;text-decoration:none}
-.share-row{display:flex;gap:12px;align-items:center;margin-top:10px}
-.share-row a{color:var(--fg);font-size:20px;text-decoration:none}
-.yat-btn{background:#e53935;color:#fff;padding:2px 6px;border-radius:4px;font:700 12px "Bebas Neue",sans-serif}
-.site-footer{position:fixed;bottom:0;left:0;right:0;height:var(--footerH);background:#000;border-top:1px solid var(--line)}
-.site-footer img{width:100%;height:100%;object-fit:contain}
+*{box-sizing:border-box} html,body{margin:0}
+body{background:var(--bg);color:var(--fg);font-family:Oswald,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
+
+/* ---- Header ---- */
+.header{position:sticky;top:0;z-index:20;background:var(--header-bg);border-bottom:1px solid var(--line)}
+.container{max-width:1300px;margin:0 auto;padding:0 var(--containerPad)}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:10px 0}
+.brand{display:flex;align-items:center;gap:10px}
+.brand img{height:44px;width:auto}
+.brand .school{line-height:1}
+.school .small{font:300 12px/1 Oswald;color:var(--muted)}
+.school .big{font:400 22px/1 "Bebas Neue",sans-serif;letter-spacing:.02em}
+.navbtn{background:none;border:none;color:var(--fg);font-size:22px;cursor:pointer}
+
+/* ---- Layout: feed + right column (drawer on mobile) ---- */
+.main{padding:14px 0 80px}
+.grid{display:grid;grid-template-columns:1fr;gap:16px}
+@media(min-width:1024px){
+  .grid{grid-template-columns:minmax(0,1.6fr) minmax(320px,0.9fr)}
+}
+
+/* ---- Section headers ---- */
+.h1{font:400 26px/1 "Bebas Neue",sans-serif;letter-spacing:.03em;margin:8px 0 6px}
+.h2{font:400 20px/1 "Bebas Neue",sans-serif;letter-spacing:.03em;margin:16px 0 8px;color:#ddd}
+
+/* ---- News list ---- */
+.news-list{display:flex;flex-direction:column;gap:14px}
+.card{display:grid;grid-template-columns:120px 1fr;gap:12px;background:var(--card-bg);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+@media(min-width:520px){.card{grid-template-columns:160px 1fr}}
+.thumb{position:relative;background:#000}
+.thumb::before{content:"";display:block;padding-top:140%} /* 5:7ish */
+.thumb > img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.body{padding:12px 12px 10px}
+.title{font:400 22px/1.05 "Bebas Neue",sans-serif;margin:0 0 6px}
+.meta{font:300 12px/1 Oswald;color:var(--muted);margin-bottom:8px}
+.actions{display:flex;align-items:center;gap:16px;margin-top:8px}
+.action a{display:inline-flex;align-items:center;gap:6px;color:#bbb;text-decoration:none}
+.action i{font-size:18px}
+.readmore{display:inline-block;margin-top:2px;color:#fff;border:1px solid var(--line);padding:6px 10px;border-radius:10px;text-decoration:none}
+
+/* ---- Right column / Line scores ---- */
+.side{position:relative;background:var(--card-bg);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.side-header{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-bottom:1px solid var(--line)}
+.side-title{font:400 20px "Bebas Neue",sans-serif;letter-spacing:.04em}
+.side-body{max-height:70vh;overflow:auto;padding:10px}
+.week-head{font:300 12px Oswald;color:#ccc;margin-bottom:6px}
+.player-block{border-bottom:1px solid var(--line);padding:10px 0}
+.player-block:last-child{border-bottom:none}
+.player-name{font-weight:700}
+.line{font:300 13px/1.35 Oswald;margin:4px 0}
+
+/* Mobile drawer for line scores */
+.drawer-mask{position:fixed;inset:0;background:rgba(0,0,0,.35);opacity:0;pointer-events:none;transition:.2s;z-index:40}
+.drawer{position:fixed;top:0;right:-100%;bottom:0;width:min(92vw,420px);background:var(--drawer-bg);backdrop-filter:blur(4px);border-left:1px solid var(--line);transition:.25s;z-index:50;display:flex;flex-direction:column}
+.drawer .side{border:none;border-radius:0;height:100%}
+body.drawer-open .drawer-mask{opacity:1;pointer-events:auto}
+body.drawer-open .drawer{right:0}
+@media(min-width:1024px){
+  .drawer-mask,.drawer{display:none}
+}
+
+/* ---- Empty / error ---- */
+.empty{color:#fca5a5;margin:18px 0}
+
+/* ---- Sponsor footer ---- */
+.footer{position:fixed;left:0;right:0;bottom:0;background:var(--bg);border-top:1px solid var(--line)}
+.footer img{display:block;width:100%;height:62px;object-fit:contain}
 </style>
 </head>
 
 <body>
-<header>
-  <div style="display:flex;align-items:center;gap:12px;">
-    <img src="assets/img/hamilton-logo.png" alt="Hamilton H" style="height:42px">
-    <div class="schooltext">
-      <div class="small">CHANDLER, AZ</div>
-      <div class="big1">HAMILTON HIGH SCHOOL</div>
-      <div class="big2">ACTIVE BASEBALL ALUMNI</div>
+<header class="header">
+  <div class="container topbar">
+    <div class="brand">
+      <img src="assets/img/hamilton-logo.png" alt="H" />
+      <div class="school">
+        <div class="small">CHANDLER, AZ</div>
+        <div class="big">HAMILTON HIGH SCHOOL — ACTIVE BASEBALL ALUMNI</div>
+      </div>
     </div>
+    <button class="navbtn" id="btnOpenScores" title="Line Scores"><i class="ri-layout-right-2-line"></i></button>
   </div>
 </header>
-<div class="hero">WEEKLY LINE SCORES</div>
 
-<main class="news-grid" id="newsGrid">
-  <p style="color:var(--muted);">Loading news...</p>
+<main class="container main">
+  <h1 class="h1">ALUMNI HEADLINES</h1>
+  <div class="grid">
+    <!-- Left: News -->
+    <section>
+      <h2 class="h2" style="margin-top:2px">Latest</h2>
+      <div id="newsList" class="news-list"><p class="meta">Loading news…</p></div>
+    </section>
+
+    <!-- Right: Line Scores (visible on desktop) -->
+    <aside class="side" id="desktopScores">
+      <div class="side-header">
+        <div class="side-title">WEEKLY LINE SCORES</div>
+        <small id="weekRange" class="meta"></small>
+      </div>
+      <div class="side-body" id="scoresBody"><p class="meta">Loading line scores…</p></div>
+    </aside>
+  </div>
 </main>
 
-<footer class="site-footer">
+<!-- Mobile drawer -->
+<div class="drawer-mask"></div>
+<div class="drawer" aria-hidden="true">
+  <aside class="side">
+    <div class="side-header">
+      <div>
+        <div class="side-title">WEEKLY LINE SCORES</div>
+        <small id="weekRangeMobile" class="meta"></small>
+      </div>
+      <button class="navbtn" id="btnCloseScores" title="Close"><i class="ri-close-line"></i></button>
+    </div>
+    <div class="side-body" id="scoresBodyMobile"><p class="meta">Loading line scores…</p></div>
+  </aside>
+</div>
+
+<footer class="footer">
   <a href="https://no-errors.com/collections/all-webgems" target="_blank" rel="noopener">
-    <img src="assets/img/partners/no-errors-banner.jpg" alt="Sponsor Banner">
+    <img src="assets/img/partners/no-errors-banner.jpg" alt="Sponsor banner">
   </a>
 </footer>
 
-<script type="module">
-const NEWS_PATH = "assets/news/alumni_news.json"; // your repo JSON
+<script>
+/* =======================
+   CONFIG + FALLBACKS
+======================= */
+const NEWS_URL  = 'assets/news/alumni_news.json';
+const SHEET_URL = 'https://docs.google.com/spreadsheets/d/1yUNQH9NbpKwOOwH9blf5ZqQfmft796sQl1dqghXP4uA/gviz/tq?tqx=out:json&sheet=STATS_SEASON_TOTALS';
 
-function renderNewsCard(item){
-  const first = String(item.player_display_name||'').split(' ')[0] || 'YAT';
-  const baseUrl = String(item.url || '#');
-  const msg = `We See Where YAT, ${first}! #YATABOY${first}`;
-  const fullText = `${item.title?item.title+' — ':''}${msg}`;
-
-  const links = {
-    x: `https://twitter.com/intent/tweet?text=${encodeURIComponent(fullText)}&url=${encodeURIComponent(baseUrl)}`,
-    fb: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(baseUrl)}`,
-    email: `mailto:?subject=${encodeURIComponent(item.title||'Check this out')}&body=${encodeURIComponent(fullText+'\n\n'+baseUrl)}`,
-    yat: `marketplace.html?player=${encodeURIComponent(first)}`
-  };
-
-  return `
-    <article class="news-card">
-      <img src="${item.image || 'assets/img/placeholder.jpg'}" alt="${item.title||''}" class="news-img">
-      <div class="news-content">
-        <h3 class="news-title">${item.title||'Untitled'}</h3>
-        <div class="news-meta">${item.source||''} • ${item.publishedAt?new Date(item.publishedAt).toLocaleDateString():''}</div>
-        <div class="news-player">${item.player_display_name||''}</div>
-        ${item.url?`<a href="${item.url}" target="_blank" class="read-more">READ MORE.</a>`:''}
-        <div class="share-row">
-          <a href="${links.x}" target="_blank" aria-label="Share on X"><i class="ri-twitter-x-line"></i></a>
-          <a href="${links.fb}" target="_blank" aria-label="Share on Facebook"><i class="ri-facebook-circle-line"></i></a>
-          <a href="${links.email}" target="_blank" aria-label="Share by Email"><i class="ri-mail-line"></i></a>
-          <a href="${links.yat}" target="_blank" aria-label="Gift a YAT-A-BOY"><span class="yat-btn">YAT-A-BOY</span></a>
-        </div>
-      </div>
-    </article>`;
-}
-
-async function loadNews(){
-  const grid=document.getElementById("newsGrid");
-  try{
-    const res=await fetch(NEWS_PATH);
-    if(!res.ok) throw new Error("HTTP "+res.status);
-    const data=await res.json();
-    if(!Array.isArray(data)||!data.length){ grid.innerHTML="<p>No news available.</p>"; return; }
-    grid.innerHTML=data.map(renderNewsCard).join("");
-  }catch(err){
-    console.error(err);
-    grid.innerHTML="<p style='color:red;'>Failed to load news.</p>";
+const SAMPLE_NEWS = [
+  {
+    id:'coop-1',
+    player_display_name:'COOPER BRASS',
+    title:'Utah Valley scrimmage highlights: Brass doubles twice',
+    url:'https://example.com/coop-story',
+    image:'assets/img/now_players/cooper_brass.jpg',
+    source:'Utah Valley',
+    publishedAt:'2025-09-01T02:00:00Z',
+    tags:{ level:'NCAA-D1', team:'Utah Valley' }
+  },
+  {
+    id:'ryan-1',
+    player_display_name:'RYAN KUCHERAK',
+    title:'Northwestern Baseball Notes: Kucherak locked in',
+    url:'https://example.com/ryan-story',
+    image:'assets/img/now_players/ryan_kucherak.jpg',
+    source:'Northwestern',
+    publishedAt:'2025-08-31T07:00:00Z',
+    tags:{ level:'NCAA-D1', team:'Northwestern' }
+  },
+  {
+    id:'cody-mlb-1',
+    player_display_name:'CODY BELLINGER',
+    title:'Bellinger launches no-doubt HR vs. Orioles',
+    url:'https://example.com/cody-story',
+    image:'assets/img/now_players/cody_bellinger.jpg',
+    source:'MLB.com',
+    publishedAt:'2025-08-30T20:00:00Z',
+    tags:{ level:'MLB', team:'New York Yankees' }
   }
+];
+
+const SAMPLE_LINES = [
+  { player: 'CODY BELLINGER', lines: ['9/18 @ BAL | 2-4, HR, 3 RBI', '9/16 @ MIN | 1-5, RBI, SB'] },
+  { player: 'DOM HAMEL',      lines: ['9/17 vs SD (MLB DEBUT) | 3 IP, 3H, 0R, 6K'] }
+];
+
+/* =======================
+   UTIL
+======================= */
+const $ = s => document.querySelector(s);
+function firstNameOf(display) {
+  const n = (display||'').trim().split(/\s+/)[0];
+  return n || 'YAT';
 }
-loadNews();
+function weekRange(startSunday = true) {
+  const now = new Date();
+  const d = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const day = d.getDay(); // 0 Sun .. 6 Sat
+  const start = new Date(d); start.setDate(d.getDate() - (startSunday ? day : (day+6)%7));
+  const end = new Date(start); end.setDate(start.getDate()+6);
+  const fmt = x => (x.getMonth()+1) + '/' + x.getDate();
+  return { start, end, label: `Week of ${start.toLocaleString('en-US',{month:'long'})} ${start.getDate()}–${end.getDate()}`, short:`${fmt(start)}–${fmt(end)}` };
+}
+
+/* =======================
+   NEWS
+======================= */
+async function loadNews(){
+  let items = [];
+  try{
+    const r = await fetch(NEWS_URL, {cache:'no-store'});
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    const data = await r.json();
+    items = Array.isArray(data) ? data : (Array.isArray(data.items) ? data.items : []);
+  }catch(e){
+    console.warn('News fetch failed, using SAMPLE_NEWS:', e);
+    items = SAMPLE_NEWS;
+  }
+
+  // Normalize + sort newest first
+  const normalized = items.map(n=>{
+    const display = n.player_display_name || n.player || n.name || '';
+    const first = n.player_first || firstNameOf(display);
+    const level = (n.tags?.level || n.level || '').toUpperCase();
+    return {
+      id: n.id || crypto.randomUUID(),
+      title: n.title || '(untitled)',
+      url: n.url || '#',
+      img: n.image || '',
+      src: n.source || 'News',
+      when: n.publishedAt || n.date || '',
+      display, first, level,
+      team: n.tags?.team || n.team || ''
+    };
+  }).sort((a,b)=> new Date(b.when||0) - new Date(a.when||0));
+
+  renderNews(normalized);
+}
+
+function shareLinks(item){
+  const msg = `We See Where YAT, ${item.first}! #YATABOY${item.first}`;
+  const u   = encodeURIComponent(item.url);
+  const t   = encodeURIComponent(item.title);
+  const m   = encodeURIComponent(msg);
+  return {
+    x:   `https://twitter.com/intent/tweet?text=${m}%20${u}`,
+    fb:  `https://www.facebook.com/sharer/sharer.php?u=${u}`,
+    mail:`mailto:?subject=${encodeURIComponent('We See Where YAT?')}&body=${m}%0A%0A${t}%0A${u}`
+  };
+}
+
+function cardHTML(item){
+  const k = shareLinks(item);
+  const when = item.when ? new Date(item.when).toLocaleString() : '';
+  const img = item.img || ('https://picsum.photos/seed/' + encodeURIComponent(item.id) + '/600/800');
+  return `
+  <article class="card">
+    <div class="thumb"><img src="${img}" alt="${item.display}"></div>
+    <div class="body">
+      <h3 class="title">${item.title}</h3>
+      <div class="meta">${item.team || item.src} • ${when}</div>
+      <div class="meta" style="color:#fff;opacity:.9">${item.display}</div>
+      <a class="readmore" href="${item.url}" target="_blank" rel="noopener">READ MORE</a>
+      <div class="actions">
+        <span class="action"><a href="${k.x}" target="_blank" rel="noopener"><i class="ri-twitter-x-line"></i> Share</a></span>
+        <span class="action"><a href="${k.fb}" target="_blank" rel="noopener"><i class="ri-facebook-circle-line"></i> Share</a></span>
+        <span class="action"><a href="${k.mail}"><i class="ri-mail-line"></i> Email</a></span>
+        <span class="action"><a href="marketplace.html" target="_blank" rel="noopener"><i class="ri-gift-line"></i> YAT-A-BOY</a></span>
+      </div>
+    </div>
+  </article>`;
+}
+
+function renderNews(list){
+  const box = $('#newsList');
+  if(!list.length){ box.innerHTML = `<p class="empty">No news found.</p>`; return; }
+  box.innerHTML = list.map(cardHTML).join('');
+}
+
+/* =======================
+   LINE SCORES
+======================= */
+async function loadLineScores(){
+  const { label, short, start, end } = weekRange(true); // Sunday–Saturday
+  $('#weekRange').textContent = short;
+  $('#weekRangeMobile').textContent = short;
+
+  let rows = null, cols = null;
+  try{
+    const txt = await fetch(SHEET_URL, {cache:'no-store'}).then(r=>r.text());
+    // Trim the gviz preamble "/*O_o*/google.visualization.Query.setResponse(...);"
+    const json = JSON.parse(txt.substring(txt.indexOf('{'), txt.lastIndexOf('}')+1));
+    rows = json.table.rows; cols = json.table.cols;
+  }catch(e){
+    console.warn('Sheet fetch failed, using SAMPLE_LINES:', e);
+    renderLines(SAMPLE_LINES, label); return;
+  }
+
+  // Collect column indexes that fall inside this week (labels like "9/18")
+  const dateCols = [];
+  cols.forEach((c, idx)=>{
+    if(idx===0) return; // player name column
+    const lbl = (c.label||'').trim();
+    if(!/^\d{1,2}\/\d{1,2}$/.test(lbl)) return;
+    const [m,d] = lbl.split('/').map(Number);
+    const dt = new Date(start.getFullYear(), m-1, d);
+    if(dt >= start && dt <= end) dateCols.push({idx, lbl});
+  });
+
+  const players = [];
+  rows.forEach(r=>{
+    const name = r.c?.[0]?.v?.toString().trim();
+    if(!name) return;
+    const lines = [];
+    dateCols.forEach(dc=>{
+      const cell = r.c?.[dc.idx];
+      const v = cell && (cell.f || cell.v);
+      if(v && String(v).trim() && String(v).trim() !== '-' && String(v).trim() !== '--'){
+        // Assume cell already has a nice "9/18 @ CHI | 2-4, HR" style or just stats.
+        const text = String(v).includes('/') ? String(v) : `${dc.lbl} | ${String(v)}`;
+        lines.push(text);
+      }
+    });
+    if(lines.length) players.push({player:name, lines});
+  });
+
+  if(!players.length){ players.push({player:'—', lines:['No stats entered for this week yet.']}); }
+  renderLines(players, label);
+}
+
+function renderLines(players, weekLabel){
+  const html = [
+    `<div class="week-head">${weekLabel}</div>`,
+    ...players.map(p=>`
+      <div class="player-block">
+        <div class="player-name">${p.player}</div>
+        ${p.lines.map(l=>`<div class="line">${l}</div>`).join('')}
+      </div>
+    `)
+  ].join('');
+
+  // Desktop column
+  $('#scoresBody').innerHTML = html;
+  // Mobile drawer copy
+  $('#scoresBodyMobile').innerHTML = html;
+}
+
+/* =======================
+   Drawer buttons (mobile)
+======================= */
+const openBtn = $('#btnOpenScores');
+const closeBtn = $('#btnCloseScores');
+const mask = document.querySelector('.drawer-mask');
+openBtn?.addEventListener('click', ()=> document.body.classList.add('drawer-open'));
+closeBtn?.addEventListener('click', ()=> document.body.classList.remove('drawer-open'));
+mask?.addEventListener('click', ()=> document.body.classList.remove('drawer-open'));
+
+/* =======================
+   BOOT
+======================= */
+document.addEventListener('DOMContentLoaded', ()=>{
+  loadNews();
+  loadLineScores();
+});
 </script>
 </body>
 </html>
