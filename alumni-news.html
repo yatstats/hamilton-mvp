@@ -1,93 +1,98 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>Hamilton Alumni News — YAT?STATS</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Alumni News • Hamilton YATSTATS</title>
   <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;600&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/css/style.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400&family=Bebas+Neue&display=swap" rel="stylesheet">
   <style>
-    body { background:#111; color:#f9f9f9; margin:0; font-family:Roboto,Arial,sans-serif; }
-    main { max-width:960px; margin:100px auto 40px; padding:0 1rem; }
-
-    h2.section-title { font-family:Oswald,sans-serif; font-size:1.4rem; letter-spacing:.05em; margin-bottom:1rem; border-bottom:2px solid #7A0019; padding-bottom:.25rem; }
-
+    body { margin:0; font-family: Oswald, sans-serif; background:#111; color:#fff; }
+    header { display:flex; align-items:center; justify-content:space-between;
+             padding:12px 20px; background:#000; }
+    header h1 { font-family:'Bebas Neue', sans-serif; font-size:26px; margin:0; }
+    .news-container { max-width:900px; margin:20px auto; padding:0 15px; }
     .news-card {
-      display:flex; gap:1rem;
-      background:#1a1a1a; border-radius:12px; overflow:hidden;
-      margin-bottom:1rem; box-shadow:0 1px 4px rgba(0,0,0,.3);
+      display:flex; flex-direction:row; background:#1a1a1a; border-radius:8px;
+      margin-bottom:15px; overflow:hidden;
     }
-    .news-card img { width:140px; height:100%; object-fit:cover; flex-shrink:0; }
-    .news-body { padding:1rem; flex:1; display:flex; flex-direction:column; }
-    .news-body h3 { margin:0 0 .4rem; font-size:1.05rem; font-family:Oswald,sans-serif; }
-    .news-meta { font-size:.8rem; color:#bbb; margin-bottom:.5rem; }
-    .news-body a.readmore { margin-top:auto; display:inline-block; font-size:.85rem; color:#fff; background:#7A0019; padding:.35rem .75rem; border-radius:4px; text-decoration:none; }
-    .social-icons { display:flex; gap:.5rem; margin-top:.6rem; }
-    .social-icons a { font-size:1.1rem; color:#aaa; transition:.2s; }
-    .social-icons a:hover { color:#fff; }
-
-    @media(max-width:700px){
-      .news-card { flex-direction:column; }
-      .news-card img { width:100%; height:180px; }
-    }
+    .news-card img { width:160px; height:120px; object-fit:cover; }
+    .news-content { flex:1; padding:10px 15px; }
+    .news-content h3 { margin:0 0 8px; font-size:18px; }
+    .meta { font-size:12px; color:#bbb; margin-bottom:6px; }
+    .share { display:flex; gap:12px; margin-top:8px; font-size:18px; }
+    .share i { cursor:pointer; }
+    .empty { color:red; font-size:14px; }
   </style>
 </head>
 <body>
-  <!-- HEADER copied from index.html -->
-  <header class="site-header">
-    <div class="left">
-      <button class="nav-toggle"><i class="ri-menu-line"></i></button>
-      <span class="school-info">Chandler, AZ<br/>Hamilton High School</span>
-    </div>
-    <img src="assets/img/yatstats-logo.png" alt="YAT?STATS" class="logo"/>
-    <div class="right">
-      <button id="themeToggle"><i class="ri-sun-line"></i></button>
+  <header>
+    <h1>CHANDLER, AZ – HAMILTON HS BASEBALL ALUMNI</h1>
+    <div class="icons">
+      <i class="ri-menu-line"></i>
+      <i class="ri-user-line"></i>
+      <i class="ri-sun-line"></i>
     </div>
   </header>
 
-  <main>
-    <h2 class="section-title">ALUMNI HEADLINES</h2>
-    <div id="newsFeed">Loading…</div>
-  </main>
+  <div class="news-container" id="news">
+    <p>Loading news…</p>
+  </div>
 
-  <script>
-    async function loadNews(){
-      try {
-        const res = await fetch('assets/news/alumni_news.json');
-        const data = await res.json();
-        const feed = document.getElementById('newsFeed');
-        feed.innerHTML = '';
+<script>
+const basePath = window.location.hostname.includes("github.io")
+  ? "/hamilton-mvp"
+  : "";
 
-        // Sort newest first
-        data.sort((a,b)=> new Date(b.publishedAt)-new Date(a.publishedAt));
+async function loadNews() {
+  try {
+    const res = await fetch(`${basePath}/assets/news/alumni_news.json`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const items = await res.json();
 
-        data.forEach(item=>{
-          const firstName = (item.player_display_name||'').split(' ')[0];
-          const card = document.createElement('div');
-          card.className = 'news-card';
-          card.innerHTML = `
-            <img src="${item.image}" alt="${item.player_display_name}">
-            <div class="news-body">
-              <h3>${item.title}</h3>
-              <div class="news-meta">${item.player_display_name} — ${new Date(item.publishedAt).toLocaleDateString()} | ${item.source}</div>
-              <a class="readmore" href="${item.url}" target="_blank">READ MORE</a>
-              <div class="social-icons">
-                <a href="https://twitter.com/intent/tweet?url=${encodeURIComponent(item.url)}&text=${encodeURIComponent(`We See Where YAT, ${firstName}! #YATABOY${firstName}`)}" target="_blank"><i class="ri-twitter-fill"></i></a>
-                <a href="https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(item.url)}" target="_blank"><i class="ri-facebook-circle-fill"></i></a>
-                <a href="mailto:?subject=${encodeURIComponent(item.title)}&body=${encodeURIComponent(item.url)}"><i class="ri-mail-fill"></i></a>
-                <a href="yataboy.html"><i class="ri-gift-fill"></i></a>
-              </div>
-            </div>
-          `;
-          feed.appendChild(card);
-        });
-      } catch(err){
-        console.error(err);
-        document.getElementById('newsFeed').innerHTML = '<p style="color:red">Failed to load news.</p>';
-      }
+    if (!Array.isArray(items) || items.length === 0) {
+      document.querySelector("#news").innerHTML = "<p class='empty'>No news found.</p>";
+      return;
     }
-    loadNews();
-  </script>
+
+    const html = items.sort((a,b) =>
+      new Date(b.publishedAt) - new Date(a.publishedAt)
+    ).map(item => `
+      <div class="news-card">
+        <img src="${item.image}" alt="${item.player_display_name}">
+        <div class="news-content">
+          <h3>${item.title}</h3>
+          <div class="meta">${item.level} • ${new Date(item.publishedAt).toLocaleString()} • ${item.player_display_name}</div>
+          <a href="${item.url}" target="_blank" style="color:#4da6ff">Read More</a>
+          <div class="share">
+            <i class="ri-twitter-x-line" title="Share on X" onclick="share('${item.player_display_name}','x')"></i>
+            <i class="ri-facebook-circle-line" title="Share on Facebook" onclick="share('${item.player_display_name}','facebook')"></i>
+            <i class="ri-mail-line" title="Share via Email" onclick="share('${item.player_display_name}','email')"></i>
+          </div>
+        </div>
+      </div>
+    `).join("");
+
+    document.querySelector("#news").innerHTML = html;
+
+  } catch (err) {
+    console.error("Error fetching news:", err);
+    document.querySelector("#news").innerHTML = "<p class='empty'>Failed to load news.</p>";
+  }
+}
+
+function share(name, platform) {
+  const msg = `We See Where YAT, ${name.split(" ")[0]}! #YATABOY${name.split(" ")[0]}`;
+  const url = encodeURIComponent(window.location.href);
+  const text = encodeURIComponent(msg);
+  let shareUrl = "";
+  if (platform === "x") shareUrl = `https://twitter.com/intent/tweet?text=${text}&url=${url}`;
+  if (platform === "facebook") shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${url}&quote=${text}`;
+  if (platform === "email") shareUrl = `mailto:?subject=YAT?STATS Update&body=${text} ${url}`;
+  window.open(shareUrl, "_blank");
+}
+
+document.addEventListener("DOMContentLoaded", loadNews);
+</script>
 </body>
 </html>
