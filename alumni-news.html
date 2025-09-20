@@ -1,98 +1,78 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Alumni News • Hamilton YATSTATS</title>
-  <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400&family=Bebas+Neue&display=swap" rel="stylesheet">
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Line Scores Module</title>
   <style>
-    body { margin:0; font-family: Oswald, sans-serif; background:#111; color:#fff; }
-    header { display:flex; align-items:center; justify-content:space-between;
-             padding:12px 20px; background:#000; }
-    header h1 { font-family:'Bebas Neue', sans-serif; font-size:26px; margin:0; }
-    .news-container { max-width:900px; margin:20px auto; padding:0 15px; }
-    .news-card {
-      display:flex; flex-direction:row; background:#1a1a1a; border-radius:8px;
-      margin-bottom:15px; overflow:hidden;
-    }
-    .news-card img { width:160px; height:120px; object-fit:cover; }
-    .news-content { flex:1; padding:10px 15px; }
-    .news-content h3 { margin:0 0 8px; font-size:18px; }
-    .meta { font-size:12px; color:#bbb; margin-bottom:6px; }
-    .share { display:flex; gap:12px; margin-top:8px; font-size:18px; }
-    .share i { cursor:pointer; }
-    .empty { color:red; font-size:14px; }
+    body { font:16px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial; color:#111; margin:1rem; background:#fafafa; }
+    .week { margin-bottom:2rem; }
+    .week h2 { margin:0 0 1rem; font-size:1.25rem; border-bottom:2px solid #333; padding-bottom:.25rem; }
+    .player { margin-bottom:1rem; }
+    .player h3 { margin:.5rem 0; font-size:1.1rem; color:#7A0019; }
+    .game { margin-left:1rem; font-size:0.95rem; }
+    .suffix { font-weight:bold; }
   </style>
 </head>
 <body>
-  <header>
-    <h1>CHANDLER, AZ – HAMILTON HS BASEBALL ALUMNI</h1>
-    <div class="icons">
-      <i class="ri-menu-line"></i>
-      <i class="ri-user-line"></i>
-      <i class="ri-sun-line"></i>
-    </div>
-  </header>
+  <div id="lineScores"></div>
 
-  <div class="news-container" id="news">
-    <p>Loading news…</p>
-  </div>
+  <script>
+    // --- Mock Data (replace later with your Google Sheet script) ---
+    const mockGames = [
+      { week: "Week of September 21-27", player: "CODY BELLINGER", date:"9/21", opp:"@ BAL", status:"Final", stats:"2-3 | 2HR, 6RBI, K, SB" },
+      { week: "Week of September 21-27", player: "CODY BELLINGER", date:"9/23", opp:"vs. CWS", status:"In Progress" },
+      { week: "Week of September 21-27", player: "CODY BELLINGER", date:"9/24", opp:"vs. CWS", status:"Scheduled", time:"4:05PM" },
+      { week: "Week of September 21-27", player: "CODY BELLINGER", date:"9/25", opp:"vs. CWS", status:"Scheduled", time:"4:05PM" },
+      { week: "Week of September 21-27", player: "DREW SWIFT", date:"9/21", opp:"@ SAL", status:"Final", stats:null }, // no stats → DNP
+      { week: "Week of September 21-27", player: "DREW SWIFT", date:"9/23", opp:"vs. CWS", status:"In Progress" },
+      { week: "Week of September 21-27", player: "DREW SWIFT", date:"9/24", opp:"vs. CWS", status:"Scheduled", time:"4:05PM" }
+    ];
 
-<script>
-const basePath = window.location.hostname.includes("github.io")
-  ? "/hamilton-mvp"
-  : "";
+    // --- Render Function ---
+    function renderLineScores(data) {
+      const container = document.getElementById("lineScores");
+      container.innerHTML = "";
 
-async function loadNews() {
-  try {
-    const res = await fetch(`${basePath}/assets/news/alumni_news.json`);
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const items = await res.json();
+      // Group by week → then by player
+      const weeks = {};
+      data.forEach(g=>{
+        if(!weeks[g.week]) weeks[g.week] = {};
+        if(!weeks[g.week][g.player]) weeks[g.week][g.player] = [];
+        weeks[g.week][g.player].push(g);
+      });
 
-    if (!Array.isArray(items) || items.length === 0) {
-      document.querySelector("#news").innerHTML = "<p class='empty'>No news found.</p>";
-      return;
+      for(const [week, players] of Object.entries(weeks)){
+        const weekDiv = document.createElement("div");
+        weekDiv.className = "week";
+        weekDiv.innerHTML = `<h2>${week}</h2>`;
+        
+        for(const [player, games] of Object.entries(players)){
+          const playerDiv = document.createElement("div");
+          playerDiv.className = "player";
+          playerDiv.innerHTML = `<h3>${player}</h3>`;
+          
+          games.forEach(game=>{
+            let suffix="";
+            if(game.status==="Final"){
+              suffix = game.stats ? game.stats : "DNP";
+            } else if(game.status==="In Progress"){
+              suffix = "GAME IN PROGRESS";
+            } else if(game.status==="Scheduled"){
+              suffix = game.time;
+            }
+            const gameDiv = document.createElement("div");
+            gameDiv.className = "game";
+            gameDiv.innerHTML = `${game.date} – ${game.opp} <span class="suffix">| ${suffix}</span>`;
+            playerDiv.appendChild(gameDiv);
+          });
+          weekDiv.appendChild(playerDiv);
+        }
+        container.appendChild(weekDiv);
+      }
     }
 
-    const html = items.sort((a,b) =>
-      new Date(b.publishedAt) - new Date(a.publishedAt)
-    ).map(item => `
-      <div class="news-card">
-        <img src="${item.image}" alt="${item.player_display_name}">
-        <div class="news-content">
-          <h3>${item.title}</h3>
-          <div class="meta">${item.level} • ${new Date(item.publishedAt).toLocaleString()} • ${item.player_display_name}</div>
-          <a href="${item.url}" target="_blank" style="color:#4da6ff">Read More</a>
-          <div class="share">
-            <i class="ri-twitter-x-line" title="Share on X" onclick="share('${item.player_display_name}','x')"></i>
-            <i class="ri-facebook-circle-line" title="Share on Facebook" onclick="share('${item.player_display_name}','facebook')"></i>
-            <i class="ri-mail-line" title="Share via Email" onclick="share('${item.player_display_name}','email')"></i>
-          </div>
-        </div>
-      </div>
-    `).join("");
-
-    document.querySelector("#news").innerHTML = html;
-
-  } catch (err) {
-    console.error("Error fetching news:", err);
-    document.querySelector("#news").innerHTML = "<p class='empty'>Failed to load news.</p>";
-  }
-}
-
-function share(name, platform) {
-  const msg = `We See Where YAT, ${name.split(" ")[0]}! #YATABOY${name.split(" ")[0]}`;
-  const url = encodeURIComponent(window.location.href);
-  const text = encodeURIComponent(msg);
-  let shareUrl = "";
-  if (platform === "x") shareUrl = `https://twitter.com/intent/tweet?text=${text}&url=${url}`;
-  if (platform === "facebook") shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${url}&quote=${text}`;
-  if (platform === "email") shareUrl = `mailto:?subject=YAT?STATS Update&body=${text} ${url}`;
-  window.open(shareUrl, "_blank");
-}
-
-document.addEventListener("DOMContentLoaded", loadNews);
-</script>
+    renderLineScores(mockGames);
+  </script>
 </body>
 </html>
