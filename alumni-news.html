@@ -1,118 +1,86 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>Line Scores Module (Live)</title>
+  <meta charset="utf-8" />
+  <title>Line Scores Test</title>
   <style>
-    body { font:16px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial; color:#111; margin:1rem; background:#fafafa; }
-    .week { margin-bottom:2rem; }
-    .week h2 { margin:0 0 1rem; font-size:1.25rem; border-bottom:2px solid #333; padding-bottom:.25rem; }
-    .player { margin-bottom:1rem; }
-    .player h3 { margin:.5rem 0; font-size:1.1rem; color:#7A0019; }
-    .game { margin-left:1rem; font-size:0.95rem; }
-    .suffix { font-weight:bold; }
+    body { font-family: Arial, sans-serif; background:#111; color:#eee; margin:20px; }
+    .week-block { margin-bottom:30px; }
+    .week-title { font-weight:700; font-size:18px; margin:10px 0; border-bottom:1px solid #444; padding-bottom:4px; }
+    .player-block { margin:12px 0; }
+    .player-name { font-weight:700; margin-bottom:4px; color:#ffd700; }
+    .game-line { margin-left:12px; font-size:14px; line-height:1.4; }
   </style>
 </head>
 <body>
-  <div id="lineScores">Loading line scores…</div>
+  <h1>Weekly Line Scores</h1>
+  <div id="lineScores">Loading…</div>
 
-  <script>
-    // Replace with your sheet ID
-    const SHEET_URL =
-      "https://docs.google.com/spreadsheets/d/1yUNQH9NbpKwOOwH9blf5ZqQfmft796sQl1dqghXP4uA/gviz/tq?tqx=out:json&sheet=STATS_SEASON_TOTALS&range=AU2:CD100";
+<script>
+const CSV_URL = "https://docs.google.com/spreadsheets/d/1yUNQH9NbpKwOOwH9blf5ZqQfmft796sQ1ldgqhXP4uA/gviz/tq?tqx=out:csv&sheet=STATS_SEASON_TOTALS&range=AU2:CD100";
 
-    async function loadLineScores() {
-      try {
-        const res = await fetch(SHEET_URL);
-        const txt = await res.text();
-        const json = JSON.parse(txt.substring(47, txt.length - 2));
-        const rows = json.table.rows;
+function parseCSV(text) {
+  return text.trim().split(/\r?\n/).map(r => r.split(",").map(c => c.replace(/^"|"$/g,"")));
+}
 
-        // Parse rows → player name + games
-        const games = [];
-        rows.forEach(r => {
-          if (!r.c[0] || !r.c[0].v) return;
-          const player = r.c[0].v;
-          for (let i = 1; i < r.c.length; i++) {
-            const val = r.c[i] ? r.c[i].v : null;
-            if (!val) continue;
+function groupByWeek(rows) {
+  const weeks = {};
+  rows.forEach(r => {
+    const [week, player, date, opponent, line, status] = r;
+    if (!week || !player) return;
+    if (!weeks[week]) weeks[week] = {};
+    if (!weeks[week][player]) weeks[week][player] = [];
+    let display;
+    if (status === "In Progress") {
+      display = `${date} - ${opponent} | GAME IN PROGRESS`;
+    } else if (status === "Scheduled") {
+      display = `${date} - ${opponent}`;
+    } else if (status === "DNP") {
+      display = `${date} - ${opponent} | DNP`;
+    } else {
+      display = `${date} - ${opponent} | ${line}`;
+    }
+    weeks[week][player].push(display);
+  });
+  return weeks;
+}
 
-            // Expect val like "9/21 @ BAL | 2-3 | 2HR, 6RBI"
-            // or "9/24 vs. CWS 4:05PM", etc.
-            let status = "Scheduled", stats = null, time = null;
-            if (val.includes("GAME IN PROGRESS")) status = "In Progress";
-            else if (val.includes("DNP")) { status = "Final"; stats = null; }
-            else if (val.includes("|")) { status = "Final"; stats = val.split("|").slice(1).join("|").trim(); }
-            else if (val.match(/\d{1,2}:\d{2}/)) { status = "Scheduled"; time = val.match(/\d{1,2}:\d{2}\s?(AM|PM)?/)[0]; }
-
-            const datePart = val.split(" ")[0];
-            const opp = val.replace(datePart, "").split("|")[0].trim();
-
-            games.push({
-              week: "Week of September 21–27", // TODO: script this dynamically
-              player,
-              date: datePart,
-              opp,
-              status,
-              stats,
-              time
-            });
-          }
+async function loadLineScores() {
+  try {
+    const res = await fetch(CSV_URL);
+    const text = await res.text();
+    const rows = parseCSV(text).filter(r => r.length >= 6);
+    if (!rows.length) {
+      document.getElementById("lineScores").innerHTML = "<p>No line score data in AU2:CD100.</p>";
+      return;
+    }
+    const grouped = groupByWeek(rows);
+    const container = document.getElementById("lineScores");
+    container.innerHTML = "";
+    Object.keys(grouped).sort().forEach(week => {
+      const wDiv = document.createElement("div");
+      wDiv.className = "week-block";
+      wDiv.innerHTML = `<div class="week-title">Week of ${week}</div>`;
+      Object.keys(grouped[week]).forEach(player => {
+        const pDiv = document.createElement("div");
+        pDiv.className = "player-block";
+        pDiv.innerHTML = `<div class="player-name">${player}</div>`;
+        grouped[week][player].forEach(g => {
+          const gDiv = document.createElement("div");
+          gDiv.className = "game-line";
+          gDiv.textContent = g;
+          pDiv.appendChild(gDiv);
         });
-
-        renderLineScores(games);
-      } catch (err) {
-        console.error("Error loading line scores:", err);
-        document.getElementById("lineScores").innerHTML =
-          "<p>Could not load line scores.</p>";
-      }
-    }
-
-    function renderLineScores(data) {
-      const container = document.getElementById("lineScores");
-      container.innerHTML = "";
-
-      // Group by week → player
-      const weeks = {};
-      data.forEach(g => {
-        if (!weeks[g.week]) weeks[g.week] = {};
-        if (!weeks[g.week][g.player]) weeks[g.week][g.player] = [];
-        weeks[g.week][g.player].push(g);
+        wDiv.appendChild(pDiv);
       });
+      container.appendChild(wDiv);
+    });
+  } catch (err) {
+    document.getElementById("lineScores").innerHTML = `<p style="color:red">Error loading line scores: ${err.message}</p>`;
+  }
+}
 
-      for (const [week, players] of Object.entries(weeks)) {
-        const weekDiv = document.createElement("div");
-        weekDiv.className = "week";
-        weekDiv.innerHTML = `<h2>${week}</h2>`;
-
-        for (const [player, games] of Object.entries(players)) {
-          const playerDiv = document.createElement("div");
-          playerDiv.className = "player";
-          playerDiv.innerHTML = `<h3>${player}</h3>`;
-
-          games.forEach(game => {
-            let suffix = "";
-            if (game.status === "Final") {
-              suffix = game.stats ? game.stats : "DNP";
-            } else if (game.status === "In Progress") {
-              suffix = "GAME IN PROGRESS";
-            } else if (game.status === "Scheduled") {
-              suffix = game.time;
-            }
-            const gameDiv = document.createElement("div");
-            gameDiv.className = "game";
-            gameDiv.innerHTML = `${game.date} – ${game.opp} <span class="suffix">| ${suffix}</span>`;
-            playerDiv.appendChild(gameDiv);
-          });
-
-          weekDiv.appendChild(playerDiv);
-        }
-        container.appendChild(weekDiv);
-      }
-    }
-
-    loadLineScores();
-  </script>
+loadLineScores();
+</script>
 </body>
 </html>
