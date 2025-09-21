@@ -1,260 +1,155 @@
-<!-- ===========================
-FILE: assets/js/lineScores.js
-ES module to render weekly line scores from Google Sheets
-================================ -->
-<script type="module" id="__linescores_module__">
-/**
- * initLineScores({
- *   sheetId: string,                       // Google Sheet ID
- *   sheetName: 'STATS_SEASON_TOTALS',      // tab name
- *   rangeBody: 'AU2:CD100',                // player rows
- *   rangeHeader: 'AU1:CD1',                // date row
- *   container: '#lineScores',              // CSS selector or Element
- *   weeks: 1,                              // how many weeks to show (1..4)
- *   timezone: 'America/Phoenix'            // for dates/labels
- * })
- *
- * Exports: window.initLineScores
- */
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Active Alumni News • Hamilton YATSTATS</title>
 
-(function(){
-  const CSV_SPLIT = /,(?=(?:[^"]*"[^"]*")*[^"]*$)/;
+<link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400&family=Bebas+Neue&display=swap" rel="stylesheet">
 
-  function _qs(sel){ return (typeof sel==='string') ? document.querySelector(sel) : sel; }
+<style>
+/* ---- pulled directly from index.html ---- */
+:root{
+  --bg:#0c0c0c; --fg:#f2f2f2; --muted:#c4c4c4; --ink:#e8e8e8; --line:rgba(255,255,255,.08);
+  --card-bg:#171717; --header-bg:#000; --drawer-bg:rgba(10,10,10,.65);
+  --shade-end:rgba(0,0,0,.95);
+  --hamSmall:13px; --hamBig:20px; --hamBigger:24px; --tagGrey:#cfd2d6;
+  --crestH:clamp(28px,4.2vw,42px);
+  --containerPad:16px; --footerH:clamp(56px,8vh,77px);
+}
+body.light-theme{
+  --bg:#f4f4f4; --fg:#121212; --muted:#555; --ink:#222; --line:rgba(0,0,0,.1);
+  --card-bg:#fff; --header-bg:#fff; --drawer-bg:rgba(255,255,255,.65);
+}
+*{box-sizing:border-box} html,body{margin:0}
+body{background:var(--bg);color:var(--fg);font-family:Oswald,system-ui,sans-serif;transition:.3s}
+a{color:inherit;text-decoration:none}
+.container{max-width:1400px;margin:0 auto;padding:0 var(--containerPad)}
+.header{position:sticky;top:0;z-index:50;background:var(--header-bg)}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:8px 0}
+.icon-btn{background:none;border:none;color:var(--fg);display:inline-flex;align-items:center;cursor:pointer}
+.icon-btn i{font-size:20px}
+.topnav{display:flex;gap:18px;align-items:center}
+.nav-pair .thin{font:300 13px Oswald;color:#cfd2d6;margin-right:2px}
+.nav-pair .bold{font:400 13px "Bebas Neue"}
+.wordmark-img{height:24px;width:auto}
+.hr-y{border-top:1px solid var(--line)}
+.schoolrow{display:flex;align-items:center;gap:10px;padding:6px var(--containerPad)}
+.ham-logo{height:var(--crestH)}
+.schooltext .big1{font:400 20px "Bebas Neue"}
+.schooltext .big2{font:400 24px "Bebas Neue"}
+.hero{padding:2px 0}
+.hero-grid{display:flex;align-items:center;justify-content:space-between;gap:16px}
+.hero-right{display:flex;gap:10px}
+.drawer-mask{position:fixed;inset:0;background:rgba(0,0,0,.35);opacity:0;pointer-events:none;z-index:60}
+.drawer{position:fixed;top:0;bottom:0;width:min(360px,82vw);background:var(--drawer-bg);backdrop-filter:blur(4px);color:var(--ink);transform:translateX(110%);transition:.25s;z-index:70;display:flex;flex-direction:column}
+.drawer h3{margin:18px 16px 8px}
+.drawer .drawer-content{flex-grow:1;overflow-y:auto;padding:10px 16px}
+.drawer.open{transform:translateX(0)}
+.main{padding:8px 0 calc(var(--footerH) + 12px)}
+.grid{display:grid;gap:16px;grid-template-columns:repeat(3,1fr)}
+@media(max-width:900px){.grid{grid-template-columns:repeat(1,1fr)}}
+.news-card{background:var(--card-bg);border-radius:8px;overflow:hidden;margin-bottom:12px;box-shadow:0 2px 4px rgba(0,0,0,.2)}
+.news-card img{width:100%;height:180px;object-fit:cover}
+.news-body{padding:12px}
+.news-body h4{margin:0 0 6px;font-size:1.1rem}
+.meta{font-size:0.85rem;color:var(--muted);margin-bottom:6px}
+.social-icons{display:flex;gap:10px;margin-top:.5rem}
+.social-icons a{font-size:1.2rem;color:var(--muted)}
+.site-footer{position:fixed;left:0;right:0;bottom:0;height:var(--footerH);background:var(--bg);border-top:1px solid var(--line)}
+.site-footer img{height:100%;width:100%;object-fit:contain}
+</style>
+</head>
 
-  function parseCSV(text){
-    const rows = text.trim().split(/\r?\n/).map(line=>{
-      return line.split(CSV_SPLIT).map(c=>c.replace(/^"|"$/g,'').trim());
-    });
-    return rows;
-  }
+<body>
+<header class="header">
+  <div class="container topbar">
+    <div class="left-icons">
+      <button class="icon-btn" id="btnMenu"><i class="ri-menu-line"></i></button>
+      <button class="icon-btn" id="theme-toggle"><i class="ri-sun-line"></i></button>
+    </div>
+    <nav class="topnav">
+      <a href="index.html" class="nav-pair"><span class="thin">WHERE THEY</span><span class="bold">YAT?</span></a>
+      <a href="alumni-news.html" class="nav-pair"><span class="thin">ACTIVE ALUMNI</span><span class="bold">NEWS</span></a>
+    </nav>
+    <div class="wordmark-wrap">
+      <img class="wordmark-img" src="assets/img/yatstats-logo.png" alt="YAT?STATS">
+    </div>
+  </div>
+  <div class="hr-y"></div>
+  <div class="container schoolrow">
+    <img class="ham-logo" src="assets/img/hamilton-logo.png" alt="Hamilton H">
+    <div class="schooltext">
+      <div class="small">CHANDLER, AZ</div>
+      <div class="big1">HAMILTON HIGH SCHOOL</div>
+      <div class="big2">ACTIVE BASEBALL ALUMNI</div>
+    </div>
+  </div>
+</header>
 
-  function fmtDate(d, tz='America/Phoenix', opts={ month:'numeric', day:'numeric'}){
-    return new Intl.DateTimeFormat('en-US', { timeZone: tz, ...opts }).format(d);
-  }
+<main class="main container">
+  <div class="grid">
+    <section id="proNews"><h3>Pro Alumni News</h3><div class="news-feed"></div></section>
+    <section id="collegeNews"><h3>College Alumni News</h3><div class="news-feed"></div></section>
+    <section id="lineScores"><h3>Line Scores</h3><div id="scoresWrap"></div></section>
+  </div>
+</main>
 
-  function startOfWeek_Sat(d){
-    // “Week of Sep 21–27” style using Saturday→Friday window
-    const x = new Date(d.getFullYear(), d.getMonth(), d.getDate());
-    const day = x.getDay();             // 0=Sun ... 6=Sat
-    const diff = (day===6) ? 0 : (day+1); // days since last Sat
-    x.setDate(x.getDate() - diff);
-    x.setHours(0,0,0,0);
-    return x;
-  }
-  function addDays(d, n){ const x = new Date(d); x.setDate(x.getDate()+n); return x; }
-  function sameDay(a,b){ return a.getFullYear()===b.getFullYear() && a.getMonth()===b.getMonth() && a.getDate()===b.getDate(); }
+<footer class="site-footer">
+  <a href="https://no-errors.com/collections/all-webgems" target="_blank">
+    <img src="assets/img/partners/no-errors-banner.jpg" alt="Sponsor Banner">
+  </a>
+</footer>
 
-  function buildWeekWindows(today, weeks){
-    const windows = [];
-    let anchor = startOfWeek_Sat(today); // current week (Sat..Fri)
-    for(let i=0;i<weeks;i++){
-      const start = addDays(anchor, -7*i);
-      const end   = addDays(start, 6);
-      windows.push({ start, end });
-    }
-    return windows;
-  }
-
-  function makeWeekLabel(win, tz){
-    const s = fmtDate(win.start, tz, { month:'long', day:'numeric'});
-    const e = fmtDate(win.end, tz, { month:'numeric', day:'numeric'});
-    return `Week of ${s}–${e}`;
-  }
-
-  function dateFromMD(mmdd, baseYear){
-    // mmdd like "9/21" -> Date in current season year
-    const [m,d] = mmdd.split('/').map(n=>parseInt(n,10));
-    if (!m || !d) return null;
-    return new Date(baseYear, m-1, d);
-  }
-
-  function buildGameLine(mmdd, cellValue, today, tz){
-    const d = dateFromMD(mmdd, today.getFullYear());
-    if (!d) return null;
-
-    const isPast = d < addDays(today, 0) && !sameDay(d,today);
-    const isFuture = d > today;
-    const isToday = sameDay(d, today);
-
-    // Normalize the cell text
-    const v = (cellValue||'').trim();
-
-    // Decide suffix
-    let suffix;
-    if (v){
-      // We already have a line score (ex: "2-3 | 2HR, 6RBI")
-      suffix = v;
-    } else if (isFuture || isToday){
-      // No stats yet ⇒ scheduled game time placeholder
-      // You can pipe actual time from another sheet later; leaving time off for now
-      suffix = isToday ? 'GAME IN PROGRESS' : ''; // if you prefer, leave blank for future
-    } else {
-      // Past and no stats recorded ⇒ DNP
-      suffix = 'DNP';
-    }
-
-    // Build the line:
-    const when = fmtDate(d, tz, { month:'numeric', day:'numeric'});
-    // For demo, opponent/home/away can be injected later; prefix “@” as a neutral placeholder
-    const vs = '@ ???';
-    const left = `${when} - ${vs}`;
-    return { date:d, text: suffix ? `${left} | ${suffix}` : left };
-  }
-
-  async function fetchCSV(sheetId, sheetName, range){
-    const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(sheetName)}&range=${encodeURIComponent(range)}`;
-    const res = await fetch(url, { cache:'no-store' });
-    if (!res.ok) throw new Error(`Google Sheets HTTP ${res.status}`);
-    return await res.text();
-  }
-
-  function htmlEscape(s){ return String(s).replace(/[&<>"]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m])); }
-
-  function render(container, grouped, tz){
-    const root = _qs(container);
-    if (!root){ console.error('lineScores: container not found'); return; }
-    root.innerHTML = '';
-    root.classList.add('ys-linescores-root');
-
-    grouped.forEach(group=>{
-      const weekEl = document.createElement('section');
-      weekEl.className = 'ys-week';
-
-      weekEl.innerHTML = `<h4 class="ys-week-title">${htmlEscape(group.label)}</h4>`;
-      group.players.forEach(p=>{
-        const block = document.createElement('div');
-        block.className = 'ys-player';
-        const lines = p.lines.map(l => `<li>${htmlEscape(l.text)}</li>`).join('');
-        block.innerHTML = `
-          <div class="ys-player-name">${htmlEscape(p.name)}</div>
-          <ul class="ys-games">
-            ${lines || '<li class="ys-empty">No games this week</li>'}
-          </ul>
-        `;
-        weekEl.appendChild(block);
-      });
-      root.appendChild(weekEl);
-    });
-  }
-
-  async function initLineScores({
-    sheetId,
-    sheetName='STATS_SEASON_TOTALS',
-    rangeBody='AU2:CD100',
-    rangeHeader='AU1:CD1',
-    container='#lineScores',
-    weeks=1,
-    timezone='America/Phoenix'
-  }){
-    const root = _qs(container);
-    if (root){ root.innerHTML = '<div class="ys-loading">Loading…</div>'; }
-
-    // 1) Fetch header row for dates
-    const [hdrCSV, bodyCSV] = await Promise.all([
-      fetchCSV(sheetId, sheetName, rangeHeader),
-      fetchCSV(sheetId, sheetName, rangeBody)
-    ]);
-
-    const hdrRows = parseCSV(hdrCSV);
-    const header = hdrRows[0] || []; // AU1..CD1 are mm/dd labels
-
-    const body = parseCSV(bodyCSV);   // rows: [PlayerName, AU, AV, ..., CD]
-    const today = new Date();
-
-    // 2) Build week windows (Sat–Fri), most-recent first
-    const windows = buildWeekWindows(today, weeks);
-
-    // 3) For each week, build: [{ label, players:[{ name, lines:[{date, text}]}] }]
-    const grouped = windows.map(win=>{
-      // map mm/dd headers within this window to their column indexes
-      const hdrMap = header.map((mmdd, idx) => {
-        const d = dateFromMD(mmdd, today.getFullYear());
-        return { idx, mmdd, date:d };
-      }).filter(h => h.date && h.date >= win.start && h.date <= win.end)
-        .sort((a,b)=> a.date - b.date); // chronological within the week
-
-      const players = [];
-      for (const row of body){
-        if (!row.length) continue;
-        const name = (row[0]||'').trim();
-        if (!name) continue;
-
-        const lines = [];
-        for (const h of hdrMap){
-          const cell = row[h.idx+1] ?? ''; // +1 because col0 is Player Name
-          const line = buildGameLine(h.mmdd, cell, today, timezone);
-          if (line) lines.push(line);
-        }
-
-        // Only include players who have **some** content in this window
-        if (lines.length){
-          players.push({
-            name,
-            lines: lines.sort((a,b)=> a.date - b.date)
-          });
-        }
-      }
-
-      // Sort players A→Z
-      players.sort((a,b)=> a.name.localeCompare(b.name));
-
-      return { label: makeWeekLabel(win, timezone), players };
-    });
-
-    render(container, grouped, timezone);
-  }
-
-  // Basic styles (tiny, safe to include in-page once)
-  const STYLE_ID = 'ys-linescores-style';
-  if (!document.getElementById(STYLE_ID)){
-    const css = `
-      .ys-linescores-root{max-height:100%;overflow:auto;padding:10px}
-      .ys-loading{padding:10px;opacity:.8}
-      .ys-week{margin:12px 0 18px}
-      .ys-week-title{margin:0 0 8px;font:700 15px "Bebas Neue",system-ui;letter-spacing:.04em}
-      .ys-player{margin:8px 0 12px}
-      .ys-player-name{font:700 14px/1.1 "Bebas Neue",system-ui;letter-spacing:.04em;margin-bottom:4px}
-      .ys-games{list-style:none;margin:0;padding:0 0 0 2px}
-      .ys-games li{padding:3px 0;border-bottom:1px solid rgba(255,255,255,.08)}
-      .ys-games li:last-child{border-bottom:none}
-      .ys-empty{opacity:.6;font-style:italic}
-      @media (prefers-color-scheme: light){
-        .ys-games li{border-bottom:1px solid rgba(0,0,0,.08)}
-      }
-    `;
-    const tag = document.createElement('style');
-    tag.id = STYLE_ID;
-    tag.textContent = css;
-    document.head.appendChild(tag);
-  }
-
-  // expose globally
-  window.initLineScores = initLineScores;
-})();
-</script>
-
-<!-- ===========================
-USAGE: paste this where you want the scores to appear
-- Keeps your “independent scroll” behavior if this column has a fixed height
-- On desktop: put this in column 3
-- On mobile: mount this same container inside the right drawer
-================================ -->
-<!-- Example container -->
-<div id="lineScores" style="max-height:calc(100vh - 180px);overflow:auto;"></div>
-
-<!-- Kick it off (REAL Google Sheet) -->
 <script type="module">
-  // Hamilton YATSTATS sheet
-  const SHEET_ID = '1yUNQH9NbpKwOOwH9blf5ZqQfmft796sQl1dqghXP4uA';
-  // Initialize for 4 rolling weeks (change to 1 if you only want current week)
-  window.initLineScores({
-    sheetId: SHEET_ID,
-    sheetName: 'STATS_SEASON_TOTALS',
-    rangeHeader: 'AU1:CD1',
-    rangeBody: 'AU2:CD100',
-    container: '#lineScores',
-    weeks: 4,
-    timezone: 'America/Phoenix'
+/* ---- Inline mock alumni news ---- */
+const alumniNews = [
+  {title:"Cody Bellinger goes deep twice",player_display_name:"Cody Bellinger",publishedAt:"2025-09-18",source:"ESPN",url:"#",image:"https://picsum.photos/seed/bellinger/600/400",tags:{level:"MLB"}},
+  {title:"Drew Swift sparks Reno Aces with defense",player_display_name:"Drew Swift",publishedAt:"2025-09-17",source:"MiLB",url:"#",image:"https://picsum.photos/seed/swift/600/400",tags:{level:"AAA"}},
+  {title:"Gavin Turley homers for Stockton",player_display_name:"Gavin Turley",publishedAt:"2025-09-16",source:"Athletics Org",url:"#",image:"https://picsum.photos/seed/turley/600/400",tags:{level:"A"}},
+  {title:"Cole Klecker shines for ASU",player_display_name:"Cole Klecker",publishedAt:"2025-09-15",source:"ASU Sports",url:"#",image:"https://picsum.photos/seed/klecker/600/400",tags:{level:"NCAA-D1"}},
+  {title:"Jackson Smith clutch hit for SIU",player_display_name:"Jackson Smith",publishedAt:"2025-09-14",source:"SIU Athletics",url:"#",image:"https://picsum.photos/seed/smith/600/400",tags:{level:"NCAA-D1"}}
+];
+
+/* Render news by level */
+function renderNews(){
+  const pro=document.querySelector('#proNews .news-feed');
+  const col=document.querySelector('#collegeNews .news-feed');
+  pro.innerHTML=''; col.innerHTML='';
+  alumniNews.forEach(n=>{
+    const card=document.createElement('div');
+    card.className='news-card';
+    card.innerHTML=`
+      <img src="${n.image}" alt="${n.player_display_name}">
+      <div class="news-body">
+        <h4>${n.title}</h4>
+        <div class="meta">${n.player_display_name} — ${new Date(n.publishedAt).toLocaleDateString()} | ${n.source}</div>
+        <div class="social-icons">
+          <a href="https://twitter.com/intent/tweet?text=We See Where YAT, ${n.player_display_name.split(' ')[0]}! #YATABOY${n.player_display_name.split(' ')[0]} ${encodeURIComponent(n.url)}" target="_blank"><i class="ri-twitter-fill"></i></a>
+          <a href="https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(n.url)}" target="_blank"><i class="ri-facebook-circle-fill"></i></a>
+          <a href="https://www.linkedin.com/shareArticle?mini=true&url=${encodeURIComponent(n.url)}" target="_blank"><i class="ri-linkedin-box-fill"></i></a>
+        </div>
+      </div>`;
+    if(n.tags.level.includes("NCAA")) col.appendChild(card); else pro.appendChild(card);
   });
+}
+
+/* Mock line scores (replace later with real sheet fetch) */
+function renderScores(){
+  const scores=document.querySelector('#scoresWrap');
+  scores.innerHTML=`
+    <h4>Week of Sept 21–27</h4>
+    <div><strong>CODY BELLINGER</strong><br>9/21 @BAL | 2-3 | 2HR, 6RBI</div>
+    <div><strong>DREW SWIFT</strong><br>9/21 @SAL | DNP</div>
+    <div><strong>GAVIN TURLEY</strong><br>9/22 vs OAK | In Progress</div>`;
+}
+
+/* Boot */
+document.addEventListener('DOMContentLoaded',()=>{
+  renderNews();
+  renderScores();
+});
 </script>
+</body>
+</html>
