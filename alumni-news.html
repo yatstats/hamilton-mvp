@@ -5,265 +5,130 @@
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Active Alumni News • Hamilton YATSTATS</title>
 
-<!-- Icons / Fonts -->
 <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400&family=Bebas+Neue&display=swap" rel="stylesheet">
 
-<!-- Firebase init (kept from index.html) -->
+<!-- Firebase init (kept lightweight; anonymous if no config present) -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-  import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, signInWithCustomToken, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-  window.firebaseAuth = { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, signInWithCustomToken, signInAnonymously };
+  import { getAuth, signInWithCustomToken, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
   try {
     const firebaseConfig = JSON.parse(window.__firebase_config || '{}');
     const app = initializeApp(firebaseConfig);
-    window.auth = getAuth(app);
-    onAuthStateChanged(window.auth, user => { document.dispatchEvent(new CustomEvent('authStateChanged', { detail: { user } })); });
-    if (window.__initial_auth_token) {
-      await signInWithCustomToken(window.auth, window.__initial_auth_token);
-    } else {
-      await signInAnonymously(window.auth);
-    }
-  } catch (e) {
-    console.error("Firebase initialization error:", e);
-  }
+    const auth = getAuth(app);
+    window.auth = auth;
+    onAuthStateChanged(auth, user => document.dispatchEvent(new CustomEvent('authStateChanged',{detail:{user}})));
+    if (window.__initial_auth_token) await signInWithCustomToken(auth, window.__initial_auth_token);
+    else await signInAnonymously(auth);
+  } catch(e){ console.warn("Firebase init skipped:", e?.message||e); }
 </script>
 
 <style>
-/* ====== Base theme (same tokens as index) ====== */
 :root{
-  --bg:#0c0c0c; --fg:#f2f2f2; --muted:#c4c4c4; --ink:#e8e8e8; --line:rgba(255,255,255,.08);
+  --bg:#0c0c0c; --fg:#f2f2f2; --muted:#b9b9b9; --ink:#e8e8e8; --line:rgba(255,255,255,.08);
   --card-bg:#171717; --header-bg:#000; --drawer-bg:rgba(10,10,10,.65);
-  --shade-end:rgba(0,0,0,.95);
-  --hamSmall:13px; --hamBig:20px; --hamBigger:24px; --tagGrey:#cfd2d6;
-  --crestH:clamp(28px,4.2vw,42px);
   --containerPad:16px; --footerH:clamp(56px,8vh,77px);
+  --colGap:16px; --radius:12px;
 }
 body.light-theme{
-  --bg:#f4f4f4; --fg:#121212; --muted:#555; --ink:#222; --line:rgba(0,0,0,.1);
-  --card-bg:#fff; --header-bg:#fff; --drawer-bg:rgba(255,255,255,.65);
+  --bg:#f6f6f6; --fg:#121212; --muted:#666; --ink:#222; --line:rgba(0,0,0,.1);
+  --card-bg:#fff; --header-bg:#fff; --drawer-bg:rgba(255,255,255,.7);
 }
-@font-face{font-family:'Indigo';src:url('assets/fonts/Indigo.otf') format('opentype');font-weight:400;font-style:normal;font-display:swap;}
+@font-face{font-family:'Indigo';src:url('assets/fonts/Indigo.otf') format('opentype');font-display:swap}
 *{box-sizing:border-box} html,body{margin:0}
-body{background:var(--bg);color:var(--fg);font-family:Oswald,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;transition:background-color .3s,color .3s;}
-body.drawer-open{overflow:hidden}
+body{background:var(--bg);color:var(--fg);font-family:Oswald,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;transition:background-color .25s,color .25s}
 a{color:inherit;text-decoration:none}
 .container{max-width:1400px;margin:0 auto;padding:0 var(--containerPad)}
-.header{position:sticky;top:0;z-index:50;background:var(--header-bg);transition:background-color .3s;}
+.header{position:sticky;top:0;z-index:50;background:var(--header-bg);transition:background-color .25s}
 .topbar{display:flex;align-items:center;justify-content:space-between;padding:8px 0}
 .left-icons{display:flex;align-items:center;gap:8px}
-.icon-btn{background:none;border:none;color:var(--fg);opacity:.92;display:inline-flex;align-items:center;justify-content:center;padding:0;margin:0 2px;cursor:pointer}
+.icon-btn{background:none;border:none;color:var(--fg);opacity:.92;display:inline-grid;place-items:center;width:34px;height:34px;border-radius:8px;cursor:pointer}
+.icon-btn:hover{background:var(--line)}
 .icon-btn i{font-size:20px}
 .topnav{display:flex;gap:18px;align-items:center}
 .nav-pair{white-space:nowrap}
-.nav-pair .thin{font:300 var(--hamSmall) Oswald,sans-serif;letter-spacing:.02em;color:#cfd2d6;margin-right:2px}
+.nav-pair .thin{font:300 13px/1 Oswald;letter-spacing:.02em;color:#cfd2d6;margin-right:2px}
 body.light-theme .nav-pair .thin{color:var(--muted)}
-.nav-pair .bold{font:400 var(--hamSmall) Indigo,"Bebas Neue",sans-serif}
+.nav-pair .bold{font:400 13px/1 Indigo,"Bebas Neue",sans-serif}
 .wordmark-wrap{display:flex;align-items:center;justify-content:flex-end;min-width:120px}
-.wordmark-img{height:clamp(18px,3.2vw,28px);width:auto;display:block}
-body.light-theme .wordmark-img{filter:invert(1)}
-@media (max-width:1200px){.topnav{display:none !important}}
+.wordmark-img{height:clamp(18px,3.2vw,28px)}
+@media (max-width:1200px){.topnav{display:none}}
 .hr-y{border-top:1px solid var(--line)}
 .schoolrow{display:flex;align-items:center;gap:10px;padding:6px var(--containerPad)}
-.ham-logo{height:var(--crestH);width:auto;object-fit:contain;display:block;flex-shrink:0}
-.schooltext{line-height:1}
-.schooltext .small{font:300 var(--hamSmall)/1 Oswald;letter-spacing:.02em;color:var(--muted)}
-.schooltext .big1{font:400 var(--hamBig)/1 "Bebas Neue",sans-serif}
-.schooltext .big2{font:400 var(--hamBigger)/1 "Bebas Neue",sans-serif;margin-top:-4px}
-.crumbs{font:300 calc(var(--hamSmall)*.5)/1 Oswald;letter-spacing:.02em;color:var(--muted);text-transform:uppercase}
+.ham-logo{height:clamp(28px,4.2vw,42px)}
+.schooltext .small{font:300 13px/1 Oswald;color:var(--muted)}
+.schooltext .big1{font:400 20px/1 "Bebas Neue",sans-serif}
+.schooltext .big2{font:400 24px/1 "Bebas Neue",sans-serif;margin-top:-4px}
 .hero{padding:2px 0}
 .hero-grid{display:flex;align-items:center;justify-content:space-between;gap:16px}
-.hero-left{display:flex;flex-direction:column;gap:4px}
-.hero-crumbs{margin:0;text-align:left;white-space:nowrap}
-@media (max-width:768px){.topbar .crumbs{display:block}.hero-left .crumbs{display:none}}
-@media (min-width:769px){.topbar .crumbs{display:none}.hero-left .crumbs{display:block}}
-.tag-duo{position:relative;height:1.8em}
-.tag-swap{position:absolute;left:0;top:0;right:0;opacity:0;animation:swap 6s infinite;white-space:nowrap}
-.tag-swap:nth-child(1){animation-delay:0s}
-.tag-swap:nth-child(2){animation-delay:3s}
-.tag-grey{font:300 1em Oswald,sans-serif;letter-spacing:.02em;color:var(--tagGrey)}
-body.light-theme .tag-grey{color:var(--muted)}
-.tag-bold{font:400 1em Indigo,"Bebas Neue",sans-serif}
+.tag-duo{position:relative;height:1.6em}
+.tag-swap{position:absolute;left:0;top:0;right:0;opacity:0;animation:swap 6s infinite}
+.tag-swap:nth-child(1){animation-delay:0s}.tag-swap:nth-child(2){animation-delay:3s}
+.tag-grey{font:300 1em Oswald;color:#cfd2d6} body.light-theme .tag-grey{color:var(--muted)}
+.tag-bold{font:400 1em Indigo,"Bebas Neue"}
 @keyframes swap{0%{opacity:0}5%{opacity:1}45%{opacity:1}50%{opacity:0}100%{opacity:0}}
-.hero-right{display:flex;gap:10px}
-.hero-icon i{font-size:20px}
+.hero-right{display:flex;gap:8px}
 
 /* Drawers */
 .drawer-mask{position:fixed;inset:0;background:rgba(0,0,0,.35);opacity:0;pointer-events:none;transition:opacity .2s;z-index:60}
-.drawer{position:fixed;top:0;bottom:0;width:min(360px,82vw);background:var(--drawer-bg);backdrop-filter:blur(4px);color:var(--ink);transform:translateX(-110%);transition:transform .25s,background-color .3s;z-index:70}
-.drawer-right{right:0;left:auto;transform:translateX(110%);display:flex;flex-direction:column;height:100%}
-.drawer h3{margin:18px 16px 8px;padding-right:30px}
+.drawer{position:fixed;top:0;bottom:0;width:min(360px,82vw);background:var(--drawer-bg);backdrop-filter:blur(6px);color:var(--ink);transform:translateX(-110%);transition:transform .25s,background-color .25s;z-index:70}
+.drawer-right{right:0;left:auto;transform:translateX(110%);display:flex;flex-direction:column}
+.drawer h3{margin:18px 16px 8px}
 .drawer .pad{padding:10px 16px}
-.drawer .close-btn{position:absolute;top:12px;right:12px}
-.drawer a{color:var(--ink)}
-.drawer a:hover{color:var(--fg)}
+.drawer .close-btn{position:absolute;top:10px;right:10px}
+.drawer-content{flex:1;overflow:auto;padding:10px 16px}
+.drawer-footer{padding:12px 16px;border-top:1px solid var(--line);display:flex;gap:10px;align-items:center}
 body.drawer-left-open .drawer-mask,body.drawer-right-open .drawer-mask{opacity:1;pointer-events:auto}
 body.drawer-left-open #drawerLeft{transform:translateX(0)}
 body.drawer-right-open .drawer-right{transform:translateX(0)}
-.drawer-content{flex-grow:1;overflow-y:auto;padding:10px 16px}
-.drawer-footer{flex-shrink:0;padding:12px 16px;border-top:1px solid var(--line);background:rgba(10,10,10,.8);display:flex;gap:10px;align-items:center}
-body.light-theme .drawer-footer{background:rgba(255,255,255,.8)}
-.filter-group{border-bottom:1px solid var(--line)}
-.filter-group:last-of-type{border-bottom:none}
-.filter-title{padding:14px 0;cursor:pointer;font-weight:700;font-family:"Bebas Neue",sans-serif;letter-spacing:.05em;list-style:none;display:flex;justify-content:space-between;align-items:center}
-.filter-title::-webkit-details-marker{display:none}
-.filter-title::after{content:'▸';font-size:1.2em;transition:transform .2s}
-details[open]>.filter-title::after{transform:rotate(90deg)}
-.filter-options{padding:4px 0 16px 0}
-.filter-options label{display:block;margin-bottom:8px;padding-left:4px}
-.filter-options input[type=checkbox]{margin-right:8px;transform:scale(1.1)}
-.select-all-label{font-weight:700;border-bottom:1px solid var(--line);padding-bottom:8px !important;margin-bottom:12px !important}
-#liveResults{margin:10px 4px 18px;max-height:55vh;overflow:auto}
-.live-hit{padding:10px 12px;display:flex;align-items:center;gap:10px;border-radius:10px;cursor:pointer}
-.live-hit:hover{background:var(--line)}
-.live-hit img{width:36px;height:36px;border-radius:6px;object-fit:cover}
-.auth-tabs{display:flex;border-bottom:1px solid var(--line)}
-.auth-tab{flex:1;text-align:center;padding:10px;cursor:pointer;background:transparent;border:none;color:var(--muted);font-family:"Bebas Neue",sans-serif;font-size:16px;letter-spacing:.05em}
-.auth-tab.active{color:var(--fg);border-bottom:2px solid var(--fg)}
-.auth-form{display:none}
-.auth-form.active{display:block}
-.form-field{margin-bottom:15px}
-.form-field label{display:block;margin-bottom:5px;font-size:12px}
-.form-field input{width:100%;padding:10px;border-radius:8px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--ink)}
-body.light-theme .form-field input{background:rgba(0,0,0,.06)}
-.auth-btn{width:100%;padding:12px;background:var(--fg);color:var(--bg);border:none;border-radius:8px;font-family:"Bebas Neue",sans-serif;font-size:16px;letter-spacing:.08em;cursor:pointer}
-#authMessage{margin-top:15px;text-align:center;font-size:13px}
-.error{color:#fca5a5}
-.success{color:#86efac}
-.site-footer{position:fixed;left:0;right:0;bottom:0;height:var(--footerH);background:var(--bg);border-top:1px solid var(--line);z-index:40}
-.site-footer a{display:block;height:100%;width:100%}
-.site-footer img{height:100%;width:100%;object-fit:contain}
-.icon-btn:focus,button:focus,input:focus,details summary:focus{outline:2px solid var(--fg);outline-offset:2px}
 
-/* ====== Alumni News layout ====== */
-.main{padding:8px 0 calc(var(--footerH) + 12px)}
-#contentGrid{
-  display:grid; gap:16px;
-  grid-template-columns: 1fr 1fr 1fr;
-  grid-template-areas: "pro college scores";
-  align-items:start;
-}
-@media (max-width:1100px){
-  /* Tablet: 2 wide; left column stacks Pro over College, right keeps Scores visible */
-  #contentGrid{
-    grid-template-columns: 1.2fr .8fr;
-    grid-template-areas:
-      "pro scores"
-      "college scores";
-  }
-}
-@media (max-width:768px){
-  /* Mobile: single column news; scores move to drawer */
-  #contentGrid{
-    grid-template-columns: 1fr;
-    grid-template-areas: "pro" "college";
-  }
-  #scoresCol{ display:none; }
-}
+/* Main grid: desktop 3 cols, tablet 2 cols, phone 1 col (scores in drawer) */
+.main{padding:10px 0 calc(var(--footerH) + 12px)}
+.grid3{display:grid;gap:var(--colGap);grid-template-columns:2fr 2fr 1.5fr}
+@media (max-width:1100px){.grid3{grid-template-columns:1fr 1fr}}
+@media (max-width:800px){.grid3{grid-template-columns:1fr}}
+.card{background:var(--card-bg);border:1px solid var(--line);border-radius:var(--radius);box-shadow:0 4px 10px rgba(0,0,0,.18)}
+.sec-head{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-bottom:1px solid var(--line);font:700 14px "Bebas Neue";letter-spacing:.06em}
+.scroller{max-height:70vh;overflow:auto;padding:10px}
+.news-item{display:grid;grid-template-columns:92px 1fr;gap:10px;padding:10px;border:1px solid var(--line);border-radius:10px;margin-bottom:10px}
+.news-img{width:92px;height:68px;border-radius:8px;object-fit:cover;background:#111}
+.news-meta{font-size:11px;opacity:.8;margin-top:2px}
+.news-title{font:700 18px/1.1 "Bebas Neue";letter-spacing:.03em}
+.news-actions{display:flex;gap:8px;margin-top:8px}
+.icon-pill{display:inline-grid;place-items:center;width:34px;height:34px;border-radius:8px;border:1px solid var(--line);background:transparent}
+.icon-pill:hover{background:var(--line)}
+.btn{display:inline-block;padding:8px 12px;border:1px solid var(--line);border-radius:10px;font:700 12px "Bebas Neue";letter-spacing:.06em}
 
-/* Section wrappers */
-.section{
-  background:var(--card-bg);
-  border:1px solid var(--line);
-  border-radius:14px;
-  overflow:hidden;
-  box-shadow:0 4px 8px rgba(0,0,0,.2);
-}
-.section-header{
-  position:sticky; top:0; z-index:1;
-  background:linear-gradient(180deg, rgba(0,0,0,.35), rgba(0,0,0,0));
-  backdrop-filter: blur(2px);
-  padding:10px 12px; border-bottom:1px solid var(--line);
-  display:flex; align-items:center; justify-content:space-between;
-}
-.section-title{ font:400 20px "Bebas Neue",sans-serif; letter-spacing:.06em; }
-.section-body{ padding:12px; }
+/* Line scores column */
+.week-block{border:1px solid var(--line);border-radius:10px;margin-bottom:12px}
+.week-head{padding:10px 12px;border-bottom:1px solid var(--line);font:700 14px "Bebas Neue";letter-spacing:.06em;opacity:.9}
+.player-block{padding:8px 8px 10px}
+.player-name{font:700 13px "Bebas Neue";letter-spacing:.06em;opacity:.9;margin:6px 2px}
+.game-row{display:flex;align-items:center;gap:8px;margin:6px 0;padding:8px;border:1px solid var(--line);border-radius:10px}
+.badge{font:700 10px "Bebas Neue";letter-spacing:.08em;padding:3px 7px;border-radius:7px;border:1px solid var(--line);opacity:.8}
+.badge.final{background:rgba(60,200,130,.15)} .badge.progress{background:rgba(200,200,60,.15)}
+.badge.scheduled{background:rgba(255,255,255,.05)} .badge.dnp{background:rgba(255,80,80,.15)}
+.game-text{font-size:12px;opacity:.92}
 
-/* ====== ESPN-style news cards ====== */
-.news-feed{ display:flex; flex-direction:column; gap:12px; }
-.news-card{
-  display:grid; grid-template-columns:84px 1fr; gap:10px;
-  padding:10px; border:1px solid var(--line); border-radius:12px;
-  background:rgba(255,255,255,.02);
-}
-.news-thumb{
-  width:84px; height:84px; border-radius:10px; overflow:hidden; background:#111;
-  display:block; position:relative;
-}
-.news-thumb img{ width:100%; height:100%; object-fit:cover; display:block; }
-.news-content{ min-width:0; display:flex; flex-direction:column; gap:6px; }
-.news-headline{
-  font:700 16px/1.2 "Bebas Neue",sans-serif; letter-spacing:.02em;
-  display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;
-}
-.news-meta{
-  display:flex; align-items:center; justify-content:space-between; gap:8px;
-}
-.meta-left{ display:flex; align-items:center; gap:8px; opacity:.8; font-size:12px; }
-.meta-left i{ font-size:16px; opacity:.9; }
-.share-row{ display:flex; align-items:center; gap:8px; }
-.share-btn{ background:transparent; border:none; color:var(--fg); cursor:pointer; padding:6px; border-radius:10px; }
-.share-btn:hover{ background:var(--line); }
-
-/* ====== Scores Column ====== */
-#scoresCol{ grid-area:scores; }
-.scores-wrap{ max-height: calc(100vh - var(--footerH) - 220px); overflow:auto; padding:12px; }
-@media (max-width:1100px){
-  .scores-wrap{ max-height: calc(100vh - var(--footerH) - 170px); }
-}
-.week-header{
-  position:sticky; top:0; z-index:1;
-  background:var(--card-bg); padding:6px 10px; margin:-6px -6px 10px;
-  border-bottom:1px solid var(--line); font:700 14px "Bebas Neue",sans-serif; letter-spacing:.06em;
-}
-.player-block{ margin:10px 0 16px; }
-.player-name{ font:700 15px "Bebas Neue",sans-serif; letter-spacing:.06em; margin-bottom:6px; }
-.game-line{
-  display:flex; align-items:flex-start; gap:8px;
-  padding:8px 10px; border:1px solid var(--line); border-radius:10px; margin-bottom:8px;
-  background:rgba(255,255,255,.02);
-}
-.badge{
-  font:700 10px "Bebas Neue",sans-serif; letter-spacing:.08em; padding:2px 6px; border-radius:999px;
-  border:1px solid var(--line); opacity:.9; white-space:nowrap;
-}
-.badge.final{ background:rgba(52,211,153,.1); }
-.badge.ip{ background:rgba(59,130,246,.12); }
-.badge.scheduled{ background:rgba(156,163,175,.15); }
-.badge.dnp{ background:rgba(251,146,60,.12); }
-.game-text{ font:400 13px/1.25 Oswald,sans-serif; letter-spacing:.02em; }
-
-/* Scores drawer (mobile) */
-#drawerScores .drawer-content{ padding:0 0 14px; }
-#drawerScores .scores-wrap{ max-height:calc(100vh - 220px); padding:12px 14px; }
-
-/* Splash (kept) */
-#splashScreen{position:fixed;top:0;left:0;width:100%;height:100vh;background:#000;z-index:1000;opacity:1;transition:opacity .8s ease-out;pointer-events:auto;overflow:hidden}
+/* Splash & footer */
+#splashScreen{position:fixed;inset:0;background:#000;z-index:1000;opacity:1;transition:opacity .6s ease-out;pointer-events:auto}
 #splashScreen.is-hidden{opacity:0;pointer-events:none}
-.splash-top{position:absolute;width:100%;top:33%;left:50%;transform:translate(-50%,-50%);text-align:center}
-.splash-bottom{position:absolute;width:100%;bottom:33%;left:50%;transform:translate(-50%,50%);display:flex;align-items:center;justify-content:center;gap:clamp(12px,4vw,20px)}
-.splash-top .logo-container{position:relative;display:inline-block;overflow:hidden}
-.splash-top .splash-logo-main{width:clamp(280px,70vw,450px);height:auto;filter:drop-shadow(0 0 15px rgba(255,255,255,.2));animation:pulse-glow 2.5s infinite ease-in-out}
-.shimmer::after{content:'';position:absolute;top:0;left:-150%;width:70%;height:100%;background:linear-gradient(90deg,rgba(255,255,255,0) 0%,rgba(255,255,255,.2) 50%,rgba(255,255,255,0) 100%);transform:skewX(-25deg);animation:shimmer-effect 4s infinite;animation-delay:1.5s}
-.splash-bottom .splash-logo-h{height:clamp(45px,15vw,65px);width:auto;animation:fadeInDelayed 1s ease-in-out forwards;animation-delay:1.2s;opacity:0}
-.splash-bottom .splash-logo-ne{height:clamp(35px,12vw,50px);width:auto;animation:fadeInDelayed 1s ease-in-out forwards;animation-delay:1.2s;opacity:0}
-@keyframes fadeInDelayed{to{opacity:1}}
-@keyframes pulse-glow{0%{filter:drop-shadow(0 0 15px rgba(255,255,255,.2))}50%{filter:drop-shadow(0 0 25px rgba(255,255,255,.4))}100%{filter:drop-shadow(0 0 15px rgba(255,255,255,.2))}}
-@keyframes shimmer-effect{100%{left:150%}}
+.splash-top{position:absolute;width:100%;top:35%;left:50%;transform:translate(-50%,-50%);text-align:center}
+.splash-bottom{position:absolute;width:100%;bottom:30%;left:50%;transform:translate(-50%,50%);display:flex;gap:16px;justify-content:center;align-items:center}
+.splash-logo-main{width:clamp(260px,60vw,420px)}
+.site-footer{position:fixed;left:0;right:0;bottom:0;height:var(--footerH);background:var(--bg);border-top:1px solid var(--line);z-index:40}
+.site-footer a{display:block;height:100%}
+.site-footer img{height:100%;width:100%;object-fit:contain}
 </style>
 </head>
 
 <body>
 <!-- Splash -->
 <div id="splashScreen">
-  <div class="splash-top">
-    <div class="logo-container shimmer">
-      <img src="assets/img/yatstats-logo.png" alt="YAT?STATS Logo" class="splash-logo-main">
-    </div>
-  </div>
+  <div class="splash-top"><img src="assets/img/yatstats-logo.png" alt="YAT?STATS" class="splash-logo-main"></div>
   <div class="splash-bottom">
-    <img src="assets/img/hamilton-logo.png" alt="Hamilton Huskies Logo" class="splash-logo-h">
-    <img src="assets/img/partners/no-errors.png" alt="No Errors Logo" class="splash-logo-ne">
+    <img src="assets/img/hamilton-logo.png" alt="Hamilton Huskies" style="height:58px">
+    <img src="assets/img/partners/no-errors.png" alt="No Errors" style="height:48px">
   </div>
 </div>
 
@@ -271,12 +136,12 @@ body.light-theme .form-field input{background:rgba(0,0,0,.06)}
 <header class="header">
   <div class="container topbar">
     <div class="left-icons">
-      <button class="icon-btn" id="btnMenu" aria-label="Menu"><i class="ri-menu-line"></i></button>
+      <button class="icon-btn" id="btnMenu" title="Menu"><i class="ri-menu-line"></i></button>
       <div id="auth-container">
-        <button class="icon-btn" id="btnAccount" aria-label="Account"><i class="ri-user-3-line"></i></button>
-        <button class="icon-btn" id="btnSignOut" style="display:none;" aria-label="Sign out"><i class="ri-logout-box-line"></i></button>
+        <button class="icon-btn" id="btnAccount" title="Account"><i class="ri-user-3-line"></i></button>
+        <button class="icon-btn" id="btnSignOut" style="display:none" title="Sign out"><i class="ri-logout-box-line"></i></button>
       </div>
-      <button class="icon-btn" id="theme-toggle" aria-label="Toggle Theme"><i class="ri-sun-line"></i></button>
+      <button class="icon-btn" id="theme-toggle" title="Theme"><i class="ri-sun-line"></i></button>
     </div>
     <nav class="topnav" aria-label="Top Navigation">
       <a href="index.html" class="nav-pair"><span class="thin">WHERE THEY</span><span class="bold">YAT?</span></a>
@@ -287,12 +152,9 @@ body.light-theme .form-field input{background:rgba(0,0,0,.06)}
       <a href="partner-program.html" class="nav-pair"><span class="thin">PCD ACTION</span><span class="bold">PARTNER PROGRAM</span></a>
       <a href="faq.html" class="nav-pair"><span class="bold">FAQ’S</span></a>
     </nav>
-    <div class="wordmark-wrap">
-      <img class="wordmark-img" src="assets/img/yatstats-logo.png" alt="YAT?STATS">
-    </div>
+    <div class="wordmark-wrap"><img class="wordmark-img" src="assets/img/yatstats-logo.png" alt="YAT?STATS"></div>
   </div>
   <div class="hr-y"></div>
-
   <div class="container schoolrow">
     <img class="ham-logo" src="assets/img/hamilton-logo.png" alt="Hamilton H">
     <div class="schooltext">
@@ -305,19 +167,18 @@ body.light-theme .form-field input{background:rgba(0,0,0,.06)}
 
   <section class="hero">
     <div class="container hero-grid">
-      <div class="hero-left" aria-live="polite">
+      <div class="hero-left">
         <div class="tag-duo">
           <div class="tag-swap"><span class="tag-grey">ALUMNI</span> <span class="tag-bold">HEADLINES</span></div>
           <div class="tag-swap"><span class="tag-grey">LATEST</span> <span class="tag-bold">NEWS & SCORES</span></div>
         </div>
-        <div class="crumbs hero-crumbs">HAMILTON ▸ ACTIVE ALUMNI NEWS</div>
+        <div class="crumbs" style="font:300 11px Oswald;color:var(--muted)">HAMILTON ▸ ACTIVE ALUMNI NEWS</div>
       </div>
       <div class="hero-right">
-        <button id="openSearch" class="hero-icon icon-btn" aria-label="Open search"><i class="ri-search-line"></i></button>
-        <button id="openFilters" class="hero-icon icon-btn" aria-label="Open filters"><i class="ri-filter-3-line"></i></button>
-        <button id="filtersReset2" class="hero-icon icon-btn" aria-label="Reset filters"><i class="ri-restart-line"></i></button>
-        <!-- Scores drawer icon (mobile) -->
-        <button id="openScores" class="hero-icon icon-btn" aria-label="Open line scores"><i class="ri-bar-chart-box-line"></i></button>
+        <button id="openSearch" class="icon-btn" title="Search"><i class="ri-search-line"></i></button>
+        <button id="openFilters" class="icon-btn" title="Filters"><i class="ri-filter-3-line"></i></button>
+        <button id="filtersReset2" class="icon-btn" title="Reset"><i class="ri-restart-line"></i></button>
+        <button id="openScores" class="icon-btn" title="Line Scores"><i class="ri-bar-chart-box-line"></i></button>
       </div>
     </div>
   </section>
@@ -332,7 +193,7 @@ body.light-theme .form-field input{background:rgba(0,0,0,.06)}
     <h3>PLAYER PROFILE SEARCH</h3>
     <div class="pad">
       <input id="playerSearch" placeholder="Type to search…" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--ink)">
-      <div id="liveResults"></div>
+      <div id="liveResults" style="margin-top:10px"></div>
     </div>
     <h3>NAVIGATION</h3>
     <div class="pad" style="display:flex;flex-direction:column;gap:12px">
@@ -347,472 +208,213 @@ body.light-theme .form-field input{background:rgba(0,0,0,.06)}
   </div>
 </aside>
 
-<aside class="drawer drawer-right" id="drawerFilters" style="display:flex;">
+<aside class="drawer drawer-right" id="drawerFilters" style="display:none">
   <button class="icon-btn close-btn"><i class="ri-close-line"></i></button>
   <h3>FILTERS</h3>
-  <div class="drawer-content" id="filters">
-    <details class="filter-group" open>
-      <summary class="filter-title">By Keyword</summary>
-      <div class="filter-options">
-        <input id="filterKeyword" placeholder="Search headlines…" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--ink)"/>
-      </div>
-    </details>
-    <details class="filter-group">
-      <summary class="filter-title">By Level</summary>
-      <div class="filter-options" id="filterLevels">
-        <label class="select-all-label"><input type="checkbox" class="select-all"> Select All</label>
-        <label><input type="checkbox" value="MLB"> MLB</label>
-        <label><input type="checkbox" value="MiLB"> MiLB</label>
-        <label><input type="checkbox" value="NCAA-D1"> NCAA-D1</label>
-        <label><input type="checkbox" value="NCAA-D2"> NCAA-D2</label>
-        <label><input type="checkbox" value="NCAA-D3"> NCAA-D3</label>
-        <label><input type="checkbox" value="NAIA"> NAIA</label>
-        <label><input type="checkbox" value="JUCO"> JUCO</label>
-      </div>
-    </details>
+  <div class="drawer-content">
+    <p style="opacity:.7">Filters for news feed coming soon.</p>
   </div>
   <div class="drawer-footer">
-    <button id="filtersReset" class="icon-btn" style="padding:10px 14px;border:1px solid var(--line);border-radius:12px"><i class="ri-restart-line"></i>&nbsp;Reset Filters</button>
+    <button id="filtersReset" class="btn">Reset</button>
   </div>
 </aside>
 
-<aside class="drawer drawer-right" id="drawerAccount" style="display:none;">
+<aside class="drawer drawer-right" id="drawerAccount" style="display:none">
   <button class="icon-btn close-btn"><i class="ri-close-line"></i></button>
   <h3>ACCOUNT</h3>
   <div class="drawer-content">
-    <div class="auth-tabs">
-      <button class="auth-tab active" data-tab="signIn">Sign In</button>
-      <button class="auth-tab" data-tab="register">Register</button>
-    </div>
-    <div id="auth-forms-container" class="pad">
-      <form id="signInForm" class="auth-form active">
-        <div class="form-field"><label for="signInEmail">Email</label><input type="email" id="signInEmail" required></div>
-        <div class="form-field"><label for="signInPassword">Password</label><input type="password" id="signInPassword" required></div>
-        <button type="submit" class="auth-btn">Sign In</button>
-      </form>
-      <form id="registerForm" class="auth-form">
-        <div class="form-field"><label for="registerEmail">Email</label><input type="email" id="registerEmail" required></div>
-        <div class="form-field"><label for="registerPassword">Password</label><input type="password" id="registerPassword" required></div>
-        <button type="submit" class="auth-btn">Create Account</button>
-      </form>
-      <p id="authMessage"></p>
-    </div>
+    <p style="opacity:.7">Sign in is optional here.</p>
   </div>
 </aside>
 
-<!-- Scores Drawer (mobile) -->
-<aside class="drawer drawer-right" id="drawerScores" style="display:none;">
+<aside class="drawer drawer-right" id="drawerScores" style="display:none">
   <button class="icon-btn close-btn"><i class="ri-close-line"></i></button>
-  <h3>WEEKLY LINE SCORES</h3>
-  <div class="drawer-content">
-    <div id="scoresDrawerMount" class="scores-wrap"></div>
-  </div>
+  <h3 style="margin:14px 16px 0">WEEKLY LINE SCORES</h3>
+  <div id="scoresDrawerBody" class="drawer-content"></div>
 </aside>
 
+<!-- MAIN -->
 <main class="main container">
-  <div id="contentGrid">
-    <!-- Pro News -->
-    <section id="proCol" class="section" style="grid-area:pro;">
-      <div class="section-header">
-        <div class="section-title">PRO ALUMNI NEWS</div>
-        <div class="share-row" aria-hidden="true" style="opacity:.6;">
-          <!-- decorative to match ESPN vibe -->
-          <i class="ri-newspaper-line"></i>
-        </div>
-      </div>
-      <div id="proFeed" class="section-body">
-        <div class="news-feed" id="proNews"></div>
-      </div>
+  <div class="grid3">
+    <!-- Pro news -->
+    <section class="card" id="proNews">
+      <div class="sec-head">PRO ALUMNI NEWS <span class="icon-btn" id="refreshPro" title="Refresh"><i class="ri-refresh-line"></i></span></div>
+      <div class="scroller" id="proFeed"></div>
     </section>
 
-    <!-- College News -->
-    <section id="collegeCol" class="section" style="grid-area:college;">
-      <div class="section-header">
-        <div class="section-title">COLLEGE ALUMNI NEWS</div>
-        <div class="share-row" aria-hidden="true" style="opacity:.6;">
-          <i class="ri-graduation-cap-line"></i>
-        </div>
-      </div>
-      <div id="collegeFeed" class="section-body">
-        <div class="news-feed" id="collegeNews"></div>
-      </div>
+    <!-- College news -->
+    <section class="card" id="collegeNews">
+      <div class="sec-head">COLLEGE ALUMNI NEWS <span class="icon-btn" id="refreshCollege" title="Refresh"><i class="ri-refresh-line"></i></span></div>
+      <div class="scroller" id="collegeFeed"></div>
     </section>
 
-    <!-- Line Scores Column -->
-    <section id="scoresCol" class="section">
-      <div class="section-header">
-        <div class="section-title">WEEKLY LINE SCORES</div>
-        <div class="share-row" aria-hidden="true" style="opacity:.6;">
-          <i class="ri-bar-chart-box-line"></i>
-        </div>
-      </div>
-      <div class="scores-wrap" id="scoresMount"></div>
+    <!-- Line scores (independent scroll) -->
+    <section class="card" id="scoresCard">
+      <div class="sec-head">WEEKLY LINE SCORES <span class="icon-btn" id="refreshScores" title="Refresh"><i class="ri-refresh-line"></i></span></div>
+      <div class="scroller" id="scoresBody"></div>
     </section>
   </div>
 </main>
 
+<!-- Footer -->
 <footer class="site-footer">
   <a href="https://no-errors.com/collections/all-webgems" target="_blank" rel="noopener noreferrer">
     <img src="assets/img/partners/no-errors-banner.jpg" alt="Sponsor Banner">
   </a>
 </footer>
 
-<script type="module">
-/* ===================== Utilities ===================== */
+<script>
+/* ========= Inline Data (swap later with real endpoints) ========= */
+
+/* NEWS — one or more items per player. level: MLB/AAA/AA/College (NCAA-D1 etc.) */
+const NEWS = [
+  { id:"n1", title:"Bellinger belts 2 HR in slugfest vs. Orioles", player_display_name:"CODY BELLINGER", level:"MLB", team:"New York Yankees", publishedAt:"2025-09-21T20:15:00Z", image:"assets/img/now_players/cody_bellinger.jpg", url:"https://example.com/bellinger-2hr" },
+  { id:"n2", title:"Hamel racks up 9 K over six strong frames", player_display_name:"DOM HAMEL", level:"AAA", team:"Norfolk Tides", publishedAt:"2025-09-23T02:40:00Z", image:"assets/img/now_players/dom_hamel.jpg", url:"https://example.com/hamel-9k" },
+  { id:"n3", title:"Swift clubs go-ahead RBI; adds key smile", player_display_name:"DREW SWIFT", level:"AAA", team:"Las Vegas Aviators", publishedAt:"2025-09-22T01:30:00Z", image:"assets/img/now_players/drew_swift.jpg", url:"https://example.com/swift-rbi" },
+  { id:"n4", title:"Murphy notches first big-league save of the week", player_display_name:"PATRICK MURPHY", level:"INTERNATIONAL", team:"KT Wiz Suwon", publishedAt:"2025-09-22T04:50:00Z", image:"assets/img/now_players/patrick_murphy.jpg", url:"https://example.com/murphy-save" },
+  /* College */
+  { id:"n5", title:"Johnson twirls quality start: 7 IP, 1 ER", player_display_name:"MIKE JOHNSON", level:"NCAA-D1", team:"Northwestern", publishedAt:"2025-09-25T19:15:00Z", image:"assets/img/now_players/mike_johnson.jpg", url:"https://example.com/johnson-qs" },
+  { id:"n6", title:"Smith goes 3-for-4; extends on-base streak to 15", player_display_name:"RYAN KUCHERAK", level:"NCAA-D1", team:"Northwestern", publishedAt:"2025-09-21T03:00:00Z", image:"assets/img/now_players/ryan_kucherak.jpg", url:"https://example.com/kucherak-streak" }
+];
+
+/* LINE SCORES — pulled from your screenshot (3 columns of recent logs). 
+   Organized by week -> players -> games. status in {FINAL, IN PROGRESS, SCHEDULED, DNP} */
+const LINE_SCORES = [
+  {
+    weekLabel:"WEEK OF SEPTEMBER 21–27",
+    players:[
+      { name:"CODY BELLINGER", games:[
+        { status:"FINAL",     text:"9/21 – @ BAL | 2-3 | 2HR, 6RBI, K, SB" },
+        { status:"IN PROGRESS", text:"9/23 – vs. CWS | GAME IN PROGRESS" },
+        { status:"SCHEDULED", text:"9/24 – vs. CWS | 4:05PM" },
+        { status:"SCHEDULED", text:"9/25 – vs. CWS | 4:05PM" },
+        { status:"SCHEDULED", text:"9/26 – vs. BAL | 4:05PM" },
+        { status:"SCHEDULED", text:"9/27 – vs. BAL | 10:05AM" },
+      ]},
+      { name:"DREW SWIFT", games:[
+        { status:"DNP",       text:"9/21 – @ SAL | DNP" },
+        { status:"IN PROGRESS", text:"9/23 – vs. CWS | GAME IN PROGRESS" },
+        { status:"SCHEDULED", text:"9/24 – vs. CWS | 4:05PM" },
+        { status:"SCHEDULED", text:"9/25 – vs. CWS | 4:05PM" },
+        { status:"SCHEDULED", text:"9/26 – vs. BAL | 4:05PM" },
+        { status:"SCHEDULED", text:"9/27 – vs. BAL | 10:05AM" },
+      ]},
+      { name:"DOM HAMEL", games:[
+        { status:"FINAL",     text:"9/21 – @ NOR | 6.0 IP | 3H, 1ER, 9K, 1BB" },
+        { status:"SCHEDULED", text:"9/24 – @ NOR | 5:35PM" },
+        { status:"SCHEDULED", text:"9/29 – vs. SWB | 6:05PM" },
+      ]},
+      { name:"PATRICK MURPHY", games:[
+        { status:"FINAL",     text:"9/22 – vs. TEX | 1.0 IP | 0H, 0R, 2K • SV" },
+        { status:"SCHEDULED", text:"9/24 – @ SEA | 7:10PM" }
+      ]}
+    ]
+  },
+  {
+    weekLabel:"WEEK OF SEPTEMBER 14–20",
+    players:[
+      { name:"CODY BELLINGER", games:[
+        { status:"FINAL", text:"9/18 – vs. DET | 1-4 | HR, 2RBI" },
+        { status:"FINAL", text:"9/20 – @ BAL | 0-3 | BB" }
+      ]},
+      { name:"DREW SWIFT", games:[
+        { status:"FINAL", text:"9/16 – @ RIC | 2-5 | 2B, R" }
+      ]},
+      { name:"DOM HAMEL", games:[
+        { status:"DNP", text:"9/17 – vs. ROC | DNP" }
+      ]},
+      { name:"PATRICK MURPHY", games:[
+        { status:"FINAL", text:"9/19 – vs. HOU | 1.0 IP | 1H, 0R" }
+      ]}
+    ]
+  }
+];
+
+/* ========= Helpers ========= */
 const $ = s => document.querySelector(s);
 const $$ = s => Array.from(document.querySelectorAll(s));
-const debounce = (fn, ms=300)=>{ let t; return (...a)=>{ clearTimeout(t); t=setTimeout(()=>fn(...a),ms); }; };
-function firstNameOf(full){ return String(full||'').trim().split(/\s+/)[0] || ''; }
-function openWin(u){ window.open(u,'_blank','noopener,noreferrer'); }
+const encode = s => encodeURIComponent(s||"");
 
-/* ===================== Inline News (mock) ===================== */
-/* One+ story per player; levels used to split Pro vs College. */
-const INLINE_NEWS = [
-  {
-    id:"n1", level:"MLB", player_display_name:"Cody Bellinger",
-    title:"Bellinger belts 2 HR in slugfest vs. Orioles",
-    url:"https://example.com/game/bellinger-hr",
-    image:"assets/img/now_players/cody_bellinger.jpg",
-    publishedAt:"2025-09-21T20:15:00-07:00",
-    source:"MLB.com"
-  },
-  {
-    id:"n2", level:"MiLB", player_display_name:"Drew Swift",
-    title:"Swift dazzles on defense, adds key RBI single",
-    url:"https://example.com/game/drew-swift-rbi",
-    image:"assets/img/now_players/drew_swift.jpg",
-    publishedAt:"2025-09-22T18:30:00-07:00",
-    source:"MiLB.com"
-  },
-  {
-    id:"n3", level:"MiLB", player_display_name:"Dom Hamel",
-    title:"Hamel racks up 9 Ks over six strong frames",
-    url:"https://example.com/game/dom-hamel-9k",
-    image:"assets/img/now_players/dom_hamel.jpg",
-    publishedAt:"2025-09-23T19:40:00-07:00",
-    source:"ESPN"
-  },
-  {
-    id:"n4", level:"MLB", player_display_name:"Patrick Murphy",
-    title:"Murphy notches first big-league save of the week",
-    url:"https://example.com/game/patrick-murphy-save",
-    image:"assets/img/now_players/patrick_murphy.jpg",
-    publishedAt:"2025-09-24T21:05:00-07:00",
-    source:"The Athletic"
-  },
-  {
-    id:"n5", level:"NCAA-D1", player_display_name:"Tyler Smith",
-    title:"Smith goes 3-for-4; extends on-base streak to 15",
-    url:"https://example.com/college/tyler-smith-streak",
-    image:"assets/img/hs_players/tyler_smith.jpg",
-    publishedAt:"2025-09-21T14:00:00-07:00",
-    source:"School SID"
-  },
-  {
-    id:"n6", level:"NCAA-D1", player_display_name:"Jake Johnson",
-    title:"Johnson twirls quality start; 7 IP, 1 ER",
-    url:"https://example.com/college/jake-johnson-qs",
-    image:"assets/img/hs_players/jake_johnson.jpg",
-    publishedAt:"2025-09-25T12:15:00-07:00",
-    source:"D1Baseball"
+/* Theme */
+(function setupTheme(){
+  const btn = $('#theme-toggle'); if(!btn) return;
+  const apply=()=>{ const t=localStorage.getItem('theme'); document.body.classList.toggle('light-theme', t==='light'); btn.querySelector('i')?.classList.toggle('ri-moon-line', t==='light'); btn.querySelector('i')?.classList.toggle('ri-sun-line', t!=='light'); };
+  btn.addEventListener('click',()=>{ const next = document.body.classList.contains('light-theme') ? 'dark' : 'light'; localStorage.setItem('theme', next); apply(); });
+  apply();
+})();
+
+/* Drawers & splash */
+(function setupUI(){
+  const closeAll=()=>document.body.classList.remove('drawer-left-open','drawer-right-open');
+  $('#btnMenu')?.addEventListener('click',()=>{ document.body.classList.add('drawer-left-open'); });
+  $('#openSearch')?.addEventListener('click',()=>{ document.body.classList.add('drawer-left-open'); });
+  $('#openFilters')?.addEventListener('click',()=>{ $('#drawerFilters').style.display='flex'; $('#drawerScores').style.display='none'; document.body.classList.add('drawer-right-open'); });
+  $('#btnAccount')?.addEventListener('click',()=>{ $('#drawerAccount').style.display='flex'; $('#drawerFilters').style.display='none'; $('#drawerScores').style.display='none'; document.body.classList.add('drawer-right-open'); });
+  $('#openScores')?.addEventListener('click',()=>{ $('#drawerScores').style.display='flex'; $('#drawerFilters').style.display='none'; document.body.classList.add('drawer-right-open'); });
+  $('.drawer-mask')?.addEventListener('click',closeAll);
+  $$('.close-btn').forEach(b=>b.addEventListener('click',closeAll));
+  // splash once per session
+  const splash = $('#splashScreen');
+  if (sessionStorage.getItem('splashShown')) splash.style.display='none';
+  else {
+    setTimeout(()=>{ splash.classList.add('is-hidden'); splash.addEventListener('transitionend', ()=> splash.style.display='none', {once:true}); }, 1600);
+    sessionStorage.setItem('splashShown','true');
   }
-];
+})();
 
-/* ===================== Inline Scores (structured) ===================== */
-/* Organized by Week -> Player -> Games (Final/In Progress/Scheduled/DNP) */
-const INLINE_SCORES = [
-  {
-    label:"Week of September 21–27",
-    players:[
-      { name:"CODY BELLINGER", games:[
-        { date:"9/21", opp:"@ BAL", status:"FINAL", line:"2-3 | 2HR, 6RBI, K, SB" },
-        { date:"9/23", opp:"vs. CWS", status:"IN_PROGRESS" },
-        { date:"9/24", opp:"vs. CWS", status:"SCHEDULED", time:"4:05PM" },
-        { date:"9/25", opp:"vs. CWS", status:"SCHEDULED", time:"4:05PM" },
-        { date:"9/26", opp:"vs. BAL", status:"SCHEDULED", time:"4:05PM" },
-        { date:"9/27", opp:"vs. BAL", status:"SCHEDULED", time:"10:05AM" }
-      ]},
-      { name:"DREW SWIFT", games:[
-        { date:"9/21", opp:"@ SAL", status:"DNP" },
-        { date:"9/23", opp:"vs. CWS", status:"IN_PROGRESS" },
-        { date:"9/24", opp:"vs. CWS", status:"SCHEDULED", time:"4:05PM" },
-        { date:"9/25", opp:"vs. CWS", status:"SCHEDULED", time:"4:05PM" },
-        { date:"9/26", opp:"vs. BAL", status:"SCHEDULED", time:"4:05PM" },
-        { date:"9/27", opp:"vs. BAL", status:"SCHEDULED", time:"10:05AM" }
-      ]},
-      { name:"DOM HAMEL", games:[
-        { date:"9/21", opp:"@ NOR", status:"FINAL", line:"6.0 IP | 3H, 1ER, 9K, 1BB" },
-        { date:"9/24", opp:"@ NOR", status:"SCHEDULED", time:"5:35PM" },
-        { date:"9/29", opp:"vs. SWB", status:"SCHEDULED", time:"6:05PM" }
-      ]},
-      { name:"PATRICK MURPHY", games:[
-        { date:"9/22", opp:"vs. TEX", status:"FINAL", line:"1.0 IP | 0H, 0R, 2K • SV" },
-        { date:"9/25", opp:"@ SEA", status:"SCHEDULED", time:"7:10PM" }
-      ]}
-    ]
-  },
-  {
-    label:"Week of September 14–20",
-    players:[
-      { name:"CODY BELLINGER", games:[
-        { date:"9/18", opp:"vs. DET", status:"FINAL", line:"1-4 | HR, 2RBI" },
-        { date:"9/20", opp:"@ BAL", status:"FINAL", line:"0-3 | BB" }
-      ]},
-      { name:"DREW SWIFT", games:[
-        { date:"9/16", opp:"@ RIC", status:"FINAL", line:"2-5 | 2B, R" }
-      ]},
-      { name:"DOM HAMEL", games:[
-        { date:"9/17", opp:"vs. ROC", status:"DNP" }
-      ]},
-      { name:"PATRICK MURPHY", games:[
-        { date:"9/19", opp:"vs. HOU", status:"FINAL", line:"1.0 IP | 1H, 0R" }
-      ]}
-    ]
-  }
-];
-
-/* ===================== Theme / Drawers / Auth (kept) ===================== */
-function setupTheme(){
-  const themeToggle=$('#theme-toggle'); if(!themeToggle) return;
-  const body=document.body, icon=themeToggle.querySelector('i');
-  const applyTheme=()=>{
-    const saved=localStorage.getItem('theme');
-    if (saved==='light'){ body.classList.add('light-theme'); icon?.classList.replace('ri-sun-line','ri-moon-line'); }
-    else { body.classList.remove('light-theme'); icon?.classList.replace('ri-moon-line','ri-sun-line'); }
-  };
-  themeToggle.addEventListener('click', ()=>{
-    body.classList.toggle('light-theme');
-    localStorage.setItem('theme', body.classList.contains('light-theme') ? 'light' : 'dark');
-    applyTheme();
-  });
-  applyTheme();
-}
-
-function closeDrawers(){ document.body.classList.remove('drawer-left-open','drawer-right-open','drawer-open'); }
-function setupEventListeners(){
-  $('#btnMenu')?.addEventListener('click',()=>{ document.body.classList.add('drawer-left-open','drawer-open'); });
-  $('#openSearch')?.addEventListener('click',()=>{ document.body.classList.add('drawer-left-open','drawer-open'); });
-  $('#openFilters')?.addEventListener('click',()=>{
-    $('#drawerFilters').style.display='flex';
-    $('#drawerAccount').style.display='none';
-    $('#drawerScores').style.display='none';
-    document.body.classList.add('drawer-right-open','drawer-open');
-  });
-  $('#btnAccount')?.addEventListener('click',()=>{
-    $('#drawerAccount').style.display='flex';
-    $('#drawerFilters').style.display='none';
-    $('#drawerScores').style.display='none';
-    document.body.classList.add('drawer-right-open','drawer-open');
-  });
-  $('#openScores')?.addEventListener('click',()=>{
-    $('#drawerScores').style.display='flex';
-    $('#drawerFilters').style.display='none';
-    $('#drawerAccount').style.display='none';
-    document.body.classList.add('drawer-right-open','drawer-open');
-  });
-  $$('.close-btn').forEach(b=>b.addEventListener('click',closeDrawers));
-  $('.drawer-mask')?.addEventListener('click',closeDrawers);
-
-  // Filters
-  $('#filtersReset')?.addEventListener('click',()=>{ $('#filterKeyword').value=''; $$('#filterLevels input[type=checkbox]').forEach(cb=>cb.checked=false); renderNews(); });
-  $('#filtersReset2')?.addEventListener('click',()=>{ $('#filterKeyword').value=''; $$('#filterLevels input[type=checkbox]').forEach(cb=>cb.checked=false); renderNews(); });
-  $('#filterKeyword')?.addEventListener('input',debounce(renderNews,200));
-  $('#filterLevels')?.addEventListener('change',e=>{
-    if (e.target.classList.contains('select-all')){
-      const on = e.target.checked;
-      e.target.closest('.filter-options')?.querySelectorAll('input[type="checkbox"]:not(.select-all)').forEach(cb=>cb.checked=on);
-    }
-    renderNews();
-  });
-}
-
-function setupAuth(){
-  if (!window.firebaseAuth){ console.warn("Firebase auth script not ready yet, skipping auth setup."); return; }
-  const { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } = window.firebaseAuth;
-  const auth = window.auth;
-  const signInForm=$('#signInForm'), registerForm=$('#registerForm'), signOutBtn=$('#btnSignOut'), authMessage=$('#authMessage');
-
-  signInForm?.addEventListener('submit', async e=>{
-    e.preventDefault();
-    try{
-      await signInWithEmailAndPassword(auth, $('#signInEmail').value, $('#signInPassword').value);
-      authMessage.textContent='Sign in successful!'; authMessage.className='success';
-      setTimeout(()=>{ closeDrawers(); authMessage.textContent=''; },1200);
-    }catch(err){ authMessage.textContent=err.message; authMessage.className='error'; }
-  });
-  registerForm?.addEventListener('submit', async e=>{
-    e.preventDefault();
-    try{
-      await createUserWithEmailAndPassword(auth, $('#registerEmail').value, $('#registerPassword').value);
-      authMessage.textContent='Registration successful!'; authMessage.className='success';
-      setTimeout(()=>{ closeDrawers(); authMessage.textContent=''; },1200);
-    }catch(err){ authMessage.textContent=err.message; authMessage.className='error'; }
-  });
-  signOutBtn?.addEventListener('click', async ()=>{ await signOut(auth); });
-
-  document.addEventListener('authStateChanged', ({detail})=>{
-    const { user } = detail;
-    const accountBtn=$('#btnAccount'), soBtn=$('#btnSignOut');
-    if (user && !user.isAnonymous){ accountBtn.style.display='none'; soBtn.style.display='inline-flex'; }
-    else { accountBtn.style.display='inline-flex'; soBtn.style.display='none'; }
-  });
-}
-
-/* ===================== News Rendering ===================== */
-function passesFilters(item){
-  const q = ($('#filterKeyword')?.value || '').trim().toLowerCase();
-  const chosen = $$('#filterLevels input:checked:not(.select-all)').map(cb=>cb.value);
-  const text = (item.title + ' ' + item.player_display_name + ' ' + item.source).toLowerCase();
-  const keywordOk = !q || text.includes(q);
-  const levelOk = !chosen.length || chosen.includes(item.level);
-  return keywordOk && levelOk;
-}
-function newsCardHTML(n){
-  const name = n.player_display_name || '';
-  const first = firstNameOf(name);
-  const headline = n.title || 'Headline';
-  const img = n.image || 'assets/img/yatstats-logo.png';
-  const when = n.publishedAt ? new Date(n.publishedAt).toLocaleString() : '';
-  const url = n.url || location.href;
-
-  // share text pattern: We See Where YAT, <FIRSTNAME>! #YATABOY<FIRSTNAME>
+/* Render news */
+function buildNewsItem(n){
+  const first = (n.player_display_name||'').split(' ')[0];
   const shareText = `We See Where YAT, ${first}! #YATABOY${first}`;
-  const xUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(url)}`;
-  const fbUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}&quote=${encodeURIComponent(shareText)}`;
-
-  const onCopy = `navigator.clipboard.writeText('${(shareText+' '+url).replace(/'/g,"\\'")}').then(()=>{this.classList.add('copied'); setTimeout(()=>this.classList.remove('copied'),1200);}); return false;`;
-  const onWebShare = `
-    if(navigator.share){
-      navigator.share({title:${JSON.stringify(headline)}, text:${JSON.stringify(shareText)}, url:${JSON.stringify(url)}}).catch(()=>{});
-    } else { window.open('${xUrl}','_blank','noopener'); }
-    return false;`;
-
+  const tw = `https://x.com/intent/tweet?text=${encode(shareText)}&url=${encode(n.url)}`;
+  const fb = `https://www.facebook.com/sharer/sharer.php?u=${encode(n.url)}`;
+  const ml = `mailto:?subject=${encode(n.title)}&body=${encode(shareText + ' ' + n.url)}`;
   return `
-  <article class="news-card">
-    <a class="news-thumb" href="${url}" target="_blank" rel="noopener">
-      <img src="${img}" alt="${headline}" onerror="this.style.display='none'; this.closest('.news-thumb').style.background='linear-gradient(45deg,#111,#222)';">
-    </a>
-    <div class="news-content">
-      <a class="news-headline" href="${url}" target="_blank" rel="noopener">${headline}</a>
-      <div class="news-meta">
-        <div class="meta-left" title="${when}">
-          <i class="ri-time-line" aria-hidden="true"></i><span>${when}</span>
-        </div>
-        <div class="share-row">
-          <!-- icons only -->
-          <button class="share-btn" aria-label="Share (Web Share)" onclick="${onWebShare}"><i class="ri-share-forward-line"></i></button>
-          <button class="share-btn" aria-label="Share on X" onclick="window.open('${xUrl}','_blank','noopener')"><i class="ri-twitter-x-line"></i></button>
-          <button class="share-btn" aria-label="Share on Facebook" onclick="window.open('${fbUrl}','_blank','noopener')"><i class="ri-facebook-circle-line"></i></button>
-          <button class="share-btn" aria-label="Copy caption & link" onclick="${onCopy}"><i class="ri-link-m"></i></button>
+    <article class="news-item">
+      <img class="news-img" src="${n.image||'https://picsum.photos/seed/'+encode(n.id)+'/300/200'}" alt="">
+      <div>
+        <div class="news-title">${n.title}</div>
+        <div class="news-meta">${n.team||''} • ${new Date(n.publishedAt||Date.now()).toLocaleString()}</div>
+        <div class="news-meta" style="margin-top:2px;opacity:.9">${n.player_display_name||''}</div>
+        <div class="news-actions">
+          <a class="icon-pill" href="${n.url}" target="_blank" rel="noopener" title="Read"><i class="ri-external-link-line"></i></a>
+          <a class="icon-pill" href="${tw}" target="_blank" rel="noopener" title="Share on X"><i class="ri-twitter-x-line"></i></a>
+          <a class="icon-pill" href="${fb}" target="_blank" rel="noopener" title="Share on Facebook"><i class="ri-facebook-circle-line"></i></a>
+          <a class="icon-pill" href="${ml}" title="Share via Email"><i class="ri-mail-line"></i></a>
         </div>
       </div>
-    </div>
-  </article>`;
+    </article>`;
 }
 function renderNews(){
-  const pro = INLINE_NEWS.filter(n=>['MLB','MiLB','INTERNATIONAL','INDY'].includes(n.level)).filter(passesFilters)
-    .sort((a,b)=> new Date(b.publishedAt||0)-new Date(a.publishedAt||0));
-  const college = INLINE_NEWS.filter(n=>/^NCAA|NAIA|JUCO/.test(n.level)).filter(passesFilters)
-    .sort((a,b)=> new Date(b.publishedAt||0)-new Date(a.publishedAt||0));
-
-  $('#proNews').innerHTML = pro.length ? pro.map(newsCardHTML).join('') : `<p style="color:var(--muted);">No pro headlines match.</p>`;
-  $('#collegeNews').innerHTML = college.length ? college.map(newsCardHTML).join('') : `<p style="color:var(--muted);">No college headlines match.</p>`;
+  const pro = NEWS.filter(n => (n.level||'').toUpperCase().includes('MLB') || (['AAA','AA','HIGH-A','A+','LOW-A','A','INTERNATIONAL','INDY'].includes((n.level||'').toUpperCase())));
+  const col = NEWS.filter(n => (n.level||'').toUpperCase().includes('NCAA') || (n.level||'').toUpperCase()==='JUCO' || (n.level||'').toUpperCase()==='NAIA');
+  pro.sort((a,b)=> new Date(b.publishedAt)-new Date(a.publishedAt));
+  col.sort((a,b)=> new Date(b.publishedAt)-new Date(a.publishedAt));
+  $('#proFeed').innerHTML = pro.map(buildNewsItem).join('') || `<p style="opacity:.7">No pro headlines yet.</p>`;
+  $('#collegeFeed').innerHTML = col.map(buildNewsItem).join('') || `<p style="opacity:.7">No college headlines yet.</p>`;
 }
 
-/* ===================== Scores Rendering ===================== */
-function badgeClass(status){
-  const s = (status||'').toUpperCase();
-  if (s==='FINAL') return 'final';
-  if (s==='IN_PROGRESS') return 'ip';
-  if (s==='SCHEDULED') return 'scheduled';
-  if (s==='DNP') return 'dnp';
-  return '';
-}
-function gameLineHTML(g){
-  const s = (g.status||'').toUpperCase();
-  let right = '';
-  if (s==='FINAL' && g.line){ right = g.line; }
-  else if (s==='IN_PROGRESS'){ right = 'GAME IN PROGRESS'; }
-  else if (s==='SCHEDULED'){ right = g.time || ''; }
-  else if (s==='FINAL' && !g.line){ right = 'DNP'; }
-  else if (s==='DNP'){ right = 'DNP'; }
-
-  return `
-    <div class="game-line">
-      <span class="badge ${badgeClass(s)}">${s.replace('_',' ')}</span>
-      <div class="game-text">${g.date}&nbsp;–&nbsp;${g.opp} ${right?`| ${right}`:''}</div>
-    </div>`;
-}
-function renderScoresInto(targetSel){
-  const mount = typeof targetSel==='string' ? $(targetSel) : targetSel;
-  if (!mount) return;
-  mount.innerHTML = INLINE_SCORES.map(week=>{
+/* Render line scores (target container) */
+function renderScores(container){
+  const el = typeof container==='string' ? $(container) : container;
+  if (!el) return;
+  el.innerHTML = LINE_SCORES.map(week=>{
     const playersHTML = week.players.map(p=>{
-      const games = (p.games||[]).map(gameLineHTML).join('');
-      return `<div class="player-block"><div class="player-name">${p.name}</div>${games}</div>`;
+      const rows = p.games.map(g=>{
+        const cls = (g.status==='FINAL'?'final':g.status==='IN PROGRESS'?'progress':g.status==='SCHEDULED'?'scheduled':'dnp');
+        return `<div class="game-row"><span class="badge ${cls}">${g.status}</span><span class="game-text">${g.text}</span></div>`;
+      }).join('');
+      return `<div class="player-block"><div class="player-name">${p.name}</div>${rows}</div>`;
     }).join('');
-    return `<div class="week">
-      <div class="week-header">${week.label}</div>
-      ${playersHTML}
-    </div>`;
+    return `<div class="week-block"><div class="week-head">${week.weekLabel}</div>${playersHTML}</div>`;
   }).join('');
 }
 
-/* ===================== Live Search (left drawer) ===================== */
-/* For now, wire it to news players so the demo works */
-function makeHit(name, level){
-  const el=document.createElement('div'); el.className='live-hit';
-  el.innerHTML=`<div style="width:36px;height:36px;border-radius:6px;background:#333;display:grid;place-items:center;">🧢</div>
-                <div><div style="font-weight:700">${name}</div>
-                <div style="opacity:.7;font-size:.92em">${level||''}</div></div>`;
-  el.onclick=()=>{
-    // quick filter to this player
-    $('#filterKeyword').value = name;
-    renderNews();
-    closeDrawers();
-  };
-  return el;
-}
-function liveSearch(){
-  const q=($('#playerSearch')?.value||'').trim().toLowerCase();
-  const box=$('#liveResults'); if(!box) return;
-  if(!q){ box.innerHTML=''; return; }
-  const players = [...new Set(INLINE_NEWS.map(n=>n.player_display_name))];
-  const hits = players.filter(n=>n.toLowerCase().includes(q)).slice(0,25)
-    .map(n=>{
-      const level = INLINE_NEWS.find(x=>x.player_display_name===n)?.level || '';
-      return makeHit(n, level);
-    });
-  box.innerHTML=''; hits.forEach(h=>box.appendChild(h));
-}
-
-/* ===================== Boot ===================== */
+/* Init */
 document.addEventListener('DOMContentLoaded', ()=>{
-  // Splash once per session
-  const splash = $('#splashScreen');
-  if (sessionStorage.getItem('splashShown')) {
-    if (splash) splash.style.display='none';
-  } else {
-    if (splash){
-      setTimeout(()=>{
-        splash.classList.add('is-hidden');
-        splash.addEventListener('transitionend', (e)=>{ if(e.target===splash) splash.style.display='none'; }, {once:true});
-      }, 2000);
-    }
-    sessionStorage.setItem('splashShown','true');
-  }
-
-  setupTheme();
-  setupEventListeners();
-  setupAuth();
-
-  // Initial renders
   renderNews();
-  renderScoresInto('#scoresMount');
-  renderScoresInto('#scoresDrawerMount');
-
-  // Hookups
-  $('#playerSearch')?.addEventListener('input',debounce(liveSearch,150));
+  renderScores('#scoresBody');     // desktop/tablet column
+  renderScores('#scoresDrawerBody'); // mobile drawer
 });
 </script>
 </body>
