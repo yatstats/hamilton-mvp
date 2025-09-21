@@ -1,86 +1,260 @@
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <title>Line Scores Test</title>
-  <style>
-    body { font-family: Arial, sans-serif; background:#111; color:#eee; margin:20px; }
-    .week-block { margin-bottom:30px; }
-    .week-title { font-weight:700; font-size:18px; margin:10px 0; border-bottom:1px solid #444; padding-bottom:4px; }
-    .player-block { margin:12px 0; }
-    .player-name { font-weight:700; margin-bottom:4px; color:#ffd700; }
-    .game-line { margin-left:12px; font-size:14px; line-height:1.4; }
-  </style>
-</head>
-<body>
-  <h1>Weekly Line Scores</h1>
-  <div id="lineScores">Loading…</div>
+<!-- ===========================
+FILE: assets/js/lineScores.js
+ES module to render weekly line scores from Google Sheets
+================================ -->
+<script type="module" id="__linescores_module__">
+/**
+ * initLineScores({
+ *   sheetId: string,                       // Google Sheet ID
+ *   sheetName: 'STATS_SEASON_TOTALS',      // tab name
+ *   rangeBody: 'AU2:CD100',                // player rows
+ *   rangeHeader: 'AU1:CD1',                // date row
+ *   container: '#lineScores',              // CSS selector or Element
+ *   weeks: 1,                              // how many weeks to show (1..4)
+ *   timezone: 'America/Phoenix'            // for dates/labels
+ * })
+ *
+ * Exports: window.initLineScores
+ */
 
-<script>
-const CSV_URL = "https://docs.google.com/spreadsheets/d/1yUNQH9NbpKwOOwH9blf5ZqQfmft796sQ1ldgqhXP4uA/gviz/tq?tqx=out:csv&sheet=STATS_SEASON_TOTALS&range=AU2:CD100";
+(function(){
+  const CSV_SPLIT = /,(?=(?:[^"]*"[^"]*")*[^"]*$)/;
 
-function parseCSV(text) {
-  return text.trim().split(/\r?\n/).map(r => r.split(",").map(c => c.replace(/^"|"$/g,"")));
-}
+  function _qs(sel){ return (typeof sel==='string') ? document.querySelector(sel) : sel; }
 
-function groupByWeek(rows) {
-  const weeks = {};
-  rows.forEach(r => {
-    const [week, player, date, opponent, line, status] = r;
-    if (!week || !player) return;
-    if (!weeks[week]) weeks[week] = {};
-    if (!weeks[week][player]) weeks[week][player] = [];
-    let display;
-    if (status === "In Progress") {
-      display = `${date} - ${opponent} | GAME IN PROGRESS`;
-    } else if (status === "Scheduled") {
-      display = `${date} - ${opponent}`;
-    } else if (status === "DNP") {
-      display = `${date} - ${opponent} | DNP`;
-    } else {
-      display = `${date} - ${opponent} | ${line}`;
-    }
-    weeks[week][player].push(display);
-  });
-  return weeks;
-}
-
-async function loadLineScores() {
-  try {
-    const res = await fetch(CSV_URL);
-    const text = await res.text();
-    const rows = parseCSV(text).filter(r => r.length >= 6);
-    if (!rows.length) {
-      document.getElementById("lineScores").innerHTML = "<p>No line score data in AU2:CD100.</p>";
-      return;
-    }
-    const grouped = groupByWeek(rows);
-    const container = document.getElementById("lineScores");
-    container.innerHTML = "";
-    Object.keys(grouped).sort().forEach(week => {
-      const wDiv = document.createElement("div");
-      wDiv.className = "week-block";
-      wDiv.innerHTML = `<div class="week-title">Week of ${week}</div>`;
-      Object.keys(grouped[week]).forEach(player => {
-        const pDiv = document.createElement("div");
-        pDiv.className = "player-block";
-        pDiv.innerHTML = `<div class="player-name">${player}</div>`;
-        grouped[week][player].forEach(g => {
-          const gDiv = document.createElement("div");
-          gDiv.className = "game-line";
-          gDiv.textContent = g;
-          pDiv.appendChild(gDiv);
-        });
-        wDiv.appendChild(pDiv);
-      });
-      container.appendChild(wDiv);
+  function parseCSV(text){
+    const rows = text.trim().split(/\r?\n/).map(line=>{
+      return line.split(CSV_SPLIT).map(c=>c.replace(/^"|"$/g,'').trim());
     });
-  } catch (err) {
-    document.getElementById("lineScores").innerHTML = `<p style="color:red">Error loading line scores: ${err.message}</p>`;
+    return rows;
   }
-}
 
-loadLineScores();
+  function fmtDate(d, tz='America/Phoenix', opts={ month:'numeric', day:'numeric'}){
+    return new Intl.DateTimeFormat('en-US', { timeZone: tz, ...opts }).format(d);
+  }
+
+  function startOfWeek_Sat(d){
+    // “Week of Sep 21–27” style using Saturday→Friday window
+    const x = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+    const day = x.getDay();             // 0=Sun ... 6=Sat
+    const diff = (day===6) ? 0 : (day+1); // days since last Sat
+    x.setDate(x.getDate() - diff);
+    x.setHours(0,0,0,0);
+    return x;
+  }
+  function addDays(d, n){ const x = new Date(d); x.setDate(x.getDate()+n); return x; }
+  function sameDay(a,b){ return a.getFullYear()===b.getFullYear() && a.getMonth()===b.getMonth() && a.getDate()===b.getDate(); }
+
+  function buildWeekWindows(today, weeks){
+    const windows = [];
+    let anchor = startOfWeek_Sat(today); // current week (Sat..Fri)
+    for(let i=0;i<weeks;i++){
+      const start = addDays(anchor, -7*i);
+      const end   = addDays(start, 6);
+      windows.push({ start, end });
+    }
+    return windows;
+  }
+
+  function makeWeekLabel(win, tz){
+    const s = fmtDate(win.start, tz, { month:'long', day:'numeric'});
+    const e = fmtDate(win.end, tz, { month:'numeric', day:'numeric'});
+    return `Week of ${s}–${e}`;
+  }
+
+  function dateFromMD(mmdd, baseYear){
+    // mmdd like "9/21" -> Date in current season year
+    const [m,d] = mmdd.split('/').map(n=>parseInt(n,10));
+    if (!m || !d) return null;
+    return new Date(baseYear, m-1, d);
+  }
+
+  function buildGameLine(mmdd, cellValue, today, tz){
+    const d = dateFromMD(mmdd, today.getFullYear());
+    if (!d) return null;
+
+    const isPast = d < addDays(today, 0) && !sameDay(d,today);
+    const isFuture = d > today;
+    const isToday = sameDay(d, today);
+
+    // Normalize the cell text
+    const v = (cellValue||'').trim();
+
+    // Decide suffix
+    let suffix;
+    if (v){
+      // We already have a line score (ex: "2-3 | 2HR, 6RBI")
+      suffix = v;
+    } else if (isFuture || isToday){
+      // No stats yet ⇒ scheduled game time placeholder
+      // You can pipe actual time from another sheet later; leaving time off for now
+      suffix = isToday ? 'GAME IN PROGRESS' : ''; // if you prefer, leave blank for future
+    } else {
+      // Past and no stats recorded ⇒ DNP
+      suffix = 'DNP';
+    }
+
+    // Build the line:
+    const when = fmtDate(d, tz, { month:'numeric', day:'numeric'});
+    // For demo, opponent/home/away can be injected later; prefix “@” as a neutral placeholder
+    const vs = '@ ???';
+    const left = `${when} - ${vs}`;
+    return { date:d, text: suffix ? `${left} | ${suffix}` : left };
+  }
+
+  async function fetchCSV(sheetId, sheetName, range){
+    const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(sheetName)}&range=${encodeURIComponent(range)}`;
+    const res = await fetch(url, { cache:'no-store' });
+    if (!res.ok) throw new Error(`Google Sheets HTTP ${res.status}`);
+    return await res.text();
+  }
+
+  function htmlEscape(s){ return String(s).replace(/[&<>"]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m])); }
+
+  function render(container, grouped, tz){
+    const root = _qs(container);
+    if (!root){ console.error('lineScores: container not found'); return; }
+    root.innerHTML = '';
+    root.classList.add('ys-linescores-root');
+
+    grouped.forEach(group=>{
+      const weekEl = document.createElement('section');
+      weekEl.className = 'ys-week';
+
+      weekEl.innerHTML = `<h4 class="ys-week-title">${htmlEscape(group.label)}</h4>`;
+      group.players.forEach(p=>{
+        const block = document.createElement('div');
+        block.className = 'ys-player';
+        const lines = p.lines.map(l => `<li>${htmlEscape(l.text)}</li>`).join('');
+        block.innerHTML = `
+          <div class="ys-player-name">${htmlEscape(p.name)}</div>
+          <ul class="ys-games">
+            ${lines || '<li class="ys-empty">No games this week</li>'}
+          </ul>
+        `;
+        weekEl.appendChild(block);
+      });
+      root.appendChild(weekEl);
+    });
+  }
+
+  async function initLineScores({
+    sheetId,
+    sheetName='STATS_SEASON_TOTALS',
+    rangeBody='AU2:CD100',
+    rangeHeader='AU1:CD1',
+    container='#lineScores',
+    weeks=1,
+    timezone='America/Phoenix'
+  }){
+    const root = _qs(container);
+    if (root){ root.innerHTML = '<div class="ys-loading">Loading…</div>'; }
+
+    // 1) Fetch header row for dates
+    const [hdrCSV, bodyCSV] = await Promise.all([
+      fetchCSV(sheetId, sheetName, rangeHeader),
+      fetchCSV(sheetId, sheetName, rangeBody)
+    ]);
+
+    const hdrRows = parseCSV(hdrCSV);
+    const header = hdrRows[0] || []; // AU1..CD1 are mm/dd labels
+
+    const body = parseCSV(bodyCSV);   // rows: [PlayerName, AU, AV, ..., CD]
+    const today = new Date();
+
+    // 2) Build week windows (Sat–Fri), most-recent first
+    const windows = buildWeekWindows(today, weeks);
+
+    // 3) For each week, build: [{ label, players:[{ name, lines:[{date, text}]}] }]
+    const grouped = windows.map(win=>{
+      // map mm/dd headers within this window to their column indexes
+      const hdrMap = header.map((mmdd, idx) => {
+        const d = dateFromMD(mmdd, today.getFullYear());
+        return { idx, mmdd, date:d };
+      }).filter(h => h.date && h.date >= win.start && h.date <= win.end)
+        .sort((a,b)=> a.date - b.date); // chronological within the week
+
+      const players = [];
+      for (const row of body){
+        if (!row.length) continue;
+        const name = (row[0]||'').trim();
+        if (!name) continue;
+
+        const lines = [];
+        for (const h of hdrMap){
+          const cell = row[h.idx+1] ?? ''; // +1 because col0 is Player Name
+          const line = buildGameLine(h.mmdd, cell, today, timezone);
+          if (line) lines.push(line);
+        }
+
+        // Only include players who have **some** content in this window
+        if (lines.length){
+          players.push({
+            name,
+            lines: lines.sort((a,b)=> a.date - b.date)
+          });
+        }
+      }
+
+      // Sort players A→Z
+      players.sort((a,b)=> a.name.localeCompare(b.name));
+
+      return { label: makeWeekLabel(win, timezone), players };
+    });
+
+    render(container, grouped, timezone);
+  }
+
+  // Basic styles (tiny, safe to include in-page once)
+  const STYLE_ID = 'ys-linescores-style';
+  if (!document.getElementById(STYLE_ID)){
+    const css = `
+      .ys-linescores-root{max-height:100%;overflow:auto;padding:10px}
+      .ys-loading{padding:10px;opacity:.8}
+      .ys-week{margin:12px 0 18px}
+      .ys-week-title{margin:0 0 8px;font:700 15px "Bebas Neue",system-ui;letter-spacing:.04em}
+      .ys-player{margin:8px 0 12px}
+      .ys-player-name{font:700 14px/1.1 "Bebas Neue",system-ui;letter-spacing:.04em;margin-bottom:4px}
+      .ys-games{list-style:none;margin:0;padding:0 0 0 2px}
+      .ys-games li{padding:3px 0;border-bottom:1px solid rgba(255,255,255,.08)}
+      .ys-games li:last-child{border-bottom:none}
+      .ys-empty{opacity:.6;font-style:italic}
+      @media (prefers-color-scheme: light){
+        .ys-games li{border-bottom:1px solid rgba(0,0,0,.08)}
+      }
+    `;
+    const tag = document.createElement('style');
+    tag.id = STYLE_ID;
+    tag.textContent = css;
+    document.head.appendChild(tag);
+  }
+
+  // expose globally
+  window.initLineScores = initLineScores;
+})();
 </script>
-</body>
-</html>
+
+<!-- ===========================
+USAGE: paste this where you want the scores to appear
+- Keeps your “independent scroll” behavior if this column has a fixed height
+- On desktop: put this in column 3
+- On mobile: mount this same container inside the right drawer
+================================ -->
+<!-- Example container -->
+<div id="lineScores" style="max-height:calc(100vh - 180px);overflow:auto;"></div>
+
+<!-- Kick it off (REAL Google Sheet) -->
+<script type="module">
+  // Hamilton YATSTATS sheet
+  const SHEET_ID = '1yUNQH9NbpKwOOwH9blf5ZqQfmft796sQl1dqghXP4uA';
+  // Initialize for 4 rolling weeks (change to 1 if you only want current week)
+  window.initLineScores({
+    sheetId: SHEET_ID,
+    sheetName: 'STATS_SEASON_TOTALS',
+    rangeHeader: 'AU1:CD1',
+    rangeBody: 'AU2:CD100',
+    container: '#lineScores',
+    weeks: 4,
+    timezone: 'America/Phoenix'
+  });
+</script>
