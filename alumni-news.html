@@ -8,26 +8,6 @@
 <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400&family=Bebas+Neue&display=swap" rel="stylesheet">
 
-<!-- Firebase init (same pattern as index.html) -->
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-  import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, signInWithCustomToken, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-  window.firebaseAuth = { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, signInWithCustomToken, signInAnonymously };
-  try {
-    const firebaseConfig = JSON.parse(window.__firebase_config || '{}');
-    const app = initializeApp(firebaseConfig);
-    window.auth = getAuth(app);
-    onAuthStateChanged(window.auth, user => { document.dispatchEvent(new CustomEvent('authStateChanged', { detail: { user } })); });
-    if (window.__initial_auth_token) {
-      await signInWithCustomToken(window.auth, window.__initial_auth_token);
-    } else {
-      await signInAnonymously(window.auth);
-    }
-  } catch (e) {
-    console.error("Firebase initialization error:", e);
-  }
-</script>
-
 <style>
 /* -------------------- CORE THEME (from index.html) -------------------- */
 :root{
@@ -210,6 +190,18 @@ body.light-theme .form-field input{background:rgba(0,0,0,.06)}
 </head>
 
 <body>
+<!-- Splash -->
+<div id="splashScreen">
+  <div class="splash-top">
+    <div class="logo-container shimmer">
+      <img src="assets/img/yatstats-logo.png" alt="YAT?STATS Logo" class="splash-logo-main">
+    </div>
+  </div>
+  <div class="splash-bottom">
+    <img src="assets/img/hamilton-logo.png" alt="Hamilton Huskies Logo" class="splash-logo-h">
+    <img src="assets/img/partners/no-errors.png" alt="No Errors Logo" class="splash-logo-ne">
+  </div>
+</div>
 
 <!-- Header -->
 <header class="header">
@@ -664,7 +656,7 @@ function makeHit(p){
   el.innerHTML=`<img src="${hsImgJpg}" onerror="this.onerror=null;this.src='${hsImgPng}';" alt="">
                 <div><div style="font-weight:700">${p.display_name}</div>
                 <div style="opacity:.7;font-size:.92em">${p.level||''} • Class of ${p.grad_class||''}</div></div>`;
-  el.onclick=()=>{ window.location.href = \`./profile.html?player=\${encodeURIComponent((p.slug||name))}\`; };
+  el.onclick=()=>{ window.location.href = `./profile.html?player=${encodeURIComponent((p.slug||name))}`; };
   return el;
 }
 function liveSearch(){
@@ -782,7 +774,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
 
   setupTheme();
   setupEventListeners();
-  setupAuth();
+  // setupAuth();  // Skip auth since Firebase is removed
   setStickyTop(); window.addEventListener('resize', setStickyTop);
 
   // Players (for search drawer UX parity with index)
