@@ -13,24 +13,33 @@
     <div class="container mx-auto px-6 text-center">
       <h2 class="text-4xl font-extrabold mb-4">Search 17,000+ HS Baseball Programs</h2>
       <p class="text-gray-400 max-w-2xl mx-auto mb-10">
-        Enter a high school name, city, or state to see alumni stats and microsite status.
+        Enter a high school name, city, or filter by state to see alumni stats and microsite status.
       </p>
 
-      <div class="max-w-2xl mx-auto">
-        <div class="flex flex-col sm:flex-row gap-4 mb-6">
-          <input type="text" id="school-search-input"
-                 class="w-full flex-grow bg-gray-800 border-2 border-gray-700 text-white placeholder-gray-500 text-lg rounded-md p-4 focus:outline-none focus:ring-2 focus:ring-red-600"
-                 placeholder="E.g., Hamilton High School">
-          <button id="search-button"
-                  class="bg-red-700 text-white font-bold py-4 px-8 rounded-md text-lg hover:bg-red-600 transition">
-            Search
-          </button>
-        </div>
+      <div class="max-w-3xl mx-auto flex flex-col sm:flex-row gap-4 mb-6">
+        <!-- State Dropdown -->
+        <select id="state-filter" class="bg-gray-800 border border-gray-700 text-white rounded-md p-4">
+          <option value="">All States</option>
+        </select>
+
+        <!-- Text Search -->
+        <input type="text" id="school-search-input"
+               class="w-full flex-grow bg-gray-800 border-2 border-gray-700 text-white placeholder-gray-500 text-lg rounded-md p-4 focus:outline-none focus:ring-2 focus:ring-red-600"
+               placeholder="E.g., Hamilton High School">
+
+        <button id="search-button"
+                class="bg-red-700 text-white font-bold py-4 px-8 rounded-md text-lg hover:bg-red-600 transition">
+          Search
+        </button>
       </div>
 
       <div id="results-container"
            class="mt-8 rounded-lg p-8 max-w-4xl mx-auto text-left hidden">
         <div id="results-content"></div>
+        <div id="pagination" class="flex justify-between mt-6 hidden">
+          <button id="prev-btn" class="bg-gray-700 px-4 py-2 rounded disabled:opacity-50">Prev</button>
+          <button id="next-btn" class="bg-gray-700 px-4 py-2 rounded disabled:opacity-50">Next</button>
+        </div>
       </div>
     </div>
   </section>
@@ -38,64 +47,87 @@
   <script>
     const SHEET_URL = "https://opensheet.elk.sh/1yUNQH9NbpKwOOwH9blf5ZqQfmft796sQl1dqghXP4uA/HS_Baseball_Programs";
     let rows = [];
+    let currentPage = 1;
+    const resultsPerPage = 20;
+    let filteredResults = [];
 
     async function loadData() {
       const res = await fetch(SHEET_URL);
       rows = await res.json();
+      populateStateDropdown();
+    }
+
+    function populateStateDropdown() {
+      const stateSet = new Set(rows.map(r => r.state).filter(Boolean));
+      const stateFilter = document.getElementById("state-filter");
+      [...stateSet].sort().forEach(state => {
+        const opt = document.createElement("option");
+        opt.value = state;
+        opt.textContent = state;
+        stateFilter.appendChild(opt);
+      });
     }
 
     function slugifySchoolName(name) {
-      return name.toLowerCase()
-                 .replace(/[^a-z0-9]/g, '')
-                 .trim();
+      return name.toLowerCase().replace(/[^a-z0-9]/g, '').trim();
     }
 
-    function getStateAbbrev(cityStr) {
-      if (!cityStr) return "";
-      const parts = cityStr.split(",");
-      return parts.length > 1 ? parts[1].trim().toLowerCase() : "";
+    function getStateAbbrev(stateStr) {
+      return stateStr ? stateStr.toLowerCase() : "";
     }
 
-    function getLogoPath(city, hsname) {
-      if (!city || !hsname) return "assets/img/school_logo/default.jpg";
-      const state = getStateAbbrev(city);
+    function getLogoPath(city, hsname, state) {
+      if (!state || !hsname) return "assets/img/school_logo/default.jpg";
       const slug = slugifySchoolName(hsname);
-      return `assets/img/school_logo/${state}_${slug}.jpg`;
+      return `assets/img/school_logo/${state.toLowerCase()}_${slug}.jpg`;
     }
 
-    function searchSchools(query) {
+    function searchSchools(query, state) {
       query = query.trim().toLowerCase();
+
+      filteredResults = rows.filter(r => {
+        const hsname = (r.hsname || "").toLowerCase();
+        const city = (r.city || "").toLowerCase();
+        const st = (r.state || "").toLowerCase();
+        const region = (r.regionname || "").toLowerCase();
+        const hslocation = (r.hslocation || "").toLowerCase();
+
+        const textMatch = !query || hsname.includes(query) || city.includes(query) || region.includes(query) || hslocation.includes(query);
+        const stateMatch = !state || st === state.toLowerCase();
+        return textMatch && stateMatch;
+      });
+
+      currentPage = 1;
+      renderResults();
+    }
+
+    function renderResults() {
       const container = document.getElementById("results-container");
       const content = document.getElementById("results-content");
-      content.innerHTML = "";
+      const pagination = document.getElementById("pagination");
+
       container.classList.remove("hidden");
+      content.innerHTML = "";
 
-      if (!query) {
-        content.innerHTML = "<p class='text-gray-400'>Please enter a school name, city, or state.</p>";
-        return;
-      }
+      const startIndex = (currentPage - 1) * resultsPerPage;
+      const pageResults = filteredResults.slice(startIndex, startIndex + resultsPerPage);
 
-      const matches = rows.filter(r =>
-        (r.hsname && r.hsname.toLowerCase().includes(query)) ||
-        (r.city && r.city.toLowerCase().includes(query)) ||
-        (r.regionname && r.regionname.toLowerCase().includes(query))
-      );
-
-      if (matches.length === 0) {
+      if (pageResults.length === 0) {
         content.innerHTML = "<p class='text-gray-400'>No matches found.</p>";
+        pagination.classList.add("hidden");
         return;
       }
 
-      matches.slice(0, 5).forEach(school => {
+      pageResults.forEach(school => {
         const activeAlumni = parseInt(school["Active Alumni"] || 0, 10);
 
-        const logoPath = getLogoPath(school.city, school.hsname);
+        const logoPath = getLogoPath(school.city, school.hsname, school.state);
         const logoHTML = `<img src="${logoPath}" onerror="this.src='assets/img/school_logo/default.jpg'" class="h-16 mx-auto mb-4">`;
 
         const headerHTML = `
           <div class="mb-6 text-center">
             ${logoHTML}
-            <h4 class="uppercase text-sm text-gray-400 tracking-widest">${school.city || ""}</h4>
+            <h4 class="uppercase text-sm text-gray-400 tracking-widest">${school.city || ""}, ${school.state || ""}</h4>
             <h2 class="text-3xl font-extrabold text-white tracking-wide">${school.hsname}</h2>
             <h3 class="uppercase text-lg text-red-600 font-bold mt-1">Active Baseball Alumni</h3>
           </div>
@@ -140,9 +172,9 @@
           </div>`;
           actionHTML = `<button class="mt-4 bg-red-700 hover:bg-red-600 text-white font-bold px-6 py-3 rounded">Join Mailing List</button>`;
         } else {
-          const micrositeExists = (school.microsite_live === "TRUE"); // Future-proof for sheet column
+          const micrositeExists = (school.microsite_live === "TRUE"); 
           if (micrositeExists) {
-            const state = getStateAbbrev(school.city);
+            const state = (school.state || "").toLowerCase();
             const slug = slugifySchoolName(school.hsname);
             const url = `https://${state}.${slug}.yatstats.com`;
             messageHTML = `<div class="bg-green-900 text-green-200 p-4 rounded text-center">
@@ -168,11 +200,34 @@
           </div>
         `;
       });
+
+      // Pagination controls
+      const totalPages = Math.ceil(filteredResults.length / resultsPerPage);
+      pagination.classList.remove("hidden");
+      document.getElementById("prev-btn").disabled = currentPage === 1;
+      document.getElementById("next-btn").disabled = currentPage === totalPages;
     }
 
+    // Event Listeners
     document.getElementById("search-button").addEventListener("click", () => {
       const val = document.getElementById("school-search-input").value;
-      searchSchools(val);
+      const state = document.getElementById("state-filter").value;
+      searchSchools(val, state);
+    });
+
+    document.getElementById("prev-btn").addEventListener("click", () => {
+      if (currentPage > 1) {
+        currentPage--;
+        renderResults();
+      }
+    });
+
+    document.getElementById("next-btn").addEventListener("click", () => {
+      const totalPages = Math.ceil(filteredResults.length / resultsPerPage);
+      if (currentPage < totalPages) {
+        currentPage++;
+        renderResults();
+      }
     });
 
     loadData();
