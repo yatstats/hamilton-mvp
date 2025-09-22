@@ -449,22 +449,23 @@ function slugOf(p){
   if(s) return s;
   return (p.display_name||'').trim().toLowerCase().replace(/[^a-z0-9]+/g,'-');
 }
+
 function imageNameOf(p){
-  // Prefer slug if available
-  if (p.slug && p.slug.trim()) {
+  // Sponsors: force slug
+  if (p.status && p.status.toUpperCase() === 'SPONSOR' && p.slug) {
     return p.slug.trim()
       .toLowerCase()
       .replace(/\s+/g, '_')       // spaces → underscores
       .replace(/[^a-z0-9_]/g,''); // strip invalid chars
   }
 
-  // Fallback: first + last
+  // Everyone else: first + last
   const first = (p.first || '').toLowerCase().replace(/\s+/g,'_');
   const last  = (p.last || '').toLowerCase().replace(/\s+/g,'_');
   if (first || last) return [first,last].filter(Boolean).join('_');
 
-  // Last resort: display_name
-  return (p.display_name || '')
+  // Last resort: slug or display_name
+  return (p.slug || p.display_name || '')
     .toLowerCase()
     .replace(/\s+/g,'_')
     .replace(/[^a-z0-9_]/g,'');
