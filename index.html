@@ -450,8 +450,10 @@ function slugOf(p){
   return (p.display_name||'').trim().toLowerCase().replace(/[^a-z0-9]+/g,'-');
 }
 function imageNameOf(p){
-  const first=(p.first||'').toLowerCase(), last=(p.last||'').toLowerCase();
-  return (first && last) ? `${first}_${last}` : slugOf(p);
+  const first = (p.first || '').toLowerCase();
+  const last = (p.last || '').toLowerCase();
+  if (first) return first + (last ? '_' + last : ''); // Use first only if last empty
+  return slugOf(p);
 }
 function profileURL(p){ return `./profile.html?player=${slugOf(p)}`; }
 
