@@ -3,50 +3,32 @@
 <head>
   <meta charset="UTF-8">
   <title>YATSTATS – HS Baseball Program Search</title>
-
-  <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-      window.FontAwesomeConfig = { autoReplaceSvg: 'nest' };
-  </script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous"></script>
-
-  <!-- your existing styles -->
-  <style>
-    * { font-family: 'Inter', sans-serif; }
-    ::-webkit-scrollbar { display: none; }
-  </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
 </head>
-<body class="h-full text-base-content">
+<body class="bg-gray-100">
 
 <main id="main-content" class="relative overflow-hidden">
 
-  <!-- HEADER -->
-  <header id="header" class="absolute top-0 left-0 right-0 z-30 bg-black/30 backdrop-blur-sm">
-    <div class="container mx-auto px-6 py-4 flex justify-between items-center">
-      <div class="text-3xl font-black tracking-wider text-white">YATSTATS</div>
-    </div>
-  </header>
-
   <!-- HERO -->
-  <section id="hero-section" class="relative h-[900px] flex items-center justify-center text-center text-white">
-    <div class="absolute inset-0 bg-black/60 z-10"></div>
+  <section id="hero-section" class="relative h-[500px] flex items-center justify-center text-center text-white">
+    <div class="absolute inset-0 bg-black/70 z-10"></div>
     <div class="absolute inset-0 w-full h-full overflow-hidden">
       <img class="w-full h-full object-cover" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/3092fdc45d-c667c2c1a0a9ceaf650c.png">
     </div>
     <div class="relative z-20 container mx-auto px-6">
-      <h1 class="text-5xl md:text-7xl font-black uppercase mb-4">Tracking Yesterday’s Athletes as College and Pros Today!</h1>
-      <p class="text-xl md:text-2xl mb-8">Discover the high school origins of today's baseball stars. Search our database of 17,000+ programs.</p>
+      <h1 class="text-5xl font-black uppercase mb-4">Search 17,000+ HS Baseball Programs</h1>
+      <p class="text-xl font-light">Discover alumni, draft picks, and future microsites.</p>
     </div>
   </section>
 
   <!-- SEARCH -->
-  <section id="search-section" class="py-20 bg-brand-navy">
+  <section id="search-section" class="py-20 bg-brand-navy text-white">
     <div class="container mx-auto px-6 text-center">
-      <h2 class="text-4xl font-bold mb-4 text-white">Search the Database</h2>
-      <p class="text-brand-silver mb-10">Enter a high school name, city, or region.</p>
+      <h2 class="text-4xl font-bold mb-4">Search the Database</h2>
+      <p class="text-brand-silver mb-10">Enter a high school name, city, or state.</p>
 
-      <div id="search-container" class="max-w-2xl mx-auto">
+      <div class="max-w-2xl mx-auto">
         <div class="flex flex-col sm:flex-row gap-4 mb-6">
           <input type="text" id="school-search-input"
                  class="w-full flex-grow bg-brand-steel border-2 border-brand-steel text-white placeholder-brand-silver text-lg rounded-md p-4 focus:outline-none focus:ring-2 focus:ring-brand-red"
@@ -57,25 +39,26 @@
         </div>
       </div>
 
-      <div id="results-container" class="mt-8 min-h-[250px] bg-brand-blue rounded-lg p-8 max-w-3xl mx-auto transition-opacity duration-500 opacity-0">
+      <div id="results-container" class="mt-8 min-h-[250px] bg-brand-blue rounded-lg p-8 max-w-4xl mx-auto transition-opacity duration-500 opacity-0">
         <div id="loading-spinner" class="hidden text-center">
           <i class="fa-solid fa-baseball fa-spin text-5xl text-brand-silver"></i>
-          <p class="mt-4 text-lg text-white">Searching the archives...</p>
+          <p class="mt-4 text-lg">Searching the archives...</p>
         </div>
         <div id="results-content" class="hidden w-full"></div>
       </div>
     </div>
   </section>
-
-  <!-- OTHER SECTIONS (About, Data Highlights, Contact, Footer)... -->
-  <!-- You can leave your existing content below untouched -->
-
 </main>
 
-<!-- GOOGLE SHEET SEARCH SCRIPT -->
 <script>
   const SHEET_URL = "https://opensheet.elk.sh/1JXhpck9_qpJVOBMoAkIWSUbIZClNv0k9/HS_Baseball_Programs";
   let rows = [];
+
+  // Example microsites list (replace with real subdomains as they go live)
+  const microsites = {
+    "Hamilton High School": "https://hamilton.yatstats.com"
+    // Add more: "School Name": "https://schoolslug.yatstats.com"
+  };
 
   async function loadData() {
     try {
@@ -84,6 +67,40 @@
     } catch (err) {
       console.error("Error loading sheet:", err);
     }
+  }
+
+  function buildSchoolCard(r) {
+    let html = `
+      <div class="p-4 mb-4 bg-brand-steel rounded text-white text-left">
+        <h3 class="text-2xl font-bold mb-2">${r.hsname || "Unknown School"}</h3>
+        <p><strong>Ranking:</strong> ${r["YATSTATS National Ranking"] || "N/A"}</p>
+        <p><strong>City:</strong> ${r.city || ""}</p>
+        <p><strong>Region:</strong> ${r.regionname || ""}</p>
+        <p><strong>Nickname:</strong> ${r.nickname || ""}</p>
+        <p><strong>Alumni Listed:</strong> ${r.alumni || "0"}</p>
+        <p><strong>Drafted from School:</strong> ${r["Drafted from School"] || "0"}</p>
+        <p><strong>Total Draft Picks:</strong> ${r["Total Draft Picks"] || "0"}</p>
+        <p><strong>Major Leaguers:</strong> ${r["Major Leaguers"] || "0"}</p>
+        <p><strong>Active Alumni:</strong> ${r["Active Players 2024-2025"] || "0"}</p>
+    `;
+
+    const active = parseInt(r["Active Players 2024-2025"] || "0");
+
+    if (microsites[r.hsname]) {
+      html += `<p class="mt-4 font-bold text-green-400">We Found Your High School. To begin tracking their active alumni: 
+                 <a href="${microsites[r.hsname]}" class="underline text-white">Click Here</a></p>`;
+    } else if (active >= 14) {
+      html += `<p class="mt-4 text-yellow-300">We Found Your High School and Good News! Due to this program's high Active Alumni count, they will soon have their own YATSTATS Microsite.</p>
+               <p class="mt-2">Join our mailing list to be notified when your school's site is live. Share a possible co-branding sponsor to expedite the process.</p>
+               <a href="YOUR_GOHIGHLEVEL_SPONSOR_FORM_URL" target="_blank" class="inline-block mt-3 bg-brand-red px-4 py-2 rounded">Join & Suggest Sponsor</a>`;
+    } else {
+      html += `<p class="mt-4 text-red-300">We Found Your High School. Unfortunately, due to limited Active Alumni, they did not qualify for a YATSTATS Microsite.</p>
+               <p class="mt-2">Join our mailing list to access over 40,000 active alumni from the Top 1000 programs.</p>
+               <a href="YOUR_GOHIGHLEVEL_GENERAL_FORM_URL" target="_blank" class="inline-block mt-3 bg-brand-red px-4 py-2 rounded">Join Mailing List</a>`;
+    }
+
+    html += `</div>`;
+    return html;
   }
 
   function search(query) {
@@ -115,11 +132,8 @@
         return;
       }
 
-      matches.slice(0, 20).forEach(r => {
-        const div = document.createElement("div");
-        div.className = "p-3 mb-2 bg-brand-steel rounded text-white";
-        div.textContent = `${r.hsname} — ${r.city || ""} ${r.regionname || ""}`;
-        resultsContent.appendChild(div);
+      matches.slice(0, 5).forEach(r => {
+        resultsContent.innerHTML += buildSchoolCard(r);
       });
     }, 400);
   }
