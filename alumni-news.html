@@ -9,110 +9,494 @@
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400&family=Bebas+Neue&display=swap" rel="stylesheet">
 
 <style>
-/* ===== CORE THEME ===== */
-:root{
-  --bg:#0c0c0c; --fg:#f2f2f2; --muted:#c4c4c4; --ink:#e8e8e8; --line:rgba(255,255,255,.08);
-  --card-bg:#171717; --header-bg:#000; --drawer-bg:rgba(10,10,10,.65);
-  --shade-end:rgba(0,0,0,.95);
-  --hamSmall:13px; --hamBig:20px; --hamBigger:24px; --tagGrey:#cfd2d6;
-  --crestH:clamp(28px,4.2vw,42px);
-  --containerPad:16px; --footerH:clamp(56px,8vh,77px);
-}
-body.light-theme{
-  --bg:#f4f4f4; --fg:#121212; --muted:#555; --ink:#222; --line:rgba(0,0,0,.1);
-  --card-bg:#fff; --header-bg:#fff; --drawer-bg:rgba(255,255,255,.65);
-}
-@font-face{font-family:'Indigo';src:url('assets/fonts/Indigo.otf') format('opentype');font-weight:400;font-style:normal;font-display:swap;}
-*{box-sizing:border-box} html,body{margin:0}
-body{background:var(--bg);color:var(--fg);font-family:Oswald,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;transition:background-color .3s,color .3s;}
-
-/* ===== HEADER / NAV ===== */
-/* (unchanged from your version, trimmed here for brevity) */
-
-/* ===== NEWS LAYOUT ===== */
-.main{padding:8px 0 calc(var(--footerH) + 12px)}
-.news-layout{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:16px;
-}
-
-/* News cards */
-.news-feed{display:flex;flex-direction:column;gap:12px}
-.news-card{background:var(--card-bg);border:1px solid var(--line);border-radius:12px;overflow:hidden;display:flex;gap:12px;align-items:flex-start;padding:10px;transition:.2s}
-.news-card.side-mode{flex-direction:row}
-.news-card.overlay-mode{flex-direction:column}
-.news-thumb{flex-shrink:0;width:120px;background:#000 center/cover no-repeat;aspect-ratio:5/7;}
-.news-card.overlay-mode .news-thumb{width:100%;height:220px;aspect-ratio:auto}
-.news-body{flex:1}
-.news-title{display:block;font:400 22px/1.05 "Bebas Neue",sans-serif;letter-spacing:.03em;margin-bottom:6px}
-.news-meta{font:300 12px/1.2 Oswald;letter-spacing:.02em;color:var(--muted);margin-bottom:6px}
-.news-links{display:flex;gap:12px;margin-top:4px;}
-.news-share{display:flex;gap:10px;justify-content:flex-end;margin-top:8px}
-
-/* Scores column */
-.scores-col{position:relative}
-.scores-scroll{position:sticky;top:var(--stickyTop,140px);max-height:calc(100vh - var(--stickyTop,140px) - var(--footerH) - 12px);overflow:auto;border:1px solid var(--line);border-radius:12px;background:var(--card-bg);padding:10px}
-
-/* ===== BREAKPOINTS ===== */
-/* Desktop Wide ≥1280px → 3-across + side cards */
-@media (min-width:1280px){
-  .news-layout{grid-template-columns:repeat(3,1fr)}
-  .news-card{flex-direction:row}
-}
-/* Laptop 900–1279px → 3-across + overlay cards */
-@media (min-width:900px) and (max-width:1279px){
-  .news-layout{grid-template-columns:repeat(3,1fr)}
-  .news-card{flex-direction:column}
-}
-/* Tablet 601–899px → 2-across + side cards */
-@media (min-width:601px) and (max-width:899px){
-  .news-layout{grid-template-columns:repeat(2,1fr)}
-  .news-card{flex-direction:row}
-  #col-pro,#col-college{grid-column:1}
-  #col-scores{grid-column:2;grid-row:1/span 2}
-}
-/* Mobile ≤600px → 2-across + overlay cards */
-@media (max-width:600px){
-  .news-layout{grid-template-columns:repeat(2,1fr)}
-  .news-card{flex-direction:column}
-  #col-pro,#col-college{grid-column:1}
-  #col-scores{grid-column:2;grid-row:1/span 2}
-}
+/* ---- THEME, HEADER, HERO, DRAWERS, GRID, SCORES ---- */
+/* same as your index.html with 3-3-2-2 responsive rules */
+:root{--bg:#0c0c0c;--fg:#f2f2f2;--muted:#c4c4c4;--line:rgba(255,255,255,.08);
+--card-bg:#171717;--header-bg:#000;--footerH:70px;}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font-family:Oswald,sans-serif;}
+.header{position:sticky;top:0;z-index:50;background:var(--header-bg);}
+.wordmark-img{height:28px}
+.hero{padding:8px 0}.hero-right button{margin-left:8px}
+.newsgrid{display:grid;grid-template-columns:1fr clamp(200px,26vw,320px);gap:16px;}
+.scores-col .scores-sticky{position:sticky;top:140px;max-height:calc(100vh - 200px);overflow:auto;padding:10px;background:var(--card-bg);border-radius:12px}
+.week-block{margin-bottom:20px;border-bottom:1px solid var(--line)}
+.player-name{font:700 13px "Bebas Neue",sans-serif;margin:6px 0}
+.day-list{list-style:none;margin:0;padding:0}
+.day-list li{padding:4px 6px;font:300 11px Oswald}
+.day-list li.hasline{background:rgba(134,239,172,.08)}
+/* Responsive */
+@media(max-width:600px){.newsgrid{grid-template-columns:1fr clamp(130px,36vw,260px)}}
+@media(min-width:601px) and (max-width:899px){.newsgrid{grid-template-columns:1fr clamp(160px,30vw,300px)}}
+@media(min-width:900px) and (max-width:1279px){.newsgrid{grid-template-columns:1fr 1fr clamp(200px,26vw,320px)}}
+@media(min-width:1280px){.newsgrid{grid-template-columns:1fr 1fr clamp(240px,24vw,360px)}}
+.site-footer{position:fixed;left:0;right:0;bottom:0;height:var(--footerH);background:#000}
 </style>
 </head>
+
 <body>
-<!-- ===== SPLASH / HEADER / DRAWERS / FOOTER (keep your existing code here) ===== -->
+<header class="header">
+  <div class="topbar">
+    <button id="btnMenu"><i class="ri-menu-line"></i></button>
+    <nav>
+      <a href="index.html">WHERE THEY YAT?</a>
+      <a href="alumni-news.html">ALUMNI NEWS</a>
+      <a href="marketplace.html">MARKETPLACE</a>
+    </nav>
+    <img src="assets/img/yatstats-logo.png" class="wordmark-img" alt="YATSTATS">
+  </div>
+  <section class="hero">
+    <div class="hero-right">
+      <button id="openSearch"><i class="ri-search-line"></i></button>
+      <button id="openFilters"><i class="ri-filter-3-line"></i></button>
+      <button id="filtersReset2"><i class="ri-restart-line"></i></button>
+    </div>
+  </section>
+</header>
+
+<!-- Drawers omitted for brevity, identical to index.html (menu, filters, account) -->
 
 <main class="main container">
-  <div class="news-layout">
-    <!-- Column 1: Pro -->
-    <section id="col-pro" class="news-col">
-      <h3>ALUMNI HEADLINES (Pros)</h3>
-      <div id="proFeed" class="news-feed"></div>
-    </section>
+  <div class="newsgrid">
+    <div class="news-wrap">
+      <section id="col-pro"><h3>ALUMNI HEADLINES (Pros)</h3></section>
+      <section id="col-college"><h3>ALUMNI HEADLINES (College)</h3></section>
+    </div>
 
-    <!-- Column 2: College -->
-    <section id="col-college" class="news-col">
-      <h3>ALUMNI HEADLINES (College)</h3>
-      <div id="collegeFeed" class="news-feed"></div>
-    </section>
-
-    <!-- Column 3: Scores -->
-    <aside id="col-scores" class="scores-col">
+    <aside class="scores-col">
       <h3>WEEKLY LINE SCORES</h3>
-      <div id="scoresMount" class="scores-scroll"></div>
+      <div class="scores-sticky">
+
+        <!-- Week of Sept 21–27 -->
+        <div class="week-block">
+          <div class="week-title">Week of September 21–27</div>
+          <div class="player-block"><div class="player-name">CODY BELLINGER</div>
+            <ul class="day-list"><li>9/21</li><li>9/22</li><li>9/23</li><li>9/24</li><li>9/25</li><li>9/26</li><li>9/27</li></ul>
+          </div>
+          <div class="player-block"><div class="player-name">DREW SWIFT</div>
+            <ul class="day-list"><li class="hasline">9/21 @ STL | 2-4 | R, BB, K, 2B, HR, 2RBI</li><li>9/22</li><li>9/23</li><li>9/24</li><li>9/25</li><li>9/26</li><li>9/27</li></ul>
+          </div>
+          <div class="player-block"><div class="player-name">GAVIN TURLEY</div>
+            <ul class="day-list"><li>9/21</li><li>9/22</li><li>9/23</li><li>9/24</li><li>9/25</li><li>9/26</li><li>9/27</li></ul>
+          </div>
+          <div class="player-block"><div class="player-name">LOGAN BOYER</div>
+            <ul class="day-list"><li>9/21</li><li>9/22</li><li>9/23</li><li>9/24</li><li>9/25</li><li>9/26</li><li>9/27</li></ul>
+          </div>
+          <div class="player-block"><div class="player-name">DOM HAMEL</div>
+            <ul class="day-list"><li>9/21</li><li>9/22</li><li>9/23</li><li>9/24</li><li>9/25</li><li>9/26</li><li>9/27</li></ul>
+          </div>
+        </div>
+
+        <!-- Week of Sept 14–20 -->
+        <div class="week-block">
+          <div class="week-title">Week of September 14–20</div>
+          <div class="player-block"><div class="player-name">CODY BELLINGER</div>
+            <ul class="day-list"><li>9/14</li><li class="hasline">9/15 @ BOS - 0-4 | 2K</li><li class="hasline">9/16 @ MIN - 1-5 | K, RBI, SB</li><li class="hasline">9/17 @ MIN - 2-4 | R, K, HR, 3RBI</li><li>9/18</li><li>9/19</li><li>9/20</li></ul>
+          </div>
+          <div class="player-block"><div class="player-name">DREW SWIFT</div>
+            <ul class="day-list"><li class="hasline">9/14 @ RENO - 1-4 | K</li><li>9/15</li><li class="hasline">9/16 vs SAL - 2-4 | 2K, 2RBI, SB</li><li class="hasline">9/17 vs SAL - 2-4 | K</li><li>9/18</li><li>9/19</li><li>9/20</li></ul>
+          </div>
+          <div class="player-block"><div class="player-name">DOM HAMEL</div>
+            <ul class="day-list"><li>9/14</li><li>9/15</li><li>9/16</li><li class="hasline">9/17 vs SD (MLB DEBUT) - 1IP, 3H, 0R, 0ER, 0BB</li><li>9/18</li><li>9/19</li><li>9/20</li></ul>
+          </div>
+        </div>
+<li class="empty"><div class="day-line"><span class="date">9/16</span></div></li>
+              <li class="empty"><div class="day-line"><span class="date">9/17</span></div></li>
+              <li class="empty"><div class="day-line"><span class="date">9/18</span></div></li>
+              <li class="empty"><div class="day-line"><span class="date">9/19</span></div></li>
+              <li class="empty"><div class="day-line"><span class="date">9/20</span></div></li>
+            </ul>
+          </div>
+
+          <div class="player-block">
+            <div class="player-name">LOGAN BOYER</div>
+            <ul class="day-list">
+              <li class="hasline"><div class="day-line"><span class="date">9/14</span>vs.SAC - 1IP, 1H, 0R, 0ER, 1K, 1BB</div></li>
+              <li class="empty"><div class="day-line"><span class="date">9/15</span></div></li>
+              <li class="empty"><div class="day-line"><span class="date">9/16</span></div></li>
+              <li class="hasline"><div class="day-line"><span class="date">9/17</span>vs.SAC - 1IP, 0H, 0R, 0ER, 0BB</div></li>
+              <li class="empty"><div class="day-line"><span class="date">9/18</span></div></li>
+              <li class="empty"><div class="day-line"><span class="date">9/19</span></div></li>
+              <li class="empty"><div class="day-line"><span class="date">9/20</span></div></li>
+            </ul>
+          </div>
+
+          <div class="player-block">
+            <div class="player-name">PATRICK MURPHY</div>
+            <ul class="day-list">
+              <li class="empty"><div class="day-line"><span class="date">9/14</span></div></li>
+              <li class="empty"><div class="day-line"><span class="date">9/15</span></div></li>
+              <li class="empty"><div class="day-line"><span class="date">9/16</span></div></li>
+              <li class="empty"><div class="day-line"><span class="date">9/17</span></div></li>
+              <li class="hasline"><div class="day-line"><span class="date">9/18</span>vs. LG - 4IP, 8H, 7R, 4ER, 2K, 2BB L</div></li>
+              <li class="empty"><div class="day-line"><span class="date">9/19</span></div></li>
+              <li class="empty"><div class="day-line"><span class="date">9/20</span></div></li>
+            </ul>
+          </div>
+
+          <div class="player-block">
+            <div class="player-name">SHANE MURPHY</div>
+            <ul class="day-list">
+              <li class="empty"><div class="day-line"><span class="date">9/14</span></div></li>
+              <li class="empty"><div class="day-line"><span class="date">9/15</span></div></li>
+              <li class="empty"><div class="day-line"><span class="date">9/16</span></div></li>
+              <li class="empty"><div class="day-line"><span class="date">9/17</span></div></li>
+              <li class="empty"><div class="day-line"><span class="date">9/18</span></div></li>
+              <li class="empty"><div class="day-line"><span class="date">9/19</span></div></li>
+              <li class="empty"><div class="day-line"><span class="date">9/20</span></div></li>
+            </ul>
+          </div>
+
+          <div class="player-block">
+            <div class="player-name">BROCK SELVIDGE</div>
+            <ul class="day-list">
+              <li class="empty"><div class="day-line"><span class="date">9/14</span></div></li>
+              <li class="empty"><div class="day-line"><span class="date">9/15</span></div></li>
+              <li class="empty"><div class="day-line"><span class="date">9/16</span></div></li>
+              <li class="empty"><div class="day-line"><span class="date">9/17</span></div></li>
+              <li class="empty"><div class="day-line"><span class="date">9/18</span></div></li>
+              <li class="empty"><div class="day-line"><span class="date">9/19</span></div></li>
+              <li class="empty"><div class="day-line"><span class="date">9/20</span></div></li>
+            </ul>
+          </div>
+
+          <div class="player-block">
+            <div class="player-name">JOSH TIEDEMANN</div>
+            <ul class="day-list">
+              <li class="empty"><div class="day-line"><span class="date">9/14</span></div></li>
+              <li class="empty"><div class="day-line"><span class="date">9/15</span></div></li>
+              <li class="empty"><div class="day-line"><span class="date">9/16</span></div></li>
+              <li class="empty"><div class="day-line"><span class="date">9/17</span></div></li>
+              <li class="empty"><div class="day-line"><span class="date">9/18</span></div></li>
+              <li class="empty"><div class="day-line"><span class="date">9/19</span></div></li>
+              <li class="empty"><div class="day-line"><span class="date">9/20</span></div></li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Week of September 7–13 -->
+        <div class="week-block">
+          <div class="week-title">Week of September 7–13</div>
+
+          <div class="player-block">
+            <div class="player-name">CODY BELLINGER</div>
+            <ul class="day-list">
+              <li class="empty"><div class="day-line"><span class="date">9/7</span></div></li>
+              <li class="empty"><div class="day-line"><span class="date">9/8</span></div></li>
+              <li class="empty"><div class="day-line"><span class="date">9/9</span></div></li>
+              <li class="empty"><div class="day-line"><span class="date">9/10</span></div></li>
+              <li class="empty"><div class="day-line"><span class="date">9/11</span></div></li>
+              <li class="empty"><div class="day-line"><span class="date">9/12</span></div></li>
+              <li class="empty"><div class="day-line"><span class="date">9/13</span></div></li>
+            </ul>
+          </div>
+
+          <div class="player-block">
+            <div class="player-name">DREW SWIFT</div>
+            <ul class="day-list">
+              <li class="empty"><div class="day-line"><span class="date">9/7</span></div></li>
+              <li class="empty"><div class="day-line"><span class="date">9/8</span></div></li>
+              <li class="empty"><div class="day-line"><span class="date">9/9</span></div></li>
+              <li class="empty"><div class="day-line"><span class="date">9/10</span></div></li>
+              <li class="empty"><div class="day-line"><span class="date">9/11</span></div></li>
+              <li class="empty"><div class="day-line"><span class="date">9/12</span></div></li>
+              <li class="empty"><div class="day-line"><span class="date">9/13</span></div></li>
+            </ul>
+          </div>
+
+          <div class="player-block">
+            <div class="player-name">GAVIN TURLEY</div>
+            <ul class="day-list">
+              <li class="empty"><div class="day-line"><span class="date">9/7</span></div></li>
+              <li class="empty"><div class="day-line"><span class="date">9/8</span></div></li>
+              <li class="empty"><div class="day-line"><span class="date">9/9</span></div></li>
+              <li class="empty"><div class="day-line"><span class="date">9/10</span></div></li>
+              <li class="empty"><div class="day-line"><span class="date">9/11</span></div></li>
+              <li class="empty"><div class="day-line"><span class="date">9/12</span></div></li>
+              <li class="empty"><div class="day-line"><span class="date">9/13</span></div></li>
+            </ul>
+          </div>
+
+          <div class="player-block">
+            <div class="player-name">TYLER WILSON</div>
+            <ul class="day-list">
+              <li class="empty"><div class="day-line"><span class="date">9/7</span></div></li>
+              <li class="empty"><div class="day-line"><span class="date">9/8</span></div></li>
+              <li class="empty"><div class="day-line"><span class="date">9/9</span></div></li>
+              <li class="empty"><div class="day-line"><span class="date">9/10</span></div></li>
+              <li class="empty"><div class="day-line"><span class="date">9/11</span></div></li>
+              <li class="empty"><div class="day-line"><span class="date">9/12</span></div></li>
+              <li class="empty"><div class="day-line"><span class="date">9/13</span></div></li>
+            </ul>
+          </div>
+
+          <div class="player-block">
+            <div class="player-name">LOGAN BOYER</div>
+            <ul class="day-list">
+              <li class="empty"><div class="day-line"><span class="date">9/7</span></div></li>
+              <li class="empty"><div class="day-line"><span class="date">9/8</span></div></li>
+              <li class="empty"><div class="day-line"><span class="date">9/9</span></div></li>
+              <li class="hasline"><div class="day-line"><span class="date">9/10</span>@ SUG - 1IP, 0H, 0R, 0ER, 1K, 1BB</div></li>
+              <li class="empty"><div class="day-line"><span class="date">9/11</span></div></li>
+              <li class="empty"><div class="day-line"><span class="date">9/12</span></div></li>
+              <li class="empty"><div class="day-line"><span class="date">9/13</span></div></li>
+            </ul>
+          </div>
+
+          <div class="player-block">
+            <div class="player-name">DOM HAMEL</div>
+            <ul class="day-list">
+              <li class="empty"><div class="day-line"><span class="date">9/7</span></div></li>
+              <li class="empty"><div class="day-line"><span class="date">9/8</span></div></li>
+              <li class="hasline"><div class="day-line"><span class="date">9/9</span>vs. WOR - 3IP, 1H, 0R, 0ER, 2K, 0BB</div></li>
+              <li class="empty"><div class="day-line"><span class="date">9/10</span></div></li>
+              <li class="empty"><div class="day-line"><span class="date">9/11</span></div></li>
+              <li class="empty"><div class="day-line"><span class="date">9/12</span></div></li>
+              <li class="empty"><div class="day-line"><span class="date">9/13</span></div></li>
+            </ul>
+          </div>
+
+          <div class="player-block">
+            <div class="player-name">PATRICK MURPHY</div>
+            <ul class="day-list">
+              <li class="empty"><div class="day-line"><span class="date">9/7</span></div></li>
+              <li class="empty"><div class="day-line"><span class="date">9/8</span></div></li>
+              <li class="hasline"><div class="day-line"><span class="date">9/9</span>vs. DOO - 1IP, 1H, 0R, 0ER, 2K, 0BB</div></li>
+              <li class="hasline"><div class="day-line"><span class="date">9/10</span>@ LG  - 1..2IP, 0H, 0R, 0ER, 2K, 1BB HOLD</div></li>
+              <li class="empty"><div class="day-line"><span class="date">9/11</span></div></li>
+              <li class="empty"><div class="day-line"><span class="date">9/12</span></div></li>
+              <li class="empty"><div class="day-line"><span class="date">9/13</span></div></li>
+              <!-- keeping your provided trailing 9/14 line in this block -->
+              <li class="empty"><div class="day-line"><span class="date">9/14</span></div></li>
+            </ul>
+          </div>
+
+          <div class="player-block">
+            <div class="player-name">SHANE MURPHY</div>
+            <ul class="day-list">
+              <li class="empty"><div class="day-line"><span class="date">9/7</span></div></li>
+              <li class="empty"><div class="day-line"><span class="date">9/8</span></div></li>
+              <li class="empty"><div class="day-line"><span class="date">9/9</span></div></li>
+              <li class="empty"><div class="day-line"><span class="date">9/10</span></div></li>
+              <li class="empty"><div class="day-line"><span class="date">9/11</span></div></li>
+              <li class="hasline"><div class="day-line"><span class="date">9/12</span>@ OMA - 5IP, 2H, 0R, 0ER, 1K, 1BB</div></li>
+              <li class="empty"><div class="day-line"><span class="date">9/13</span></div></li>
+            </ul>
+          </div>
+
+          <div class="player-block">
+            <div class="player-name">BROCK SELVIDGE</div>
+            <ul class="day-list">
+              <li class="empty"><div class="day-line"><span class="date">9/7</span></div></li>
+              <li class="empty"><div class="day-line"><span class="date">9/8</span></div></li>
+              <li class="empty"><div class="day-line"><span class="date">9/9</span></div></li>
+              <li class="empty"><div class="day-line"><span class="date">9/10</span></div></li>
+              <li class="empty"><div class="day-line"><span class="date">9/11</span></div></li>
+              <li class="hasline"><div class="day-line"><span class="date">9/12</span>@ REA - 7IP, 6H, 3R, 3ER, 5K, 1BB</div></li>
+              <li class="empty"><div class="day-line"><span class="date">9/13</span></div></li>
+            </ul>
+          </div>
+
+          <div class="player-block">
+            <div class="player-name">JOSH TIEDEMANN</div>
+            <ul class="day-list">
+              <li class="empty"><div class="day-line"><span class="date">9/7</span></div></li>
+              <li class="empty"><div class="day-line"><span class="date">9/8</span></div></li>
+              <li class="empty"><div class="day-line"><span class="date">9/9</span></div></li>
+              <li class="empty"><div class="day-line"><span class="date">9/10</span></div></li>
+              <li class="empty"><div class="day-line"><span class="date">9/11</span></div></li>
+              <li class="empty"><div class="day-line"><span class="date">9/12</span></div></li>
+              <li class="empty"><div class="day-line"><span class="date">9/13</span></div></li>
+            </ul>
+          </div>
+        </div>
+
+      </div><!-- /.scores-sticky -->
     </aside>
-  </div>
+  </div><!-- /.newsgrid -->
 </main>
 
+<!-- Footer -->
 <footer class="site-footer">
-  <a href="https://no-errors.com/collections/all-webgems" target="_blank">
-    <img src="assets/img/partners/no-errors-banner.jpg" alt="Sponsor Banner">
+  <a href="marketplace.html" aria-label="YAT-A-BOY Marketplace">
+    <img src="assets/img/partners/american_banner.png" alt="Visit the YAT-A-BOY Marketplace" style="height:100%;width:100%;object-fit:contain">
   </a>
 </footer>
 
-<!-- ===== JSON NEWS & SCRIPT BOOTSTRAP (your existing script block here) ===== -->
+<!-- Drawer mask + Drawers (fixed, can live anywhere in body) -->
+<div class="drawer-mask" style="position:fixed;inset:0;background:rgba(0,0,0,.35);opacity:0;pointer-events:none;transition:.2s"></div>
 
+<aside class="drawer" id="drawerLeft" aria-label="Left drawer" style="position:fixed;top:0;bottom:0;left:0;width:min(360px,82vw);transform:translateX(-110%);background:rgba(10,10,10,.9);backdrop-filter:blur(4px);z-index:70;color:#fff;">
+  <button class="icon-btn close-btn" style="position:absolute;top:12px;right:12px"><i class="ri-close-line"></i></button>
+  <div class="drawer-content" style="height:100%;overflow:auto;padding:16px">
+    <h3 style="margin-top:0">PLAYER PROFILE SEARCH</h3>
+    <input id="playerSearch" placeholder="Type to search…" style="width:100%;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.06);color:#fff">
+    <div id="liveResults" style="margin-top:10px"></div>
+    <h3>NAVIGATION</h3>
+    <nav style="display:flex;flex-direction:column;gap:10px">
+      <a href="index.html">WHERE THEY YAT?</a>
+      <a href="alumni-news.html">ACTIVE ALUMNI NEWS</a>
+      <a href="all-time-list.html">NEXT-LEVEL ALL-TIME LIST</a>
+      <a href="marketplace.html">NIL &amp; YAT-A-BOY MARKETPLACE</a>
+      <a href="current-team.html">THE CURRENT TEAM</a>
+      <a href="partner-program.html">PCD ACTION PARTNER PROGRAM</a>
+      <a href="faq.html">FAQ’S</a>
+    </nav>
+  </div>
+</aside>
+
+<aside class="drawer drawer-right" id="drawerFilters" aria-label="Right drawer (filters)" style="position:fixed;top:0;bottom:0;right:0;width:min(360px,82vw);transform:translateX(110%);background:rgba(10,10,10,.9);backdrop-filter:blur(4px);z-index:70;color:#fff;display:flex;flex-direction:column;">
+  <button class="icon-btn close-btn" style="position:absolute;top:12px;right:12px"><i class="ri-close-line"></i></button>
+  <h3 style="margin:18px 16px 8px">FILTERS</h3>
+  <div class="drawer-content" id="filters" style="flex:1;overflow:auto;padding:10px 16px">
+    <details class="filter-group" open>
+      <summary class="filter-title">By Name</summary>
+      <div class="filter-options">
+        <input id="filterName" placeholder="Type a name…" style="width:100%;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.06);color:#fff"/>
+      </div>
+    </details>
+    <details class="filter-group" open>
+      <summary class="filter-title">By Date (Headlines)</summary>
+      <div class="filter-options">
+        <label>From <input id="dateFrom" type="date" style="width:100%;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.06);color:#fff"></label>
+        <label>To <input id="dateTo" type="date" style="width:100%;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.06);color:#fff"></label>
+        <div style="display:flex;gap:8px;margin-top:8px">
+          <button class="icon-btn" id="quick7" style="padding:8px 10px;border:1px solid rgba(255,255,255,.15);border-radius:10px">Last 7 days</button>
+          <button class="icon-btn" id="quick30" style="padding:8px 10px;border:1px solid rgba(255,255,255,.15);border-radius:10px">Last 30 days</button>
+          <button class="icon-btn" id="clearDates" style="padding:8px 10px;border:1px solid rgba(255,255,255,.15);border-radius:10px">Clear</button>
+        </div>
+        <div style="opacity:.75;font-size:12px;margin-top:6px">Affects headlines only. Line scores are independent.</div>
+      </div>
+    </details>
+    <details class="filter-group">
+      <summary class="filter-title">By Status</summary>
+      <div class="filter-options" id="filterStatus">
+        <label class="select-all-label"><input type="checkbox" class="select-all"> Select All</label>
+        <label><input type="checkbox" value="ACTIVE 2025"> ACTIVE 2025</label>
+        <label><input type="checkbox" value="ACTIVE 2024"> ACTIVE 2024</label>
+        <label><input type="checkbox" value="FREE AGENT"> FREE AGENT</label>
+        <label><input type="checkbox" value="INJURED"> INJURED</label>
+        <label><input type="checkbox" value="RETIRED"> RETIRED</label>
+        <label><input type="checkbox" value="SPONSOR"> SPONSOR</label>
+      </div>
+    </details>
+    <details class="filter-group">
+      <summary class="filter-title">By Level</summary>
+      <div class="filter-options" id="filterLevels">
+        <label class="select-all-label"><input type="checkbox" class="select-all"> Select All</label>
+        <!-- populate dynamically later if needed -->
+      </div>
+    </details>
+    <details class="filter-group">
+      <summary class="filter-title">By Graduating Class</summary>
+      <div class="filter-options" id="filterGradClass"></div>
+    </details>
+    <details class="filter-group">
+      <summary class="filter-title">By Roster Year</summary>
+      <div class="filter-options" id="filterRosterYear"></div>
+    </details>
+  </div>
+  <div class="drawer-footer" style="padding:12px 16px;border-top:1px solid rgba(255,255,255,.15);display:flex;gap:8px">
+    <button id="filtersReset" class="icon-btn" style="padding:10px 14px;border:1px solid rgba(255,255,255,.15);border-radius:12px"><i class="ri-restart-line"></i>&nbsp;Reset Filters</button>
+  </div>
+</aside>
+
+<aside class="drawer drawer-right" id="drawerAccount" aria-label="Right drawer (account)" style="position:fixed;top:0;bottom:0;right:0;width:min(360px,82vw);transform:translateX(110%);background:rgba(10,10,10,.9);backdrop-filter:blur(4px);z-index:70;color:#fff;display:flex;flex-direction:column;">
+  <button class="icon-btn close-btn" style="position:absolute;top:12px;right:12px"><i class="ri-close-line"></i></button>
+  <h3 style="margin:18px 16px 8px">ACCOUNT</h3>
+  <div class="drawer-content" style="flex:1;overflow:auto;padding:10px 16px">
+    <div class="auth-tabs" style="display:flex;border-bottom:1px solid rgba(255,255,255,.15)">
+      <button class="auth-tab active" data-tab="signIn" style="flex:1;padding:10px;background:none;border:none;color:#fff">Sign In</button>
+      <button class="auth-tab" data-tab="register" style="flex:1;padding:10px;background:none;border:none;color:#aaa">Register</button>
+    </div>
+    <div id="auth-forms-container" class="pad">
+      <form id="signInForm" class="auth-form active">
+        <div class="form-field"><label>Email</label><input type="email" required style="width:100%;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.06);color:#fff"></div>
+        <div class="form-field"><label>Password</label><input type="password" required style="width:100%;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.06);color:#fff"></div>
+        <button type="submit" class="auth-btn" style="width:100%;padding:12px;border:none;border-radius:8px;background:#fff;color:#000">Sign In</button>
+      </form>
+      <form id="registerForm" class="auth-form" style="display:none">
+        <div class="form-field"><label>Email</label><input type="email" required style="width:100%;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.06);color:#fff"></div>
+        <div class="form-field"><label>Password</label><input type="password" required style="width:100%;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.06);color:#fff"></div>
+        <button type="submit" class="auth-btn" style="width:100%;padding:12px;border:none;border-radius:8px;background:#fff;color:#000">Create Account</button>
+      </form>
+      <p id="authMessage" style="margin-top:10px"></p>
+    </div>
+  </div>
+</aside>
+
+<!-- Scripts -->
+<script>
+/* Drawer helpers */
+const body = document.body;
+const mask = document.querySelector('.drawer-mask');
+function openLeft(){ body.classList.add('drawer-left-open'); showMask(); document.getElementById('drawerLeft').style.transform='translateX(0)'; }
+function openRight(which){ body.classList.add('drawer-right-open'); showMask(); document.querySelectorAll('.drawer-right').forEach(d=>d.style.transform='translateX(110%)'); document.getElementById(which).style.transform='translateX(0)'; }
+function closeDrawers(){ body.classList.remove('drawer-left-open','drawer-right-open'); hideMask(); document.getElementById('drawerLeft').style.transform='translateX(-110%)'; document.querySelectorAll('.drawer-right').forEach(d=>d.style.transform='translateX(110%)'); }
+function showMask(){ mask.style.opacity='1'; mask.style.pointerEvents='auto'; }
+function hideMask(){ mask.style.opacity='0'; mask.style.pointerEvents='none'; }
+
+/* Topbar buttons */
+document.getElementById('btnMenu')?.addEventListener('click', openLeft);
+document.getElementById('openFilters')?.addEventListener('click', ()=> openRight('drawerFilters'));
+document.getElementById('btnAccount')?.addEventListener('click', ()=> openRight('drawerAccount'));
+document.getElementById('filtersReset2')?.addEventListener('click', ()=> {
+  document.getElementById('filtersReset')?.click();
+});
+mask?.addEventListener('click', closeDrawers);
+document.querySelectorAll('.drawer .close-btn').forEach(b=>b.addEventListener('click', closeDrawers));
+
+/* Auth tabs */
+document.querySelectorAll('.auth-tab').forEach(tab=>{
+  tab.addEventListener('click', ()=>{
+    document.querySelectorAll('.auth-tab').forEach(t=>t.classList.remove('active'));
+    tab.classList.add('active');
+    document.querySelectorAll('.auth-form').forEach(f=>f.style.display='none');
+    const form = document.getElementById(tab.dataset.tab+'Form');
+    if(form) form.style.display='block';
+  });
+});
+
+/* Filters quick date buttons + reset */
+document.getElementById('quick7')?.addEventListener('click',()=>{
+  const to=new Date(), from=new Date(); from.setDate(to.getDate()-7);
+  document.getElementById('dateFrom').value = from.toISOString().slice(0,10);
+  document.getElementById('dateTo').value   = to.toISOString().slice(0,10);
+});
+document.getElementById('quick30')?.addEventListener('click',()=>{
+  const to=new Date(), from=new Date(); from.setDate(to.getDate()-30);
+  document.getElementById('dateFrom').value = from.toISOString().slice(0,10);
+  document.getElementById('dateTo').value   = to.toISOString().slice(0,10);
+});
+document.getElementById('clearDates')?.addEventListener('click',()=>{
+  document.getElementById('dateFrom').value=''; document.getElementById('dateTo').value='';
+});
+document.getElementById('filtersReset')?.addEventListener('click',()=>{
+  document.querySelectorAll('#filters input[type=checkbox]').forEach(cb=>cb.checked=false);
+  const name=document.getElementById('filterName'); if(name) name.value='';
+  const df=document.getElementById('dateFrom'); if(df) df.value='';
+  const dt=document.getElementById('dateTo'); if(dt) dt.value='';
+});
+
+/* Basic live search (optional visual) */
+document.getElementById('playerSearch')?.addEventListener('input', e=>{
+  const q=e.target.value.trim().toLowerCase();
+  const box=document.getElementById('liveResults'); if(!box) return;
+  if(!q){ box.innerHTML=''; return; }
+  box.innerHTML = `<div style="opacity:.7">Search for “${q}”…</div>`;
+});
+
+/* Social share icon behavior for any .news-card (if you add cards later) */
+function urlEncode(s){return encodeURIComponent(s||location.href);}
+document.querySelectorAll('.news-card').forEach(card=>{
+  const url = card.dataset.url || location.href;
+  const title = card.dataset.title || 'Hamilton Alumni News';
+  card.querySelectorAll('[data-share=x]')?.forEach(a=>a.href=`https://twitter.com/intent/tweet?text=${urlEncode(title)}&url=${urlEncode(url)}`);
+  card.querySelectorAll('[data-share=fb]')?.forEach(a=>a.href=`https://www.facebook.com/sharer/sharer.php?u=${urlEncode(url)}`);
+  card.querySelectorAll('[data-share=mail]')?.forEach(a=>a.href=`mailto:?subject=${urlEncode(title)}&body=${urlEncode(url)}`);
+  // TikTok & Instagram don't have simple web share URLs; linking home as requested
+  card.querySelectorAll('[data-share=ig]')?.forEach(a=>a.href=`https://www.instagram.com/`);
+  card.querySelectorAll('[data-share=tt]')?.forEach(a=>a.href=`https://www.tiktok.com/`);
+});
+</script>
 </body>
 </html>
