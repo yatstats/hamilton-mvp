@@ -1,56 +1,162 @@
-/* Layout tweaks for 2-2-3 responsiveness */
-.news-layout {
-  display: grid;
-  grid-template-columns: 1fr 1fr; /* Default: 2 across */
-  gap: 16px;
-}
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Active Alumni News • Hamilton YATSTATS</title>
 
-@media (max-width: 768px) {
-  .news-layout {
-    grid-template-columns: 1fr 1fr; /* Mobile: 2 across */
-  }
-  .news-card {
-    position: relative;
-  }
-  .news-title {
-    position: absolute;
-    bottom: 8px;
-    left: 8px;
-    right: 8px;
-    background: rgba(0,0,0,0.6);
-    padding: 6px;
-    border-radius: 6px;
-    color: #fff;
-    font-size: 16px;
-  }
-}
+<link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400&family=Bebas+Neue&display=swap" rel="stylesheet">
 
-@media (min-width: 769px) and (max-width: 1200px) {
-  .news-layout {
-    grid-template-columns: 1.4fr .6fr; /* Tablet: 2 across */
-  }
-  .news-card {
-    display: flex;
-    flex-direction: row;
-  }
-  .news-thumb {
-    width: 160px;
-    aspect-ratio: auto;
-  }
-  .news-title {
-    position: static;
-    background: none;
-    padding: 0;
-    color: inherit;
-    font-size: 20px;
-  }
+<style>
+:root {
+  --maroon:#7A0019; --bg:#f9fafb; --text:#111; --muted:#666;
 }
+body { margin:0; font-family:Oswald, sans-serif; background:var(--bg); color:var(--text);}
+header {background:var(--maroon); color:#fff; position:sticky; top:0; z-index:1000;}
+.container {max-width:1400px; margin:0 auto; padding:0 1rem;}
+.topbar{display:flex; align-items:center; justify-content:space-between; height:72px;}
+.icon-btn{background:none;border:none;color:inherit;cursor:pointer;font-size:22px;margin:0 4px;}
+.topnav{display:flex;gap:16px;}
+.topnav a{color:#fff;text-decoration:none;font-size:14px;}
+.hero{background:#111;color:#fff;padding:.5rem 0;}
+.hero-grid{display:flex;align-items:center;justify-content:space-between;}
+.hero-right{display:flex;gap:10px;}
+.hero-icon{font-size:22px;}
+.news-layout{display:grid;gap:16px;margin:16px auto;}
+.news-card{background:#fff;box-shadow:0 2px 6px rgba(0,0,0,.1);border-radius:10px;overflow:hidden;position:relative;}
+.news-thumb{width:100%;aspect-ratio:5/7;object-fit:cover;}
+.news-body{padding:10px;}
+.news-title{margin:6px 0;font-size:1rem;}
+.meta{font-size:.8rem;color:var(--muted);}
+.social-icons{display:flex;gap:8px;font-size:18px;margin-top:6px;}
+.linescores{background:#f3f3f3;padding:10px;border-radius:8px;overflow-y:auto;max-height:calc(100vh - 200px);}
+.linescores h4{margin:8px 0 4px;font-size:1rem;border-bottom:1px solid #ccc;}
+.linescores .player{margin-bottom:12px;}
+/* Responsive rules */
+@media(max-width:768px){
+  .news-layout{grid-template-columns:1fr 1fr;}
+  .news-card .news-title{position:absolute;bottom:8px;left:8px;right:8px;background:rgba(0,0,0,.6);color:#fff;padding:4px;border-radius:4px;}
+}
+@media(min-width:769px) and (max-width:1200px){
+  .news-layout{grid-template-columns:1.4fr .6fr;}
+  .news-card{display:flex;}
+  .news-thumb{width:160px;aspect-ratio:auto;}
+  .news-title{position:static;background:none;color:inherit;}
+}
+@media(min-width:1201px) and (max-width:1599px){
+  .news-layout{grid-template-columns:1fr 1fr 1fr;}
+  .news-card .news-title{position:absolute;bottom:8px;left:8px;right:8px;background:rgba(0,0,0,.6);color:#fff;padding:4px;border-radius:4px;}
+}
+@media(min-width:1600px){
+  .news-layout{grid-template-columns:1fr 1fr 1fr;}
+  .news-card{display:flex;}
+  .news-thumb{width:200px;aspect-ratio:auto;}
+  .news-title{position:static;background:none;color:inherit;font-size:20px;}
+}
+</style>
+</head>
+<body>
 
-@media (min-width: 1201px) {
-  .news-layout {
-    grid-template-columns: 1fr 1fr 1fr; /* Desktop: 3 across */
-  }
-  #col-pro { grid-column: 1; }
-  #col-college { grid-column: 2; }
-  #col-scores { grid-column: 3; }
+<header>
+  <div class="container topbar">
+    <div class="left-icons">
+      <button class="icon-btn"><i class="ri-menu-line"></i></button>
+      <button class="icon-btn"><i class="ri-user-3-line"></i></button>
+      <button class="icon-btn"><i class="ri-sun-line"></i></button>
+    </div>
+    <nav class="topnav">
+      <a href="index.html">WHERE THEY YAT?</a>
+      <a href="alumni-news.html">ACTIVE ALUMNI NEWS</a>
+      <a href="all-time-list.html">ALL-TIME LIST</a>
+    </nav>
+    <div class="wordmark-wrap">
+      <img src="assets/img/yatstats-logo.png" alt="YAT?STATS" style="height:40px;">
+    </div>
+  </div>
+  <div class="hero">
+    <div class="container hero-grid">
+      <div class="hero-left">ACTIVE ALUMNI NEWS</div>
+      <div class="hero-right">
+        <input type="date" id="filterStart"> -
+        <input type="date" id="filterEnd">
+        <button class="icon-btn" id="resetFilter"><i class="ri-restart-line"></i></button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main class="container">
+  <div class="news-layout">
+    <section id="proNews"><h3>Pro Alumni News</h3><div class="news-feed"></div></section>
+    <section id="collegeNews"><h3>College Alumni News</h3><div class="news-feed"></div></section>
+    <section><h3>Line Scores</h3><div class="linescores" id="lineScores"></div></section>
+  </div>
+</main>
+
+<footer class="site-footer">
+  <a href="#"><img src="assets/img/partners/no-errors-banner.jpg" alt="Sponsor Banner"></a>
+</footer>
+
+<script>
+// Mock inline alumni news JSON
+const alumniNews=[
+ {player_display_name:"CODY BELLINGER",title:"Bellinger belts homer",url:"#",image:"assets/img/now_players/cody_bellinger.jpg",publishedAt:"2025-09-21",source:"MLB.com",tags:{level:"MLB"}},
+ {player_display_name:"DREW SWIFT",title:"Swift sparks comeback",url:"#",image:"assets/img/now_players/drew_swift.jpg",publishedAt:"2025-09-20",source:"ESPN",tags:{level:"MiLB"}},
+ {player_display_name:"NATE FISHER",title:"Fisher Ks 9 in win",url:"#",image:"assets/img/now_players/nate_fisher.jpg",publishedAt:"2025-09-19",source:"CBS",tags:{level:"AAA"}}
+];
+
+// Populate news
+function renderNews(feed,filterLevel){
+  feed.innerHTML="";
+  alumniNews.filter(n=>!filterLevel||n.tags.level.includes(filterLevel)).forEach(n=>{
+    const div=document.createElement("div");
+    div.className="news-card";
+    div.innerHTML=`
+      <img src="${n.image}" alt="${n.player_display_name}" class="news-thumb">
+      <div class="news-body">
+        <h4 class="news-title">${n.title}</h4>
+        <div class="meta">${n.player_display_name} — ${new Date(n.publishedAt).toLocaleDateString()} | ${n.source}</div>
+        <a href="${n.url}" target="_blank">Read More</a>
+        <div class="social-icons">
+          <a href="https://twitter.com/intent/tweet?text=We See Where YAT, ${n.player_display_name.split(' ')[0]}! #YATABOY${n.player_display_name.split(' ')[0]} ${encodeURIComponent(n.url)}" target="_blank"><i class="ri-twitter-x-line"></i></a>
+          <a href="#" target="_blank"><i class="ri-instagram-line"></i></a>
+          <a href="#" target="_blank"><i class="ri-facebook-circle-line"></i></a>
+          <a href="#" target="_blank"><i class="ri-tiktok-line"></i></a>
+          <a href="mailto:?subject=${encodeURIComponent(n.title)}&body=${encodeURIComponent(n.url)}"><i class="ri-mail-line"></i></a>
+          <a href="marketplace.html"><i class="ri-gift-line"></i></a>
+        </div>
+      </div>`;
+    feed.appendChild(div);
+  });
 }
+renderNews(document.querySelector("#proNews .news-feed"),"MLB");
+renderNews(document.querySelector("#collegeNews .news-feed"),"MiLB");
+
+// Mock line scores
+const lineData={
+ "Week of Sept 21-27":{
+   "CODY BELLINGER":[
+     "9/21 @ BAL | 2-3 | 2HR, 6RBI, K, SB",
+     "9/23 vs. CWS | GAME IN PROGRESS",
+     "9/24 vs. CWS 4:05PM"
+   ],
+   "DREW SWIFT":[
+     "9/21 @ SAL | DNP",
+     "9/23 vs. CWS | GAME IN PROGRESS",
+     "9/24 vs. CWS 4:05PM"
+   ]
+ }
+};
+const ls=document.getElementById("lineScores");
+for(const week in lineData){
+  const h=document.createElement("h4");h.textContent=week;ls.appendChild(h);
+  for(const player in lineData[week]){
+    const p=document.createElement("div");p.className="player";
+    p.innerHTML=`<strong>${player}</strong><br>${lineData[week][player].join("<br>")}`;
+    ls.appendChild(p);
+  }
+}
+</script>
+</body>
+</html>
