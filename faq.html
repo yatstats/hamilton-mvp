@@ -4,148 +4,145 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Active Alumni News • Hamilton YATSTATS</title>
+
 <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400&family=Bebas+Neue&display=swap" rel="stylesheet">
 
 <style>
-/* Core Theme + Vars */
-:root{
-  --bg:#0c0c0c; --fg:#f2f2f2; --muted:#c4c4c4;
-  --line:rgba(255,255,255,.08); --card-bg:#171717;
-  --header-bg:#000; --footerH:64px;
+:root {
+  --bg: #0d0d0d;
+  --fg: #fff;
+  --muted: #aaa;
+  --accent: #b30000;
+  --overlay: linear-gradient(to top, rgba(0,0,0,0.7), rgba(0,0,0,0));
 }
-body{margin:0;background:var(--bg);color:var(--fg);font-family:Oswald,Arial,sans-serif}
-a{color:inherit;text-decoration:none}
+body { margin:0; font-family: Oswald, sans-serif; background:var(--bg); color:var(--fg); }
+a { color:inherit; text-decoration:none; }
 
-/* Layout */
-.main{padding:12px 0 calc(var(--footerH) + 12px)}
-.newsgrid{display:grid;gap:16px;align-items:start}
+/* Header */
+.header { background:#111; }
+.topbar, .hero { display:flex; align-items:center; justify-content:space-between; padding:0.5rem 1rem; }
+.topnav { display:flex; gap:1rem; }
+.nav-pair { font-size:0.8rem; display:flex; flex-direction:column; text-align:center; }
+.wordmark-img { height:40px; }
+.hr-y { height:2px; background:var(--accent); margin:0.5rem 0; }
 
-/* Breakpoints — 2–2–3A–3B */
-@media (max-width:600px){
-  .newsgrid{grid-template-columns:1fr clamp(130px,36vw,260px)}
-}
-@media (min-width:601px) and (max-width:899px){
-  .newsgrid{grid-template-columns:1fr clamp(160px,30vw,300px)}
-}
-@media (min-width:900px) and (max-width:1279px){
-  .newsgrid{grid-template-columns:1fr 1fr clamp(200px,26vw,320px)}
-}
-@media (min-width:1280px){
-  .newsgrid{grid-template-columns:1fr 1fr clamp(240px,24vw,360px)}
-}
+/* Hero */
+.hero-left .crumbs { font-size:0.75rem; color:var(--muted); }
+
+/* Grid Layout */
+.main.container { display:grid; grid-template-columns:2fr 2fr 1fr; gap:16px; padding:1rem; }
+@media(max-width:1200px){ .main.container{grid-template-columns:1fr 1fr 1fr;} }
+@media(max-width:1000px){ .main.container{grid-template-columns:1fr 1fr;} }
+@media(max-width:700px){ .main.container{grid-template-columns:1fr;} }
 
 /* News Cards */
-.news-feed{display:flex;flex-direction:column;gap:12px}
-.news-card{position:relative;background:var(--card-bg);border:1px solid var(--line);
-  border-radius:12px;overflow:hidden;display:flex;gap:12px;padding:10px}
-.news-thumb{width:120px;aspect-ratio:5/7;flex-shrink:0;background:#000 center/cover no-repeat;border-radius:8px}
-.news-body{flex:1}
-.news-title{font:400 20px/1.1 "Bebas Neue",sans-serif}
-.news-meta{font:300 12px Oswald;color:var(--muted);margin-top:4px}
+.news-card { position:relative; margin-bottom:1rem; overflow:hidden; border-radius:8px; background:#222; }
+.news-thumb { width:100%; aspect-ratio:5/7; object-fit:cover; display:block; }
+.overlay { position:absolute; bottom:0; left:0; right:0; padding:0.5rem; background:var(--overlay); color:#fff; }
+.news-title { font-size:1rem; font-weight:700; }
+.social-icons { margin-top:0.25rem; display:flex; gap:0.5rem; }
+.social-icons i { font-size:1.2rem; cursor:pointer; }
 
-/* Overlay Mode */
-.overlay-mode .news-card{display:block;padding:0}
-.overlay-mode .news-thumb{width:100%;border-radius:0}
-.overlay-mode .news-body{position:absolute;left:0;right:0;bottom:0;padding:10px;
-  background:linear-gradient(180deg,rgba(0,0,0,0) 0%,rgba(0,0,0,.45) 55%,rgba(0,0,0,.9) 100%)}
-.overlay-mode .news-title{color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.7)}
-.overlay-mode .news-meta{color:#ddd}
+/* Side layout for some breakpoints */
+@media(min-width:700px) and (max-width:1000px){
+  .news-card { display:flex; align-items:center; }
+  .news-thumb { width:40%; aspect-ratio:auto; }
+  .overlay { position:static; background:none; color:var(--fg); }
+}
 
-/* Scores */
-.scores-col{position:relative}
-.scores-sticky{position:sticky;top:100px;background:var(--card-bg);
-  border:1px solid var(--line);border-radius:12px;padding:10px;
-  max-height:calc(100vh - 140px);overflow:auto}
-.week-block{margin-bottom:10px}
-.week-title{font:700 12px "Bebas Neue",sans-serif;color:var(--muted)}
-.player-name{font:700 12px "Bebas Neue",sans-serif;margin-top:6px}
-.games-list{list-style:none;margin:0;padding:0}
-.games-list li{padding:4px 0;border-left:2px solid transparent;padding-left:6px}
-.games-list li.final{border-color:#86efac4d}
-.games-line{font:300 11px Oswald}
-.games-line .date{margin-right:4px;opacity:.8}
+/* Line Scores */
+#lineScores { position:sticky; top:80px; height:calc(100vh - 100px); overflow-y:auto; padding:0.5rem; background:#181818; border-left:2px solid var(--accent); }
+.linescore-week { margin-bottom:1rem; }
+.linescore-week h4 { margin:0.5rem 0; border-bottom:1px solid var(--muted); }
+.linescore-player { margin:0.5rem 0; }
+.linescore-player strong { display:block; margin-bottom:0.25rem; color:var(--accent); }
+.linescore-player div { font-size:0.9rem; color:var(--muted); }
+
+/* Footer */
+.site-footer { margin-top:1rem; text-align:center; }
+.site-footer img { max-width:100%; }
 </style>
 </head>
+
 <body>
+<header class="header">
+  <div class="container topbar">
+    <nav class="topnav">
+      <a href="index.html" class="nav-pair"><span class="thin">WHERE THEY</span><span class="bold">YAT?</span></a>
+      <a href="alumni-news.html" class="nav-pair"><span class="thin">ACTIVE ALUMNI</span><span class="bold">NEWS</span></a>
+      <a href="all-time-list.html" class="nav-pair"><span class="thin">NEXT-LEVEL</span><span class="bold">ALL-TIME LIST</span></a>
+    </nav>
+    <div class="wordmark-wrap">
+      <img class="wordmark-img" src="assets/img/yatstats-logo.png" alt="YAT?STATS">
+    </div>
+  </div>
+  <div class="hr-y"></div>
+  <section class="hero">
+    <div class="hero-left">
+      <div class="crumbs">HAMILTON ▸ ACTIVE ALUMNI NEWS</div>
+    </div>
+    <div class="hero-right">
+      <button class="icon-btn"><i class="ri-search-line"></i></button>
+      <button class="icon-btn"><i class="ri-filter-3-line"></i></button>
+    </div>
+  </section>
+</header>
 
 <main class="main container">
-  <div class="newsgrid">
-    <div class="news-wrap">
-      <section id="col-pro" class="news-col news-root overlay-mode">
-        <h3>ALUMNI HEADLINES (Pros)</h3>
-        <div id="proFeed" class="news-feed"></div>
-      </section>
-      <section id="col-college" class="news-col news-root overlay-mode">
-        <h3>ALUMNI HEADLINES (College)</h3>
-        <div id="collegeFeed" class="news-feed"></div>
-      </section>
+  <!-- Column 1: Pro News -->
+  <section id="proNews">
+    <h3>Pro Alumni News</h3>
+    <article class="news-card">
+      <img src="assets/img/players/dom_hamel.jpg" alt="Dom Hamel" class="news-thumb">
+      <div class="overlay">
+        <div class="news-title">Orioles claim Dom Hamel off waivers from Mets</div>
+        <div class="social-icons">
+          <i class="ri-twitter-x-line"></i><i class="ri-instagram-line"></i><i class="ri-facebook-fill"></i>
+        </div>
+      </div>
+    </article>
+    <article class="news-card">
+      <img src="assets/img/players/cody_bellinger.jpg" alt="Cody Bellinger" class="news-thumb">
+      <div class="overlay">
+        <div class="news-title">Bellinger belts homer in Yankees win</div>
+        <div class="social-icons">
+          <i class="ri-twitter-x-line"></i><i class="ri-instagram-line"></i><i class="ri-facebook-fill"></i>
+        </div>
+      </div>
+    </article>
+  </section>
+
+  <!-- Column 2: College News -->
+  <section id="collegeNews">
+    <h3>College Alumni News</h3>
+    <article class="news-card">
+      <img src="assets/img/players/gavin_turley.jpg" alt="Gavin Turley" class="news-thumb">
+      <div class="overlay">
+        <div class="news-title">Gavin Turley blasts 2 HRs for Oregon State</div>
+        <div class="social-icons">
+          <i class="ri-twitter-x-line"></i><i class="ri-instagram-line"></i><i class="ri-facebook-fill"></i>
+        </div>
+      </div>
+    </article>
+  </section>
+
+  <!-- Column 3: Line Scores -->
+  <aside id="lineScores">
+    <div class="linescore-week">
+      <h4>Week of September 21–27</h4>
+      <div class="linescore-player"><strong>CODY BELLINGER</strong><div>9/21</div><div>9/22</div><div>9/23</div><div>9/24</div><div>9/25</div><div>9/26</div><div>9/27</div></div>
+      <div class="linescore-player"><strong>DOM HAMEL</strong><div>9/21</div><div>9/22</div><div>9/23</div><div>9/24</div><div>9/25</div><div>9/26</div><div>9/27</div></div>
     </div>
-    <aside class="scores-col">
-      <h3>WEEKLY LINE SCORES</h3>
-      <div id="scoresMount" class="scores-sticky"></div>
-    </aside>
-  </div>
+    <div class="linescore-week">
+      <h4>Week of September 14–20</h4>
+      <div class="linescore-player"><strong>GAVIN TURLEY</strong><div>9/14</div><div>9/15</div><div>9/16</div><div>9/17</div><div>9/18</div><div>9/19</div><div>9/20</div></div>
+    </div>
+  </aside>
 </main>
 
-<!-- Mock Data -->
-<script type="application/json" id="news-json">
-{
- "items":[
-  {"id":"1","title":"Dom Hamel released by Mets, signs with Orioles","url":"https://www.milb.com/news/orioles-sign-dom-hamel",
-   "image":"assets/img/now_players/dom_hamel.jpg","source":"MiLB.com","publishedAt":"2025-09-21T18:30:00-07:00","player_display_name":"Dom Hamel","tags":{"level":"AAA"}},
-  {"id":"2","title":"Cody Bellinger belts two HR vs Baltimore","url":"https://mlb.com/bellinger-2hr",
-   "image":"assets/img/now_players/cody_bellinger.jpg","source":"MLB.com","publishedAt":"2025-09-20T22:15:00-07:00","player_display_name":"Cody Bellinger","tags":{"level":"MLB"}},
-  {"id":"3","title":"Drew Swift sparks SeaWolves rally","url":"https://example.com/swift-defense",
-   "image":"assets/img/now_players/drew_swift.jpg","source":"MiLB.com","publishedAt":"2025-09-19T18:40:00-07:00","player_display_name":"Drew Swift","tags":{"level":"AA"}},
-  {"id":"4","title":"Ryan Kucherak collects three hits for Northwestern","url":"https://northwestern.edu/kucherak-3hit",
-   "image":"assets/img/now_players/ryan_kucherak.jpg","source":"Northwestern Athletics","publishedAt":"2025-09-18T12:00:00-07:00","player_display_name":"Ryan Kucherak","tags":{"level":"NCAA-D1"}}
- ]}
-</script>
-
-<script type="application/json" id="scores-json">
-{
- "weeks":[
-  {"label":"This Week","players":[
-    {"name":"DOM HAMEL","games":[
-      {"date":"9/21","opp":"vs SWB","status":"final","line":"6.0 IP, 3 H, 1 ER, 9 K"}]},
-    {"name":"CODY BELLINGER","games":[
-      {"date":"9/20","opp":"@ BAL","status":"final","line":"2-4, 2 HR, 4 RBI"},
-      {"date":"9/19","opp":"@ BAL","status":"final","line":"1-3, BB"}]}
-  ]},
-  {"label":"Last Week","players":[
-    {"name":"DREW SWIFT","games":[{"date":"9/18","opp":"@ ERI","status":"final","line":"1-3, BB, R"}]},
-    {"name":"RYAN KUCHERAK","games":[{"date":"9/17","opp":"vs ILL","status":"final","line":"3-5, 2B, 2 RBI"}]}
-  ]}
- ]}
-</script>
-
-<script>
-function $(s){return document.querySelector(s)}
-function newsCard(n){
-  return `<article class="news-card">
-    <a class="news-thumb" href="${n.url}" target="_blank" style="background-image:url('${n.image}')"></a>
-    <div class="news-body">
-      <a class="news-title" href="${n.url}" target="_blank">${n.title}</a>
-      <div class="news-meta">${n.source} • ${new Date(n.publishedAt).toLocaleDateString()}</div>
-    </div></article>`
-}
-function renderNews(){
-  const data=JSON.parse($("#news-json").textContent||"{}")
-  const pros=data.items.filter(x=>["MLB","AAA","AA","INTERNATIONAL"].includes(x.tags.level))
-  const college=data.items.filter(x=>["NCAA-D1","NCAA-D2","JUCO"].includes(x.tags.level))
-  $("#proFeed").innerHTML=pros.map(newsCard).join("")||"<p>No pro headlines</p>"
-  $("#collegeFeed").innerHTML=college.map(newsCard).join("")||"<p>No college headlines</p>"
-}
-function renderScores(){
-  const d=JSON.parse($("#scores-json").textContent||"{}")
-  $("#scoresMount").innerHTML=(d.weeks||[]).map(w=>`<div class="week-block"><div class="week-title">${w.label}</div>${
-    (w.players||[]).map(p=>`<div class="player-block"><div class="player-name">${p.name}</div>
-    <ul class="games-list">${p.games.map(g=>`<li class="${g.status}"><div class="games-line"><span class="date">${g.date}</span> ${g.opp} | ${g.line}</div></li>`).join("")}</ul>
-    </div>`).join("")
-  }</div>`).join("")
-}
-document.addEventListener("DOMContentLoaded",()=>{renderNews();renderScores()})
-</script>
+<footer class="site-footer">
+  <a href="#"><img src="assets/img/partners/no-errors-banner.jpg" alt="Sponsor"></a>
+</footer>
 </body>
 </html>
