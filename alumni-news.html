@@ -1,100 +1,118 @@
-/* ======== NEWS + SCORES GRID ======== */
-.newsgrid,
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Active Alumni News • Hamilton YATSTATS</title>
+
+<link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400&family=Bebas+Neue&display=swap" rel="stylesheet">
+
+<style>
+/* ===== CORE THEME ===== */
+:root{
+  --bg:#0c0c0c; --fg:#f2f2f2; --muted:#c4c4c4; --ink:#e8e8e8; --line:rgba(255,255,255,.08);
+  --card-bg:#171717; --header-bg:#000; --drawer-bg:rgba(10,10,10,.65);
+  --shade-end:rgba(0,0,0,.95);
+  --hamSmall:13px; --hamBig:20px; --hamBigger:24px; --tagGrey:#cfd2d6;
+  --crestH:clamp(28px,4.2vw,42px);
+  --containerPad:16px; --footerH:clamp(56px,8vh,77px);
+}
+body.light-theme{
+  --bg:#f4f4f4; --fg:#121212; --muted:#555; --ink:#222; --line:rgba(0,0,0,.1);
+  --card-bg:#fff; --header-bg:#fff; --drawer-bg:rgba(255,255,255,.65);
+}
+@font-face{font-family:'Indigo';src:url('assets/fonts/Indigo.otf') format('opentype');font-weight:400;font-style:normal;font-display:swap;}
+*{box-sizing:border-box} html,body{margin:0}
+body{background:var(--bg);color:var(--fg);font-family:Oswald,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;transition:background-color .3s,color .3s;}
+
+/* ===== HEADER / NAV ===== */
+/* (unchanged from your version, trimmed here for brevity) */
+
+/* ===== NEWS LAYOUT ===== */
+.main{padding:8px 0 calc(var(--footerH) + 12px)}
 .news-layout{
   display:grid;
-  grid-template-columns: 1fr clamp(140px, 30vw, 320px); /* default = 2 across */
+  grid-template-columns:repeat(3,1fr);
   gap:16px;
-  align-items:start;
 }
 
-/* Put both headline sections in the left column at 2-across */
-#col-pro, #col-college{ grid-column:1; }
-#col-scores{ grid-column:2; }
+/* News cards */
+.news-feed{display:flex;flex-direction:column;gap:12px}
+.news-card{background:var(--card-bg);border:1px solid var(--line);border-radius:12px;overflow:hidden;display:flex;gap:12px;align-items:flex-start;padding:10px;transition:.2s}
+.news-card.side-mode{flex-direction:row}
+.news-card.overlay-mode{flex-direction:column}
+.news-thumb{flex-shrink:0;width:120px;background:#000 center/cover no-repeat;aspect-ratio:5/7;}
+.news-card.overlay-mode .news-thumb{width:100%;height:220px;aspect-ratio:auto}
+.news-body{flex:1}
+.news-title{display:block;font:400 22px/1.05 "Bebas Neue",sans-serif;letter-spacing:.03em;margin-bottom:6px}
+.news-meta{font:300 12px/1.2 Oswald;letter-spacing:.02em;color:var(--muted);margin-bottom:6px}
+.news-links{display:flex;gap:12px;margin-top:4px;}
+.news-share{display:flex;gap:10px;justify-content:flex-end;margin-top:8px}
 
-/* Sticky, independently scrolling scores */
-.scores-sticky,
-.scores-scroll{
-  position:sticky;
-  top:var(--stickyTop,140px);
-  max-height:calc(100vh - var(--stickyTop,140px) - var(--footerH) - 12px);
-  overflow:auto;
-  border:1px solid var(--line);
-  border-radius:12px;
-  background:var(--card-bg);
-  padding:10px;
-}
+/* Scores column */
+.scores-col{position:relative}
+.scores-scroll{position:sticky;top:var(--stickyTop,140px);max-height:calc(100vh - var(--stickyTop,140px) - var(--footerH) - 12px);overflow:auto;border:1px solid var(--line);border-radius:12px;background:var(--card-bg);padding:10px}
 
-/* ======== CARD VISUAL MODES ======== */
-/* Base SIDE mode (thumb left, text right) */
-.news-card{
-  position:relative; background:var(--card-bg);
-  border:1px solid var(--line); border-radius:12px;
-  overflow:hidden; display:flex; gap:12px; align-items:flex-start; padding:10px;
-}
-.news-thumb{ flex-shrink:0; width:120px; aspect-ratio:5/7; background:#000 center/cover no-repeat; border-radius:8px }
-.news-body{ flex:1; padding:0 }
-.news-title{ display:block; font:400 22px/1.05 "Bebas Neue",sans-serif; letter-spacing:.03em }
-.news-meta{ font:300 12px/1.2 Oswald; letter-spacing:.02em; color:var(--muted); margin-top:6px }
-
-/* Overlay mode: full-bleed image + black gradient for legibility */
-.news-root.overlay-mode .news-card{ display:block; padding:0 }
-.news-root.overlay-mode .news-thumb{ width:100%; border-radius:0 }
-.news-root.overlay-mode .news-body{
-  position:absolute; left:0; right:0; bottom:0; padding:10px 12px;
-  background:linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,.4) 50%, rgba(0,0,0,.88) 100%);
-}
-.news-root.overlay-mode .news-title{ color:#fff; text-shadow:0 1px 2px rgba(0,0,0,.6) }
-.news-root.overlay-mode .news-meta{ color:#e5e7eb }
-
-/* ======== 3-3-2-2 BREAKPOINTS + mode switching ======== */
-
-/* Laptop: 3 across, OVERLAY cards */
-@media (min-width:900px) and (max-width:1279px){
-  .newsgrid,.news-layout{
-    grid-template-columns: 1fr 1fr clamp(200px, 26vw, 320px);
-  }
-  #col-pro{ grid-column:1 }
-  #col-college{ grid-column:2 }
-  #col-scores{ grid-column:3; grid-row:auto }
-  /* keep overlay look */
-}
-
-/* Desktop wide: 3 across, SIDE cards */
+/* ===== BREAKPOINTS ===== */
+/* Desktop Wide ≥1280px → 3-across + side cards */
 @media (min-width:1280px){
-  .newsgrid,.news-layout{
-    grid-template-columns: 1fr 1fr clamp(240px, 24vw, 360px);
-  }
-  #col-pro{ grid-column:1 }
-  #col-college{ grid-column:2 }
-  #col-scores{ grid-column:3 }
-  /* turn overlay sections back into SIDE visuals */
-  .news-root.overlay-mode .news-card{ display:flex; padding:10px }
-  .news-root.overlay-mode .news-thumb{ width:120px; border-radius:8px }
-  .news-root.overlay-mode .news-body{ position:static; background:none; padding:0 }
-  .news-root.overlay-mode .news-title{ color:inherit; text-shadow:none }
+  .news-layout{grid-template-columns:repeat(3,1fr)}
+  .news-card{flex-direction:row}
 }
-
-/* Tablet: 2 across, SIDE cards (tighter) */
+/* Laptop 900–1279px → 3-across + overlay cards */
+@media (min-width:900px) and (max-width:1279px){
+  .news-layout{grid-template-columns:repeat(3,1fr)}
+  .news-card{flex-direction:column}
+}
+/* Tablet 601–899px → 2-across + side cards */
 @media (min-width:601px) and (max-width:899px){
-  .newsgrid,.news-layout{
-    grid-template-columns: 1.4fr .6fr;
-  }
-  #col-pro, #col-college{ grid-column:1 }
-  #col-scores{ grid-column:2; grid-row:1 / span 2 }
-  /* force SIDE look */
-  .news-root.overlay-mode .news-card{ display:flex; padding:10px }
-  .news-root.overlay-mode .news-thumb{ width:120px; border-radius:8px }
-  .news-root.overlay-mode .news-body{ position:static; background:none; padding:0 }
-  .news-root.overlay-mode .news-title{ color:inherit; text-shadow:none }
+  .news-layout{grid-template-columns:repeat(2,1fr)}
+  .news-card{flex-direction:row}
+  #col-pro,#col-college{grid-column:1}
+  #col-scores{grid-column:2;grid-row:1/span 2}
 }
-
-/* Mobile: 2 across, OVERLAY cards */
+/* Mobile ≤600px → 2-across + overlay cards */
 @media (max-width:600px){
-  .newsgrid,.news-layout{
-    grid-template-columns: 1fr clamp(130px, 36vw, 260px);
-    row-gap:16px;
-  }
-  #col-pro, #col-college{ grid-column:1 }
-  #col-scores{ grid-column:2; grid-row:1 / span 2 }
-  /* overlay already active by default via .overlay-mode */
+  .news-layout{grid-template-columns:repeat(2,1fr)}
+  .news-card{flex-direction:column}
+  #col-pro,#col-college{grid-column:1}
+  #col-scores{grid-column:2;grid-row:1/span 2}
 }
+</style>
+</head>
+<body>
+<!-- ===== SPLASH / HEADER / DRAWERS / FOOTER (keep your existing code here) ===== -->
+
+<main class="main container">
+  <div class="news-layout">
+    <!-- Column 1: Pro -->
+    <section id="col-pro" class="news-col">
+      <h3>ALUMNI HEADLINES (Pros)</h3>
+      <div id="proFeed" class="news-feed"></div>
+    </section>
+
+    <!-- Column 2: College -->
+    <section id="col-college" class="news-col">
+      <h3>ALUMNI HEADLINES (College)</h3>
+      <div id="collegeFeed" class="news-feed"></div>
+    </section>
+
+    <!-- Column 3: Scores -->
+    <aside id="col-scores" class="scores-col">
+      <h3>WEEKLY LINE SCORES</h3>
+      <div id="scoresMount" class="scores-scroll"></div>
+    </aside>
+  </div>
+</main>
+
+<footer class="site-footer">
+  <a href="https://no-errors.com/collections/all-webgems" target="_blank">
+    <img src="assets/img/partners/no-errors-banner.jpg" alt="Sponsor Banner">
+  </a>
+</footer>
+
+<!-- ===== JSON NEWS & SCRIPT BOOTSTRAP (your existing script block here) ===== -->
+
+</body>
+</html>
