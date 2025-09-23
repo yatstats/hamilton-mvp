@@ -9,364 +9,397 @@
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400&family=Bebas+Neue&display=swap" rel="stylesheet">
 
 <style>
-/* ---- THEME, HEADER, HERO, DRAWERS, GRID, SCORES ---- */
-/* same as your index.html with 3-3-2-2 responsive rules */
-:root{--bg:#0c0c0c;--fg:#f2f2f2;--muted:#c4c4c4;--line:rgba(255,255,255,.08);
---card-bg:#171717;--header-bg:#000;--footerH:70px;}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font-family:Oswald,sans-serif;}
-.header{position:sticky;top:0;z-index:50;background:var(--header-bg);}
-.wordmark-img{height:28px}
-.hero{padding:8px 0}.hero-right button{margin-left:8px}
-.newsgrid{display:grid;grid-template-columns:1fr clamp(200px,26vw,320px);gap:16px;}
-.scores-col .scores-sticky{position:sticky;top:140px;max-height:calc(100vh - 200px);overflow:auto;padding:10px;background:var(--card-bg);border-radius:12px}
-.week-block{margin-bottom:20px;border-bottom:1px solid var(--line)}
-.player-name{font:700 13px "Bebas Neue",sans-serif;margin:6px 0}
-.day-list{list-style:none;margin:0;padding:0}
-.day-list li{padding:4px 6px;font:300 11px Oswald}
-.day-list li.hasline{background:rgba(134,239,172,.08)}
-/* Responsive */
-@media(max-width:600px){.newsgrid{grid-template-columns:1fr clamp(130px,36vw,260px)}}
-@media(min-width:601px) and (max-width:899px){.newsgrid{grid-template-columns:1fr clamp(160px,30vw,300px)}}
-@media(min-width:900px) and (max-width:1279px){.newsgrid{grid-template-columns:1fr 1fr clamp(200px,26vw,320px)}}
-@media(min-width:1280px){.newsgrid{grid-template-columns:1fr 1fr clamp(240px,24vw,360px)}}
-.site-footer{position:fixed;left:0;right:0;bottom:0;height:var(--footerH);background:#000}
+/* -------------------- CORE THEME (matches index.html) -------------------- */
+:root{
+  --bg:#0c0c0c; --fg:#f2f2f2; --muted:#c4c4c4; --ink:#e8e8e8; --line:rgba(255,255,255,.08);
+  --card-bg:#171717; --header-bg:#000; --drawer-bg:rgba(10,10,10,.65);
+  --shade-end:rgba(0,0,0,.95);
+  --hamSmall:13px; --hamBig:20px; --hamBigger:24px; --tagGrey:#cfd2d6;
+  --crestH:clamp(28px,4.2vw,42px);
+  --containerPad:16px; --footerH:clamp(56px,8vh,77px);
+}
+body.light-theme{
+  --bg:#f4f4f4; --fg:#121212; --muted:#555; --ink:#222; --line:rgba(0,0,0,.1);
+  --card-bg:#fff; --header-bg:#fff; --drawer-bg:rgba(255,255,255,.65);
+}
+@font-face{font-family:'Indigo';src:url('assets/fonts/Indigo.otf') format('opentype');font-weight:400;font-style:normal;font-display:swap;}
+* {box-sizing:border-box} html,body{margin:0}
+body{background:var(--bg);color:var(--fg);font-family:Oswald,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;transition:background-color .3s,color .3s;}
+body.drawer-open{overflow:hidden}
+a{color:inherit;text-decoration:none}
+.container{max-width:1400px;margin:0 auto;padding:0 var(--containerPad)}
+.header{position:sticky;top:0;z-index:50;background:var(--header-bg);transition:background-color .3s;}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:8px 0}
+.left-icons{display:flex;align-items:center;gap:8px}
+.icon-btn{background:none;border:none;color:var(--fg);opacity:.92;display:inline-flex;align-items:center;justify-content:center;padding:0;margin:0 2px;cursor:pointer}
+.icon-btn i{font-size:20px}
+.topnav{display:flex;gap:18px;align-items:center}
+.nav-pair{white-space:nowrap}
+.nav-pair .thin{font:300 var(--hamSmall) Oswald,sans-serif;letter-spacing:.02em;color:#cfd2d6;margin-right:2px}
+body.light-theme .nav-pair .thin{color:var(--muted)}
+.nav-pair .bold{font:400 var(--hamSmall) Indigo,"Bebas Neue",sans-serif}
+.wordmark-wrap{display:flex;align-items:center;justify-content:flex-end;min-width:120px}
+.wordmark-img{height:clamp(18px,3.2vw,28px);width:auto;display:block}
+body.light-theme .wordmark-img{filter:invert(1)}
+@media (max-width:1200px){.topnav{display:none !important}}
+.hr-y{border-top:1px solid var(--line)}
+.schoolrow{display:flex;align-items:center;gap:10px;padding:6px var(--containerPad)}
+.ham-logo{height:var(--crestH);width:auto;object-fit:contain;display:block;flex-shrink:0}
+.schooltext{line-height:1}
+.schooltext .small{font:300 var(--hamSmall)/1 Oswald;letter-spacing:.02em;color:var(--muted)}
+.schooltext .big1{font:400 var(--hamBig)/1 "Bebas Neue",sans-serif}
+.schooltext .big2{font:400 var(--hamBigger)/1 "Bebas Neue",sans-serif;margin-top:-4px}
+.crumbs{font:300 calc(var(--hamSmall)*.5)/1 Oswald;letter-spacing:.02em;color:var(--muted);text-transform:uppercase}
+.hero{padding:2px 0}
+.hero-grid{display:flex;align-items:center;justify-content:space-between;gap:16px}
+.hero-left{display:flex;flex-direction:column;gap:4px}
+.hero-crumbs{margin:0;text-align:left;white-space:nowrap}
+@media (max-width:768px){.topbar .crumbs{display:block}.hero-left .crumbs{display:none}}
+@media (min-width:769px){.topbar .crumbs{display:none}.hero-left .crumbs{display:block}}
+.tag-duo{position:relative;height:1.8em}
+.tag-swap{position:absolute;left:0;top:0;right:0;opacity:0;animation:swap 6s infinite;white-space:nowrap}
+.tag-swap:nth-child(1){animation-delay:0s}
+.tag-swap:nth-child(2){animation-delay:3s}
+.tag-grey{font:300 1em Oswald,sans-serif;letter-spacing:.02em;color:var(--tagGrey)}
+body.light-theme .tag-grey{color:var(--muted)}
+.tag-bold{font:400 1em Indigo,"Bebas Neue",sans-serif}
+@keyframes swap{0%{opacity:0}5%{opacity:1}45%{opacity:1}50%{opacity:0}100%{opacity:0}}
+.hero-right{display:flex;gap:10px}
+.hero-icon i{font-size:20px}
+
+/* Drawers (unchanged structure) */
+.drawer-mask{position:fixed;inset:0;background:rgba(0,0,0,.35);opacity:0;pointer-events:none;transition:opacity .2s;z-index:60}
+.drawer{position:fixed;top:0;bottom:0;width:min(360px,82vw);background:var(--drawer-bg);backdrop-filter:blur(4px);color:var(--ink);transform:translateX(-110%);transition:transform .25s,background-color .3s;z-index:70}
+.drawer-right{right:0;left:auto;transform:translateX(110%);display:flex;flex-direction:column;height:100%}
+.drawer h3{margin:18px 16px 8px;padding-right:30px}
+.drawer .pad{padding:10px 16px}
+.drawer .close-btn{position:absolute;top:12px;right:12px}
+.drawer a{color:var(--ink)}
+.drawer a:hover{color:var(--fg)}
+body.drawer-left-open .drawer-mask,body.drawer-right-open .drawer-mask{opacity:1;pointer-events:auto}
+body.drawer-left-open #drawerLeft{transform:translateX(0)}
+body.drawer-right-open .drawer-right{transform:translateX(0)}
+.drawer-content{flex-grow:1;overflow-y:auto;padding:10px 16px}
+.drawer-footer{flex-shrink:0;padding:12px 16px;border-top:1px solid var(--line);background:rgba(10,10,10,.8);display:flex;gap:10px;align-items:center}
+body.light-theme .drawer-footer{background:rgba(255,255,255,.8)}
+
+/* Search + Filters + Account */
+.filter-group{border-bottom:1px solid var(--line)}
+.filter-group:last-of-type{border-bottom:none}
+.filter-title{padding:14px 0;cursor:pointer;font-weight:700;font-family:"Bebas Neue",sans-serif;letter-spacing:.05em;list-style:none;display:flex;justify-content:space-between;align-items:center}
+.filter-title::-webkit-details-marker{display:none}
+.filter-title::after{content:'▸';font-size:1.2em;transition:transform .2s}
+details[open]>.filter-title::after{transform:rotate(90deg)}
+.filter-options{padding:4px 0 16px 0}
+.filter-options label{display:block;margin-bottom:8px;padding-left:4px}
+.filter-options input[type=checkbox]{margin-right:8px;transform:scale(1.1)}
+.select-all-label{font-weight:700;border-bottom:1px solid var(--line);padding-bottom:8px !important;margin-bottom:12px !important}
+#liveResults{margin:10px 4px 18px;max-height:55vh;overflow:auto}
+.live-hit{padding:10px 12px;display:flex;align-items:center;gap:10px;border-radius:10px;cursor:pointer}
+.live-hit:hover{background:var(--line)}
+.live-hit img{width:36px;height:36px;border-radius:6px;object-fit:cover}
+.auth-tabs{display:flex;border-bottom:1px solid var(--line)}
+.auth-tab{flex:1;text-align:center;padding:10px;cursor:pointer;background:transparent;border:none;color:var(--muted);font-family:"Bebas Neue",sans-serif;font-size:16px;letter-spacing:.05em}
+.auth-tab.active{color:var(--fg);border-bottom:2px solid var(--fg)}
+.auth-form{display:none}
+.auth-form.active{display:block}
+.form-field{margin-bottom:15px}
+.form-field label{display:block;margin-bottom:5px;font-size:12px}
+.form-field input{width:100%;padding:10px;border-radius:8px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--ink)}
+body.light-theme .form-field input{background:rgba(0,0,0,.06)}
+.auth-btn{width:100%;padding:12px;background:var(--fg);color:var(--bg);border:none;border-radius:8px;font-family:"Bebas Neue",sans-serif;font-size:16px;letter-spacing:.08em;cursor:pointer}
+#authMessage{margin-top:15px;text-align:center;font-size:13px}
+.error{color:#fca5a5}
+.success{color:#86efac}
+
+/* -------------------- Page layout -------------------- */
+.main{padding:8px 0 calc(var(--footerH) + 12px)}
+
+/* Grid container for News + Scores (always 2 cols min; scores sticky right) */
+.newsgrid{
+  display:grid;
+  grid-template-columns: 1fr clamp(140px, 30vw, 320px);
+  gap:16px;
+  align-items:start;
+}
+
+/* Sections */
+.news-col h3, .scores-col h3{
+  font:400 18px "Bebas Neue",sans-serif;letter-spacing:.06em;margin:6px 0 10px
+}
+
+/* -------- News card base (SIDE mode default) -------- */
+.news-feed{display:flex;flex-direction:column;gap:12px}
+.news-card{
+  position:relative;background:var(--card-bg);border:1px solid var(--line);border-radius:12px;
+  overflow:hidden;display:flex;gap:12px;align-items:flex-start;padding:10px;
+}
+.news-thumb{
+  display:block;flex-shrink:0;width:120px;aspect-ratio:5/7;background:#000 center/cover no-repeat;border-radius:8px
+}
+.news-body{flex:1;padding:0}
+.news-title{display:block;font:400 22px/1.05 "Bebas Neue",sans-serif;letter-spacing:.03em}
+.news-title:hover{text-decoration:underline}
+.news-meta{font:300 12px/1.2 Oswald;letter-spacing:.02em;color:var(--muted);margin-top:6px}
+.news-links{display:flex;gap:12px;margin-top:4px}
+.news-readmore, .news-market{font:400 13px/1.1 "Bebas Neue",sans-serif;letter-spacing:.03em}
+.news-readmore:hover, .news-market:hover{text-decoration:underline}
+.news-share{display:flex;gap:10px;justify-content:flex-end;margin-top:8px}
+.news-share .icon-btn{opacity:.85;font-size:18px}
+.news-share .icon-btn:hover{opacity:1}
+
+/* -------- Overlay mode (used on BP1 and BP3) -------- */
+.overlay-mode .news-card{display:block;padding:0}
+.overlay-mode .news-thumb{width:100%;border-radius:0}
+.overlay-mode .news-body{
+  position:absolute;left:0;right:0;bottom:0;padding:10px 12px;
+  background:linear-gradient(180deg,rgba(0,0,0,0) 0%, rgba(0,0,0,.4) 50%, rgba(0,0,0,.85) 100%);
+}
+.overlay-mode .news-title{color:white;text-shadow:0 1px 2px rgba(0,0,0,.6)}
+.overlay-mode .news-meta{color:#e5e7eb}
+.overlay-mode .news-links{margin-top:6px}
+.overlay-mode .news-share{margin:8px 2px 2px 0}
+
+/* -------- Scores column (sticky) -------- */
+.scores-col{position:relative}
+.scores-sticky{
+  position:sticky; top:var(--stickyTop,140px);
+  max-height:calc(100vh - var(--stickyTop,140px) - var(--footerH) - 12px);
+  overflow:auto;border:1px solid var(--line);border-radius:12px;background:var(--card-bg);padding:10px
+}
+
+/* Simple score blocks */
+.week-block{padding:8px 6px 10px;border-bottom:1px solid var(--line)}
+.week-title{font:700 12px "Bebas Neue",sans-serif;letter-spacing:.06em;opacity:.9;margin:4px 2px 8px}
+.player-block{margin:8px 0 10px}
+.player-name{font:700 12px "Bebas Neue",sans-serif;letter-spacing:.04em;margin:3px 2px 6px}
+.games-list{list-style:none;margin:0;padding:0}
+.games-list li{padding:6px 8px;border-left:2px solid transparent}
+.games-list li.final{border-color:#86efac4d}
+.games-list li.inprogress{border-color:#fde0474d}
+.games-list li.scheduled{border-color:#93c5fd4d}
+.games-list li.dnp{border-color:#e5e7eb33;opacity:.85}
+.games-line{font:300 10px Oswald}
+.games-line .date{opacity:.9;margin-right:4px}
+.games-line .opp{opacity:.9}
+.games-line .sep{opacity:.3;margin:0 4px}
+
+/* -------- Breakpoints (2–2–3A–3B) -------- */
+
+/* BP1: Mobile — 2 across (news stacked in col1), overlay headlines */
+@media (max-width: 600px){
+  .newsgrid{
+    grid-template-columns: 1fr clamp(130px, 36vw, 260px);
+  }
+  .scores-sticky{font-size: clamp(9px, 2.6vw, 11px)}
+  .news-wrap{grid-column:1}
+  .scores-col{grid-column:2; grid-row:1 / span 2}
+  .news-section{margin-bottom:16px}
+  .newsgrid{row-gap:16px}
+  .news-wrap{display:block}
+  .news-root{display:block}
+  .news-root.overlay-mode{display:block}
+  .news-root{ /* flip to overlay in BP1 */
+    /* add a helper class via CSS only */
+  }
+  .news-root { }
+  .news-root { }
+  .news-root.overlay-mode .news-card{}
+}
+
+/* Force overlay visuals on BP1 */
+@media (max-width:600px){
+  .news-root{ }
+  .news-root{ }
+}
+
+/* BP2: Small tablets — still 2 across, switch to SIDE headlines/icons */
+@media (min-width:601px) and (max-width:899px){
+  .newsgrid{
+    grid-template-columns: 1fr clamp(160px, 30vw, 300px);
+  }
+  .scores-sticky{font-size: clamp(10px, 1.6vw, 12px)}
+  .news-wrap{grid-column:1}
+  .scores-col{grid-column:2; grid-row:1 / span 2}
+  .news-root{ /* ensure side mode */ }
+  .news-root.overlay-mode .news-card{display:flex;padding:10px}
+  .news-root.overlay-mode .news-thumb{width:120px;border-radius:8px}
+  .news-root.overlay-mode .news-body{position:static;background:none;padding:0}
+  .news-root.overlay-mode .news-title{color:inherit;text-shadow:none}
+}
+
+/* BP3: Laptops — 3 across (Pro | College | Scores). Overlay headlines again */
+@media (min-width:900px) and (max-width:1279px){
+  .newsgrid{
+    grid-template-columns: 1fr 1fr clamp(200px, 26vw, 320px);
+  }
+  #col-pro{grid-column:1}
+  #col-college{grid-column:2}
+  .scores-col{grid-column:3; grid-row:auto}
+  .news-root{ }
+  .news-root.overlay-mode .news-card{display:block;padding:0}
+  .news-root.overlay-mode .news-thumb{width:100%;border-radius:0}
+  .news-root.overlay-mode .news-body{
+    position:absolute;left:0;right:0;bottom:0;padding:10px 12px;
+    background:linear-gradient(180deg,rgba(0,0,0,0) 0%, rgba(0,0,0,.4) 50%, rgba(0,0,0,.85) 100%);
+  }
+  .news-root.overlay-mode .news-title{color:white;text-shadow:0 1px 2px rgba(0,0,0,.6)}
+}
+
+/* BP4: Wide desktop — 3 across; return to SIDE headlines/icons */
+@media (min-width:1280px){
+  .newsgrid{
+    grid-template-columns: 1fr 1fr clamp(240px, 24vw, 360px);
+  }
+  #col-pro{grid-column:1}
+  #col-college{grid-column:2}
+  .scores-col{grid-column:3}
+  .news-root.overlay-mode .news-card{display:flex;padding:10px}
+  .news-root.overlay-mode .news-thumb{width:120px;border-radius:8px}
+  .news-root.overlay-mode .news-body{position:static;background:none;padding:0}
+  .news-root.overlay-mode .news-title{color:inherit;text-shadow:none}
+}
+
+/* Footer */
+.site-footer{position:fixed;left:0;right:0;bottom:0;height:var(--footerH);background:var(--bg);border-top:1px solid var(--line);z-index:40}
+.site-footer a{display:block;height:100%;width:100%}
+.site-footer img{height:100%;width:100%;object-fit:contain}
+
+/* Accessibility focus */
+.icon-btn:focus,button:focus,input:focus,details summary:focus{outline:2px solid var(--fg);outline-offset:2px}
+
+/* Splash */
+#splashScreen{position:fixed;top:0;left:0;width:100%;height:100vh;background:#000;z-index:1000;opacity:1;transition:opacity .8s ease-out;pointer-events:auto;overflow:hidden}
+#splashScreen.is-hidden{opacity:0;pointer-events:none}
+.splash-top{position:absolute;width:100%;top:33%;left:50%;transform:translate(-50%,-50%);text-align:center}
+.splash-bottom{position:absolute;width:100%;bottom:33%;left:50%;transform:translate(-50%,50%);display:flex;align-items:center;justify-content:center;gap:clamp(12px,4vw,20px)}
+.splash-top .logo-container{position:relative;display:inline-block;overflow:hidden}
+.splash-top .splash-logo-main{width:clamp(280px,70vw,450px);height:auto;filter:drop-shadow(0 0 15px rgba(255,255,255,.2));animation:pulse-glow 2.5s infinite ease-in-out}
+.shimmer::after{content:'';position:absolute;top:0;left:-150%;width:70%;height:100%;background:linear-gradient(90deg,rgba(255,255,255,0) 0%,rgba(255,255,255,.2) 50%,rgba(255,255,255,0) 100%);transform:skewX(-25deg);animation:shimmer-effect 4s infinite;animation-delay:1.5s}
+.splash-bottom .splash-logo-h{height:clamp(45px,15vw,65px);width:auto;animation:fadeInDelayed 1s ease-in-out forwards;animation-delay:1.2s;opacity:0}
+.splash-bottom .splash-logo-ne{height:clamp(35px,12vw,50px);width:auto;animation:fadeInDelayed 1s ease-in-out forwards;animation-delay:1.2s;opacity:0}
+@keyframes fadeInDelayed{to{opacity:1}}
+@keyframes pulse-glow{0%{filter:drop-shadow(0 0 15px rgba(255,255,255,.2))}50%{filter:drop-shadow(0 0 25px rgba(255,255,255,.4))}100%{filter:drop-shadow(0 0 15px rgba(255,255,255,.2))}}
+@keyframes shimmer-effect{100%{left:150%}}
 </style>
 </head>
 
 <body>
-<header class="header">
-  <div class="topbar">
-    <button id="btnMenu"><i class="ri-menu-line"></i></button>
-    <nav>
-      <a href="index.html">WHERE THEY YAT?</a>
-      <a href="alumni-news.html">ALUMNI NEWS</a>
-      <a href="marketplace.html">MARKETPLACE</a>
-    </nav>
-    <img src="assets/img/yatstats-logo.png" class="wordmark-img" alt="YATSTATS">
+<!-- Splash -->
+<div id="splashScreen">
+  <div class="splash-top">
+    <div class="logo-container shimmer">
+      <img src="assets/img/yatstats-logo.png" alt="YAT?STATS Logo" class="splash-logo-main">
+    </div>
   </div>
+  <div class="splash-bottom">
+    <img src="assets/img/hamilton-logo.png" alt="Hamilton Huskies Logo" class="splash-logo-h">
+    <img src="assets/img/partners/american_logo.png" alt="American Logo" class="splash-logo-ne">
+  </div>
+</div>
+
+<!-- Header (identical structure) -->
+<header class="header">
+  <div class="container topbar">
+    <div class="left-icons">
+      <button class="icon-btn" id="btnMenu" aria-label="Menu"><i class="ri-menu-line"></i></button>
+      <div id="auth-container">
+        <button class="icon-btn" id="btnAccount" aria-label="Account"><i class="ri-user-3-line"></i></button>
+        <button class="icon-btn" id="btnSignOut" style="display:none;" aria-label="Sign out"><i class="ri-logout-box-line"></i></button>
+      </div>
+      <button class="icon-btn" id="theme-toggle" aria-label="Toggle Theme"><i class="ri-sun-line"></i></button>
+    </div>
+    <nav class="topnav" aria-label="Top Navigation">
+      <a href="index.html" class="nav-pair"><span class="thin">WHERE THEY</span><span class="bold">YAT?</span></a>
+      <a href="alumni-news.html" class="nav-pair"><span class="thin">ACTIVE ALUMNI</span><span class="bold">NEWS</span></a>
+      <a href="all-time-list.html" class="nav-pair"><span class="thin">NEXT-LEVEL</span><span class="bold">ALL-TIME LIST</span></a>
+      <a href="marketplace.html" class="nav-pair"><span class="thin">NIL & YAT-A-BOY</span><span class="bold">MARKETPLACE</span></a>
+      <a href="current-team.html" class="nav-pair"><span class="thin">THE</span><span class="bold">CURRENT TEAM</span></a>
+      <a href="partner-program.html" class="nav-pair"><span class="thin">PCD ACTION</span><span class="bold">PARTNER PROGRAM</span></a>
+      <a href="faq.html" class="nav-pair"><span class="bold">FAQ’S</span></a>
+    </nav>
+    <div class="wordmark-wrap">
+      <img class="wordmark-img" src="assets/img/yatstats-logo.png" alt="YAT?STATS">
+    </div>
+  </div>
+  <div class="hr-y"></div>
+  <div class="container schoolrow">
+    <img class="ham-logo" src="assets/img/hamilton-logo.png" alt="Hamilton H">
+    <div class="schooltext">
+      <div class="small">CHANDLER, AZ</div>
+      <div class="big1">HAMILTON HIGH SCHOOL</div>
+      <div class="big2">ACTIVE BASEBALL ALUMNI</div>
+    </div>
+  </div>
+  <div class="hr-y"></div>
   <section class="hero">
-    <div class="hero-right">
-      <button id="openSearch"><i class="ri-search-line"></i></button>
-      <button id="openFilters"><i class="ri-filter-3-line"></i></button>
-      <button id="filtersReset2"><i class="ri-restart-line"></i></button>
+    <div class="container hero-grid">
+      <div class="hero-left" aria-live="polite">
+        <div class="tag-duo">
+          <div class="tag-swap"><span class="tag-grey">ALUMNI</span> <span class="tag-bold">HEADLINES</span></div>
+          <div class="tag-swap"><span class="tag-grey">LATEST</span> <span class="tag-bold">NEWS & SCORES</span></div>
+        </div>
+        <div class="crumbs hero-crumbs">HAMILTON ▸ ACTIVE ALUMNI NEWS</div>
+      </div>
+      <div class="hero-right">
+        <button id="openSearch" class="hero-icon icon-btn" aria-label="Open search"><i class="ri-search-line"></i></button>
+        <button id="openFilters" class="hero-icon icon-btn" aria-label="Open filters"><i class="ri-filter-3-line"></i></button>
+        <button id="filtersReset2" class="hero-icon icon-btn" aria-label="Reset"><i class="ri-restart-line"></i></button>
+      </div>
     </div>
   </section>
 </header>
 
-<!-- Drawers omitted for brevity, identical to index.html (menu, filters, account) -->
+<!-- Drawers -->
+<div class="drawer-mask"></div>
 
-<main class="main container">
-  <div class="newsgrid">
-    <div class="news-wrap">
-      <section id="col-pro"><h3>ALUMNI HEADLINES (Pros)</h3></section>
-      <section id="col-college"><h3>ALUMNI HEADLINES (College)</h3></section>
+<aside class="drawer" id="drawerLeft" aria-label="Left drawer">
+  <button class="icon-btn close-btn"><i class="ri-close-line"></i></button>
+  <div class="drawer-content">
+    <h3>PLAYER PROFILE SEARCH</h3>
+    <div class="pad">
+      <input id="playerSearch" placeholder="Type to search…" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--ink)">
+      <div id="liveResults"></div>
     </div>
-
-    <aside class="scores-col">
-      <h3>WEEKLY LINE SCORES</h3>
-      <div class="scores-sticky">
-
-        <!-- Week of Sept 21–27 -->
-        <div class="week-block">
-          <div class="week-title">Week of September 21–27</div>
-          <div class="player-block"><div class="player-name">CODY BELLINGER</div>
-            <ul class="day-list"><li>9/21</li><li>9/22</li><li>9/23</li><li>9/24</li><li>9/25</li><li>9/26</li><li>9/27</li></ul>
-          </div>
-          <div class="player-block"><div class="player-name">DREW SWIFT</div>
-            <ul class="day-list"><li class="hasline">9/21 @ STL | 2-4 | R, BB, K, 2B, HR, 2RBI</li><li>9/22</li><li>9/23</li><li>9/24</li><li>9/25</li><li>9/26</li><li>9/27</li></ul>
-          </div>
-          <div class="player-block"><div class="player-name">GAVIN TURLEY</div>
-            <ul class="day-list"><li>9/21</li><li>9/22</li><li>9/23</li><li>9/24</li><li>9/25</li><li>9/26</li><li>9/27</li></ul>
-          </div>
-          <div class="player-block"><div class="player-name">LOGAN BOYER</div>
-            <ul class="day-list"><li>9/21</li><li>9/22</li><li>9/23</li><li>9/24</li><li>9/25</li><li>9/26</li><li>9/27</li></ul>
-          </div>
-          <div class="player-block"><div class="player-name">DOM HAMEL</div>
-            <ul class="day-list"><li>9/21</li><li>9/22</li><li>9/23</li><li>9/24</li><li>9/25</li><li>9/26</li><li>9/27</li></ul>
-          </div>
-        </div>
-
-        <!-- Week of Sept 14–20 -->
-        <div class="week-block">
-          <div class="week-title">Week of September 14–20</div>
-          <div class="player-block"><div class="player-name">CODY BELLINGER</div>
-            <ul class="day-list"><li>9/14</li><li class="hasline">9/15 @ BOS - 0-4 | 2K</li><li class="hasline">9/16 @ MIN - 1-5 | K, RBI, SB</li><li class="hasline">9/17 @ MIN - 2-4 | R, K, HR, 3RBI</li><li>9/18</li><li>9/19</li><li>9/20</li></ul>
-          </div>
-          <div class="player-block"><div class="player-name">DREW SWIFT</div>
-            <ul class="day-list"><li class="hasline">9/14 @ RENO - 1-4 | K</li><li>9/15</li><li class="hasline">9/16 vs SAL - 2-4 | 2K, 2RBI, SB</li><li class="hasline">9/17 vs SAL - 2-4 | K</li><li>9/18</li><li>9/19</li><li>9/20</li></ul>
-          </div>
-          <div class="player-block"><div class="player-name">DOM HAMEL</div>
-            <ul class="day-list"><li>9/14</li><li>9/15</li><li>9/16</li><li class="hasline">9/17 vs SD (MLB DEBUT) - 1IP, 3H, 0R, 0ER, 0BB</li><li>9/18</li><li>9/19</li><li>9/20</li></ul>
-          </div>
-        </div>
-<li class="empty"><div class="day-line"><span class="date">9/16</span></div></li>
-              <li class="empty"><div class="day-line"><span class="date">9/17</span></div></li>
-              <li class="empty"><div class="day-line"><span class="date">9/18</span></div></li>
-              <li class="empty"><div class="day-line"><span class="date">9/19</span></div></li>
-              <li class="empty"><div class="day-line"><span class="date">9/20</span></div></li>
-            </ul>
-          </div>
-
-          <div class="player-block">
-            <div class="player-name">LOGAN BOYER</div>
-            <ul class="day-list">
-              <li class="hasline"><div class="day-line"><span class="date">9/14</span>vs.SAC - 1IP, 1H, 0R, 0ER, 1K, 1BB</div></li>
-              <li class="empty"><div class="day-line"><span class="date">9/15</span></div></li>
-              <li class="empty"><div class="day-line"><span class="date">9/16</span></div></li>
-              <li class="hasline"><div class="day-line"><span class="date">9/17</span>vs.SAC - 1IP, 0H, 0R, 0ER, 0BB</div></li>
-              <li class="empty"><div class="day-line"><span class="date">9/18</span></div></li>
-              <li class="empty"><div class="day-line"><span class="date">9/19</span></div></li>
-              <li class="empty"><div class="day-line"><span class="date">9/20</span></div></li>
-            </ul>
-          </div>
-
-          <div class="player-block">
-            <div class="player-name">PATRICK MURPHY</div>
-            <ul class="day-list">
-              <li class="empty"><div class="day-line"><span class="date">9/14</span></div></li>
-              <li class="empty"><div class="day-line"><span class="date">9/15</span></div></li>
-              <li class="empty"><div class="day-line"><span class="date">9/16</span></div></li>
-              <li class="empty"><div class="day-line"><span class="date">9/17</span></div></li>
-              <li class="hasline"><div class="day-line"><span class="date">9/18</span>vs. LG - 4IP, 8H, 7R, 4ER, 2K, 2BB L</div></li>
-              <li class="empty"><div class="day-line"><span class="date">9/19</span></div></li>
-              <li class="empty"><div class="day-line"><span class="date">9/20</span></div></li>
-            </ul>
-          </div>
-
-          <div class="player-block">
-            <div class="player-name">SHANE MURPHY</div>
-            <ul class="day-list">
-              <li class="empty"><div class="day-line"><span class="date">9/14</span></div></li>
-              <li class="empty"><div class="day-line"><span class="date">9/15</span></div></li>
-              <li class="empty"><div class="day-line"><span class="date">9/16</span></div></li>
-              <li class="empty"><div class="day-line"><span class="date">9/17</span></div></li>
-              <li class="empty"><div class="day-line"><span class="date">9/18</span></div></li>
-              <li class="empty"><div class="day-line"><span class="date">9/19</span></div></li>
-              <li class="empty"><div class="day-line"><span class="date">9/20</span></div></li>
-            </ul>
-          </div>
-
-          <div class="player-block">
-            <div class="player-name">BROCK SELVIDGE</div>
-            <ul class="day-list">
-              <li class="empty"><div class="day-line"><span class="date">9/14</span></div></li>
-              <li class="empty"><div class="day-line"><span class="date">9/15</span></div></li>
-              <li class="empty"><div class="day-line"><span class="date">9/16</span></div></li>
-              <li class="empty"><div class="day-line"><span class="date">9/17</span></div></li>
-              <li class="empty"><div class="day-line"><span class="date">9/18</span></div></li>
-              <li class="empty"><div class="day-line"><span class="date">9/19</span></div></li>
-              <li class="empty"><div class="day-line"><span class="date">9/20</span></div></li>
-            </ul>
-          </div>
-
-          <div class="player-block">
-            <div class="player-name">JOSH TIEDEMANN</div>
-            <ul class="day-list">
-              <li class="empty"><div class="day-line"><span class="date">9/14</span></div></li>
-              <li class="empty"><div class="day-line"><span class="date">9/15</span></div></li>
-              <li class="empty"><div class="day-line"><span class="date">9/16</span></div></li>
-              <li class="empty"><div class="day-line"><span class="date">9/17</span></div></li>
-              <li class="empty"><div class="day-line"><span class="date">9/18</span></div></li>
-              <li class="empty"><div class="day-line"><span class="date">9/19</span></div></li>
-              <li class="empty"><div class="day-line"><span class="date">9/20</span></div></li>
-            </ul>
-          </div>
-        </div>
-
-        <!-- Week of September 7–13 -->
-        <div class="week-block">
-          <div class="week-title">Week of September 7–13</div>
-
-          <div class="player-block">
-            <div class="player-name">CODY BELLINGER</div>
-            <ul class="day-list">
-              <li class="empty"><div class="day-line"><span class="date">9/7</span></div></li>
-              <li class="empty"><div class="day-line"><span class="date">9/8</span></div></li>
-              <li class="empty"><div class="day-line"><span class="date">9/9</span></div></li>
-              <li class="empty"><div class="day-line"><span class="date">9/10</span></div></li>
-              <li class="empty"><div class="day-line"><span class="date">9/11</span></div></li>
-              <li class="empty"><div class="day-line"><span class="date">9/12</span></div></li>
-              <li class="empty"><div class="day-line"><span class="date">9/13</span></div></li>
-            </ul>
-          </div>
-
-          <div class="player-block">
-            <div class="player-name">DREW SWIFT</div>
-            <ul class="day-list">
-              <li class="empty"><div class="day-line"><span class="date">9/7</span></div></li>
-              <li class="empty"><div class="day-line"><span class="date">9/8</span></div></li>
-              <li class="empty"><div class="day-line"><span class="date">9/9</span></div></li>
-              <li class="empty"><div class="day-line"><span class="date">9/10</span></div></li>
-              <li class="empty"><div class="day-line"><span class="date">9/11</span></div></li>
-              <li class="empty"><div class="day-line"><span class="date">9/12</span></div></li>
-              <li class="empty"><div class="day-line"><span class="date">9/13</span></div></li>
-            </ul>
-          </div>
-
-          <div class="player-block">
-            <div class="player-name">GAVIN TURLEY</div>
-            <ul class="day-list">
-              <li class="empty"><div class="day-line"><span class="date">9/7</span></div></li>
-              <li class="empty"><div class="day-line"><span class="date">9/8</span></div></li>
-              <li class="empty"><div class="day-line"><span class="date">9/9</span></div></li>
-              <li class="empty"><div class="day-line"><span class="date">9/10</span></div></li>
-              <li class="empty"><div class="day-line"><span class="date">9/11</span></div></li>
-              <li class="empty"><div class="day-line"><span class="date">9/12</span></div></li>
-              <li class="empty"><div class="day-line"><span class="date">9/13</span></div></li>
-            </ul>
-          </div>
-
-          <div class="player-block">
-            <div class="player-name">TYLER WILSON</div>
-            <ul class="day-list">
-              <li class="empty"><div class="day-line"><span class="date">9/7</span></div></li>
-              <li class="empty"><div class="day-line"><span class="date">9/8</span></div></li>
-              <li class="empty"><div class="day-line"><span class="date">9/9</span></div></li>
-              <li class="empty"><div class="day-line"><span class="date">9/10</span></div></li>
-              <li class="empty"><div class="day-line"><span class="date">9/11</span></div></li>
-              <li class="empty"><div class="day-line"><span class="date">9/12</span></div></li>
-              <li class="empty"><div class="day-line"><span class="date">9/13</span></div></li>
-            </ul>
-          </div>
-
-          <div class="player-block">
-            <div class="player-name">LOGAN BOYER</div>
-            <ul class="day-list">
-              <li class="empty"><div class="day-line"><span class="date">9/7</span></div></li>
-              <li class="empty"><div class="day-line"><span class="date">9/8</span></div></li>
-              <li class="empty"><div class="day-line"><span class="date">9/9</span></div></li>
-              <li class="hasline"><div class="day-line"><span class="date">9/10</span>@ SUG - 1IP, 0H, 0R, 0ER, 1K, 1BB</div></li>
-              <li class="empty"><div class="day-line"><span class="date">9/11</span></div></li>
-              <li class="empty"><div class="day-line"><span class="date">9/12</span></div></li>
-              <li class="empty"><div class="day-line"><span class="date">9/13</span></div></li>
-            </ul>
-          </div>
-
-          <div class="player-block">
-            <div class="player-name">DOM HAMEL</div>
-            <ul class="day-list">
-              <li class="empty"><div class="day-line"><span class="date">9/7</span></div></li>
-              <li class="empty"><div class="day-line"><span class="date">9/8</span></div></li>
-              <li class="hasline"><div class="day-line"><span class="date">9/9</span>vs. WOR - 3IP, 1H, 0R, 0ER, 2K, 0BB</div></li>
-              <li class="empty"><div class="day-line"><span class="date">9/10</span></div></li>
-              <li class="empty"><div class="day-line"><span class="date">9/11</span></div></li>
-              <li class="empty"><div class="day-line"><span class="date">9/12</span></div></li>
-              <li class="empty"><div class="day-line"><span class="date">9/13</span></div></li>
-            </ul>
-          </div>
-
-          <div class="player-block">
-            <div class="player-name">PATRICK MURPHY</div>
-            <ul class="day-list">
-              <li class="empty"><div class="day-line"><span class="date">9/7</span></div></li>
-              <li class="empty"><div class="day-line"><span class="date">9/8</span></div></li>
-              <li class="hasline"><div class="day-line"><span class="date">9/9</span>vs. DOO - 1IP, 1H, 0R, 0ER, 2K, 0BB</div></li>
-              <li class="hasline"><div class="day-line"><span class="date">9/10</span>@ LG  - 1..2IP, 0H, 0R, 0ER, 2K, 1BB HOLD</div></li>
-              <li class="empty"><div class="day-line"><span class="date">9/11</span></div></li>
-              <li class="empty"><div class="day-line"><span class="date">9/12</span></div></li>
-              <li class="empty"><div class="day-line"><span class="date">9/13</span></div></li>
-              <!-- keeping your provided trailing 9/14 line in this block -->
-              <li class="empty"><div class="day-line"><span class="date">9/14</span></div></li>
-            </ul>
-          </div>
-
-          <div class="player-block">
-            <div class="player-name">SHANE MURPHY</div>
-            <ul class="day-list">
-              <li class="empty"><div class="day-line"><span class="date">9/7</span></div></li>
-              <li class="empty"><div class="day-line"><span class="date">9/8</span></div></li>
-              <li class="empty"><div class="day-line"><span class="date">9/9</span></div></li>
-              <li class="empty"><div class="day-line"><span class="date">9/10</span></div></li>
-              <li class="empty"><div class="day-line"><span class="date">9/11</span></div></li>
-              <li class="hasline"><div class="day-line"><span class="date">9/12</span>@ OMA - 5IP, 2H, 0R, 0ER, 1K, 1BB</div></li>
-              <li class="empty"><div class="day-line"><span class="date">9/13</span></div></li>
-            </ul>
-          </div>
-
-          <div class="player-block">
-            <div class="player-name">BROCK SELVIDGE</div>
-            <ul class="day-list">
-              <li class="empty"><div class="day-line"><span class="date">9/7</span></div></li>
-              <li class="empty"><div class="day-line"><span class="date">9/8</span></div></li>
-              <li class="empty"><div class="day-line"><span class="date">9/9</span></div></li>
-              <li class="empty"><div class="day-line"><span class="date">9/10</span></div></li>
-              <li class="empty"><div class="day-line"><span class="date">9/11</span></div></li>
-              <li class="hasline"><div class="day-line"><span class="date">9/12</span>@ REA - 7IP, 6H, 3R, 3ER, 5K, 1BB</div></li>
-              <li class="empty"><div class="day-line"><span class="date">9/13</span></div></li>
-            </ul>
-          </div>
-
-          <div class="player-block">
-            <div class="player-name">JOSH TIEDEMANN</div>
-            <ul class="day-list">
-              <li class="empty"><div class="day-line"><span class="date">9/7</span></div></li>
-              <li class="empty"><div class="day-line"><span class="date">9/8</span></div></li>
-              <li class="empty"><div class="day-line"><span class="date">9/9</span></div></li>
-              <li class="empty"><div class="day-line"><span class="date">9/10</span></div></li>
-              <li class="empty"><div class="day-line"><span class="date">9/11</span></div></li>
-              <li class="empty"><div class="day-line"><span class="date">9/12</span></div></li>
-              <li class="empty"><div class="day-line"><span class="date">9/13</span></div></li>
-            </ul>
-          </div>
-        </div>
-
-      </div><!-- /.scores-sticky -->
-    </aside>
-  </div><!-- /.newsgrid -->
-</main>
-
-<!-- Footer -->
-<footer class="site-footer">
-  <a href="marketplace.html" aria-label="YAT-A-BOY Marketplace">
-    <img src="assets/img/partners/american_banner.png" alt="Visit the YAT-A-BOY Marketplace" style="height:100%;width:100%;object-fit:contain">
-  </a>
-</footer>
-
-<!-- Drawer mask + Drawers (fixed, can live anywhere in body) -->
-<div class="drawer-mask" style="position:fixed;inset:0;background:rgba(0,0,0,.35);opacity:0;pointer-events:none;transition:.2s"></div>
-
-<aside class="drawer" id="drawerLeft" aria-label="Left drawer" style="position:fixed;top:0;bottom:0;left:0;width:min(360px,82vw);transform:translateX(-110%);background:rgba(10,10,10,.9);backdrop-filter:blur(4px);z-index:70;color:#fff;">
-  <button class="icon-btn close-btn" style="position:absolute;top:12px;right:12px"><i class="ri-close-line"></i></button>
-  <div class="drawer-content" style="height:100%;overflow:auto;padding:16px">
-    <h3 style="margin-top:0">PLAYER PROFILE SEARCH</h3>
-    <input id="playerSearch" placeholder="Type to search…" style="width:100%;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.06);color:#fff">
-    <div id="liveResults" style="margin-top:10px"></div>
     <h3>NAVIGATION</h3>
-    <nav style="display:flex;flex-direction:column;gap:10px">
-      <a href="index.html">WHERE THEY YAT?</a>
-      <a href="alumni-news.html">ACTIVE ALUMNI NEWS</a>
-      <a href="all-time-list.html">NEXT-LEVEL ALL-TIME LIST</a>
-      <a href="marketplace.html">NIL &amp; YAT-A-BOY MARKETPLACE</a>
-      <a href="current-team.html">THE CURRENT TEAM</a>
-      <a href="partner-program.html">PCD ACTION PARTNER PROGRAM</a>
-      <a href="faq.html">FAQ’S</a>
-    </nav>
+    <div class="pad" style="display:flex;flex-direction:column;gap:12px">
+      <a href="index.html" class="nav-pair"><span class="thin">WHERE THEY</span><span class="bold">YAT?</span></a>
+      <a href="alumni-news.html" class="nav-pair"><span class="thin">ACTIVE ALUMNI</span><span class="bold">NEWS</span></a>
+      <a href="all-time-list.html" class="nav-pair"><span class="thin">NEXT-LEVEL</span><span class="bold">ALL-TIME LIST</span></a>
+      <a href="marketplace.html" class="nav-pair"><span class="thin">NIL & YAT-A-BOY</span><span class="bold">MARKETPLACE</span></a>
+      <a href="current-team.html" class="nav-pair"><span class="thin">THE</span><span class="bold">CURRENT TEAM</span></a>
+      <a href="partner-program.html" class="nav-pair"><span class="thin">PCD ACTION</span><span class="bold">PARTNER PROGRAM</span></a>
+      <a href="faq.html" class="nav-pair"><span class="bold">FAQ’S</span></a>
+    </div>
   </div>
 </aside>
 
-<aside class="drawer drawer-right" id="drawerFilters" aria-label="Right drawer (filters)" style="position:fixed;top:0;bottom:0;right:0;width:min(360px,82vw);transform:translateX(110%);background:rgba(10,10,10,.9);backdrop-filter:blur(4px);z-index:70;color:#fff;display:flex;flex-direction:column;">
-  <button class="icon-btn close-btn" style="position:absolute;top:12px;right:12px"><i class="ri-close-line"></i></button>
-  <h3 style="margin:18px 16px 8px">FILTERS</h3>
-  <div class="drawer-content" id="filters" style="flex:1;overflow:auto;padding:10px 16px">
+<aside class="drawer drawer-right" id="drawerFilters" style="display:flex;">
+  <button class="icon-btn close-btn"><i class="ri-close-line"></i></button>
+  <h3>FILTERS</h3>
+  <div class="drawer-content" id="filters">
     <details class="filter-group" open>
       <summary class="filter-title">By Name</summary>
       <div class="filter-options">
-        <input id="filterName" placeholder="Type a name…" style="width:100%;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.06);color:#fff"/>
+        <input id="filterName" placeholder="Type a name…" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--ink)"/>
       </div>
     </details>
+
+    <!-- NEW: Date filter for headlines only -->
     <details class="filter-group" open>
       <summary class="filter-title">By Date (Headlines)</summary>
       <div class="filter-options">
-        <label>From <input id="dateFrom" type="date" style="width:100%;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.06);color:#fff"></label>
-        <label>To <input id="dateTo" type="date" style="width:100%;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.06);color:#fff"></label>
+        <label>From <input id="dateFrom" type="date" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--ink)"></label>
+        <label>To <input id="dateTo" type="date" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--ink)"></label>
         <div style="display:flex;gap:8px;margin-top:8px">
-          <button class="icon-btn" id="quick7" style="padding:8px 10px;border:1px solid rgba(255,255,255,.15);border-radius:10px">Last 7 days</button>
-          <button class="icon-btn" id="quick30" style="padding:8px 10px;border:1px solid rgba(255,255,255,.15);border-radius:10px">Last 30 days</button>
-          <button class="icon-btn" id="clearDates" style="padding:8px 10px;border:1px solid rgba(255,255,255,.15);border-radius:10px">Clear</button>
+          <button class="icon-btn" id="quick7" style="padding:8px 10px;border:1px solid var(--line);border-radius:10px">Last 7 days</button>
+          <button class="icon-btn" id="quick30" style="padding:8px 10px;border:1px solid var(--line);border-radius:10px">Last 30 days</button>
+          <button class="icon-btn" id="clearDates" style="padding:8px 10px;border:1px solid var(--line);border-radius:10px">Clear</button>
         </div>
         <div style="opacity:.75;font-size:12px;margin-top:6px">Affects headlines only. Line scores are independent.</div>
       </div>
     </details>
+
     <details class="filter-group">
       <summary class="filter-title">By Status</summary>
       <div class="filter-options" id="filterStatus">
@@ -383,7 +416,6 @@
       <summary class="filter-title">By Level</summary>
       <div class="filter-options" id="filterLevels">
         <label class="select-all-label"><input type="checkbox" class="select-all"> Select All</label>
-        <!-- populate dynamically later if needed -->
       </div>
     </details>
     <details class="filter-group">
@@ -395,107 +427,450 @@
       <div class="filter-options" id="filterRosterYear"></div>
     </details>
   </div>
-  <div class="drawer-footer" style="padding:12px 16px;border-top:1px solid rgba(255,255,255,.15);display:flex;gap:8px">
-    <button id="filtersReset" class="icon-btn" style="padding:10px 14px;border:1px solid rgba(255,255,255,.15);border-radius:12px"><i class="ri-restart-line"></i>&nbsp;Reset Filters</button>
+  <div class="drawer-footer">
+    <button id="filtersReset" class="icon-btn" style="padding:10px 14px;border:1px solid var(--line);border-radius:12px"><i class="ri-restart-line"></i>&nbsp;Reset Filters</button>
   </div>
 </aside>
 
-<aside class="drawer drawer-right" id="drawerAccount" aria-label="Right drawer (account)" style="position:fixed;top:0;bottom:0;right:0;width:min(360px,82vw);transform:translateX(110%);background:rgba(10,10,10,.9);backdrop-filter:blur(4px);z-index:70;color:#fff;display:flex;flex-direction:column;">
-  <button class="icon-btn close-btn" style="position:absolute;top:12px;right:12px"><i class="ri-close-line"></i></button>
-  <h3 style="margin:18px 16px 8px">ACCOUNT</h3>
-  <div class="drawer-content" style="flex:1;overflow:auto;padding:10px 16px">
-    <div class="auth-tabs" style="display:flex;border-bottom:1px solid rgba(255,255,255,.15)">
-      <button class="auth-tab active" data-tab="signIn" style="flex:1;padding:10px;background:none;border:none;color:#fff">Sign In</button>
-      <button class="auth-tab" data-tab="register" style="flex:1;padding:10px;background:none;border:none;color:#aaa">Register</button>
+<aside class="drawer drawer-right" id="drawerAccount" style="display:none;">
+  <button class="icon-btn close-btn"><i class="ri-close-line"></i></button>
+  <h3>ACCOUNT</h3>
+  <div class="drawer-content">
+    <div class="auth-tabs">
+      <button class="auth-tab active" data-tab="signIn">Sign In</button>
+      <button class="auth-tab" data-tab="register">Register</button>
     </div>
     <div id="auth-forms-container" class="pad">
       <form id="signInForm" class="auth-form active">
-        <div class="form-field"><label>Email</label><input type="email" required style="width:100%;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.06);color:#fff"></div>
-        <div class="form-field"><label>Password</label><input type="password" required style="width:100%;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.06);color:#fff"></div>
-        <button type="submit" class="auth-btn" style="width:100%;padding:12px;border:none;border-radius:8px;background:#fff;color:#000">Sign In</button>
+        <div class="form-field"><label for="signInEmail">Email</label><input type="email" id="signInEmail" required></div>
+        <div class="form-field"><label for="signInPassword">Password</label><input type="password" id="signInPassword" required></div>
+        <button type="submit" class="auth-btn">Sign In</button>
       </form>
-      <form id="registerForm" class="auth-form" style="display:none">
-        <div class="form-field"><label>Email</label><input type="email" required style="width:100%;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.06);color:#fff"></div>
-        <div class="form-field"><label>Password</label><input type="password" required style="width:100%;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.06);color:#fff"></div>
-        <button type="submit" class="auth-btn" style="width:100%;padding:12px;border:none;border-radius:8px;background:#fff;color:#000">Create Account</button>
+      <form id="registerForm" class="auth-form">
+        <div class="form-field"><label for="registerEmail">Email</label><input type="email" id="registerEmail" required></div>
+        <div class="form-field"><label for="registerPassword">Password</label><input type="password" id="registerPassword" required></div>
+        <button type="submit" class="auth-btn">Create Account</button>
       </form>
-      <p id="authMessage" style="margin-top:10px"></p>
+      <p id="authMessage"></p>
     </div>
   </div>
 </aside>
 
-<!-- Scripts -->
-<script>
-/* Drawer helpers */
-const body = document.body;
-const mask = document.querySelector('.drawer-mask');
-function openLeft(){ body.classList.add('drawer-left-open'); showMask(); document.getElementById('drawerLeft').style.transform='translateX(0)'; }
-function openRight(which){ body.classList.add('drawer-right-open'); showMask(); document.querySelectorAll('.drawer-right').forEach(d=>d.style.transform='translateX(110%)'); document.getElementById(which).style.transform='translateX(0)'; }
-function closeDrawers(){ body.classList.remove('drawer-left-open','drawer-right-open'); hideMask(); document.getElementById('drawerLeft').style.transform='translateX(-110%)'; document.querySelectorAll('.drawer-right').forEach(d=>d.style.transform='translateX(110%)'); }
-function showMask(){ mask.style.opacity='1'; mask.style.pointerEvents='auto'; }
-function hideMask(){ mask.style.opacity='0'; mask.style.pointerEvents='none'; }
+<!-- MAIN -->
+<main class="main container">
+  <div class="newsgrid" aria-live="polite">
+    <!-- Left area (col 1 on 2-col; col 1 & 2 on 3-col) -->
+    <div class="news-wrap">
+      <section id="col-pro" class="news-col news-root overlay-mode">
+        <h3>ALUMNI HEADLINES (Pros)</h3>
+        <div id="proFeed" class="news-feed">
+          <p style="color:var(--muted)">Loading…</p>
+        </div>
+      </section>
 
-/* Topbar buttons */
-document.getElementById('btnMenu')?.addEventListener('click', openLeft);
-document.getElementById('openFilters')?.addEventListener('click', ()=> openRight('drawerFilters'));
-document.getElementById('btnAccount')?.addEventListener('click', ()=> openRight('drawerAccount'));
-document.getElementById('filtersReset2')?.addEventListener('click', ()=> {
-  document.getElementById('filtersReset')?.click();
-});
-mask?.addEventListener('click', closeDrawers);
-document.querySelectorAll('.drawer .close-btn').forEach(b=>b.addEventListener('click', closeDrawers));
+      <section id="col-college" class="news-col news-root overlay-mode">
+        <h3>ALUMNI HEADLINES (College)</h3>
+        <div id="collegeFeed" class="news-feed">
+          <p style="color:var(--muted)">Loading…</p>
+        </div>
+      </section>
+    </div>
 
-/* Auth tabs */
-document.querySelectorAll('.auth-tab').forEach(tab=>{
-  tab.addEventListener('click', ()=>{
-    document.querySelectorAll('.auth-tab').forEach(t=>t.classList.remove('active'));
-    tab.classList.add('active');
-    document.querySelectorAll('.auth-form').forEach(f=>f.style.display='none');
-    const form = document.getElementById(tab.dataset.tab+'Form');
-    if(form) form.style.display='block';
+    <!-- Sticky right column (always visible) -->
+    <aside class="scores-col">
+      <h3>WEEKLY LINE SCORES</h3>
+      <div id="scoresMount" class="scores-sticky">
+        <p style="color:var(--muted);padding:8px">Loading…</p>
+      </div>
+    </aside>
+  </div>
+</main>
+
+<footer class="site-footer">
+  <a href="https://www.americanpromo.com/" target="_blank" rel="noopener noreferrer">
+    <img src="assets/img/partners/american_banner.png" alt="Sponsor Banner">
+  </a>
+</footer>
+
+<!-- Inline mock data (replace with Sheets/API later) -->
+<script type="application/json" id="news-json">
+{
+  "items":[
+    {
+      "id":"1",
+      "title":"Bellinger goes deep twice in Baltimore slugfest",
+      "url":"https://example.com/bellinger-two-hr",
+      "image":"assets/img/now_players/cody_bellinger.jpg",
+      "source":"MLB.com",
+      "publishedAt":"2025-09-21T22:15:00-07:00",
+      "player_display_name":"Cody Bellinger",
+      "tags":{"level":"MLB"}
+    },
+    {
+      "id":"2",
+      "title":"Swift flashes leather, reaches twice in SeaWolves win",
+      "url":"https://example.com/swift-defense",
+      "image":"assets/img/now_players/drew_swift.jpg",
+      "source":"MiLB.com",
+      "publishedAt":"2025-09-19T18:40:00-07:00",
+      "player_display_name":"Drew Swift",
+      "tags":{"level":"AA"}
+    },
+    {
+      "id":"3",
+      "title":"Hamel racks up 9 Ks over six strong",
+      "url":"https://example.com/hamel-9k",
+      "image":"assets/img/now_players/dom_hamel.jpg",
+      "source":"MiLB.com",
+      "publishedAt":"2025-09-20T19:00:00-07:00",
+      "player_display_name":"Dom Hamel",
+      "tags":{"level":"AAA"}
+    },
+    {
+      "id":"4",
+      "title":"Murphy locks down first KBO save",
+      "url":"https://example.com/murphy-save",
+      "image":"assets/img/now_players/patrick_murphy.jpg",
+      "source":"Yonhap",
+      "publishedAt":"2025-09-22T09:12:00-07:00",
+      "player_display_name":"Patrick Murphy",
+      "tags":{"level":"INTERNATIONAL"}
+    },
+    {
+      "id":"5",
+      "title":"Garcia homers as Wildcats rally",
+      "url":"https://example.com/garcia-wildcats",
+      "image":"assets/img/now_players/luis_garcia.jpg",
+      "source":"Arizona Daily",
+      "publishedAt":"2025-09-17T12:12:00-07:00",
+      "player_display_name":"Luis Garcia",
+      "tags":{"level":"NCAA-D1"}
+    },
+    {
+      "id":"6",
+      "title":"Kucherak strings together three-hit day for Northwestern",
+      "url":"https://example.com/kucherak-three-hit",
+      "image":"assets/img/now_players/ryan_kucherak.jpg",
+      "source":"northwestern.edu",
+      "publishedAt":"2025-09-18T13:05:00-07:00",
+      "player_display_name":"Ryan Kucherak",
+      "tags":{"level":"NCAA-D1"}
+    }
+  ]
+}
+</script>
+
+<script type="application/json" id="scores-json">
+{
+  "weeks":[
+    {
+      "label":"This Week",
+      "players":[
+        {"name":"CODY BELLINGER","games":[
+          {"date":"9/21","opp":"@ BAL","status":"final","line":"2-4, 2 HR, 4 RBI"},
+          {"date":"9/20","opp":"@ BAL","status":"final","line":"1-3, BB"}
+        ]},
+        {"name":"DOM HAMEL","games":[
+          {"date":"9/20","opp":"vs SWB","status":"final","line":"6.0 IP, 3 H, 1 ER, 9 K"}
+        ]}
+      ]
+    },
+    {
+      "label":"Last Week",
+      "players":[
+        {"name":"DREW SWIFT","games":[
+          {"date":"9/18","opp":"@ ERI","status":"final","line":"1-3, BB, R"}
+        ]},
+        {"name":"PATRICK MURPHY","games":[
+          {"date":"9/17","opp":"KBO","status":"final","line":"1.0 IP, SV"}
+        ]}
+      ]
+    }
+  ]
+}
+</script>
+
+<!-- MAIN APP SCRIPT -->
+<script type="module">
+/* ---- Alumni News • 2–2–3A–3B layout • build 1.0 ---- */
+
+/* --------- Config (players CSV only used for search drawer like index) --------- */
+const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQcWJM6Q6hTdFnES_G5LUy4teCS-sJ5HdAc9F5HSY8DGE9egdGy8yUAe2ShT3tFm-CwUuCYeAYy_YiW/pub?gid=2028135390&single=true&output=csv";
+
+/* --------- Helpers --------- */
+const $ = s => document.querySelector(s);
+const $$ = s => Array.from(document.querySelectorAll(s));
+const debounce = (fn, ms=300)=>{ let t; return (...a)=>{ clearTimeout(t); t=setTimeout(()=>fn(...a),ms); }; };
+function setStickyTop(){
+  const header = document.querySelector('.header');
+  const top = (header?.offsetHeight || 120) + 10;
+  document.documentElement.style.setProperty('--stickyTop', top+'px');
+}
+function firstNameOf(full){ return String(full||'').trim().split(/\s+/)[0] || ''; }
+
+/* --------- Theme --------- */
+function setupTheme(){
+  const themeToggle=$('#theme-toggle'); if(!themeToggle) return;
+  const body=document.body, icon=themeToggle.querySelector('i');
+  const applyTheme=()=>{
+    const saved=localStorage.getItem('theme');
+    if (saved==='light'){ body.classList.add('light-theme'); icon?.classList.replace('ri-sun-line','ri-moon-line'); }
+    else { body.classList.remove('light-theme'); icon?.classList.replace('ri-moon-line','ri-sun-line'); }
+  };
+  themeToggle.addEventListener('click', ()=>{
+    body.classList.toggle('light-theme');
+    localStorage.setItem('theme', body.classList.contains('light-theme') ? 'light' : 'dark');
+    applyTheme();
   });
-});
+  applyTheme();
+}
 
-/* Filters quick date buttons + reset */
-document.getElementById('quick7')?.addEventListener('click',()=>{
-  const to=new Date(), from=new Date(); from.setDate(to.getDate()-7);
-  document.getElementById('dateFrom').value = from.toISOString().slice(0,10);
-  document.getElementById('dateTo').value   = to.toISOString().slice(0,10);
-});
-document.getElementById('quick30')?.addEventListener('click',()=>{
-  const to=new Date(), from=new Date(); from.setDate(to.getDate()-30);
-  document.getElementById('dateFrom').value = from.toISOString().slice(0,10);
-  document.getElementById('dateTo').value   = to.toISOString().slice(0,10);
-});
-document.getElementById('clearDates')?.addEventListener('click',()=>{
-  document.getElementById('dateFrom').value=''; document.getElementById('dateTo').value='';
-});
-document.getElementById('filtersReset')?.addEventListener('click',()=>{
-  document.querySelectorAll('#filters input[type=checkbox]').forEach(cb=>cb.checked=false);
-  const name=document.getElementById('filterName'); if(name) name.value='';
-  const df=document.getElementById('dateFrom'); if(df) df.value='';
-  const dt=document.getElementById('dateTo'); if(dt) dt.value='';
-});
+/* --------- Drawers & Events --------- */
+function closeDrawers(){ document.body.classList.remove('drawer-left-open','drawer-right-open','drawer-open'); }
+function setupEventListeners(){
+  $('#btnMenu')?.addEventListener('click',()=>{ document.body.classList.add('drawer-left-open','drawer-open'); });
+  $('#openSearch')?.addEventListener('click',()=>{ document.body.classList.add('drawer-left-open','drawer-open'); });
+  $('#openFilters')?.addEventListener('click',()=>{
+    $('#drawerFilters').style.display='flex';
+    $('#drawerAccount').style.display='none';
+    document.body.classList.add('drawer-right-open','drawer-open');
+  });
+  $('#btnAccount')?.addEventListener('click',()=>{
+    $('#drawerAccount').style.display='flex';
+    $('#drawerFilters').style.display='none';
+    document.body.classList.add('drawer-right-open','drawer-open');
+  });
+  $$('.close-btn').forEach(b=>b.addEventListener('click',closeDrawers));
+  $('.drawer-mask')?.addEventListener('click',closeDrawers);
+  $('#filtersReset')?.addEventListener('click',()=>{ resetFilters(); applyPlayerFilters(); applyNewsFilters(); });
+  $('#filtersReset2')?.addEventListener('click',()=>{ resetFilters(); applyPlayerFilters(); applyNewsFilters(); });
 
-/* Basic live search (optional visual) */
-document.getElementById('playerSearch')?.addEventListener('input', e=>{
-  const q=e.target.value.trim().toLowerCase();
-  const box=document.getElementById('liveResults'); if(!box) return;
+  // Date filter quick buttons
+  $('#quick7')?.addEventListener('click',()=>{ setDateRangeDays(7); applyNewsFilters(); });
+  $('#quick30')?.addEventListener('click',()=>{ setDateRangeDays(30); applyNewsFilters(); });
+  $('#clearDates')?.addEventListener('click',()=>{ $('#dateFrom').value=''; $('#dateTo').value=''; applyNewsFilters(); });
+  $('#dateFrom')?.addEventListener('change',applyNewsFilters);
+  $('#dateTo')?.addEventListener('change',applyNewsFilters);
+
+  window.addEventListener('resize', setStickyTop);
+}
+
+/* --------- Optional: players CSV for search drawer --------- */
+async function loadCSV(url){
+  const res = await fetch(url); if(!res.ok) throw new Error(`HTTP ${res.status}`);
+  const text = await res.text(); if(!text.trim()) throw new Error('Empty CSV');
+  const rows = text.trim().split(/\r?\n/).map(line => line.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/).map(c=>c.replace(/^"|"$/g,'')));
+  const header = rows.shift().map(h => h.trim());
+  const idx = n => header.indexOf(n);
+  return rows.map(r=>({
+    slug:r[idx('slug')], display_name:r[idx('display_name')],
+    first:r[idx('first')], last:r[idx('last')],
+    grad_class:r[idx('grad_class')], level:r[idx('level')]
+  }));
+}
+function imageNameOf(p){
+  const first=(p.first||'').toLowerCase(), last=(p.last||'').toLowerCase();
+  return (first && last) ? `${first}_${last}` : (p.display_name||'').toLowerCase().replace(/[^a-z0-9]+/g,'-');
+}
+function makeHit(p){
+  const el=document.createElement('div'); el.className='live-hit';
+  const name=imageNameOf(p);
+  const hsImgJpg=`assets/img/hs_players/${name}.jpg`;
+  const hsImgPng=`assets/img/hs_players/${name}.png`;
+  el.innerHTML=`<img src="${hsImgJpg}" onerror="this.onerror=null;this.src='${hsImgPng}';" alt="">
+                <div><div style="font-weight:700">${p.display_name}</div>
+                <div style="opacity:.7;font-size:.92em">${p.level||''} • Class of ${p.grad_class||''}</div></div>`;
+  el.onclick=()=>{ window.location.href = `./profile.html?player=${encodeURIComponent((p.slug||name))}`; };
+  return el;
+}
+function liveSearch(){
+  const q=($('#playerSearch')?.value||'').trim().toLowerCase();
+  const box=$('#liveResults'); if(!box) return;
   if(!q){ box.innerHTML=''; return; }
-  box.innerHTML = `<div style="opacity:.7">Search for “${q}”…</div>`;
-});
+  const hits=(window.PLAYERS||[]).filter(p=>(p.display_name||'').toLowerCase().includes(q)).slice(0,25);
+  box.innerHTML=''; hits.forEach(p=>box.appendChild(makeHit(p)));
+}
 
-/* Social share icon behavior for any .news-card (if you add cards later) */
-function urlEncode(s){return encodeURIComponent(s||location.href);}
-document.querySelectorAll('.news-card').forEach(card=>{
-  const url = card.dataset.url || location.href;
-  const title = card.dataset.title || 'Hamilton Alumni News';
-  card.querySelectorAll('[data-share=x]')?.forEach(a=>a.href=`https://twitter.com/intent/tweet?text=${urlEncode(title)}&url=${urlEncode(url)}`);
-  card.querySelectorAll('[data-share=fb]')?.forEach(a=>a.href=`https://www.facebook.com/sharer/sharer.php?u=${urlEncode(url)}`);
-  card.querySelectorAll('[data-share=mail]')?.forEach(a=>a.href=`mailto:?subject=${urlEncode(title)}&body=${urlEncode(url)}`);
-  // TikTok & Instagram don't have simple web share URLs; linking home as requested
-  card.querySelectorAll('[data-share=ig]')?.forEach(a=>a.href=`https://www.instagram.com/`);
-  card.querySelectorAll('[data-share=tt]')?.forEach(a=>a.href=`https://www.tiktok.com/`);
+/* --------- News rendering + filtering --------- */
+const PRO_LEVELS = new Set(['MLB','INTERNATIONAL','TRIPLE-A','AAA','DOUBLE-A','AA','HIGH-A','A+','LOW-A','A','ROOKIE','ROK','INDY']);
+const COLLEGE_LEVELS = new Set(['NCAA-D1','NCAA-D2','NCAA-D3','NAIA','JUCO']);
+let ALL_NEWS = [];
+
+function newsCardHTML(n){
+  const img = n.image || 'assets/img/news/placeholder.jpg';
+  const when = n.publishedAt ? new Date(n.publishedAt).toLocaleString() : '';
+  const src = n.source || 'News';
+  const pname = n.player_display_name || '';
+  const first = firstNameOf(pname);
+  const shareText = encodeURIComponent(`We See Where YAT, ${first}! #YATABOY${first}`);
+  const shareUrl = encodeURIComponent(n.url || location.href);
+  const xHref = `https://twitter.com/intent/tweet?text=${shareText}&url=${shareUrl}`;
+  const mailHref = `mailto:?subject=${encodeURIComponent(n.title||'Hamilton Alumni News')}&body=${shareText}%0A${shareUrl}`;
+  return `
+  <article class="news-card">
+    <a class="news-thumb" href="${n.url||'#'}" target="_blank" rel="noopener" style="background-image:url('${img}')" aria-label="Open story"></a>
+    <div class="news-body">
+      <a class="news-title" href="${n.url||'#'}" target="_blank" rel="noopener">${n.title||'Read more'}</a>
+      <div class="news-meta">${src} • ${when}</div>
+      <div class="news-links">
+        <a class="news-readmore" href="${n.url||'#'}" target="_blank" rel="noopener">READ MORE</a>
+        <a class="news-market" href="marketplace.html">YAT-A-BOY MARKETPLACE</a>
+      </div>
+      <div class="news-share" aria-label="Share">
+        <a class="icon-btn" href="${xHref}" target="_blank" rel="noopener" title="Share to X"><i class="ri-twitter-x-line"></i></a>
+        <a class="icon-btn" href="#" title="Instagram"><i class="ri-instagram-line"></i></a>
+        <a class="icon-btn" href="#" title="Facebook"><i class="ri-facebook-circle-line"></i></a>
+        <a class="icon-btn" href="#" title="TikTok"><i class="ri-tiktok-line"></i></a>
+        <a class="icon-btn" href="${mailHref}" title="Email"><i class="ri-mail-line"></i></a>
+      </div>
+    </div>
+  </article>`;
+}
+function renderNewsLists(){
+  const from = $('#dateFrom')?.value ? new Date($('#dateFrom').value) : null;
+  const to   = $('#dateTo')?.value ? new Date($('#dateTo').value+'T23:59:59') : null;
+
+  const items = ALL_NEWS.filter(it=>{
+    if (!from && !to) return true;
+    const d = new Date(it.publishedAt||0);
+    if (from && d < from) return false;
+    if (to && d > to) return false;
+    return true;
+  });
+
+  const pros = items.filter(n=> PRO_LEVELS.has(String(n.tags?.level||'').toUpperCase()) )
+                    .sort((a,b)=> new Date(b.publishedAt||0)-new Date(a.publishedAt||0));
+  const college = items.filter(n=> COLLEGE_LEVELS.has(String(n.tags?.level||'').toUpperCase()) )
+                       .sort((a,b)=> new Date(b.publishedAt||0)-new Date(a.publishedAt||0));
+
+  $('#proFeed').innerHTML = pros.length ? pros.map(newsCardHTML).join('') : `<p style="color:var(--muted)">No pro headlines in range.</p>`;
+  $('#collegeFeed').innerHTML = college.length ? college.map(newsCardHTML).join('') : `<p style="color:var(--muted)">No college headlines in range.</p>`;
+}
+function applyNewsFilters(){ renderNewsLists(); }
+function setDateRangeDays(days){
+  const to = new Date(); const from = new Date(); from.setDate(to.getDate()-days);
+  const iso = d => d.toISOString().slice(0,10);
+  $('#dateFrom').value = iso(from); $('#dateTo').value = iso(to);
+}
+
+/* --------- Line scores rendering --------- */
+function lineRowHTML(g){
+  const cls = (g.status||'final').toLowerCase();
+  const line = (g.status==='final' && g.line) ? g.line :
+               (g.status==='inprogress') ? 'GAME IN PROGRESS' :
+               (g.status==='scheduled') ? (g.time||'TBD') : 'DNP';
+  const segs = [
+    `<span class="date">${g.date}</span>`,
+    `<span class="opp">${g.opp}</span>`,
+    `<span class="sep">|</span>`,
+    `<span class="line">${line}</span>`
+  ];
+  return `<li class="${cls}"><div class="games-line">${segs.join(' ')}</div></li>`;
+}
+function renderScores(containerSel, data){
+  const el = $(containerSel); if(!el) return;
+  if (!data?.weeks?.length){ el.innerHTML = `<p style="color:var(--muted)">No scores available.</p>`; return; }
+  el.innerHTML = data.weeks.map(week=>{
+    const playersHTML = (week.players||[]).map(p=>{
+      const gamesHTML = (p.games||[]).map(lineRowHTML).join('');
+      return `<div class="player-block">
+        <div class="player-name">${p.name}</div>
+        <ul class="games-list">${gamesHTML}</ul>
+      </div>`;
+    }).join('');
+    return `<div class="week-block">
+      <div class="week-title">${week.label}</div>
+      ${playersHTML}
+    </div>`;
+  }).join('');
+}
+
+/* --------- Filters (shared with index patterns; here used for search/UX parity) --------- */
+function populateFilters(players){
+  const levels = [...new Set(players.map(p=>p.level).filter(Boolean))];
+  $('#filterLevels').innerHTML =
+    '<label class="select-all-label"><input type="checkbox" class="select-all"> Select All</label>' +
+    levels.map(level=>`<label><input type="checkbox" value="${level}"> ${level}</label>`).join('');
+
+  const gradClasses = [...new Set(players.map(p=>p.grad_class).filter(Boolean))].sort((a,b)=>b-a);
+  $('#filterGradClass').innerHTML =
+    '<label class="select-all-label"><input type="checkbox" class="select-all"> Select All</label>' +
+    gradClasses.map(y=>`<label><input type="checkbox" value="${y}"> ${y}</label>`).join('');
+
+  const rosterYears = [...new Set(players.flatMap(p=>(p.letter_years||'').split(',')).map(y=>y.trim()).filter(Boolean))].sort((a,b)=>b-a);
+  $('#filterRosterYear').innerHTML =
+    '<label class="select-all-label"><input type="checkbox" class="select-all"> Select All</label>' +
+    rosterYears.map(y=>`<label><input type="checkbox" value="${y}"> ${y}</label>`).join('');
+}
+function readPlayerFilters(){
+  const name=($('#filterName')?.value||'').trim().toLowerCase();
+  const levels = $$('#filterLevels input:checked:not(.select-all)').map(i=>i.value);
+  const status = $$('#filterStatus input:checked:not(.select-all)').map(i=>i.value);
+  const classes = $$('#filterGradClass input:checked:not(.select-all)').map(i=>i.value);
+  const rosterYears = $$('#filterRosterYear input:checked:not(.select-all)').map(i=>i.value);
+  return { name, levels, status, classes, rosterYears };
+}
+function applyPlayerFilters(){ /* this page doesn't list players; keep for future hook */ }
+function resetFilters(){
+  $$('#filters input').forEach(i=>{
+    if(i.type==='checkbox') i.checked=false;
+    if(i.type==='text' || i.type==='date') i.value='';
+  });
+  $$('#filterStatus input[value^="ACTIVE"]').forEach(i=>i.checked=true);
+}
+
+/* --------- Boot --------- */
+document.addEventListener('DOMContentLoaded', async ()=>{
+  // Splash once per session
+  const splash = $('#splashScreen');
+  if (sessionStorage.getItem('splashShown')) { if (splash) splash.style.display='none'; }
+  else {
+    if (splash){
+      setTimeout(()=>{
+        splash.classList.add('is-hidden');
+        splash.addEventListener('transitionend', (e)=>{ if(e.target===splash) splash.style.display='none'; }, {once:true});
+      }, 1800);
+    }
+    sessionStorage.setItem('splashShown','true');
+  }
+
+  setupTheme();
+  setupEventListeners();
+  setStickyTop();
+
+  // CSV for search drawer UX parity
+  try{
+    const players = await loadCSV(CSV_URL);
+    window.PLAYERS = players||[];
+    populateFilters(players||[]);
+    $('#playerSearch')?.addEventListener('input',debounce(liveSearch));
+  }catch{ /* silent */ }
+
+  // Load news
+  try{
+    const raw = $('#news-json')?.textContent || '{}';
+    const data = JSON.parse(raw);
+    ALL_NEWS = Array.isArray(data.items) ? data.items : [];
+  }catch{ ALL_NEWS = []; }
+  renderNewsLists();
+
+  // Load scores
+  let scores;
+  try{
+    const raw = $('#scores-json')?.textContent || '{}';
+    scores = JSON.parse(raw);
+  }catch{ scores = { weeks:[] }; }
+  renderScores('#scoresMount', scores);
+
+  // Filters interaction (checkbox select-all and name search live)
+  $('#filters')?.addEventListener('change',e=>{
+    if (e.target.classList.contains('select-all')){
+      const on = e.target.checked;
+      e.target.closest('.filter-options')?.querySelectorAll('input[type="checkbox"]:not(.select-all)').forEach(cb=>cb.checked=on);
+    }
+    applyPlayerFilters();
+    applyNewsFilters();
+  });
 });
 </script>
 </body>
