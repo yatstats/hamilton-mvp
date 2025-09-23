@@ -9,147 +9,157 @@
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400&family=Bebas+Neue&display=swap" rel="stylesheet">
 
 <style>
-/* ---- Core Theme ---- */
-:root{--bg:#0c0c0c;--fg:#f2f2f2;--muted:#c4c4c4;--line:rgba(255,255,255,.08);
- --card-bg:#171717;--header-bg:#000;--drawer-bg:rgba(10,10,10,.65);}
-body.light-theme{--bg:#f4f4f4;--fg:#121212;--muted:#555;--line:rgba(0,0,0,.1);--card-bg:#fff;--header-bg:#fff;--drawer-bg:rgba(255,255,255,.65);}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font-family:Oswald,sans-serif}
-a{text-decoration:none;color:inherit}.container{max-width:1400px;margin:0 auto;padding:0 16px}
-.header{position:sticky;top:0;z-index:50;background:var(--header-bg)}
-.topbar{display:flex;align-items:center;justify-content:space-between;padding:8px 0}
-.left-icons{display:flex;gap:8px}.icon-btn{background:none;border:none;color:var(--fg);cursor:pointer}
-.topnav{display:flex;gap:18px}@media(max-width:1200px){.topnav{display:none}}
-.wordmark-img{height:26px}.hr-y{border-top:1px solid var(--line)}
-.schoolrow{display:flex;align-items:center;gap:10px;padding:6px 16px}.ham-logo{height:40px}
-.hero{padding:4px 0}.hero-grid{display:flex;justify-content:space-between;align-items:center}
-.hero-right{display:flex;gap:10px}
-
-/* Layout */
-.main{padding:16px 0 80px}.news-layout{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
-@media(max-width:1200px){.news-layout{grid-template-columns:1.4fr .6fr}#col-pro,#col-college{grid-column:1}#col-scores{grid-column:2}}
-@media(max-width:768px){.news-layout{grid-template-columns:1fr}#col-scores{display:none}}
-
-/* News cards */
-.news-feed{display:flex;flex-direction:column;gap:12px}
-.news-card{display:flex;gap:12px;background:var(--card-bg);border:1px solid var(--line);border-radius:12px;padding:10px}
-.news-thumb{flex-shrink:0;width:120px;aspect-ratio:5/7;background:#000 center/cover no-repeat}
-.news-body{flex:1}.news-title{font:400 22px/1.1 "Bebas Neue",sans-serif}
-.news-meta{font:300 12px Oswald;color:var(--muted);margin-top:6px}
-.news-links{display:flex;gap:12px;margin-top:4px;font:400 13px "Bebas Neue"}
-.news-share{display:flex;gap:10px;margin-top:6px}
-.news-share .icon-btn{font-size:18px;opacity:.85}.news-share .icon-btn:hover{opacity:1}
-
-/* Scores */
-.scores-scroll{max-height:75vh;overflow:auto;background:var(--card-bg);border:1px solid var(--line);border-radius:12px;padding:10px}
-.week-title{font:700 13px "Bebas Neue";margin:8px 0}
-.player-name{font:700 12px "Bebas Neue";margin:6px 0}
-.games-list{list-style:none;margin:0;padding:0}
-.games-list li{padding:4px 6px;border-left:2px solid transparent}
-li.final{border-color:#86efac}li.inprogress{border-color:#fde047}li.scheduled{border-color:#93c5fd}li.dnp{border-color:#999}
-
-/* Footer */
-.site-footer{position:fixed;left:0;right:0;bottom:0;height:64px;background:var(--bg);border-top:1px solid var(--line)}
-.site-footer img{height:100%;object-fit:contain;width:100%}
+:root {
+  --bg: #0d0d0d;
+  --card: #1c1c1c;
+  --text: #fff;
+  --muted: #aaa;
+  --accent: #e63946;
+}
+body {margin:0; font-family: Oswald, sans-serif; background:var(--bg); color:var(--text);}
+header {background:#111; padding:10px; display:flex; justify-content:space-between; align-items:center;}
+header img {height:40px;}
+.grid {display:grid; gap:16px; margin:16px;}
+@media(max-width:767px){
+  .grid {grid-template-columns:1fr 1fr;}
+  .news-card {position:relative; overflow:hidden;}
+  .news-card img {width:100%; aspect-ratio:5/7; object-fit:cover;}
+  .news-content {position:absolute; bottom:0; left:0; right:0;
+    background:rgba(0,0,0,0.6); padding:8px;}
+}
+@media(min-width:768px) and (max-width:1199px){
+  .grid {grid-template-columns:1fr 1fr;}
+  .news-card {display:flex; background:var(--card);}
+  .news-card img {width:40%; object-fit:cover;}
+  .news-content {padding:10px;}
+}
+@media(min-width:1200px){
+  .grid {grid-template-columns:1fr 1fr 1fr;}
+  .news-card {background:var(--card);}
+  .news-card img {width:100%; aspect-ratio:5/7; object-fit:cover;}
+  .news-content {padding:10px;}
+}
+.news-card {border-radius:8px; overflow:hidden;}
+.news-title {font-weight:bold; margin-bottom:4px;}
+.news-meta {font-size:0.8em; color:var(--muted);}
+.icons {display:flex; gap:8px; margin-top:6px;}
+.icons i {font-size:1.2em; cursor:pointer;}
+.line-scores {background:var(--card); padding:10px; border-radius:8px; max-height:80vh; overflow-y:auto;}
+.line-scores h4 {margin:10px 0 4px; font-size:1em; border-bottom:1px solid #333;}
+select {background:#222; color:var(--text); border:none; padding:5px;}
 </style>
 </head>
-
 <body>
-<header class="header">
-  <div class="container topbar">
-    <div class="left-icons">
-      <button class="icon-btn" id="btnMenu"><i class="ri-menu-line"></i></button>
-      <button class="icon-btn" id="theme-toggle"><i class="ri-sun-line"></i></button>
-    </div>
-    <nav class="topnav">
-      <a href="index.html">YAT?STATS</a>
-      <a href="alumni-news.html">ALUMNI NEWS</a>
-    </nav>
-    <img class="wordmark-img" src="assets/img/yatstats-logo.png" alt="YAT?STATS">
-  </div>
-  <div class="hr-y"></div>
-  <div class="container schoolrow">
-    <img src="assets/img/hamilton-logo.png" class="ham-logo">
-    <div>
-      <div class="small">CHANDLER, AZ</div>
-      <div class="big1">HAMILTON HIGH SCHOOL</div>
-      <div class="big2">ACTIVE BASEBALL ALUMNI</div>
-    </div>
-  </div>
+
+<header>
+  <div><img src="assets/img/hamilton-logo.png" alt="H Logo"></div>
+  <div><img src="assets/img/yatstats-logo.png" alt="YAT?STATS"></div>
 </header>
 
-<main class="main container">
-  <div class="news-layout">
-    <!-- Pro -->
-    <section id="col-pro"><h3>Pro Alumni News</h3><div id="proFeed" class="news-feed"></div></section>
-    <!-- College -->
-    <section id="col-college"><h3>College Alumni News</h3><div id="collegeFeed" class="news-feed"></div></section>
-    <!-- Scores -->
-    <aside id="col-scores"><h3>Weekly Line Scores</h3><div id="scoresMount" class="scores-scroll"></div></aside>
-  </div>
+<main class="grid">
+  <!-- Pro Alumni News -->
+  <section>
+    <h3>Pro Alumni News</h3>
+    <div id="proNews"></div>
+  </section>
+
+  <!-- College Alumni News -->
+  <section>
+    <h3>College Alumni News</h3>
+    <div id="collegeNews"></div>
+  </section>
+
+  <!-- Line Scores -->
+  <section>
+    <h3>Weekly Line Scores</h3>
+    <label>Filter Week:
+      <select id="weekFilter">
+        <option value="sep21">Sep 21-27</option>
+        <option value="sep14">Sep 14-20</option>
+      </select>
+    </label>
+    <div id="lineScores" class="line-scores"></div>
+  </section>
 </main>
 
-<footer class="site-footer">
-  <a href="#"><img src="assets/img/partners/no-errors-banner.jpg"></a>
-</footer>
-
-<!-- Inline News JSON -->
-<script type="application/json" id="news-json">
-{
- "items":[
-  {"title":"Bellinger belts 2 HRs vs Orioles","url":"#","image":"assets/img/now_players/cody_bellinger.jpg","source":"MLB.com","publishedAt":"2025-09-21","player_display_name":"CODY BELLINGER","tags":{"level":"MLB"}},
-  {"title":"Swift reaches twice in SeaWolves win","url":"#","image":"assets/img/now_players/drew_swift.jpg","source":"MiLB.com","publishedAt":"2025-09-19","player_display_name":"DREW SWIFT","tags":{"level":"AA"}},
-  {"title":"Garcia homers for Wildcats","url":"#","image":"assets/img/now_players/luis_garcia.jpg","source":"Arizona Daily","publishedAt":"2025-09-18","player_display_name":"LUIS GARCIA","tags":{"level":"NCAA-D1"}}
- ]
-}
-</script>
-
 <script>
-const $=s=>document.querySelector(s);
-function renderNews(items,mountSel){
- const m=$(mountSel);if(!m)return;
- m.innerHTML=items.map(n=>{
-  const first=n.player_display_name.split(" ")[0];
-  const shareText=encodeURIComponent(`We See Where YAT, ${first}! #YATABOY${first}`);
-  const shareUrl=encodeURIComponent(n.url);
-  return `<article class="news-card">
-    <a class="news-thumb" href="${n.url}" style="background-image:url('${n.image}')"></a>
-    <div class="news-body">
-      <a class="news-title" href="${n.url}">${n.title}</a>
-      <div class="news-meta">${n.source} • ${n.publishedAt}</div>
-      <div class="news-links"><a href="${n.url}">READ MORE</a></div>
-      <div class="news-share">
-        <a class="icon-btn" href="https://twitter.com/intent/tweet?text=${shareText}&url=${shareUrl}" target="_blank"><i class="ri-twitter-x-line"></i></a>
-        <a class="icon-btn" href="#"><i class="ri-instagram-line"></i></a>
-        <a class="icon-btn" href="#"><i class="ri-facebook-circle-line"></i></a>
-        <a class="icon-btn" href="#"><i class="ri-tiktok-line"></i></a>
-        <a class="icon-btn" href="mailto:?subject=${encodeURIComponent(n.title)}&body=${shareText}%0A${shareUrl}"><i class="ri-mail-line"></i></a>
-        <a class="icon-btn" href="marketplace.html"><i class="ri-star-smile-line"></i></a>
+// Mock news data
+const newsData = {
+  pro: [
+    {title:"Bellinger Belts 2 HRs vs Orioles", source:"MLB.com", date:"2025-09-21", img:"https://picsum.photos/400/560?1", player:"Cody Bellinger"},
+    {title:"Swift Reaches Twice in Seawolves Win", source:"MLB.com", date:"2025-09-19", img:"https://picsum.photos/400/560?2", player:"Drew Swift"}
+  ],
+  college: [
+    {title:"Garcia Homers for Wildcats", source:"Arizona Daily", date:"2025-09-18", img:"https://picsum.photos/400/560?3", player:"Jose Garcia"}
+  ]
+};
+
+// Mock line scores
+const lineScores = {
+  sep21: {
+    "Cody Bellinger": [
+      "9/21 @ BAL | 2-3 | 2HR, 6RBI, SB",
+      "9/23 vs CWS | GAME IN PROGRESS",
+      "9/24 vs CWS | 4:05PM"
+    ],
+    "Drew Swift": [
+      "9/21 @ SAL | DNP",
+      "9/23 vs CWS | GAME IN PROGRESS"
+    ]
+  },
+  sep14: {
+    "Cody Bellinger": [
+      "9/18 vs DET | 1-4 | HR, 2RBI",
+      "9/20 @ BAL | 0-3 | BB"
+    ],
+    "Drew Swift": [
+      "9/16 @ RIC | 2-5 | 2B, R"
+    ]
+  }
+};
+
+// Render news
+function renderNews(){
+  const makeCard = (n) => `
+    <div class="news-card">
+      <img src="${n.img}" alt="${n.player}">
+      <div class="news-content">
+        <div class="news-title">${n.title}</div>
+        <div class="news-meta">${n.source} • ${n.date}</div>
+        <div class="icons">
+          <i class="ri-twitter-x-line"></i>
+          <i class="ri-instagram-line"></i>
+          <i class="ri-facebook-circle-line"></i>
+          <i class="ri-tiktok-fill"></i>
+          <i class="ri-mail-line"></i>
+          <i class="ri-star-smile-line"></i>
+        </div>
       </div>
-    </div>
-  </article>`;
- }).join('');
+    </div>`;
+  document.getElementById("proNews").innerHTML = newsData.pro.map(makeCard).join("");
+  document.getElementById("collegeNews").innerHTML = newsData.college.map(makeCard).join("");
 }
-function renderScores(){
- const el=$("#scoresMount");
- el.innerHTML=`<div class="week-title">Week of Sep 21–27</div>
- <div class="player-name">CODY BELLINGER</div>
- <ul class="games-list">
-   <li class="final"><div class="games-line">9/21 @BAL | 2-3 | 2HR, 6RBI, SB</div></li>
-   <li class="inprogress"><div class="games-line">9/23 vs CWS | GAME IN PROGRESS</div></li>
-   <li class="scheduled"><div class="games-line">9/24 vs CWS | 4:05PM</div></li>
- </ul>
- <div class="player-name">DREW SWIFT</div>
- <ul class="games-list">
-   <li class="dnp"><div class="games-line">9/21 @SAL | DNP</div></li>
-   <li class="inprogress"><div class="games-line">9/23 vs CWS | GAME IN PROGRESS</div></li>
- </ul>`;
+
+// Render line scores
+function renderScores(week){
+  const data = lineScores[week];
+  let html="";
+  Object.keys(data).forEach(player=>{
+    html += `<h4>${player}</h4>`;
+    data[player].forEach(g=>{
+      html += `<div>${g}</div>`;
+    });
+  });
+  document.getElementById("lineScores").innerHTML = html;
 }
-document.addEventListener("DOMContentLoaded",()=>{
- const data=JSON.parse($("#news-json").textContent).items||[];
- const pros=data.filter(n=>["MLB","AAA","AA"].includes(n.tags.level));
- const college=data.filter(n=>["NCAA-D1","NCAA-D2","JUCO"].includes(n.tags.level));
- renderNews(pros,"#proFeed");renderNews(college,"#collegeFeed");renderScores();
+
+// Init
+renderNews();
+renderScores("sep21");
+document.getElementById("weekFilter").addEventListener("change",e=>{
+  renderScores(e.target.value);
 });
 </script>
+
 </body>
 </html>
