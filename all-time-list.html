@@ -1,165 +1,56 @@
-<!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Active Alumni News • Hamilton YATSTATS</title>
-
-<link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400&family=Bebas+Neue&display=swap" rel="stylesheet">
-
-<style>
-:root {
-  --bg: #0d0d0d;
-  --card: #1c1c1c;
-  --text: #fff;
-  --muted: #aaa;
-  --accent: #e63946;
+/* Layout tweaks for 2-2-3 responsiveness */
+.news-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* Default: 2 across */
+  gap: 16px;
 }
-body {margin:0; font-family: Oswald, sans-serif; background:var(--bg); color:var(--text);}
-header {background:#111; padding:10px; display:flex; justify-content:space-between; align-items:center;}
-header img {height:40px;}
-.grid {display:grid; gap:16px; margin:16px;}
-@media(max-width:767px){
-  .grid {grid-template-columns:1fr 1fr;}
-  .news-card {position:relative; overflow:hidden;}
-  .news-card img {width:100%; aspect-ratio:5/7; object-fit:cover;}
-  .news-content {position:absolute; bottom:0; left:0; right:0;
-    background:rgba(0,0,0,0.6); padding:8px;}
-}
-@media(min-width:768px) and (max-width:1199px){
-  .grid {grid-template-columns:1fr 1fr;}
-  .news-card {display:flex; background:var(--card);}
-  .news-card img {width:40%; object-fit:cover;}
-  .news-content {padding:10px;}
-}
-@media(min-width:1200px){
-  .grid {grid-template-columns:1fr 1fr 1fr;}
-  .news-card {background:var(--card);}
-  .news-card img {width:100%; aspect-ratio:5/7; object-fit:cover;}
-  .news-content {padding:10px;}
-}
-.news-card {border-radius:8px; overflow:hidden;}
-.news-title {font-weight:bold; margin-bottom:4px;}
-.news-meta {font-size:0.8em; color:var(--muted);}
-.icons {display:flex; gap:8px; margin-top:6px;}
-.icons i {font-size:1.2em; cursor:pointer;}
-.line-scores {background:var(--card); padding:10px; border-radius:8px; max-height:80vh; overflow-y:auto;}
-.line-scores h4 {margin:10px 0 4px; font-size:1em; border-bottom:1px solid #333;}
-select {background:#222; color:var(--text); border:none; padding:5px;}
-</style>
-</head>
-<body>
 
-<header>
-  <div><img src="assets/img/hamilton-logo.png" alt="H Logo"></div>
-  <div><img src="assets/img/yatstats-logo.png" alt="YAT?STATS"></div>
-</header>
-
-<main class="grid">
-  <!-- Pro Alumni News -->
-  <section>
-    <h3>Pro Alumni News</h3>
-    <div id="proNews"></div>
-  </section>
-
-  <!-- College Alumni News -->
-  <section>
-    <h3>College Alumni News</h3>
-    <div id="collegeNews"></div>
-  </section>
-
-  <!-- Line Scores -->
-  <section>
-    <h3>Weekly Line Scores</h3>
-    <label>Filter Week:
-      <select id="weekFilter">
-        <option value="sep21">Sep 21-27</option>
-        <option value="sep14">Sep 14-20</option>
-      </select>
-    </label>
-    <div id="lineScores" class="line-scores"></div>
-  </section>
-</main>
-
-<script>
-// Mock news data
-const newsData = {
-  pro: [
-    {title:"Bellinger Belts 2 HRs vs Orioles", source:"MLB.com", date:"2025-09-21", img:"https://picsum.photos/400/560?1", player:"Cody Bellinger"},
-    {title:"Swift Reaches Twice in Seawolves Win", source:"MLB.com", date:"2025-09-19", img:"https://picsum.photos/400/560?2", player:"Drew Swift"}
-  ],
-  college: [
-    {title:"Garcia Homers for Wildcats", source:"Arizona Daily", date:"2025-09-18", img:"https://picsum.photos/400/560?3", player:"Jose Garcia"}
-  ]
-};
-
-// Mock line scores
-const lineScores = {
-  sep21: {
-    "Cody Bellinger": [
-      "9/21 @ BAL | 2-3 | 2HR, 6RBI, SB",
-      "9/23 vs CWS | GAME IN PROGRESS",
-      "9/24 vs CWS | 4:05PM"
-    ],
-    "Drew Swift": [
-      "9/21 @ SAL | DNP",
-      "9/23 vs CWS | GAME IN PROGRESS"
-    ]
-  },
-  sep14: {
-    "Cody Bellinger": [
-      "9/18 vs DET | 1-4 | HR, 2RBI",
-      "9/20 @ BAL | 0-3 | BB"
-    ],
-    "Drew Swift": [
-      "9/16 @ RIC | 2-5 | 2B, R"
-    ]
+@media (max-width: 768px) {
+  .news-layout {
+    grid-template-columns: 1fr 1fr; /* Mobile: 2 across */
   }
-};
-
-// Render news
-function renderNews(){
-  const makeCard = (n) => `
-    <div class="news-card">
-      <img src="${n.img}" alt="${n.player}">
-      <div class="news-content">
-        <div class="news-title">${n.title}</div>
-        <div class="news-meta">${n.source} • ${n.date}</div>
-        <div class="icons">
-          <i class="ri-twitter-x-line"></i>
-          <i class="ri-instagram-line"></i>
-          <i class="ri-facebook-circle-line"></i>
-          <i class="ri-tiktok-fill"></i>
-          <i class="ri-mail-line"></i>
-          <i class="ri-star-smile-line"></i>
-        </div>
-      </div>
-    </div>`;
-  document.getElementById("proNews").innerHTML = newsData.pro.map(makeCard).join("");
-  document.getElementById("collegeNews").innerHTML = newsData.college.map(makeCard).join("");
+  .news-card {
+    position: relative;
+  }
+  .news-title {
+    position: absolute;
+    bottom: 8px;
+    left: 8px;
+    right: 8px;
+    background: rgba(0,0,0,0.6);
+    padding: 6px;
+    border-radius: 6px;
+    color: #fff;
+    font-size: 16px;
+  }
 }
 
-// Render line scores
-function renderScores(week){
-  const data = lineScores[week];
-  let html="";
-  Object.keys(data).forEach(player=>{
-    html += `<h4>${player}</h4>`;
-    data[player].forEach(g=>{
-      html += `<div>${g}</div>`;
-    });
-  });
-  document.getElementById("lineScores").innerHTML = html;
+@media (min-width: 769px) and (max-width: 1200px) {
+  .news-layout {
+    grid-template-columns: 1.4fr .6fr; /* Tablet: 2 across */
+  }
+  .news-card {
+    display: flex;
+    flex-direction: row;
+  }
+  .news-thumb {
+    width: 160px;
+    aspect-ratio: auto;
+  }
+  .news-title {
+    position: static;
+    background: none;
+    padding: 0;
+    color: inherit;
+    font-size: 20px;
+  }
 }
 
-// Init
-renderNews();
-renderScores("sep21");
-document.getElementById("weekFilter").addEventListener("change",e=>{
-  renderScores(e.target.value);
-});
-</script>
-
-</body>
-</html>
+@media (min-width: 1201px) {
+  .news-layout {
+    grid-template-columns: 1fr 1fr 1fr; /* Desktop: 3 across */
+  }
+  #col-pro { grid-column: 1; }
+  #col-college { grid-column: 2; }
+  #col-scores { grid-column: 3; }
+}
