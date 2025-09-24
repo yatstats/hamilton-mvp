@@ -1,145 +1,148 @@
-
 <!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Alumni News • Hamilton YATSTATS</title>
+<title>Active Alumni News • Hamilton YATSTATS</title>
+
 <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400&family=Bebas+Neue&display=swap" rel="stylesheet">
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-  import { getAuth, onAuthStateChanged, signInWithCustomToken, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-  window.firebaseAuth = { getAuth, onAuthStateChanged, signInWithCustomToken, signInAnonymously };
-  try {
-    const firebaseConfig = JSON.parse(window.__firebase_config || '{}');
-    const app = initializeApp(firebaseConfig);
-    window.auth = getAuth(app);
-    onAuthStateChanged(window.auth, user => { document.dispatchEvent(new CustomEvent('authStateChanged', { detail: { user } })); });
-    if (window.__initial_auth_token) { await signInWithCustomToken(window.auth, window.__initial_auth_token); }
-    else { await signInAnonymously(window.auth); }
-  } catch (e) { console.error("Firebase initialization error:", e); }
-</script>
 
 <style>
-/* Base styles from your main page... */
+/* -------- Theme & base -------- */
 :root{
-  --bg: #0c0c0c; --fg: #f2f2f2; --muted: #c4c4c4; --ink: #e8e8e8; --line: rgba(255, 255, 255, 0.08);
-  --card-bg: #171717; --header-bg: #000; --drawer-bg: rgba(10, 10, 10, .65);
-  --hamSmall:13px; --hamBig:20px; --hamBigger:24px; --containerPad: 16px; --footerH: clamp(56px, 8vh, 77px);
+  --bg:#0c0c0c; --fg:#f2f2f2; --muted:#c4c4c4; --ink:#e8e8e8; --line:rgba(255,255,255,.08);
+  --card-bg:#171717; --header-bg:#000; --drawer-bg:rgba(10,10,10,.65);
+  --hamSmall:13px; --hamBig:20px; --hamBigger:24px; --tagGrey:#cfd2d6;
+  --crestH:clamp(28px,4.2vw,42px);
+  --containerPad:16px; --footerH:clamp(56px,8vh,77px);
 }
-body.light-theme {
-  --bg: #f4f4f4; --fg: #121212; --muted: #ddd; --ink: #222; --line: rgba(0, 0, 0, 0.1);
-  --card-bg: #ffffff; --header-bg: #ffffff; --drawer-bg: rgba(255, 255, 255, .65);
-}
-@font-face{font-family:'Indigo';src:url('assets/fonts/Indigo.otf') format('opentype');font-weight:400; font-style:normal; font-display:swap;}
-*{box-sizing:border-box} html,body{margin:0}
-body{background:var(--bg); color:var(--fg); font-family:Oswald,system-ui,sans-serif; transition: background-color 0.3s, color 0.3s;}
-body.drawer-open { overflow: hidden; }
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--fg);font-family:Oswald,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
 a{color:inherit;text-decoration:none}
 .container{max-width:1400px;margin:0 auto;padding:0 var(--containerPad)}
-.header{position:sticky;top:0;z-index:50;background:var(--header-bg);transition: background-color 0.3s;}
+
+/* -------- Header -------- */
+.header{position:sticky;top:0;z-index:50;background:var(--header-bg)}
 .topbar{display:flex;align-items:center;justify-content:space-between;padding:8px 0}
 .left-icons{display:flex;align-items:center;gap:8px}
-.icon-btn{background:none;border:none;color:var(--fg);opacity:.92;display:inline-flex;align-items:center;justify-content:center;padding:0;margin:0 2px; cursor: pointer;}
+.icon-btn{background:none;border:none;color:var(--fg);opacity:.92;display:inline-flex;align-items:center;justify-content:center;padding:0;margin:0 2px;cursor:pointer}
 .icon-btn i{font-size:20px}
 .topnav{display:flex;gap:18px;align-items:center}
-.nav-pair .thin{font:300 var(--hamSmall) Oswald, sans-serif; letter-spacing:.02em; color:#cfd2d6; margin-right:2px}
-body.light-theme .nav-pair .thin { color: var(--muted); }
-.nav-pair .bold{font:400 var(--hamSmall) Indigo, "Bebas Neue", sans-serif}
+.nav-pair{white-space:nowrap}
+.nav-pair .thin{font:300 var(--hamSmall) Oswald;letter-spacing:.02em;color:#cfd2d6;margin-right:2px}
+.nav-pair .bold{font:400 var(--hamSmall) "Bebas Neue",Indigo,sans-serif}
 .wordmark-wrap{display:flex;align-items:center;justify-content:flex-end;min-width:120px}
-.wordmark-img{height:clamp(18px,3.2vw,28px);width:auto;display:block}
-body.light-theme .wordmark-img { filter: invert(1); }
-@media (max-width:1200px){ .topnav{display:none !important} }
+.wordmark-img{height:clamp(18px,3.2vw,28px)}
 .hr-y{border-top:1px solid var(--line)}
 .schoolrow{display:flex;align-items:center;gap:10px;padding:6px var(--containerPad)}
-.ham-logo{height: clamp(28px, 4.2vw, 42px);width:auto;object-fit:contain;display:block; flex-shrink: 0;}
-.schooltext{line-height:1}
-.schooltext .small{font:300 var(--hamSmall)/1 Oswald;letter-spacing:.02em;color:var(--muted)}
-.schooltext .big1{font:400 var(--hamBig)/1 "Bebas Neue",sans-serif}
-.schooltext .big2{font:400 var(--hamBigger)/1 "Bebas Neue",sans-serif;margin-top:-4px}
+.ham-logo{height:var(--crestH)}
+.schooltext .small{font:300 var(--hamSmall) Oswald;color:var(--muted)}
+.schooltext .big1{font:400 var(--hamBig) "Bebas Neue"}
+.schooltext .big2{font:400 var(--hamBigger) "Bebas Neue";margin-top:-4px}
+.crumbs{font:300 calc(var(--hamSmall)*.5) Oswald;color:var(--muted);text-transform:uppercase}
 .hero{padding:2px 0}
 .hero-grid{display:flex;align-items:center;justify-content:space-between;gap:16px}
-.tag-duo{position:relative;height:1.8em}
-.tag-grey{font:300 1em Oswald,sans-serif;letter-spacing:.02em;color:#cfd2d6}
-.tag-bold{font:400 1em Indigo,"Bebas Neue",sans-serif}
-.drawer-mask{position:fixed;inset:0;background:rgba(0,0,0,.35);opacity:0;pointer-events:none;transition:opacity .2s;z-index:60}
-.drawer{position:fixed;top:0;bottom:0;width:min(360px,82vw);background:var(--drawer-bg);backdrop-filter:blur(4px);color:var(--ink);transform:translateX(-110%);transition:transform .25s, background-color 0.3s;z-index:70}
-.drawer-right{right:0;left:auto;transform:translateX(110%); display: flex; flex-direction: column; height: 100%;}
-.drawer h3{margin:18px 16px 8px; padding-right: 30px;}
-.drawer .pad { padding: 10px 16px; }
-.drawer .close-btn { position: absolute; top: 12px; right: 12px; }
-.drawer a{color:var(--ink)}
-body.drawer-left-open .drawer-mask,body.drawer-right-open .drawer-mask{opacity:1;pointer-events:auto}
-body.drawer-left-open #drawerLeft{transform:translateX(0)}
-body.drawer-right-open .drawer-right{transform:translateX(0)}
-.drawer-content { flex-grow: 1; overflow-y: auto; padding: 10px 16px;}
+.hero-right{display:flex;gap:10px}
+
+/* -------- Main grid (3A→3B→2A→2B) -------- */
 .main{padding:8px 0 calc(var(--footerH) + 12px)}
+.newsgrid{display:grid;grid-template-columns:1fr clamp(140px,30vw,320px);gap:16px;align-items:start}
+
+/* News cards */
+.news-feed{display:flex;flex-direction:column;gap:12px}
+.news-card{position:relative;background:var(--card-bg);border:1px solid var(--line);border-radius:12px;overflow:hidden;display:flex;gap:12px;align-items:flex-start;padding:10px}
+.news-thumb{flex-shrink:0;width:120px;aspect-ratio:5/7;background:#000 center/cover no-repeat;border-radius:8px}
+.news-body{flex:1}
+.news-title{display:block;font:400 22px/1.05 "Bebas Neue"}
+.news-meta{font:300 12px/1.2 Oswald;color:var(--muted);margin-top:6px}
+.news-links{display:flex;gap:12px;margin-top:4px}
+.news-readmore,.news-market{font:400 13px/1.1 "Bebas Neue";letter-spacing:.03em}
+.news-share{display:flex;gap:10px;justify-content:flex-end;margin-top:8px}
+.news-share .icon-btn{opacity:.85}
+.news-share .icon-btn:hover{opacity:1}
+
+/* Overlay mode (A) */
+.overlay-mode .news-card{display:block;padding:0}
+.overlay-mode .news-thumb{width:100%;border-radius:0}
+.overlay-mode .news-body{
+  position:absolute;left:0;right:0;bottom:0;padding:10px 12px;
+  background:linear-gradient(180deg,rgba(0,0,0,0) 0%, rgba(0,0,0,.4) 50%, rgba(0,0,0,.85) 100%);
+}
+.overlay-mode .news-title{color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.6)}
+.overlay-mode .news-meta{color:#e5e7eb}
+
+/* Scores column */
+.scores-col{position:relative}
+.scores-sticky{position:sticky;top:140px;max-height:calc(100vh - 140px - var(--footerH) - 12px);overflow:auto;border:1px solid var(--line);border-radius:12px;background:var(--card-bg);padding:10px}
+.week-block{padding:8px 6px 10px;border-bottom:1px solid var(--line)}
+.week-title{font:700 12px "Bebas Neue";opacity:.9;margin:4px 2px 8px}
+.player-block{margin:8px 0 10px}
+.player-name{font:700 12px "Bebas Neue";margin:3px 2px 6px}
+.games-list{list-style:none;margin:0;padding:0}
+.games-list li{padding:6px 8px;border-left:2px solid transparent}
+.games-list li.final{border-color:#86efac4d}
+.games-list li.inprogress{border-color:#fde0474d}
+.games-list li.scheduled{border-color:#93c5fd4d}
+.games-list li.dnp{border-color:#e5e7eb33;opacity:.85}
+.games-line{font:300 10px Oswald}
+.games-line .date{opacity:.9;margin-right:4px}
+
+/* Breakpoints -> 3A / 3B / 2A / 2B */
+@media (max-width:600px){ /* 2A: overlay cards + sticky scores right */
+  .newsgrid{grid-template-columns:1fr clamp(130px,36vw,260px);row-gap:16px}
+  .scores-sticky{font-size:clamp(9px,2.6vw,11px)}
+  .news-root.overlay-mode{display:block}
+}
+@media (min-width:601px) and (max-width:899px){ /* 2B: side cards + sticky scores right */
+  .newsgrid{grid-template-columns:1fr clamp(160px,30vw,300px)}
+  .scores-sticky{font-size:clamp(10px,1.6vw,12px)}
+  .news-root.overlay-mode .news-card{display:flex;padding:10px}
+  .news-root.overlay-mode .news-thumb{width:120px;border-radius:8px}
+  .news-root.overlay-mode .news-body{position:static;background:none;padding:0}
+}
+@media (min-width:900px) and (max-width:1279px){ /* 3A: overlay cards in two cols + scores */
+  .newsgrid{grid-template-columns:1fr 1fr clamp(200px,26vw,320px)}
+  #col-pro{grid-column:1} #col-college{grid-column:2} .scores-col{grid-column:3}
+  .news-root.overlay-mode .news-card{display:block;padding:0}
+  .news-root.overlay-mode .news-thumb{width:100%;border-radius:0}
+  .news-root.overlay-mode .news-body{
+    position:absolute;left:0;right:0;bottom:0;padding:10px 12px;
+    background:linear-gradient(180deg,rgba(0,0,0,0) 0%, rgba(0,0,0,.4) 50%, rgba(0,0,0,.85) 100%);
+  }
+}
+@media (min-width:1280px){ /* 3B: side cards in two cols + scores */
+  .newsgrid{grid-template-columns:1fr 1fr clamp(240px,24vw,360px)}
+  #col-pro{grid-column:1} #col-college{grid-column:2} .scores-col{grid-column:3}
+  .news-root.overlay-mode .news-card{display:flex;padding:10px}
+  .news-root.overlay-mode .news-thumb{width:120px;border-radius:8px}
+  .news-root.overlay-mode .news-body{position:static;background:none;padding:0}
+}
+
+/* Footer */
 .site-footer{position:fixed;left:0;right:0;bottom:0;height:var(--footerH);background:var(--bg);border-top:1px solid var(--line);z-index:40}
-.site-footer a { display: block; height: 100%; width: 100%; }
-.site-footer img{ height:100%; width:100%; object-fit:contain; }
-#splashScreen { position: fixed; top: 0; left: 0; width: 100%; height: 100vh; background-color: #000; z-index: 1000; }
-
-/* ▼▼▼ STYLES FOR NEWS FILTERS & FOX SPORTS CARDS ▼▼▼ */
-.news-filters { display: flex; gap: 10px; margin: 24px 0; }
-.filter-btn {
-  background-color: var(--line); color: var(--muted); border: 1px solid transparent;
-  padding: 8px 16px; border-radius: 20px; font-family: Oswald, sans-serif; cursor: pointer; transition: all 0.2s;
-}
-.filter-btn:hover { background-color: var(--card-bg); color: var(--fg); }
-.filter-btn.active { background-color: var(--fg); color: var(--bg); font-weight: bold; }
-
-.news-grid { display: grid; gap: 20px; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); }
-.news-card {
-  position: relative;
-  border-radius: 8px;
-  overflow: hidden;
-  color: #fff;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  min-height: 450px; /* Ensures cards have a consistent, tall look */
-}
-.card-background {
-  position: absolute; inset: 0; z-index: 1;
-  background-size: cover;
-  background-position: center;
-  transition: transform 0.4s ease-out;
-}
-.news-card:hover .card-background { transform: scale(1.05); }
-.card-scrim {
-  position: absolute; inset: 0; z-index: 2;
-  background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.6) 40%, rgba(0,0,0,0) 100%);
-}
-.card-content {
-  position: relative;
-  z-index: 3;
-  padding: 16px;
-  text-shadow: 1px 1px 3px rgba(0,0,0,0.7);
-}
-.news-card-title {
-  font-family: "Bebas Neue", sans-serif; font-size: 26px; line-height: 1.1; margin: 0 0 8px 0;
-}
-.news-card-meta { font-size: 12px; color: var(--muted); margin-bottom: 12px; opacity: 0.9; }
-.share-buttons { display: flex; gap: 12px; margin-top: 16px; }
-.share-buttons i { font-size: 22px; }
-.share-buttons a:hover { opacity: 0.7; }
+.site-footer a{display:block;height:100%;width:100%}
+.site-footer img{height:100%;width:100%;object-fit:contain}
 </style>
 </head>
-<body>
 
-<div id="splashScreen" style="display: none;"></div>
+<body>
 <header class="header">
   <div class="container topbar">
     <div class="left-icons">
       <button class="icon-btn" id="btnMenu" aria-label="Menu"><i class="ri-menu-line"></i></button>
-      <button class="icon-btn" id="btnAccount" aria-label="Account"><i class="ri-user-3-line"></i></button>
       <button class="icon-btn" id="theme-toggle" aria-label="Toggle Theme"><i class="ri-sun-line"></i></button>
     </div>
     <nav class="topnav" aria-label="Top Navigation">
       <a href="index.html" class="nav-pair"><span class="thin">WHERE THEY</span><span class="bold">YAT?</span></a>
       <a href="alumni-news.html" class="nav-pair"><span class="thin">ACTIVE ALUMNI</span><span class="bold">NEWS</span></a>
-      </nav>
+      <a href="all-time-list.html" class="nav-pair"><span class="thin">NEXT-LEVEL</span><span class="bold">ALL-TIME LIST</span></a>
+      <a href="marketplace.html" class="nav-pair"><span class="thin">NIL & YAT-A-BOY</span><span class="bold">MARKETPLACE</span></a>
+      <a href="current-team.html" class="nav-pair"><span class="thin">THE</span><span class="bold">CURRENT TEAM</span></a>
+      <a href="partner-program.html" class="nav-pair"><span class="thin">PCD ACTION</span><span class="bold">PARTNER PROGRAM</span></a>
+      <a href="faq.html" class="nav-pair"><span class="bold">FAQ’S</span></a>
+    </nav>
     <div class="wordmark-wrap">
       <img class="wordmark-img" src="assets/img/yatstats-logo.png" alt="YAT?STATS">
     </div>
@@ -156,90 +159,147 @@ body.drawer-right-open .drawer-right{transform:translateX(0)}
   <div class="hr-y"></div>
   <section class="hero">
     <div class="container hero-grid">
-      <div class="tag-duo">
-        <div style="opacity:1; white-space:nowrap;"><span class="tag-grey">ACTIVE ALUMNI</span> <span class="tag-bold">NEWS</span></div>
+      <div class="hero-left"><div class="crumbs">HAMILTON ▸ ACTIVE ALUMNI NEWS</div></div>
+      <div class="hero-right">
+        <button id="openSearch" class="icon-btn" aria-label="Search"><i class="ri-search-line"></i></button>
+        <button id="openFilters" class="icon-btn" aria-label="Filters"><i class="ri-filter-3-line"></i></button>
+        <button id="filtersReset2" class="icon-btn" aria-label="Reset"><i class="ri-restart-line"></i></button>
       </div>
     </div>
   </section>
 </header>
-<aside class="drawer" id="drawerLeft" aria-label="Left drawer">
-  </aside>
 
 <main class="main container">
-  <div class="news-filters" id="newsFilters">
-    <button class="filter-btn active" data-filter="all">All News</button>
-    <button class="filter-btn" data-filter="pro">Pro</button>
-    <button class="filter-btn" data-filter="college">College</button>
-  </div>
-  <div class="news-grid" id="newsGrid">
-    <p style="color: var(--muted);">Generating the latest news...</p>
+  <div class="newsgrid" aria-live="polite">
+    <div class="news-wrap">
+      <section id="col-pro" class="news-col news-root overlay-mode">
+        <h3>ALUMNI HEADLINES (Live — Pros & MiLB)</h3>
+        <div id="proFeed" class="news-feed"><p style="color:var(--muted)">Fetching live headlines…</p></div>
+      </section>
+      <section id="col-college" class="news-col news-root overlay-mode">
+        <h3>ALUMNI HEADLINES (Live — College & Amateur)</h3>
+        <div id="collegeFeed" class="news-feed"><p style="color:var(--muted)">Fetching live headlines…</p></div>
+      </section>
+    </div>
+
+    <aside class="scores-col">
+      <h3>WEEKLY LINE SCORES</h3>
+      <div id="scoresMount" class="scores-sticky">
+        <p style="color:var(--muted)">Connect your linescores.json later — this demo focuses on the live headlines fetch.</p>
+      </div>
+    </aside>
   </div>
 </main>
 
 <footer class="site-footer">
-  <a href="https://no-errors.com/collections/all-webgems" target="_blank" rel="noopener noreferrer">
-    <img src="assets/img/partners/no-errors-banner.jpg" alt="Sponsor Banner">
+  <a href="marketplace.html" aria-label="YAT-A-BOY Marketplace">
+    <img src="assets/img/footer-banner.png" alt="Visit the YAT-A-BOY Marketplace">
   </a>
 </footer>
 
-<script type="module">
-  const $ = (sel) => document.querySelector(sel);
-  const $$ = (sel) => document.querySelectorAll(sel);
+<script>
+/* ---------------- Live Google News RSS (no API) via AllOrigins ---------------
 
-  // --- PLAYER DATA & NEWS GENERATOR ---
-  const players = [ /* Your full player list here */ ];
-  const templates = { /* Your templates here */ };
-  
-  function generateRealisticNews(count = 20) { /* Your generator function here */ }
+How it works:
+- Build a Google News RSS URL for each player (query: "<name> baseball").
+- Fetch it through https://api.allorigins.win/raw?url=... to avoid CORS.
+- Parse the XML, take 2–3 items, map to our card format, and render.
+- Pros/MiLB items go to #proFeed; College/Amateur to #collegeFeed.
 
-  // --- HTML RENDERING with FOX SPORTS STYLE ---
-  function newsHTML(item, index){
-    const siteUrl = "https://yatstats.github.io/alumni-news.html";
-    const shareText = encodeURIComponent(`${item.headline} - via YAT?STATS`);
-    const twitterUrl = `https://twitter.com/intent/tweet?text=${shareText}&url=${siteUrl}`;
-    const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${siteUrl}&quote=${shareText}`;
-    
-    // Generate a unique but consistent image for each story
-    const imageUrl = `https://picsum.photos/seed/${encodeURIComponent(item.headline)}/600/800`;
-    
-    return `
-    <a href="#" class="news-card">
-      <div class="card-background" style="background-image: url('${imageUrl}')"></div>
-      <div class="card-scrim"></div>
-      <div class="card-content">
-        <p class="news-card-meta">${item.source} • ${new Date(item.date).toLocaleDateString()}</p>
-        <h3 class="news-card-title">${item.headline}</h3>
-        <div class="share-buttons">
-            <a href="${twitterUrl}" target="_blank" title="Share on X"><i class="ri-twitter-x-fill"></i></a>
-            <a href="${facebookUrl}" target="_blank" title="Share on Facebook"><i class="ri-facebook-box-fill"></i></a>
-        </div>
-      </div>
-    </a>`;
-  }
+Notes:
+- This is a free, no-key approach suitable for a demo/prototype.
+- If AllOrigins is ever down, replace the proxy with another free mirror
+  (e.g. https://r.jina.ai/http://… or https://thingproxy.freeboard.io/fetch/…).
+------------------------------------------------------------------------------ */
 
-  function renderNews(list){
-    const grid = $('#newsGrid');
-    if (!list || list.length === 0) {
-      grid.innerHTML = `<p style="color:var(--muted);">No news matching the filter.</p>`;
-      return;
-    }
-    const sortedList = list.sort((a,b) => new Date(b.date) - new Date(a.date));
-    grid.innerHTML = sortedList.map(newsHTML).join('');
-  }
+const PLAYERS_10 = [
+  { name: "CODY BELLINGER",      level: "MLB",        img: "assets/img/now_players/cody_bellinger.jpg" },
+  { name: "DOM HAMEL",           level: "AAA",        img: "assets/img/now_players/dom_hamel.jpg" },
+  { name: "PATRICK MURPHY",      level: "INTERNATIONAL", img: "assets/img/now_players/patrick_murphy.jpg" },
+  { name: "DREW SWIFT",          level: "AA",         img: "assets/img/now_players/drew_swift.jpg" },
+  { name: "LOGAN BOYER",         level: "AAA",        img: "assets/img/now_players/logan_boyer.jpg" },
+  { name: "BROCK SELVIDGE",      level: "AA",         img: "assets/img/now_players/brock_selvidge.jpg" },
+  { name: "TYLER WILSON",        level: "AA",         img: "assets/img/now_players/tyler_wilson.jpg" },
+  { name: "JOSH TIEDEMANN",      level: "NCAA-D1",    img: "assets/img/now_players/josh_tiedemann.jpg" },
+  { name: "GAVIN TURLEY",        level: "NCAA-D1",    img: "assets/img/now_players/gavin_turley.jpg" },
+  { name: "JUSTIN WYLIE",        level: "INDY",       img: "assets/img/now_players/justin_wylie.jpg" }
+];
 
-  // --- FILTERING & UI LOGIC ---
-  function setupFilters() { /* Your filter setup function here */ }
-  function setupTheme() { /* Your theme setup function here */ }
-  function setupEventListeners() { /* Your event listener setup function here */ }
+const PRO_LEVELS = new Set(["MLB","INTERNATIONAL","TRIPLE-A","AAA","DOUBLE-A","AA","HIGH-A","A+","LOW-A","A","ROOKIE","ROK","INDY"]);
+const COLLEGE_LEVELS = new Set(["NCAA-D1","NCAA-D2","NCAA-D3","NAIA","JUCO"]);
 
-  document.addEventListener('DOMContentLoaded', () => {
-    setupTheme();
-    setupEventListeners();
-    
-    window.ALL_NEWS = generateRealisticNews(30);
-    renderNews(window.ALL_NEWS);
-    setupFilters();
+const $ = s => document.querySelector(s);
+
+function googleNewsRssUrl(playerName){
+  // Tighten query a hair to reduce namesakes
+  const q = encodeURIComponent(`"${playerName}" baseball`);
+  return `https://news.google.com/rss/search?q=${q}&hl=en-US&gl=US&ceid=US:en`;
+}
+function proxied(url){
+  return `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
+}
+async function fetchRss(player){
+  const url = proxied(googleNewsRssUrl(player.name));
+  const res = await fetch(url, {cache:"no-store"});
+  if(!res.ok) throw new Error(`RSS ${res.status}`);
+  const xml = await res.text();
+  const doc = new DOMParser().parseFromString(xml, "application/xml");
+  const items = [...doc.querySelectorAll("item")].slice(0,3).map(item=>{
+    const title = item.querySelector("title")?.textContent || "Read more";
+    const link  = item.querySelector("link")?.textContent || "#";
+    const pub   = item.querySelector("pubDate")?.textContent || "";
+    const source= item.querySelector("source")?.textContent || "News";
+    return { title, url: link, source, publishedAt: pub, image: player.img, level: player.level, who: player.name };
   });
+  return items;
+}
+
+function newsCardHTML(n){
+  const img = n.image || "assets/img/news/placeholder.jpg";
+  const when = n.publishedAt ? new Date(n.publishedAt).toLocaleString() : "";
+  const shareText = encodeURIComponent(`We See Where YAT, ${n.who?.split(" ")[0]||"Husky"}! #YATABOY${n.who?.split(" ")[0]||""}`);
+  const shareUrl = encodeURIComponent(n.url || location.href);
+  const xHref = `https://twitter.com/intent/tweet?text=${shareText}&url=${shareUrl}`;
+  const mailHref = `mailto:?subject=${encodeURIComponent(n.title)}&body=${shareText}%0A${shareUrl}`;
+
+  return `
+  <article class="news-card">
+    <a class="news-thumb" href="${n.url}" target="_blank" rel="noopener" style="background-image:url('${img}')" aria-label="Open story"></a>
+    <div class="news-body">
+      <a class="news-title" href="${n.url}" target="_blank" rel="noopener">${n.title}</a>
+      <div class="news-meta">${n.source} • ${when}</div>
+      <div class="news-links">
+        <a class="news-readmore" href="${n.url}" target="_blank" rel="noopener">READ MORE</a>
+        <a class="news-market" href="marketplace.html">YAT-A-BOY MARKETPLACE</a>
+      </div>
+      <div class="news-share" aria-label="Share">
+        <a class="icon-btn" href="${xHref}" target="_blank" rel="noopener" title="Share to X"><i class="ri-twitter-x-line"></i></a>
+        <a class="icon-btn" href="https://www.instagram.com/" target="_blank" rel="noopener" title="Instagram"><i class="ri-instagram-line"></i></a>
+        <a class="icon-btn" href="https://www.facebook.com/sharer/sharer.php?u=${shareUrl}" target="_blank" rel="noopener" title="Facebook"><i class="ri-facebook-circle-line"></i></a>
+        <a class="icon-btn" href="https://www.tiktok.com/" target="_blank" rel="noopener" title="TikTok"><i class="ri-tiktok-line"></i></a>
+        <a class="icon-btn" href="${mailHref}" title="Email"><i class="ri-mail-line"></i></a>
+      </div>
+    </div>
+  </article>`;
+}
+
+async function loadNewsFor(players){
+  const proFeed = $("#proFeed"), collegeFeed = $("#collegeFeed");
+  proFeed.innerHTML = `<p style="color:var(--muted)">Loading…</p>`;
+  collegeFeed.innerHTML = `<p style="color:var(--muted)">Loading…</p>`;
+
+  const batches = await Promise.allSettled(players.map(p => fetchRss(p)));
+  const items = batches.flatMap(r => r.status==="fulfilled" ? r.value : []);
+  const pros = items.filter(n => PRO_LEVELS.has(n.level));
+  const colleges = items.filter(n => COLLEGE_LEVELS.has(n.level));
+
+  proFeed.innerHTML = pros.length ? pros.map(newsCardHTML).join("") : `<p style="color:var(--muted)">No pro headlines found right now.</p>`;
+  collegeFeed.innerHTML = colleges.length ? colleges.map(newsCardHTML).join("") : `<p style="color:var(--muted)">No college headlines found right now.</p>`;
+}
+
+document.addEventListener("DOMContentLoaded", ()=>{
+  loadNewsFor(PLAYERS_10);
+});
 </script>
 </body>
 </html>
