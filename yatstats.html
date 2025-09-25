@@ -1,293 +1,236 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>YAT?STATS • HS Search</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    window.FontAwesomeConfig = { autoReplaceSvg: 'nest' };
-  </script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"
-    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link
-    href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap"
-    rel="stylesheet" />
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: {
-            roboto: ['Roboto', 'sans-serif'],
-          },
-          colors: {
-            'brand-blue': '#0D1B2A',
-            'brand-navy': '#1B263B',
-            'brand-steel': '#415A77',
-            'brand-silver': '#778DA9',
-            'brand-light': '#E0E1DD',
-            'brand-red': '#B22222',
-          },
-        },
-      },
-    }
-  </script>
-  <style>
-    ::-webkit-scrollbar {
-      display: none;
-    }
-  </style>
-  <title>YATSTATS — Hybrid Search + Pagination</title>
 </head>
-<body class="bg-brand-blue font-roboto text-brand-light">
+<body class="bg-black text-white font-sans">
 
-  <main id="main-content" class="relative overflow-hidden">
+  <!-- Search Section -->
+  <section id="search-section" class="py-20">
+    <div class="container mx-auto px-6 text-center">
+      <h2 class="text-4xl font-extrabold mb-4">Search 17,000+ HS Baseball Programs</h2>
+      <p class="text-gray-400 max-w-2xl mx-auto mb-10">
+        Enter a high school name, city, or filter by state to see alumni stats and microsite status.
+      </p>
 
-    <!-- (You can insert your header / hero here) -->
+      <div class="max-w-3xl mx-auto flex flex-col sm:flex-row gap-4 mb-6">
+        <!-- State Dropdown -->
+        <select id="state-filter" class="bg-gray-800 border border-gray-700 text-white rounded-md p-4">
+          <option value="">All States</option>
+        </select>
 
-    <section id="search-section" class="py-20 bg-brand-navy">
-      <div class="container mx-auto px-6 text-center">
-        <h2 class="text-4xl font-bold mb-4">Search the Database</h2>
-        <p class="text-brand-silver max-w-2xl mx-auto mb-10">Enter a high school name or city, filter by state. Then browse through paged results.</p>
+        <!-- Text Search -->
+        <input type="text" id="school-search-input"
+               class="w-full flex-grow bg-gray-800 border-2 border-gray-700 text-white placeholder-gray-500 text-lg rounded-md p-4 focus:outline-none focus:ring-2 focus:ring-red-600"
+               placeholder="E.g., Hamilton High School">
 
-        <div id="search-container" class="max-w-2xl mx-auto mb-6">
-          <div class="flex flex-col sm:flex-row gap-4 mb-4">
-            <select id="state-filter"
-              class="bg-brand-steel border-2 border-brand-steel text-white rounded-md p-4">
-              <option value="">All States</option>
-            </select>
-            <input type="text" id="school-search-input"
-              class="w-full flex-grow bg-brand-steel border-2 border-brand-steel text-white placeholder-brand-silver text-lg rounded-md p-4 focus:outline-none focus:ring-2 focus:ring-brand-red focus:border-transparent"
-              placeholder="E.g., Hamilton High School" />
-            <button id="search-button"
-              class="bg-brand-red text-white font-bold py-4 px-8 rounded-md text-lg hover:bg-red-700 transition duration-300 flex items-center justify-center">
-              <i class="fa-solid fa-magnifying-glass mr-2"></i> Search
-            </button>
-          </div>
-        </div>
-
-        <div id="results-container"
-          class="mt-8 bg-brand-blue rounded-lg p-8 max-w-4xl mx-auto text-left hidden">
-          <div id="results-content"></div>
-          <div id="pagination" class="flex justify-between mt-6 hidden">
-            <button id="prev-btn" class="bg-gray-700 px-4 py-2 rounded disabled:opacity-50">Prev</button>
-            <button id="next-btn" class="bg-gray-700 px-4 py-2 rounded disabled:opacity-50">Next</button>
-          </div>
-        </div>
-
+        <button id="search-button"
+                class="bg-red-700 text-white font-bold py-4 px-8 rounded-md text-lg hover:bg-red-600 transition">
+          Search
+        </button>
       </div>
-    </section>
 
-    <!-- (Other page sections) -->
-
-  </main>
+      <div id="results-container"
+           class="mt-8 rounded-lg p-8 max-w-4xl mx-auto text-left hidden">
+        <div id="results-content"></div>
+        <div id="pagination" class="flex justify-between mt-6 hidden">
+          <button id="prev-btn" class="bg-gray-700 px-4 py-2 rounded disabled:opacity-50">Prev</button>
+          <button id="next-btn" class="bg-gray-700 px-4 py-2 rounded disabled:opacity-50">Next</button>
+        </div>
+      </div>
+    </div>
+  </section>
 
   <script>
-    // ========== CONFIG =============
-    const SHEET_URL = 'https://docs.google.com/spreadsheets/d/1gC5dJ3Kde_K3G6hsoA8s3agB0J-Yk-Qv-tYgZfU_2Lo/gviz/tq?sheet=Sheet1&tq=';
-    const RESULTS_PER_PAGE = 10;
-
-    // In-memory data
-    let allRows = [];           // Full dataset after fetch
-    let filteredRows = [];      // After applying search + state filters
+    const SHEET_URL = "https://opensheet.elk.sh/1yUNQH9NbpKwOOwH9blf5ZqQfmft796sQl1dqghXP4uA/HS_Baseball_Programs";
+    let rows = [];
     let currentPage = 1;
+    const resultsPerPage = 20;
+    let filteredResults = [];
 
-    // ========== UTILITIES =============
-
-    function parseGvizText(text) {
-      // Google’s GViz JSON is wrapped in weird prefix/suffix. This strips them.
-      const json = JSON.parse(text.substring(47).slice(0, -2));
-      return json;
+    async function loadData() {
+      const res = await fetch(SHEET_URL);
+      rows = await res.json();
+      populateStateDropdown();
     }
 
-    function populateStateFilter() {
-      const stateSet = new Set();
-      allRows.forEach(row => {
-        if (row.state) {
-          stateSet.add(row.state);
-        }
-      });
-      const sel = document.getElementById('state-filter');
-      Array.from(stateSet).sort().forEach(st => {
-        const opt = document.createElement('option');
-        opt.value = st;
-        opt.textContent = st;
-        sel.appendChild(opt);
+    function populateStateDropdown() {
+      const stateSet = new Set(rows.map(r => r.state).filter(Boolean));
+      const stateFilter = document.getElementById("state-filter");
+      [...stateSet].sort().forEach(state => {
+        const opt = document.createElement("option");
+        opt.value = state;
+        opt.textContent = state;
+        stateFilter.appendChild(opt);
       });
     }
 
-    function slugify(text) {
-      return text.toLowerCase().replace(/[^a-z0-9]/g, '').trim();
+    function slugifySchoolName(name) {
+      return name.toLowerCase().replace(/[^a-z0-9]/g, '').trim();
     }
 
-    function getLogoPath(hsname, state) {
-      if (!hsname || !state) return 'assets/img/school_logo/default.jpg';
-      const slug = slugify(hsname);
+    function getStateAbbrev(stateStr) {
+      return stateStr ? stateStr.toLowerCase() : "";
+    }
+
+    function getLogoPath(city, hsname, state) {
+      if (!state || !hsname) return "assets/img/school_logo/default.jpg";
+      const slug = slugifySchoolName(hsname);
       return `assets/img/school_logo/${state.toLowerCase()}_${slug}.jpg`;
     }
 
-    // ========== FETCH + INIT =============
-    async function loadAllData() {
-      // We'll fetch all rows first (SELECT *), then store them, then let filtering be client-side.
-      const queryAll = encodeURIComponent('SELECT *');
-      const resp = await fetch(SHEET_URL + queryAll);
-      const text = await resp.text();
-      const json = parseGvizText(text);
-      // json.table.rows is an array of rows; each row has .c (cells) with .v or .f
-      allRows = json.table.rows.map(r => {
-        const c = r.c;
-        return {
-          // map columns — adapt these indices to your sheet
-          hsname: c[0]?.v || '',
-          city: c[1]?.v || '',
-          state: c[2]?.v || '',
-          regionname: c[3]?.v || '',
-          hslocation: c[4]?.v || '',
-          'YATSTATS National Ranking': c[5]?.v || '',
-          'Active Alumni': c[6]?.v || 0,
-          microsite_live: c[7]?.v || '',
-          microsite_url: c[8]?.v || '',
-          // ... add other fields if needed
-        };
-      });
-      populateStateFilter();
-    }
+    function searchSchools(query, state) {
+      query = query.trim().toLowerCase();
 
-    // ========== FILTER + SEARCH =============
-    function applyFilters() {
-      const query = document.getElementById('school-search-input').value.trim().toLowerCase();
-      const stFilter = document.getElementById('state-filter').value.trim().toLowerCase();
+      filteredResults = rows.filter(r => {
+        const hsname = (r.hsname || "").toLowerCase();
+        const city = (r.city || "").toLowerCase();
+        const st = (r.state || "").toLowerCase();
+        const region = (r.regionname || "").toLowerCase();
+        const hslocation = (r.hslocation || "").toLowerCase();
 
-      filteredRows = allRows.filter(row => {
-        const name = (row.hsname || '').toLowerCase();
-        const city = (row.city || '').toLowerCase();
-        const region = (row.regionname || '').toLowerCase();
-        const loc = (row.hslocation || '').toLowerCase();
-        const state = (row.state || '').toLowerCase();
-
-        const matchesText = !query
-          || name.includes(query)
-          || city.includes(query)
-          || region.includes(query)
-          || loc.includes(query);
-        const matchesState = !stFilter || (state === stFilter);
-        return matchesText && matchesState;
+        const textMatch = !query || hsname.includes(query) || city.includes(query) || region.includes(query) || hslocation.includes(query);
+        const stateMatch = !state || st === state.toLowerCase();
+        return textMatch && stateMatch;
       });
 
       currentPage = 1;
       renderResults();
     }
 
-    // ========== RENDER & PAGINATION =============
     function renderResults() {
-      const container = document.getElementById('results-container');
-      const content = document.getElementById('results-content');
-      const pagination = document.getElementById('pagination');
-      container.classList.remove('hidden');
+      const container = document.getElementById("results-container");
+      const content = document.getElementById("results-content");
+      const pagination = document.getElementById("pagination");
 
-      content.innerHTML = '';
+      container.classList.remove("hidden");
+      content.innerHTML = "";
 
-      const total = filteredRows.length;
-      if (total === 0) {
-        content.innerHTML = `<p class="text-brand-silver">No matches found.</p>`;
-        pagination.classList.add('hidden');
+      const startIndex = (currentPage - 1) * resultsPerPage;
+      const pageResults = filteredResults.slice(startIndex, startIndex + resultsPerPage);
+
+      if (pageResults.length === 0) {
+        content.innerHTML = "<p class='text-gray-400'>No matches found.</p>";
+        pagination.classList.add("hidden");
         return;
       }
 
-      const totalPages = Math.ceil(total / RESULTS_PER_PAGE);
-      const start = (currentPage - 1) * RESULTS_PER_PAGE;
-      const pageRows = filteredRows.slice(start, start + RESULTS_PER_PAGE);
+      pageResults.forEach(school => {
+        const activeAlumni = parseInt(school["Active Alumni"] || 0, 10);
 
-      pageRows.forEach(row => {
-        const activeAlumni = parseInt(row['Active Alumni'], 10) || 0;
-        const logo = getLogoPath(row.hsname, row.state);
+        const logoPath = getLogoPath(school.city, school.hsname, school.state);
+        const logoHTML = `<img src="${logoPath}" onerror="this.src='assets/img/school_logo/default.jpg'" class="h-16 mx-auto mb-4">`;
 
-        let message = '';
-        let action = '';
-        if (activeAlumni < 14) {
-          message = `<div class="bg-gray-800 text-yellow-300 p-4 rounded text-center">
-            Too few active alumni for a dedicated microsite.
-          </div>`;
-        } else {
-          const live = (row.microsite_live || '').toString().toLowerCase();
-          if (live === 'true' || live === 'yes') {
-            const url = row.microsite_url || '#';
-            message = `<div class="bg-green-900 text-green-200 p-4 rounded text-center">
-              This school has its own microsite.
+        const headerHTML = `
+          <div class="mb-6 text-center">
+            ${logoHTML}
+            <h4 class="uppercase text-sm text-gray-400 tracking-widest">${school.city || ""}, ${school.state || ""}</h4>
+            <h2 class="text-3xl font-extrabold text-white tracking-wide">${school.hsname}</h2>
+            <h3 class="uppercase text-lg text-red-600 font-bold mt-1">Active Baseball Alumni</h3>
+          </div>
+        `;
+
+        const statsHTML = `
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-6">
+            <div class="bg-gray-900 rounded-lg p-4 text-center">
+              <p class="text-2xl font-bold text-white">${school["YATSTATS National Ranking"] || "-"}</p>
+              <p class="text-xs text-gray-400">Rank</p>
             </div>
-            <p class="mt-2 text-red-500 font-bold text-center">${url.replace(/^https?:\\/\\//, '')}</p>`;
-            action = `<a href="${url}" target="_blank" class="mt-4 inline-block bg-brand-red text-white font-bold px-6 py-3 rounded hover:bg-red-700">Visit Microsite</a>`;
+            <div class="bg-gray-900 rounded-lg p-4 text-center">
+              <p class="text-2xl font-bold text-white">${school["alumni listed"] || 0}</p>
+              <p class="text-xs text-gray-400">Alumni Listed</p>
+            </div>
+            <div class="bg-gray-900 rounded-lg p-4 text-center">
+              <p class="text-2xl font-bold text-white">${school["Drafted from School"] || 0}</p>
+              <p class="text-xs text-gray-400">Drafted</p>
+            </div>
+            <div class="bg-gray-900 rounded-lg p-4 text-center">
+              <p class="text-2xl font-bold text-white">${school["Total Draft Picks"] || 0}</p>
+              <p class="text-xs text-gray-400">Draft Picks</p>
+            </div>
+            <div class="bg-gray-900 rounded-lg p-4 text-center">
+              <p class="text-2xl font-bold text-white">${school["Major Leaguers"] || 0}</p>
+              <p class="text-xs text-gray-400">Major Leaguers</p>
+            </div>
+            <div class="bg-gray-900 rounded-lg p-4 text-center">
+              <p class="text-2xl font-bold text-white">${activeAlumni}</p>
+              <p class="text-xs text-gray-400">Active Alumni</p>
+            </div>
+          </div>
+        `;
+
+        let messageHTML = "";
+        let actionHTML = "";
+
+        if (activeAlumni <= 13) {
+          messageHTML = `<div class="bg-gray-800 text-yellow-300 p-4 rounded text-center">
+            Too few active alumni for a dedicated microsite.<br>
+            Join our mailing list for nationwide alumni access.
+          </div>`;
+          actionHTML = `<button class="mt-4 bg-red-700 hover:bg-red-600 text-white font-bold px-6 py-3 rounded">Join Mailing List</button>`;
+        } else {
+          const micrositeExists = (school.microsite_live === "TRUE"); 
+          if (micrositeExists) {
+            const state = (school.state || "").toLowerCase();
+            const slug = slugifySchoolName(school.hsname);
+            const url = `https://${state}.${slug}.yatstats.com`;
+            messageHTML = `<div class="bg-green-900 text-green-200 p-4 rounded text-center">
+              Good news! This school has its own YATSTATS microsite.
+            </div>
+            <p class="mt-2 text-red-500 font-bold text-center">${url.replace("https://","")}</p>`;
+            actionHTML = `<a href="${url}" target="_blank" class="mt-4 inline-block bg-red-700 hover:bg-red-600 text-white font-bold px-6 py-3 rounded">Visit Microsite</a>`;
           } else {
-            message = `<div class="bg-blue-900 text-blue-200 p-4 rounded text-center">
-              Qualifies for a microsite — coming soon.
+            messageHTML = `<div class="bg-blue-900 text-blue-200 p-4 rounded text-center">
+              Good news! This school qualifies and will soon have a microsite.<br>
+              Join our mailing list + suggest a sponsor to expedite launch.
             </div>`;
-            action = `<button class="mt-4 bg-brand-red text-white font-bold px-6 py-3 rounded hover:bg-red-700">Join Mailing List</button>`;
+            actionHTML = `<button class="mt-4 bg-red-700 hover:bg-red-600 text-white font-bold px-6 py-3 rounded">Join + Share Sponsor</button>`;
           }
         }
 
         content.innerHTML += `
-          <div class="mb-12 p-8 bg-brand-navy border border-brand-steel rounded-lg shadow-lg">
-            <div class="text-center mb-6">
-              <img src="${logo}" onerror="this.src='assets/img/school_logo/default.jpg'" class="h-16 mx-auto mb-4" />
-              <h4 class="uppercase text-sm text-brand-silver tracking-widest">${row.city}, ${row.state}</h4>
-              <h2 class="text-3xl font-extrabold text-white tracking-wide">${row.hsname}</h2>
-              <h3 class="uppercase text-lg text-brand-red font-bold mt-1">Active Baseball Alumni</h3>
-            </div>
-            <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-6">
-              <div class="bg-brand-navy rounded-lg p-4 text-center">
-                <p class="text-2xl font-bold">${row['YATSTATS National Ranking'] || '-'}</p>
-                <p class="text-xs text-brand-silver">Rank</p>
-              </div>
-              <div class="bg-brand-navy rounded-lg p-4 text-center">
-                <p class="text-2xl font-bold">${row['Active Alumni'] || 0}</p>
-                <p class="text-xs text-brand-silver">Active Alumni</p>
-              </div>
-              <!-- Add other stat cards as needed -->
-            </div>
-            ${message}
-            ${action}
+          <div class="mb-12 p-8 bg-gray-950 border border-gray-700 rounded-lg shadow-lg">
+            ${headerHTML}
+            ${statsHTML}
+            ${messageHTML}
+            ${actionHTML}
           </div>
         `;
       });
 
-      pagination.classList.remove('hidden');
-      document.getElementById('prev-btn').disabled = (currentPage === 1);
-      document.getElementById('next-btn').disabled = (currentPage === totalPages);
+      // Pagination controls
+      const totalPages = Math.ceil(filteredResults.length / resultsPerPage);
+      pagination.classList.remove("hidden");
+      document.getElementById("prev-btn").disabled = currentPage === 1;
+      document.getElementById("next-btn").disabled = currentPage === totalPages;
     }
 
-    // Pagination buttons
-    document.getElementById('prev-btn').addEventListener('click', () => {
+    // Event Listeners
+    document.getElementById("search-button").addEventListener("click", () => {
+      const val = document.getElementById("school-search-input").value;
+      const state = document.getElementById("state-filter").value;
+      searchSchools(val, state);
+    });
+
+    document.getElementById("prev-btn").addEventListener("click", () => {
       if (currentPage > 1) {
         currentPage--;
         renderResults();
       }
     });
-    document.getElementById('next-btn').addEventListener('click', () => {
-      const totalPages = Math.ceil(filteredRows.length / RESULTS_PER_PAGE);
+
+    document.getElementById("next-btn").addEventListener("click", () => {
+      const totalPages = Math.ceil(filteredResults.length / resultsPerPage);
       if (currentPage < totalPages) {
         currentPage++;
         renderResults();
       }
     });
 
-    // Search button event
-    document.getElementById('search-button').addEventListener('click', () => {
-      applyFilters();
-    });
-
-    // Optionally, trigger search when pressing “Enter” in input
-    document.getElementById('school-search-input').addEventListener('keyup', (e) => {
-      if (e.key === 'Enter') {
-        applyFilters();
-      }
-    });
-
-    // ========== START ============
-    window.onload = async () => {
-      await loadAllData();
-      // Optionally, show some initial data or leave blank
-    }
+    loadData();
   </script>
 
 </body>
