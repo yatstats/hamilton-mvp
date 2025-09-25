@@ -5,229 +5,175 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>YAT?STATS • HS Search</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap">
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    ::-webkit-scrollbar { display: none; }
+  </style>
 </head>
-<body class="bg-black text-white font-sans">
+<body class="bg-black text-white">
+
+  <!-- Hero / Flyer Banner -->
+  <section id="hero" class="relative h-[600px] flex items-center justify-center text-center text-white">
+    <div class="absolute inset-0 bg-black/60"></div>
+    <img src="https://storage.googleapis.com/uxpilot-auth.appspot.com/3092fdc45d-c667c2c1a0a9ceaf650c.png" 
+         alt="Baseball celebration" 
+         class="absolute inset-0 w-full h-full object-cover">
+    <div class="relative z-10 container mx-auto px-6">
+      <h1 class="text-5xl md:text-7xl font-black uppercase tracking-wide mb-4">
+        Tracking Yesterday's High School Athletes<br>As College & Pros Today!
+      </h1>
+      <p class="text-xl md:text-2xl text-gray-200 max-w-3xl mx-auto mb-8">
+        Stay up to date with your favorite school’s alumni!
+      </p>
+      <a href="#search-section" class="bg-red-700 text-white font-bold py-4 px-10 rounded-md text-lg hover:bg-red-600 transition">
+        Find Your High School
+      </a>
+    </div>
+  </section>
 
   <!-- Search Section -->
-  <section id="search-section" class="py-20">
+  <section id="search-section" class="py-20 bg-gray-900">
     <div class="container mx-auto px-6 text-center">
-      <h2 class="text-4xl font-extrabold mb-4">Search 17,000+ HS Baseball Programs</h2>
+      <h2 class="text-4xl font-bold mb-4">Search the Database</h2>
       <p class="text-gray-400 max-w-2xl mx-auto mb-10">
-        Enter a high school name, city, or filter by state to see alumni stats and microsite status.
+        Enter a high school name, city, or state to see alumni stats and microsite status.
       </p>
 
-      <div class="max-w-3xl mx-auto flex flex-col sm:flex-row gap-4 mb-6">
-        <!-- State Dropdown -->
-        <select id="state-filter" class="bg-gray-800 border border-gray-700 text-white rounded-md p-4">
-          <option value="">All States</option>
-        </select>
-
-        <!-- Text Search -->
-        <input type="text" id="school-search-input"
-               class="w-full flex-grow bg-gray-800 border-2 border-gray-700 text-white placeholder-gray-500 text-lg rounded-md p-4 focus:outline-none focus:ring-2 focus:ring-red-600"
-               placeholder="E.g., Hamilton High School">
-
-        <button id="search-button"
-                class="bg-red-700 text-white font-bold py-4 px-8 rounded-md text-lg hover:bg-red-600 transition">
-          Search
-        </button>
+      <div class="max-w-2xl mx-auto">
+        <div class="flex flex-col sm:flex-row gap-4 mb-6">
+          <input type="text" id="school-search-input"
+                 class="w-full flex-grow bg-gray-800 border border-gray-700 text-white placeholder-gray-500 text-lg rounded-md p-4 focus:outline-none focus:ring-2 focus:ring-red-600"
+                 placeholder="E.g., Hamilton High School">
+          <button id="search-button"
+                  class="bg-red-700 text-white font-bold py-4 px-8 rounded-md text-lg hover:bg-red-600 transition">
+            Search
+          </button>
+        </div>
       </div>
 
       <div id="results-container"
            class="mt-8 rounded-lg p-8 max-w-4xl mx-auto text-left hidden">
         <div id="results-content"></div>
-        <div id="pagination" class="flex justify-between mt-6 hidden">
-          <button id="prev-btn" class="bg-gray-700 px-4 py-2 rounded disabled:opacity-50">Prev</button>
-          <button id="next-btn" class="bg-gray-700 px-4 py-2 rounded disabled:opacity-50">Next</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- About Section -->
+  <section id="about-section" class="py-24 bg-gray-800">
+    <div class="container mx-auto px-6 grid md:grid-cols-2 gap-16 items-center">
+      <img class="w-full h-[400px] object-cover rounded-lg shadow-lg"
+           src="https://storage.googleapis.com/uxpilot-auth.appspot.com/844454507f-fec6268fb7d05fabce6c.png"
+           alt="Vintage baseball">
+      <div>
+        <h2 class="text-4xl font-bold mb-6">Connecting Past, Present, and Future</h2>
+        <p class="text-gray-300 mb-4 text-lg leading-relaxed">
+          Every pro player starts somewhere—a local field, a high school team, a community that cheered them on.
+        </p>
+        <p class="text-gray-300 mb-6 text-lg leading-relaxed">
+          We've compiled data from over 17,000 high school programs nationwide. We track MLB draftees, pros, and the next generation in college. It’s more than stats—it’s legacy.
+        </p>
+        <div class="flex space-x-8">
+          <div class="text-center">
+            <p class="text-4xl font-bold text-red-600">17,000+</p>
+            <p class="text-gray-400">HS Programs</p>
+          </div>
+          <div class="text-center">
+            <p class="text-4xl font-bold text-red-600">50</p>
+            <p class="text-gray-400">States Covered</p>
+          </div>
+          <div class="text-center">
+            <p class="text-4xl font-bold text-red-600">1000s</p>
+            <p class="text-gray-400">Alumni Tracked</p>
+          </div>
         </div>
       </div>
     </div>
   </section>
 
+  <!-- JS: Search Logic -->
   <script>
     const SHEET_URL = "https://opensheet.elk.sh/1yUNQH9NbpKwOOwH9blf5ZqQfmft796sQl1dqghXP4uA/HS_Baseball_Programs";
     let rows = [];
-    let currentPage = 1;
-    const resultsPerPage = 20;
-    let filteredResults = [];
 
     async function loadData() {
       const res = await fetch(SHEET_URL);
       rows = await res.json();
-      populateStateDropdown();
     }
 
-    function populateStateDropdown() {
-      const stateSet = new Set(rows.map(r => r.state).filter(Boolean));
-      const stateFilter = document.getElementById("state-filter");
-      [...stateSet].sort().forEach(state => {
-        const opt = document.createElement("option");
-        opt.value = state;
-        opt.textContent = state;
-        stateFilter.appendChild(opt);
-      });
+    function slugify(str) {
+      return (str || "").toLowerCase().replace(/[^a-z0-9]/g, "").trim();
     }
 
-    function slugifySchoolName(name) {
-      return name.toLowerCase().replace(/[^a-z0-9]/g, '').trim();
-    }
-
-    function getStateAbbrev(stateStr) {
-      return stateStr ? stateStr.toLowerCase() : "";
-    }
-
-    function getLogoPath(city, hsname, state) {
+    function getLogoPath(state, hsname) {
       if (!state || !hsname) return "assets/img/school_logo/default.jpg";
-      const slug = slugifySchoolName(hsname);
-      return `assets/img/school_logo/${state.toLowerCase()}_${slug}.jpg`;
+      return `assets/img/school_logo/${state.toLowerCase()}_${slugify(hsname)}.jpg`;
     }
 
-    function searchSchools(query, state) {
+    function searchSchools(query) {
       query = query.trim().toLowerCase();
-
-      filteredResults = rows.filter(r => {
-        const hsname = (r.hsname || "").toLowerCase();
-        const city = (r.city || "").toLowerCase();
-        const st = (r.state || "").toLowerCase();
-        const region = (r.regionname || "").toLowerCase();
-        const hslocation = (r.hslocation || "").toLowerCase();
-
-        const textMatch = !query || hsname.includes(query) || city.includes(query) || region.includes(query) || hslocation.includes(query);
-        const stateMatch = !state || st === state.toLowerCase();
-        return textMatch && stateMatch;
-      });
-
-      currentPage = 1;
-      renderResults();
-    }
-
-    function renderResults() {
       const container = document.getElementById("results-container");
       const content = document.getElementById("results-content");
-      const pagination = document.getElementById("pagination");
-
-      container.classList.remove("hidden");
       content.innerHTML = "";
+      container.classList.remove("hidden");
 
-      const startIndex = (currentPage - 1) * resultsPerPage;
-      const pageResults = filteredResults.slice(startIndex, startIndex + resultsPerPage);
-
-      if (pageResults.length === 0) {
-        content.innerHTML = "<p class='text-gray-400'>No matches found.</p>";
-        pagination.classList.add("hidden");
+      if (!query) {
+        content.innerHTML = "<p class='text-gray-400'>Please enter a school name, city, or state.</p>";
         return;
       }
 
-      pageResults.forEach(school => {
+      const matches = rows.filter(r =>
+        (r.hsname && r.hsname.toLowerCase().includes(query)) ||
+        (r.city && r.city.toLowerCase().includes(query)) ||
+        (r.state && r.state.toLowerCase().includes(query))
+      );
+
+      if (matches.length === 0) {
+        content.innerHTML = "<p class='text-gray-400'>No matches found.</p>";
+        return;
+      }
+
+      matches.slice(0, 10).forEach(school => {
         const activeAlumni = parseInt(school["Active Alumni"] || 0, 10);
+        const logoPath = getLogoPath(school.state, school.hsname);
 
-        const logoPath = getLogoPath(school.city, school.hsname, school.state);
-        const logoHTML = `<img src="${logoPath}" onerror="this.src='assets/img/school_logo/default.jpg'" class="h-16 mx-auto mb-4">`;
-
+        // Logo left, text right (3 stacked lines)
         const headerHTML = `
-          <div class="mb-6 text-center">
-            ${logoHTML}
-            <h4 class="uppercase text-sm text-gray-400 tracking-widest">${school.city || ""}, ${school.state || ""}</h4>
-            <h2 class="text-3xl font-extrabold text-white tracking-wide">${school.hsname}</h2>
-            <h3 class="uppercase text-lg text-red-600 font-bold mt-1">Active Baseball Alumni</h3>
-          </div>
-        `;
-
-        const statsHTML = `
-          <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-6">
-            <div class="bg-gray-900 rounded-lg p-4 text-center">
-              <p class="text-2xl font-bold text-white">${school["YATSTATS National Ranking"] || "-"}</p>
-              <p class="text-xs text-gray-400">Rank</p>
-            </div>
-            <div class="bg-gray-900 rounded-lg p-4 text-center">
-              <p class="text-2xl font-bold text-white">${school["alumni listed"] || 0}</p>
-              <p class="text-xs text-gray-400">Alumni Listed</p>
-            </div>
-            <div class="bg-gray-900 rounded-lg p-4 text-center">
-              <p class="text-2xl font-bold text-white">${school["Drafted from School"] || 0}</p>
-              <p class="text-xs text-gray-400">Drafted</p>
-            </div>
-            <div class="bg-gray-900 rounded-lg p-4 text-center">
-              <p class="text-2xl font-bold text-white">${school["Total Draft Picks"] || 0}</p>
-              <p class="text-xs text-gray-400">Draft Picks</p>
-            </div>
-            <div class="bg-gray-900 rounded-lg p-4 text-center">
-              <p class="text-2xl font-bold text-white">${school["Major Leaguers"] || 0}</p>
-              <p class="text-xs text-gray-400">Major Leaguers</p>
-            </div>
-            <div class="bg-gray-900 rounded-lg p-4 text-center">
-              <p class="text-2xl font-bold text-white">${activeAlumni}</p>
-              <p class="text-xs text-gray-400">Active Alumni</p>
+          <div class="flex items-center gap-6 mb-6">
+            <img src="${logoPath}" 
+                 onerror="this.src='assets/img/school_logo/default.jpg'" 
+                 class="h-24 w-24 object-contain bg-gray-800 rounded">
+            <div class="flex flex-col justify-between h-24">
+              <p class="uppercase text-sm text-gray-400 tracking-widest">
+                ${school.city || ""}${school.state ? ", " + school.state : ""}
+              </p>
+              <h2 class="text-2xl font-extrabold text-white">${school.hsname}</h2>
+              <h3 class="uppercase text-sm font-bold text-red-600">Active Baseball Alumni</h3>
             </div>
           </div>
         `;
 
+        // Custom microsite logic
         let messageHTML = "";
-        let actionHTML = "";
-
         if (activeAlumni <= 13) {
-          messageHTML = `<div class="bg-gray-800 text-yellow-300 p-4 rounded text-center">
-            Too few active alumni for a dedicated microsite.<br>
-            Join our mailing list for nationwide alumni access.
-          </div>`;
-          actionHTML = `<button class="mt-4 bg-red-700 hover:bg-red-600 text-white font-bold px-6 py-3 rounded">Join Mailing List</button>`;
+          messageHTML = `<p class="text-yellow-400">Too few active alumni for a microsite. Join our mailing list for nationwide access.</p>`;
         } else {
-          const micrositeExists = (school.microsite_live === "TRUE"); 
-          if (micrositeExists) {
-            const state = (school.state || "").toLowerCase();
-            const slug = slugifySchoolName(school.hsname);
-            const url = `https://${state}.${slug}.yatstats.com`;
-            messageHTML = `<div class="bg-green-900 text-green-200 p-4 rounded text-center">
-              Good news! This school has its own YATSTATS microsite.
-            </div>
-            <p class="mt-2 text-red-500 font-bold text-center">${url.replace("https://","")}</p>`;
-            actionHTML = `<a href="${url}" target="_blank" class="mt-4 inline-block bg-red-700 hover:bg-red-600 text-white font-bold px-6 py-3 rounded">Visit Microsite</a>`;
-          } else {
-            messageHTML = `<div class="bg-blue-900 text-blue-200 p-4 rounded text-center">
-              Good news! This school qualifies and will soon have a microsite.<br>
-              Join our mailing list + suggest a sponsor to expedite launch.
-            </div>`;
-            actionHTML = `<button class="mt-4 bg-red-700 hover:bg-red-600 text-white font-bold px-6 py-3 rounded">Join + Share Sponsor</button>`;
-          }
+          messageHTML = `<p class="text-green-400">Good news! This school qualifies for a microsite. Join our mailing list to get notified!</p>`;
         }
 
         content.innerHTML += `
-          <div class="mb-12 p-8 bg-gray-950 border border-gray-700 rounded-lg shadow-lg">
+          <div class="mb-8 p-6 bg-gray-950 border border-gray-700 rounded-lg shadow">
             ${headerHTML}
-            ${statsHTML}
-            ${messageHTML}
-            ${actionHTML}
+            <p class="text-gray-400">Rank: ${school["YATSTATS National Ranking"] || "N/A"} • Drafted: ${school["Drafted from School"] || 0} • MLB Players: ${school["Major Leaguers"] || 0} • Active Alumni: ${activeAlumni}</p>
+            <div class="mt-4">${messageHTML}</div>
           </div>
         `;
       });
-
-      // Pagination controls
-      const totalPages = Math.ceil(filteredResults.length / resultsPerPage);
-      pagination.classList.remove("hidden");
-      document.getElementById("prev-btn").disabled = currentPage === 1;
-      document.getElementById("next-btn").disabled = currentPage === totalPages;
     }
 
-    // Event Listeners
     document.getElementById("search-button").addEventListener("click", () => {
       const val = document.getElementById("school-search-input").value;
-      const state = document.getElementById("state-filter").value;
-      searchSchools(val, state);
-    });
-
-    document.getElementById("prev-btn").addEventListener("click", () => {
-      if (currentPage > 1) {
-        currentPage--;
-        renderResults();
-      }
-    });
-
-    document.getElementById("next-btn").addEventListener("click", () => {
-      const totalPages = Math.ceil(filteredResults.length / resultsPerPage);
-      if (currentPage < totalPages) {
-        currentPage++;
-        renderResults();
-      }
+      searchSchools(val);
     });
 
     loadData();
