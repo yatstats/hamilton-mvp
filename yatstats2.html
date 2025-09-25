@@ -1,208 +1,357 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>YAT?STATS • HS Search</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    *{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,'Helvetica Neue',Arial,'Noto Sans',sans-serif}
+  </style>
 </head>
-<body class="bg-black text-white font-sans">
+<body class="bg-black text-white">
 
   <!-- Search Section -->
-  <section id="search-section" class="py-20">
+  <section id="search-section" class="py-14">
     <div class="container mx-auto px-6 text-center">
-      <h2 class="text-4xl font-extrabold mb-4">Search 17,000+ HS Baseball Programs</h2>
-      <p class="text-gray-400 max-w-2xl mx-auto mb-10">
+      <h2 class="text-3xl md:text-4xl font-extrabold mb-3">
+        Search 17,000+ HS Baseball Programs
+      </h2>
+      <p class="text-gray-400 max-w-2xl mx-auto mb-8">
         Enter a high school name, city, or state to see alumni stats and microsite status.
       </p>
 
-      <div class="max-w-3xl mx-auto grid sm:grid-cols-3 gap-4 mb-6">
-        <input type="text" id="school-search-input"
-          class="w-full bg-gray-800 border border-gray-700 text-white placeholder-gray-500 text-lg rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-red-600"
-          placeholder="E.g., Hamilton High School">
-
+      <!-- Controls -->
+      <div class="max-w-3xl mx-auto grid sm:grid-cols-3 gap-3">
+        <input id="school-search-input"
+               class="w-full bg-gray-800 border border-gray-700 text-white placeholder-gray-500 text-base md:text-lg rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-red-600"
+               placeholder="E.g., Hamilton High School" />
         <select id="state-filter"
-          class="w-full bg-gray-800 border border-gray-700 text-white text-lg rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-red-600">
+                class="w-full bg-gray-800 border border-gray-700 text-white text-base md:text-lg rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-red-600">
           <option value="">All States</option>
-          <!-- You can fill this with all 50 states -->
-          <option value="az">Arizona</option>
-          <option value="ca">California</option>
-          <option value="fl">Florida</option>
-          <option value="tx">Texas</option>
+          <!-- options injected by JS -->
         </select>
-
         <button id="search-button"
-          class="bg-red-700 text-white font-bold py-3 px-6 rounded-md text-lg hover:bg-red-600 transition">
+                class="bg-red-700 text-white font-bold py-3 px-6 rounded-md text-base md:text-lg hover:bg-red-600 transition">
           Search
         </button>
       </div>
 
-      <div id="results-container"
-        class="mt-8 max-w-5xl mx-auto text-left hidden">
+      <!-- Results -->
+      <div id="results-container" class="mt-8 max-w-5xl mx-auto text-left hidden">
+        <div id="loading" class="py-10 text-center hidden">
+          <div class="animate-spin inline-block h-8 w-8 border-4 border-gray-600 border-t-transparent rounded-full"></div>
+          <p class="text-gray-400 mt-4">Loading…</p>
+        </div>
+
         <div id="results-content"></div>
 
         <!-- Pagination -->
-        <div id="pagination" class="flex justify-center space-x-4 mt-8"></div>
+        <div id="pagination" class="flex flex-wrap justify-center gap-2 mt-8"></div>
       </div>
+
+      <!-- Fetch / empty feedback -->
+      <p id="feedback" class="text-gray-400 mt-6 hidden"></p>
     </div>
   </section>
 
   <script>
     const SHEET_URL = "https://opensheet.elk.sh/1yUNQH9NbpKwOOwH9blf5ZqQfmft796sQl1dqghXP4uA/HS_Baseball_Programs";
+
+    // --- State maps ---
+    const STATE_ABBR_TO_NAME = {
+      AL:"Alabama", AK:"Alaska", AZ:"Arizona", AR:"Arkansas", CA:"California", CO:"Colorado", CT:"Connecticut",
+      DE:"Delaware", FL:"Florida", GA:"Georgia", HI:"Hawaii", ID:"Idaho", IL:"Illinois", IN:"Indiana",
+      IA:"Iowa", KS:"Kansas", KY:"Kentucky", LA:"Louisiana", ME:"Maine", MD:"Maryland", MA:"Massachusetts",
+      MI:"Michigan", MN:"Minnesota", MS:"Mississippi", MO:"Missouri", MT:"Montana", NE:"Nebraska", NV:"Nevada",
+      NH:"New Hampshire", NJ:"New Jersey", NM:"New Mexico", NY:"New York", NC:"North Carolina", ND:"North Dakota",
+      OH:"Ohio", OK:"Oklahoma", OR:"Oregon", PA:"Pennsylvania", RI:"Rhode Island", SC:"South Carolina",
+      SD:"South Dakota", TN:"Tennessee", TX:"Texas", UT:"Utah", VT:"Vermont", VA:"Virginia",
+      WA:"Washington", WV:"West Virginia", WI:"Wisconsin", WY:"Wyoming", DC:"District of Columbia"
+    };
+    const STATE_NAME_TO_ABBR = Object.fromEntries(
+      Object.entries(STATE_ABBR_TO_NAME).map(([abbr, name]) => [name.toLowerCase(), abbr])
+    );
+
+    // --- Elements ---
+    const resultsWrap = document.getElementById("results-container");
+    const resultsEl = document.getElementById("results-content");
+    const paginationEl = document.getElementById("pagination");
+    const loadingEl = document.getElementById("loading");
+    const feedbackEl = document.getElementById("feedback");
+    const inputEl = document.getElementById("school-search-input");
+    const stateEl = document.getElementById("state-filter");
+
+    // --- Data + paging ---
     let rows = [];
+    let filtered = [];
     let currentPage = 1;
-    const resultsPerPage = 5;
-    let filteredMatches = [];
+    const RESULTS_PER_PAGE = 6;
+
+    // Utilities
+    const norm = (s) => (s || "").toString().trim().toLowerCase();
+    const slugify = (s) => norm(s).replace(/[^a-z0-9]/g, "");
+    const parseCityState = (val) => {
+      // Accept "City,ST" or "City, ST"
+      const txt = (val || "").toString();
+      if (!txt.includes(",")) return { city: txt.trim(), st: "" };
+      const [c, st] = txt.split(",");
+      return { city: (c || "").trim(), st: (st || "").trim().toUpperCase() };
+    };
+
+    function deriveStateAbbr(row) {
+      // 1) explicit two-letter state
+      if (row.state && norm(row.state).length <= 2) return row.state.toString().toUpperCase();
+
+      // 2) from regionname as full state name
+      if (row.regionname) {
+        const ab = STATE_NAME_TO_ABBR[norm(row.regionname)];
+        if (ab) return ab;
+      }
+
+      // 3) from city or hslocation like "Chandler,AZ"
+      const fromCity = parseCityState(row.city);
+      if (fromCity.st) return fromCity.st;
+
+      const fromLoc = parseCityState(row.hslocation);
+      if (fromLoc.st) return fromLoc.st;
+
+      return ""; // unknown
+    }
+
+    function getCityOnly(row) {
+      // Prefer dedicated city column; otherwise strip from "City,ST"
+      if (row.city && !row.city.includes(",")) return row.city;
+      const fromCity = parseCityState(row.city);
+      if (fromCity.city) return fromCity.city;
+      const fromLoc = parseCityState(row.hslocation);
+      return fromLoc.city || "";
+    }
+
+    function getLogoPath(row) {
+      const st = deriveStateAbbr(row).toLowerCase();
+      const slug = slugify(row.hsname);
+      return `assets/img/school_logo/${st}_${slug}.jpg`;
+    }
+
+    function buildMicrositeUrl(row) {
+      const st = deriveStateAbbr(row).toLowerCase();
+      const slug = slugify(row.hsname);
+      if (!st || !slug) return "";
+      return `https://${st}.${slug}.yatstats.com`;
+    }
+
+    function fillStateDropdown() {
+      const frag = document.createDocumentFragment();
+      Object.keys(STATE_ABBR_TO_NAME).sort().forEach(abbr => {
+        const opt = document.createElement("option");
+        opt.value = abbr.toLowerCase();
+        opt.textContent = STATE_ABBR_TO_NAME[abbr];
+        frag.appendChild(opt);
+      });
+      stateEl.appendChild(frag);
+    }
 
     async function loadData() {
-      const res = await fetch(SHEET_URL);
-      rows = await res.json();
-    }
-
-    function slugify(str) {
-      return (str || "").toLowerCase().replace(/[^a-z0-9]/g, "");
-    }
-
-    function renderPagination(totalPages) {
-      const pagination = document.getElementById("pagination");
-      pagination.innerHTML = "";
-
-      for (let i = 1; i <= totalPages; i++) {
-        const btn = document.createElement("button");
-        btn.textContent = i;
-        btn.className =
-          "px-4 py-2 rounded " +
-          (i === currentPage
-            ? "bg-red-700 text-white font-bold"
-            : "bg-gray-800 text-gray-300 hover:bg-gray-700");
-        btn.addEventListener("click", () => {
-          currentPage = i;
-          renderResults();
-        });
-        pagination.appendChild(btn);
+      try {
+        loadingEl.classList.remove("hidden");
+        resultsWrap.classList.remove("hidden");
+        const res = await fetch(SHEET_URL, { cache: "no-store" });
+        rows = await res.json();
+        feedbackEl.classList.add("hidden");
+      } catch (e) {
+        feedbackEl.textContent = "Sorry—couldn’t load the database. Please try again.";
+        feedbackEl.classList.remove("hidden");
+      } finally {
+        loadingEl.classList.add("hidden");
       }
     }
 
-    function renderResults() {
-      const content = document.getElementById("results-content");
-      content.innerHTML = "";
+    function matchRow(row, q, stFilter) {
+      const hs = norm(row.hsname);
+      const city = norm(getCityOnly(row));
+      const region = norm(row.regionname);
+      const stAbbr = deriveStateAbbr(row).toLowerCase();
 
-      const start = (currentPage - 1) * resultsPerPage;
-      const end = start + resultsPerPage;
-      const pageMatches = filteredMatches.slice(start, end);
+      // if a state filter is chosen, enforce it
+      if (stFilter && stFilter !== stAbbr) return false;
 
-      pageMatches.forEach((school) => {
-        const activeAlumni = parseInt(school["Active Alumni"] || 0, 10);
-        const state = (school.state || "").toLowerCase();
-        const slug = slugify(school.hsname);
+      if (!q) return true; // no text query => passes state filter only
 
-        const logoPath = `assets/img/school_logo/${state}_${slug}.jpg`;
+      // Consider queries like "az" or "arizona" or a city or school name
+      return (
+        hs.includes(q) ||
+        city.includes(q) ||
+        region.includes(q) ||
+        stAbbr.includes(q)
+      );
+    }
 
-        // Header block
-        const headerHTML = `
-          <div class="flex items-center space-x-4 mb-6">
-            <img src="${logoPath}" onerror="this.src='assets/img/school_logo/default.jpg'"
-              class="h-20 w-20 object-contain bg-gray-800 rounded">
-            <div>
-              <p class="uppercase text-sm text-gray-400">${school.city || ""}, ${school.state || ""}</p>
-              <h2 class="text-2xl font-extrabold text-white tracking-wide">${school.hsname}</h2>
-              <h3 class="uppercase text-md text-red-600 font-bold">Active Alumni</h3>
+    function search() {
+      const q = norm(inputEl.value);
+      const stFilter = norm(stateEl.value); // "" or "az" etc.
+
+      filtered = rows.filter(r => matchRow(r, q, stFilter));
+
+      currentPage = 1;
+      render();
+    }
+
+    function render() {
+      resultsEl.innerHTML = "";
+      paginationEl.innerHTML = "";
+
+      if (!filtered.length) {
+        resultsEl.innerHTML = `<p class="text-gray-400 text-center py-8">No matches found.</p>`;
+        return;
+      }
+
+      const totalPages = Math.ceil(filtered.length / RESULTS_PER_PAGE);
+      const start = (currentPage - 1) * RESULTS_PER_PAGE;
+      const pageItems = filtered.slice(start, start + RESULTS_PER_PAGE);
+
+      pageItems.forEach(row => {
+        const active = parseInt(row["Active Alumni"] || 0, 10) || 0;
+        const rank = row["YATSTATS National Ranking"] || "-";
+        const alumniListed = row["alumni listed"] || 0;
+        const draftedFrom = row["Drafted from School"] || 0;
+        const totalDrafts = row["Total Draft Picks"] || 0;
+        const majors = row["Major Leaguers"] || 0;
+
+        const stAbbr = deriveStateAbbr(row);
+        const city = getCityOnly(row);
+        const logo = getLogoPath(row);
+        const logoFallback = "assets/img/school_logo/default.jpg";
+        const url = buildMicrositeUrl(row);
+        const micrositeLive = /^(true|yes|1)$/i.test(String(row.microsite_live || row.microsite || ""));
+
+        // Header: logo left + 3 lines right, aligned to fill logo height
+        const header = `
+          <div class="flex items-center gap-4 mb-6">
+            <img src="${logo}" onerror="this.src='${logoFallback}'"
+                 class="h-20 w-20 object-contain bg-gray-800 rounded" alt="">
+            <div class="h-20 flex flex-col justify-between">
+              <p class="uppercase text-xs md:text-sm text-gray-400 tracking-widest">
+                ${city ? city + "," : ""} ${stAbbr}
+              </p>
+              <h3 class="text-xl md:text-2xl font-extrabold tracking-wide">${row.hsname}</h3>
+              <p class="uppercase text-xs md:text-sm font-extrabold text-red-500 tracking-widest">Active Alumni</p>
             </div>
           </div>
         `;
 
-        // Stats grid
-        const statsHTML = `
+        const stats = `
           <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-6">
             <div class="bg-gray-900 rounded p-4 text-center">
-              <p class="text-2xl font-bold">${school["YATSTATS National Ranking"] || "-"}</p>
+              <p class="text-2xl font-bold">${rank}</p>
               <p class="text-xs text-gray-400">Rank</p>
             </div>
             <div class="bg-gray-900 rounded p-4 text-center">
-              <p class="text-2xl font-bold">${school["alumni listed"] || 0}</p>
+              <p class="text-2xl font-bold">${alumniListed}</p>
               <p class="text-xs text-gray-400">Alumni Listed</p>
             </div>
             <div class="bg-gray-900 rounded p-4 text-center">
-              <p class="text-2xl font-bold">${school["Drafted from School"] || 0}</p>
+              <p class="text-2xl font-bold">${draftedFrom}</p>
               <p class="text-xs text-gray-400">Drafted</p>
             </div>
             <div class="bg-gray-900 rounded p-4 text-center">
-              <p class="text-2xl font-bold">${school["Total Draft Picks"] || 0}</p>
+              <p class="text-2xl font-bold">${totalDrafts}</p>
               <p class="text-xs text-gray-400">Draft Picks</p>
             </div>
             <div class="bg-gray-900 rounded p-4 text-center">
-              <p class="text-2xl font-bold">${school["Major Leaguers"] || 0}</p>
+              <p class="text-2xl font-bold">${majors}</p>
               <p class="text-xs text-gray-400">Major Leaguers</p>
             </div>
             <div class="bg-gray-900 rounded p-4 text-center">
-              <p class="text-2xl font-bold">${activeAlumni}</p>
+              <p class="text-2xl font-bold">${active}</p>
               <p class="text-xs text-gray-400">Active Alumni</p>
             </div>
           </div>
         `;
 
-        // Messages
-        let messageHTML = "";
-        let actionHTML = "";
-        if (activeAlumni <= 13) {
-          messageHTML = `<div class="bg-yellow-700 text-yellow-100 p-4 rounded text-center mb-4">
-            We found your high school, but due to limited Active Alumni it does not qualify for a microsite.<br>
-            Join our mailing list to access 40,000+ nationwide alumni.
-          </div>`;
-          actionHTML = `<button class="bg-red-700 hover:bg-red-600 px-6 py-3 rounded font-bold">Join Mailing List</button>`;
+        let message = "", cta = "";
+        if (active <= 13) {
+          message = `
+            <div class="bg-yellow-700/70 text-yellow-100 p-4 rounded text-center mb-4">
+              We found your high school. Unfortunately, due to the program's limited Active Alumni,
+              they did not qualify to have their own YATSTATS Microsite.<br/>
+              Join our mailing list to access 40,000+ Active Alumni from the Top 1000 HS programs.
+            </div>`;
+          cta = `<button class="bg-red-700 hover:bg-red-600 px-6 py-3 rounded font-bold">Join Mailing List</button>`;
         } else {
-          const micrositeExists = false; // later hook into sheet
-          if (micrositeExists) {
-            const url = `https://${state}.${slug}.yatstats.com`;
-            messageHTML = `<div class="bg-green-800 text-green-100 p-4 rounded text-center mb-4">
-              Good news! This school has its own YATSTATS microsite.<br>
-              <span class="font-bold">${url.replace("https://", "")}</span>
-            </div>`;
-            actionHTML = `<a href="${url}" target="_blank"
-              class="bg-red-700 hover:bg-red-600 px-6 py-3 rounded font-bold inline-block">Visit Microsite</a>`;
+          if (micrositeLive && url) {
+            message = `
+              <div class="bg-green-800/80 text-green-100 p-4 rounded text-center mb-4">
+                We Found Your High School. To begin tracking their active alumni, click below.<br/>
+                <span class="font-bold">${url.replace("https://","")}</span>
+              </div>`;
+            cta = `<a class="inline-block bg-red-700 hover:bg-red-600 px-6 py-3 rounded font-bold" target="_blank" href="${url}">Visit Microsite</a>`;
           } else {
-            messageHTML = `<div class="bg-blue-800 text-blue-100 p-4 rounded text-center mb-4">
-              Good news! This school qualifies and will soon have a microsite.<br>
-              Join our mailing list + suggest a sponsor to expedite launch.
-            </div>`;
-            actionHTML = `<button class="bg-red-700 hover:bg-red-600 px-6 py-3 rounded font-bold">Join + Share Sponsor</button>`;
+            message = `
+              <div class="bg-blue-800/80 text-blue-100 p-4 rounded text-center mb-4">
+                We Found Your High School and Good News! Due to this program's high Active Alumni count,
+                they will soon have their own YATSTATS Microsite.<br/>
+                Join our mailing list, and suggest a possible co-branding sponsor to expedite launch.
+              </div>`;
+            cta = `<button class="bg-red-700 hover:bg-red-600 px-6 py-3 rounded font-bold">Join + Share Sponsor</button>`;
           }
         }
 
-        content.innerHTML += `
-          <div class="mb-12 p-8 bg-gray-950 border border-gray-700 rounded-lg shadow-lg">
-            ${headerHTML}
-            ${statsHTML}
-            ${messageHTML}
-            <div class="text-center">${actionHTML}</div>
+        const card = `
+          <div class="mb-10 p-6 md:p-8 bg-gray-950 border border-gray-700 rounded-lg shadow-lg">
+            ${header}
+            ${stats}
+            ${message}
+            <div class="text-center">${cta}</div>
           </div>
         `;
+
+        resultsEl.insertAdjacentHTML("beforeend", card);
       });
 
-      renderPagination(Math.ceil(filteredMatches.length / resultsPerPage));
-    }
+      // Pagination controls
+      const btn = (label, on, disabled=false, active=false) => {
+        const base = "px-3 py-2 rounded border border-gray-700";
+        const cls = disabled
+          ? base + " text-gray-500 cursor-not-allowed"
+          : active
+          ? base + " bg-red-700 text-white font-bold"
+          : base + " bg-gray-800 text-gray-200 hover:bg-gray-700";
+        const el = document.createElement("button");
+        el.textContent = label;
+        el.className = cls;
+        if (!disabled) el.addEventListener("click", on);
+        return el;
+      };
 
-    function searchSchools() {
-      const query = document.getElementById("school-search-input").value.trim().toLowerCase();
-      const stateFilter = document.getElementById("state-filter").value.trim().toLowerCase();
-
-      filteredMatches = rows.filter(r =>
-        ((r.hsname && r.hsname.toLowerCase().includes(query)) ||
-         (r.city && r.city.toLowerCase().includes(query)) ||
-         (r.state && r.state.toLowerCase().includes(query)))
-        && (!stateFilter || (r.state && r.state.toLowerCase() === stateFilter))
+      // Prev
+      paginationEl.appendChild(
+        btn("Prev", () => { currentPage = Math.max(1, currentPage - 1); render(); }, currentPage === 1)
       );
 
-      currentPage = 1;
-      renderResults();
+      for (let i = 1; i <= totalPages; i++) {
+        paginationEl.appendChild(
+          btn(String(i), () => { currentPage = i; render(); }, false, i === currentPage)
+        );
+      }
 
-      document.getElementById("results-container").classList.remove("hidden");
+      // Next
+      paginationEl.appendChild(
+        btn("Next", () => { currentPage = Math.min(totalPages, currentPage + 1); render(); }, currentPage === totalPages)
+      );
     }
 
-    document.getElementById("search-button").addEventListener("click", searchSchools);
+    // Wire up
+    document.getElementById("search-button").addEventListener("click", search);
+    inputEl.addEventListener("keydown", (e) => { if (e.key === "Enter") search(); });
+    stateEl.addEventListener("change", search);
 
+    // init
+    fillStateDropdown();
     loadData();
   </script>
-
 </body>
 </html>
