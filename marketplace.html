@@ -7,15 +7,65 @@
 <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400&family=Bebas+Neue&display=swap" rel="stylesheet">
 <style>
-  /* News grid */
+/* -------------------- CORE THEME -------------------- */
+:root{
+  --bg:#0c0c0c; --fg:#f2f2f2; --muted:#c4c4c4; --ink:#e8e8e8; --line:rgba(255,255,255,.08);
+  --card-bg:#171717; --header-bg:#000; --drawer-bg:rgba(10,10,10,.65);
+  --shade-end:rgba(0,0,0,.95);
+  --hamSmall:13px; --hamBig:20px; --hamBigger:24px; --tagGrey:#cfd2d6;
+  --crestH:clamp(28px,4.2vw,42px);
+  --containerPad:16px; --footerH:clamp(56px,8vh,77px);
+}
+body.light-theme{
+  --bg:#f4f4f4; --fg:#121212; --muted:#555; --ink:#222; --line:rgba(0,0,0,.1);
+  --card-bg:#fff; --header-bg:#fff; --drawer-bg:rgba(255,255,255,.65);
+}
+@font-face{font-family:'Indigo';src:url('assets/fonts/Indigo.otf') format('opentype');font-weight:400;font-style:normal;font-display:swap;}
+* {box-sizing:border-box} html,body{margin:0}
+body{background:var(--bg);color:var(--fg);font-family:Oswald,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;transition:background-color .3s,color .3s;}
+body.drawer-open{overflow:hidden}
+a{color:inherit;text-decoration:none}
+.container{max-width:1400px;margin:0 auto;padding:0 var(--containerPad)}
+.header{position:sticky;top:0;z-index:50;background:var(--header-bg);transition:background-color .3s;}
+
+/* -------------------- Layout Grid -------------------- */
 .newsgrid {
   display: grid;
-  grid-template-columns: 1fr clamp(140px, 30vw, 320px);
+  grid-template-columns: 1fr clamp(140px, 30vw, 320px); /* default: 2-col (content + scores) */
   gap: 16px;
   align-items: start;
 }
 
-/* News feed & cards */
+.news-wrap {
+  display: block;
+}
+
+/* At ≥900px: Pro & College split into col1/col2, Scores in col3 */
+@media (min-width: 900px) {
+  .newsgrid {
+    grid-template-columns: 1fr 1fr clamp(200px, 26vw, 320px);
+  }
+  .news-wrap {
+    display: contents; /* let children participate in grid */
+  }
+  #col-pro   { grid-column: 1; grid-row: 1; }
+  #col-college { grid-column: 2; grid-row: 1; }
+  .scores-col { grid-column: 3; grid-row: 1; }
+}
+
+/* -------------------- Scores Column -------------------- */
+.scores-col {
+  position: sticky;
+  top: var(--stickyTop, 140px);
+  max-height: calc(100vh - var(--stickyTop,140px) - var(--footerH) - 12px);
+  overflow: auto;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--card-bg);
+  padding: 10px;
+}
+
+/* -------------------- News Cards -------------------- */
 .news-feed {
   display: flex;
   flex-direction: column;
@@ -59,28 +109,6 @@
   color: var(--muted);
   margin-top: 6px;
 }
-
-/* -------------------- CORE THEME -------------------- */
-:root{
-  --bg:#0c0c0c; --fg:#f2f2f2; --muted:#c4c4c4; --ink:#e8e8e8; --line:rgba(255,255,255,.08);
-  --card-bg:#171717; --header-bg:#000; --drawer-bg:rgba(10,10,10,.65);
-  --shade-end:rgba(0,0,0,.95);
-  --hamSmall:13px; --hamBig:20px; --hamBigger:24px; --tagGrey:#cfd2d6;
-  --crestH:clamp(28px,4.2vw,42px);
-  --containerPad:16px; --footerH:clamp(56px,8vh,77px);
-}
-body.light-theme{
-  --bg:#f4f4f4; --fg:#121212; --muted:#555; --ink:#222; --line:rgba(0,0,0,.1);
-  --card-bg:#fff; --header-bg:#fff; --drawer-bg:rgba(255,255,255,.65);
-}
-@font-face{font-family:'Indigo';src:url('assets/fonts/Indigo.otf') format('opentype');font-weight:400;font-style:normal;font-display:swap;}
-* {box-sizing:border-box} html,body{margin:0}
-body{background:var(--bg);color:var(--fg);font-family:Oswald,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;transition:background-color .3s,color .3s;}
-body.drawer-open{overflow:hidden}
-a{color:inherit;text-decoration:none}
-.container{max-width:1400px;margin:0 auto;padding:0 var(--containerPad)}
-.header{position:sticky;top:0;z-index:50;background:var(--header-bg);transition:background-color .3s;}
-/* (rest of your CSS unchanged — nav, hero, newsgrid, cards, breakpoints, footer, etc.) */
 </style>
 </head>
 <body>
@@ -136,12 +164,6 @@ a{color:inherit;text-decoration:none}
   </section>
 </header>
 
-<!-- Drawers -->
-<div class="drawer-mask"></div>
-<aside class="drawer" id="drawerLeft" aria-label="Left drawer"> ... </aside>
-<aside class="drawer drawer-right" id="drawerFilters"> ... </aside>
-<aside class="drawer drawer-right" id="drawerAccount"> ... </aside>
-
 <!-- MAIN -->
 <main class="main container">
   <div class="newsgrid" aria-live="polite">
@@ -157,7 +179,7 @@ a{color:inherit;text-decoration:none}
     </div>
     <aside class="scores-col">
       <h3>WEEKLY LINE SCORES</h3>
-      <div id="scoresMount" class="scores-sticky">
+      <div id="scoresMount">
         <p style="color:var(--muted)">Loading linescores...</p>
       </div>
     </aside>
@@ -184,7 +206,7 @@ a{color:inherit;text-decoration:none}
 }
 </script>
 
-<!-- JS (splash logic removed) -->
+<!-- JS -->
 <script type="module">
 const $ = s => document.querySelector(s);
 const $$ = s => Array.from(document.querySelectorAll(s));
