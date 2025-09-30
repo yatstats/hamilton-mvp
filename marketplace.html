@@ -603,7 +603,7 @@ const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQcWJM6Q6hTdFnE
 /* --------- Helpers --------- */
 const $ = s => document.querySelector(s);
 const $$ = s => Array.from(document.querySelectorAll(s));
-const debounce = (fn, ms=300) => { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); }; };
+const debounce = (fn, ms=300) => { let t; return (...a){ clearTimeout(t); t = setTimeout(() => fn(...a), ms); }; };
 function setStickyTop() {
   const header = document.querySelector('.header');
   const top = (header?.offsetHeight || 120) + 10;
@@ -775,58 +775,6 @@ function resetFilters() {
   });
   $$('#filterStatus input[value^="ACTIVE"]').forEach(i => i.checked = true);
 }
-/* --------- New function to dynamically load linescores from Google Sheets STATS tab (BB1:CO100) --------- */
-async function loadLinescoresFromSheets() {
-  const SHEET_ID = '1yUNQH9NbpKwOOwH9blf5ZqQfmft796sQl1dqghXP4uA'; // Replace with your actual Sheet ID
-  const GID = '370019781'; // STATS tab GID (adjust if different)
-  const CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${GID}`;
-  const $scoresMount = $('#scoresMount');
-
-  try {
-    const res = await fetch(CSV_URL);
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const text = await res.text();
-    if (!text.trim()) throw new Error('Empty CSV');
-    const rows = text.trim().split(/\r?\n/).map(line => line.split(',').map(c => c.trim()));
-    const headers = rows[0]; // Row 1: Week headers and dates
-    const players = rows[1].slice(1); // Row 2: Player names (BB2 onwards, excluding first column)
-    const dataRows = rows.slice(2); // Rows 3+: Linescores
-
-    // Define weeks and their date columns (based on BB=54 to CO=92, adjust indices as needed)
-    const weeks = [
-      { label: 'WEEK of September 28 - October 4', startCol: 54, endCol: 60 },
-      { label: 'WEEK of September 21 - 27', startCol: 47, endCol: 53 },
-      { label: 'WEEK of September 14 - 20', startCol: 40, endCol: 46 },
-      { label: 'WEEK of September 7 - 13', startCol: 33, endCol: 39 },
-      { label: 'WEEK of August 31 - September 6', startCol: 26, endCol: 32 },
-      { label: 'WEEK of August 24 - 30', startCol: 19, endCol: 25 }
-    ];
-
-    let html = '';
-    weeks.forEach(week => {
-      const weekHtml = `
-        <div class="linescore-week">
-          <h4>${week.label}</h4>
-          ${players.map((player, idx) => {
-            const data = dataRows.map(row => row.slice(week.startCol - 1, week.endCol).reverse()); // Reverse dates
-            return `
-              <div class="linescore-player">
-                <strong>${player}</strong>
-                ${data[idx].map(stat => `<div>${stat || ''}</div>`).join('')}
-              </div>
-            `;
-          }).join('')}
-        </div>
-      `;
-      html += weekHtml;
-    });
-
-    $scoresMount.innerHTML = html || '<p style="color:var(--muted)">No linescores available.</p>';
-  } catch (error) {
-    console.error('Error loading linescores:', error);
-    $scoresMount.innerHTML = '<p style="color:var(--muted)">Failed to load linescores.</p>';
-  }
-}
 /* --------- Boot --------- */
 document.addEventListener('DOMContentLoaded', async () => {
   // Splash once per session
@@ -858,8 +806,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     ALL_NEWS = Array.isArray(data.items) ? data.items : [];
   } catch { ALL_NEWS = []; }
   renderNewsLists();
-  // Load linescores dynamically
-  await loadLinescoresFromSheets();
   // Filters interaction (checkbox select-all and name search live)
   $('#filters')?.addEventListener('change', e => {
     if (e.target.classList.contains('select-all')) {
