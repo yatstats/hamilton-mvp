@@ -3,150 +3,644 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Hamilton YATSTATS • Alumni News</title>
+<title>Active Alumni News • Hamilton YATSTATS</title>
 <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400&family=Bebas+Neue&display=swap" rel="stylesheet">
+
 <style>
-:root {
-  --bg:#0c0c0c; --fg:#f2f2f2; --muted:#c4c4c4; --line:rgba(255,255,255,.08);
-  --card-bg:#171717; --header-bg:#000;
+/* =========================================================
+   YAT?STATS — ALUMNI NEWS (standalone)
+   - Full header + drawers + theme
+   - 3a > 3b > 2a > 2b responsive news
+   - Sticky scores always present
+   ========================================================= */
+
+/* ---------- Theme tokens ---------- */
+:root{
+  --bg:#0c0c0c; --fg:#f2f2f2; --muted:#a8a8a8; --ink:#e8e8e8; --line:rgba(255,255,255,.08);
+  --card:#151515; --header:#000; --drawer:rgba(10,10,10,.68);
+  --accent:#37f; --danger:#f66; --ok:#86efac;
+  --crestH:clamp(28px,4.2vw,42px);
+  --pad:16px; --footerH:clamp(56px,8vh,77px);
+  --newsRadius:14px;
+  --shadow:0 10px 25px rgba(0,0,0,.25);
+  --shadeTop:rgba(0,0,0,0); --shadeMid:rgba(0,0,0,.45); --shadeBot:rgba(0,0,0,.9);
 }
-body {margin:0;font-family:Oswald,system-ui;background:var(--bg);color:var(--fg);}
-a {color:inherit;text-decoration:none;}
-/* Header */
-.header {background:var(--header-bg);position:sticky;top:0;z-index:100;}
-.topbar {display:flex;align-items:center;justify-content:space-between;padding:10px 16px;}
-.left-icons {display:flex;gap:8px;}
-.icon-btn{background:none;border:none;color:var(--fg);cursor:pointer}
-.icon-btn i{font-size:20px;}
-.topnav {display:flex;gap:16px;}
-.topnav a {font:400 14px Oswald;text-transform:uppercase;}
-.wordmark {height:28px;}
-.schoolrow {display:flex;align-items:center;gap:12px;padding:8px 16px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);}
-.schoolrow img {height:40px;}
-.schooltext .big1 {font:400 18px "Bebas Neue";}
-.schooltext .big2 {font:400 22px "Bebas Neue";}
-.hero {padding:10px 16px;border-bottom:1px solid var(--line);}
-.hero h2 {margin:0;font:400 22px "Bebas Neue";letter-spacing:.02em;}
-/* Layout */
-.main {display:grid;gap:16px;grid-template-columns:2fr 2fr 1fr;max-width:1400px;margin:0 auto;padding:16px;}
-@media (max-width:1200px){.main{grid-template-columns:1fr 1fr;}}
-@media (max-width:768px){.main{grid-template-columns:1fr;}}
-/* Sections */
-.section h3 {font:400 18px "Bebas Neue";margin:0 0 10px;}
-/* News Cards */
-.news-card {background:var(--card-bg);border-radius:8px;overflow:hidden;display:flex;flex-direction:row;min-height:180px;margin-bottom:14px;}
-.news-card img {width:40%;object-fit:cover;}
-.news-card-content {padding:12px;flex:1;display:flex;flex-direction:column;justify-content:space-between;}
-.news-title {font:400 18px "Bebas Neue";margin:0;}
-.news-sub {font-size:13px;color:var(--muted);margin:6px 0;}
-.news-meta {font-size:12px;color:var(--muted);}
-.socials {display:flex;gap:10px;margin-top:8px;}
-.socials i{font-size:18px;}
-/* Portrait cards for mobile */
-@media (max-width:768px){
-  .news-card {flex-direction:column;position:relative;}
-  .news-card img {width:100%;height:220px;}
-  .news-card-content {position:absolute;bottom:0;left:0;right:0;
-    background:linear-gradient(transparent,rgba(0,0,0,0.85));
-    color:#fff;padding:12px;}
-  .news-sub,.news-meta{color:#ddd;}
+body.light{
+  --bg:#f6f6f6; --fg:#121212; --muted:#555; --ink:#111; --line:rgba(0,0,0,.1);
+  --card:#fff; --header:#fff; --drawer:rgba(255,255,255,.82);
 }
-/* Scores Sidebar */
-.scores {background:var(--card-bg);padding:12px;border-radius:8px;}
-.scores h3 {margin-top:0;font:400 18px "Bebas Neue";}
-.score-item {margin-bottom:10px;font-size:14px;}
-/* Footer */
-footer {margin-top:20px;border-top:1px solid var(--line);padding:12px;text-align:center;}
-footer img {max-height:40px;}
+*{box-sizing:border-box} html,body{margin:0}
+body{
+  background:var(--bg); color:var(--fg);
+  font-family:Oswald,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+  -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
+}
+
+/* ---------- Utilities ---------- */
+.container{max-width:1400px; margin:0 auto; padding:0 var(--pad)}
+a{color:inherit; text-decoration:none}
+.hr{border-top:1px solid var(--line)}
+.icon-btn{background:none; border:0; color:inherit; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; padding:6px}
+.icon-btn i{font-size:20px}
+.hide{display:none}
+
+/* =========================================================
+   HEADER (match index look)
+   ========================================================= */
+.header{position:sticky; top:0; z-index:60; background:var(--header); box-shadow:0 2px 0 var(--line)}
+.topbar{display:flex; align-items:center; justify-content:space-between; padding:8px 0}
+.left-icons{display:flex; align-items:center; gap:8px}
+.topnav{display:flex; gap:18px; align-items:center}
+.nav-pair{white-space:nowrap}
+.nav-pair .thin{font:300 13px Oswald; letter-spacing:.02em; color:#cfd2d6}
+body.light .nav-pair .thin{color:var(--muted)}
+.nav-pair .bold{font:400 13px "Bebas Neue",sans-serif; letter-spacing:.02em}
+.wordmark{height:clamp(18px,3.2vw,28px)}
+body.light .wordmark{filter:invert(1)}
+@media (max-width:1200px){ .topnav{display:none} }
+
+.schoolrow{display:flex; align-items:center; gap:10px; padding:6px 0}
+.hamcrest{height:var(--crestH); width:auto; flex-shrink:0}
+.schooltxt .small{font:300 13px Oswald; letter-spacing:.02em; color:var(--muted)}
+.schooltxt .big1{font:400 20px "Bebas Neue"; line-height:1}
+.schooltxt .big2{font:400 24px "Bebas Neue"; line-height:1; margin-top:-4px}
+
+.hero{padding:6px 0}
+.hero-grid{display:flex; align-items:center; justify-content:space-between}
+.crumbs{font:300 11px Oswald; letter-spacing:.14em; text-transform:uppercase; color:var(--muted)}
+.hero-actions{display:flex; gap:10px}
+
+/* =========================================================
+   DRAWERS (left nav/search, right filters, right account)
+   ========================================================= */
+.mask{position:fixed; inset:0; background:rgba(0,0,0,.35); opacity:0; pointer-events:none; transition:.2s; z-index:59}
+.drawer{position:fixed; top:0; bottom:0; width:min(360px,82vw); background:var(--drawer);
+  backdrop-filter:blur(6px); color:var(--ink); transform:translateX(-110%); transition:transform .25s; z-index:60}
+.drawer.right{left:auto; right:0; transform:translateX(110%)}
+.drawer .close{position:absolute; top:10px; right:10px}
+.drawer h3{margin:16px; font:400 20px "Bebas Neue"; letter-spacing:.06em}
+.drawer .pad{padding:0 16px 16px}
+.drawer .section{padding:8px 16px 16px; border-top:1px solid var(--line)}
+.drawer .list a{display:block; padding:10px 0}
+
+body.show-left .mask, body.show-right .mask{opacity:1; pointer-events:auto}
+body.show-left .drawer.left{transform:translateX(0)}
+body.show-right .drawer.right{transform:translateX(0)}
+
+/* live search small UI */
+.live-hit{display:flex; align-items:center; gap:10px; padding:8px 10px; border-radius:10px}
+.live-hit:hover{background:var(--line)}
+.live-hit .pfp{width:34px; height:34px; border-radius:6px; background:#999}
+
+/* Filters details */
+details.filter{border-bottom:1px solid var(--line); padding:8px 0}
+details.filter>summary{list-style:none; cursor:pointer; font:400 16px "Bebas Neue"; letter-spacing:.06em}
+details.filter>summary::-webkit-details-marker{display:none}
+details.filter label{display:block; padding:6px 2px}
+
+/* Auth mini (localStorage stub) */
+.auth-tabs{display:flex; border-bottom:1px solid var(--line)}
+.auth-tabs button{flex:1; background:none; border:0; padding:10px; cursor:pointer; color:var(--muted); font:400 16px "Bebas Neue"; letter-spacing:.06em}
+.auth-tabs button.active{color:var(--fg); border-bottom:2px solid var(--fg)}
+.auth-form{display:none; padding-top:10px}
+.auth-form.active{display:block}
+.form-row{margin:10px 0}
+.form-row label{display:block; font-size:12px; margin-bottom:4px}
+.form-row input{width:100%; padding:10px; border:1px solid var(--line); border-radius:8px; background:rgba(255,255,255,.06); color:var(--ink)}
+.auth-cta{width:100%; padding:10px; border-radius:8px; border:0; background:var(--fg); color:var(--bg); font:400 16px "Bebas Neue"; letter-spacing:.08em; cursor:pointer}
+
+/* =========================================================
+   PAGE LAYOUT — grids + sticky scores
+   ========================================================= */
+main{padding:10px 0 calc(var(--footerH) + 14px)}
+/* Default (2b): two columns (content | sticky scores) */
+.grid{
+  display:grid; gap:16px;
+  grid-template-columns: 1fr clamp(160px, 34vw, 340px);
+  align-items:start;
+}
+.scores{position:relative}
+.scores .sticky{
+  position:sticky; top:var(--stickTop,140px);
+  background:var(--card); border:1px solid var(--line); border-radius:12px; padding:12px;
+  max-height:calc(100vh - var(--stickTop,140px) - var(--footerH) - 16px);
+  overflow:auto; box-shadow:var(--shadow);
+}
+.scores h3{font:400 22px "Bebas Neue"; letter-spacing:.06em; margin:0 0 6px}
+
+/* News columns wrapper: becomes 'contents' at 3a/3b so we can place pro+college as siblings of scores */
+.news-wrap{display:block}
+.news-col{margin-bottom:6px}
+.news-col h3{font:400 22px "Bebas Neue"; letter-spacing:.06em; margin:0 0 10px}
+
+/* =========================================================
+   CARD SYSTEM
+   Two modes toggled by CSS breakpoints (no JS):
+   - SIDE mode (rectangular container, 5:7 image on left, text on right)
+   - OVERLAY mode (portrait 5:7 image; text over gradient at bottom)
+   ========================================================= */
+
+/* base */
+.news-feed{display:flex; flex-direction:column; gap:12px}
+
+/* ---------- SIDE MODE (default we’ll turn on at 3a & 2a) ---------- */
+.news-card{
+  display:flex; gap:12px; align-items:stretch;
+  background:var(--card); border:1px solid var(--line); border-radius:var(--newsRadius);
+  overflow:hidden; box-shadow:var(--shadow);
+}
+.side .thumb{flex:0 0 34%; aspect-ratio:5/7; background:#000 center/cover no-repeat}
+.side .body{flex:1; padding:12px; display:flex; flex-direction:column}
+.side .title{font:400 clamp(20px,2vw,26px)/1.05 "Bebas Neue"; letter-spacing:.03em}
+.side .meta{font:300 12px Oswald; color:var(--muted); margin-top:6px}
+.side .links{display:flex; gap:14px; margin-top:8px}
+.side .share{margin-top:auto; display:flex; gap:10px; justify-content:flex-end}
+
+/* ---------- OVERLAY MODE (3b & 2b) ---------- */
+.overlay .news-card{position:relative; display:block; padding:0; background:transparent; border:0; box-shadow:none}
+.overlay .thumb{width:100%; aspect-ratio:5/7; border-radius:var(--newsRadius); background:#000 center/cover no-repeat; position:relative; overflow:hidden; border:1px solid var(--line)}
+.overlay .shade{
+  position:absolute; left:0; right:0; bottom:0; top:35%;
+  background:linear-gradient(180deg,var(--shadeTop) 0%, var(--shadeMid) 45%, var(--shadeBot) 100%);
+}
+.overlay .body{
+  position:absolute; left:0; right:0; bottom:0; padding:12px 12px 10px;
+  color:#fff;
+}
+.overlay .title{font:400 clamp(20px,4.2vw,28px)/1.05 "Bebas Neue"; text-shadow:0 2px 10px rgba(0,0,0,.6)}
+.overlay .meta{font:300 12px Oswald; opacity:.9; margin-top:6px}
+.overlay .links{display:flex; gap:14px; margin-top:6px}
+.overlay .share{margin-top:8px; display:flex; gap:10px}
+
+/* ---------- Badges / chips ---------- */
+.badges{display:flex; gap:6px; flex-wrap:wrap; margin-top:6px}
+.badge{font:700 11px Oswald; padding:2px 6px; border-radius:6px; border:1px solid var(--line); background:rgba(255,255,255,.08)}
+body.light .badge{background:rgba(0,0,0,.06)}
+
+/* =========================================================
+   BREAKPOINTS — 3a > 3b > 2a > 2b (never 1 column)
+   ========================================================= */
+
+/* 3a (≥1280px): 3 columns; SIDE mode cards */
+@media (min-width:1280px){
+  .grid{grid-template-columns: 1fr 1fr clamp(220px, 24vw, 360px)}
+  .news-wrap{display:contents} /* let pro + college sit next to scores as real siblings */
+  #pro{grid-column:1} #college{grid-column:2} .scores{grid-column:3}
+  .news-root{ /* ensure side mode */ }
+  .news-root.overlay{ /* disable overlay visuals in 3a */ }
+  #pro, #college{--cardMode:side}
+  .news-root{ /* nothing; the class hooks are per-column below */ }
+  #pro .news-feed, #college .news-feed{ /* extra spacing if desired */ }
+  #pro .news-card, #college .news-card{ /* side-mode is default styles */ }
+  #pro .news-root, #college .news-root{}
+  #pro .side, #college .side{display:block}
+}
+
+/* 3b (900–1279px): 3 columns; OVERLAY mode cards */
+@media (min-width:900px) and (max-width:1279px){
+  .grid{grid-template-columns: 1fr 1fr clamp(210px, 26vw, 330px)}
+  .news-wrap{display:contents}
+  #pro{grid-column:1} #college{grid-column:2} .scores{grid-column:3}
+  /* overlay mode visual is default under .overlay section */
+}
+
+/* 2a (601–899px): 2 columns; SIDE mode cards (stack Pro then College) */
+@media (min-width:601px) and (max-width:899px){
+  .grid{grid-template-columns: 1fr clamp(180px, 30vw, 320px)}
+  #pro{grid-column:1; grid-row:1}
+  #college{grid-column:1; grid-row:2}
+  .scores{grid-column:2; grid-row:1 / span 2}
+  /* switch back to side mode */
+  .overlay .news-card{display:flex; gap:12px; background:var(--card); border:1px solid var(--line); box-shadow:var(--shadow)}
+  .overlay .thumb{flex:0 0 34%; aspect-ratio:5/7; position:static; border-radius:0}
+  .overlay .shade{display:none}
+  .overlay .body{position:static; color:inherit; padding:12px}
+  .overlay .title{color:inherit; text-shadow:none}
+}
+
+/* 2b (≤600px): 2 columns; OVERLAY mode cards (stack Pro then College) */
+@media (max-width:600px){
+  .grid{grid-template-columns: 1fr clamp(140px, 36vw, 260px)}
+  #pro{grid-column:1; grid-row:1}
+  #college{grid-column:1; grid-row:2}
+  .scores{grid-column:2; grid-row:1 / span 2}
+}
+
+/* =========================================================
+   FOOTER
+   ========================================================= */
+footer{position:fixed; left:0; right:0; bottom:0; height:var(--footerH);
+  background:var(--bg); border-top:1px solid var(--line); z-index:55}
+footer a{display:block; height:100%}
+footer img{height:100%; width:100%; object-fit:contain}
+
+/* Focus */
+:focus-visible{outline:2px solid var(--fg); outline-offset:2px}
 </style>
 </head>
 <body>
+
+<!-- =================== HEADER =================== -->
 <header class="header">
-  <div class="topbar">
+  <div class="container topbar">
     <div class="left-icons">
-      <button class="icon-btn"><i class="ri-menu-line"></i></button>
-      <button class="icon-btn"><i class="ri-user-3-line"></i></button>
-      <button class="icon-btn"><i class="ri-sun-line"></i></button>
+      <button class="icon-btn" id="openLeft" aria-label="Menu"><i class="ri-menu-line"></i></button>
+      <button class="icon-btn" id="openAccount" aria-label="Account"><i class="ri-user-3-line"></i></button>
+      <button class="icon-btn" id="toggleTheme" aria-label="Toggle Theme"><i class="ri-sun-line"></i></button>
     </div>
-    <div class="topnav">
-      <a href="index.html">YAT?</a>
-      <a href="alumni-news.html">News</a>
-      <a href="all-time-list.html">All-Time</a>
-    </div>
-    <img class="wordmark" src="https://via.placeholder.com/120x28?text=YATSTATS" alt="YAT?STATS">
+
+    <nav class="topnav" aria-label="Desktop navigation">
+      <a href="#" class="nav-pair"><span class="thin">WHERE THEY</span> <span class="bold">YAT?</span></a>
+      <a href="#" class="nav-pair"><span class="thin">ACTIVE ALUMNI</span> <span class="bold">NEWS</span></a>
+      <a href="#" class="nav-pair"><span class="thin">NEXT-LEVEL</span> <span class="bold">ALL-TIME LIST</span></a>
+      <a href="#" class="nav-pair"><span class="thin">NIL & YAT-A-BOY</span> <span class="bold">MARKETPLACE</span></a>
+      <a href="#" class="nav-pair"><span class="thin">THE</span> <span class="bold">CURRENT TEAM</span></a>
+      <a href="#" class="nav-pair"><span class="thin">PCD ACTION</span> <span class="bold">PARTNER PROGRAM</span></a>
+      <a href="#" class="nav-pair"><span class="bold">FAQ’S</span></a>
+    </nav>
+
+    <img class="wordmark" src="https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/googlechrome.svg" alt="YAT?STATS" style="opacity:.0" />
+    <img class="wordmark" src="https://raw.githubusercontent.com/vanjs-org/awesome-vanjs/main/assets/yatstats-wordmark-dark.png" alt="YAT?STATS" onerror="this.src='https://dummyimage.com/150x32/ffffff/000.png&text=YAT?STATS'">
   </div>
-  <div class="schoolrow">
-    <img src="https://via.placeholder.com/40x40?text=H" alt="School Crest">
-    <div class="schooltext">
+
+  <div class="hr"></div>
+
+  <div class="container schoolrow">
+    <img class="hamcrest" src="https://dummyimage.com/84x84/222/fff.png&text=H" alt="Hamilton H">
+    <div class="schooltxt">
       <div class="small">CHANDLER, AZ</div>
       <div class="big1">HAMILTON HIGH SCHOOL</div>
       <div class="big2">ACTIVE BASEBALL ALUMNI</div>
     </div>
   </div>
-  <div class="hero"><h2>LATEST NEWS & SCORES</h2></div>
+
+  <div class="hr"></div>
+
+  <section class="hero">
+    <div class="container hero-grid">
+      <div class="crumbs">HAMILTON ▸ ACTIVE ALUMNI NEWS</div>
+      <div class="hero-actions">
+        <button class="icon-btn" id="openSearch" aria-label="Search"><i class="ri-search-line"></i></button>
+        <button class="icon-btn" id="openFilters" aria-label="Open filters"><i class="ri-filter-3-line"></i></button>
+        <button class="icon-btn" id="resetFilters" aria-label="Reset filters"><i class="ri-restart-line"></i></button>
+      </div>
+    </div>
+  </section>
 </header>
-<main class="main">
-  <!-- Pro News -->
-  <section class="section">
-    <h3>Alumni Headlines (Pros)</h3>
-    <article class="news-card">
-      <img src="https://picsum.photos/id/1011/600/400" alt="">
-      <div class="news-card-content">
-        <div>
-          <h4 class="news-title">Murphy Locks Down First KBO Save</h4>
-          <div class="news-sub">Yonhap • 9/22/2025, 9:12 AM</div>
-          <div class="news-meta">Read More • YAT-A-BOY Marketplace</div>
-        </div>
-        <div class="socials">
-          <i class="ri-twitter-fill"></i><i class="ri-instagram-line"></i><i class="ri-facebook-fill"></i>
-        </div>
+
+<!-- =================== DRAWERS =================== -->
+<div class="mask" id="mask"></div>
+
+<!-- Left drawer: menu + profile search -->
+<aside class="drawer left" id="drawerLeft" aria-label="Navigation drawer">
+  <button class="icon-btn close" id="closeLeft"><i class="ri-close-line"></i></button>
+  <h3>PLAYER PROFILE SEARCH</h3>
+  <div class="pad">
+    <input id="searchInput" placeholder="Type a name…" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--ink)">
+    <div id="liveResults" class="pad"></div>
+  </div>
+  <div class="section">
+    <h3>NAVIGATION</h3>
+    <div class="list pad">
+      <a href="#"><span class="thin">WHERE THEY</span> <span class="bold">YAT?</span></a>
+      <a href="#"><span class="thin">ACTIVE ALUMNI</span> <span class="bold">NEWS</span></a>
+      <a href="#"><span class="thin">NEXT-LEVEL</span> <span class="bold">ALL-TIME LIST</span></a>
+      <a href="#"><span class="thin">NIL & YAT-A-BOY</span> <span class="bold">MARKETPLACE</span></a>
+      <a href="#"><span class="thin">THE</span> <span class="bold">CURRENT TEAM</span></a>
+      <a href="#"><span class="thin">PCD ACTION</span> <span class="bold">PARTNER PROGRAM</span></a>
+      <a href="#"><span class="bold">FAQ’S</span></a>
+    </div>
+  </div>
+</aside>
+
+<!-- Right drawer: Filters -->
+<aside class="drawer right" id="drawerFilters" aria-label="Filters drawer">
+  <button class="icon-btn close" id="closeFilters"><i class="ri-close-line"></i></button>
+  <h3>FILTERS</h3>
+  <div class="pad">
+    <details class="filter" open>
+      <summary>By Name</summary>
+      <div class="form-row"><input id="filterName" placeholder="Type a name…"></div>
+    </details>
+    <details class="filter" open>
+      <summary>By Level</summary>
+      <label><input type="checkbox" class="lev" value="MLB"> MLB</label>
+      <label><input type="checkbox" class="lev" value="AAA"> AAA</label>
+      <label><input type="checkbox" class="lev" value="AA"> AA</label>
+      <label><input type="checkbox" class="lev" value="A+"> A+</label>
+      <label><input type="checkbox" class="lev" value="INTERNATIONAL"> INTERNATIONAL</label>
+      <label><input type="checkbox" class="lev" value="NCAA-D1"> NCAA-D1</label>
+      <label><input type="checkbox" class="lev" value="JUCO"> JUCO</label>
+    </details>
+  </div>
+</aside>
+
+<!-- Right drawer: Account (local stub) -->
+<aside class="drawer right" id="drawerAccount" aria-label="Account drawer">
+  <button class="icon-btn close" id="closeAccount"><i class="ri-close-line"></i></button>
+  <h3>ACCOUNT</h3>
+  <div class="pad">
+    <div class="auth-tabs">
+      <button class="tab active" data-for="signin">Sign In</button>
+      <button class="tab" data-for="register">Register</button>
+    </div>
+    <form id="signin" class="auth-form active">
+      <div class="form-row"><label>Email</label><input id="inEmail" type="email" required></div>
+      <div class="form-row"><label>Password</label><input id="inPass" type="password" required></div>
+      <button class="auth-cta" type="submit">Sign In</button>
+    </form>
+    <form id="register" class="auth-form">
+      <div class="form-row"><label>Email</label><input id="regEmail" type="email" required></div>
+      <div class="form-row"><label>Password</label><input id="regPass" type="password" required></div>
+      <button class="auth-cta" type="submit">Create Account</button>
+    </form>
+    <p id="authMsg" style="margin-top:10px; font-size:13px"></p>
+  </div>
+</aside>
+
+<!-- =================== MAIN =================== -->
+<main class="container">
+  <div class="grid" id="layoutGrid">
+    <!-- Pro + College live inside .news-wrap.
+         At 3a/3b, .news-wrap becomes display:contents so both columns sit beside scores. -->
+    <div class="news-wrap">
+      <section id="pro" class="news-col news-root side">
+        <h3>ALUMNI HEADLINES (Pros)</h3>
+        <div id="proFeed" class="news-feed"></div>
+      </section>
+
+      <section id="college" class="news-col news-root overlay">
+        <h3>ALUMNI HEADLINES (College)</h3>
+        <div id="collegeFeed" class="news-feed"></div>
+      </section>
+    </div>
+
+    <aside class="scores">
+      <h3>WEEKLY LINE SCORES</h3>
+      <div class="sticky" id="scoresBox">
+        <div style="opacity:.8">Loading scores…</div>
       </div>
-    </article>
-    <article class="news-card">
-      <img src="https://picsum.photos/id/1021/600/400" alt="">
-      <div class="news-card-content">
-        <div>
-          <h4 class="news-title">Bellinger Goes Deep Twice in Slugfest</h4>
-          <div class="news-sub">MLB.com • 9/21/2025, 10:15 PM</div>
-          <div class="news-meta">Read More • YAT-A-BOY Marketplace</div>
-        </div>
-        <div class="socials">
-          <i class="ri-twitter-fill"></i><i class="ri-instagram-line"></i>
-        </div>
-      </div>
-    </article>
-  </section>
-  <!-- College News -->
-  <section class="section">
-    <h3>Alumni Headlines (College)</h3>
-    <article class="news-card">
-      <img src="https://picsum.photos/id/1035/600/400" alt="">
-      <div class="news-card-content">
-        <div>
-          <h4 class="news-title">Kucherak Stays Hot, RBI Single in Win</h4>
-          <div class="news-sub">Northwestern.edu • 9/19/2025</div>
-          <div class="news-meta">Read More • YAT-A-BOY Marketplace</div>
-        </div>
-        <div class="socials">
-          <i class="ri-twitter-fill"></i><i class="ri-tiktok-fill"></i>
-        </div>
-      </div>
-    </article>
-  </section>
-  <!-- Scores Sidebar -->
-  <aside class="scores">
-    <h3>Weekly Line Scores</h3>
-    <div class="score-item"><strong>This Week</strong></div>
-    <div class="score-item">Cody Bellinger – 9/21 @ BAL | 2-4, 2 HR, 4 RBI</div>
-    <div class="score-item">Dom Hamel – 9/20 vs SWB | 6.0 IP, 3 H, 9 K</div>
-    <div class="score-item"><strong>Last Week</strong></div>
-    <div class="score-item">Drew Swift – 9/18 @ ERI | 1-3, BB, R</div>
-    <div class="score-item">Patrick Murphy – 9/17 KBO | 1.0 IP, SV</div>
-  </aside>
+    </aside>
+  </div>
 </main>
+
+<!-- =================== FOOTER =================== -->
 <footer>
-  <a href="#"><img src="https://via.placeholder.com/300x40?text=Sponsor+Banner"></a>
+  <a href="https://example.com" target="_blank" rel="noopener">
+    <img src="https://dummyimage.com/1200x120/111/fff.png&text=American+Sponsor+Banner" alt="Sponsor Banner">
+  </a>
 </footer>
+
+<!-- =================== INLINE DUMMY DATA =================== -->
+<script type="application/json" id="news-json">
+{
+  "items":[
+    { "id":"1", "title":"Bellinger goes deep twice in Baltimore slugfest", "url":"#",
+      "image":"https://images.unsplash.com/photo-1518602164577-1f1a1a89e1d0?q=80&w=1200&auto=format&fit=crop",
+      "source":"MLB.com", "publishedAt":"2025-09-21T22:15:00-07:00", "player":"Cody Bellinger", "level":"MLB" },
+
+    { "id":"2", "title":"Hamel racks up 9 Ks over six strong", "url":"#",
+      "image":"https://images.unsplash.com/photo-1521417531039-7433f5b091f8?q=80&w=1200&auto=format&fit=crop",
+      "source":"MiLB.com", "publishedAt":"2025-09-20T19:00:00-07:00", "player":"Dom Hamel", "level":"AAA" },
+
+    { "id":"3", "title":"Murphy locks down first KBO save", "url":"#",
+      "image":"https://images.unsplash.com/photo-1445404590072-16ef9c18bd83?q=80&w=1200&auto=format&fit=crop",
+      "source":"Yonhap", "publishedAt":"2025-09-22T09:12:00-07:00", "player":"Patrick Murphy", "level":"INTERNATIONAL" },
+
+    { "id":"4", "title":"Swift flashes leather, reaches twice in SeaWolves win", "url":"#",
+      "image":"https://images.unsplash.com/photo-1517649763962-0c623066013b?q=80&w=1200&auto=format&fit=crop",
+      "source":"MiLB.com", "publishedAt":"2025-09-19T18:40:00-07:00", "player":"Drew Swift", "level":"AA" },
+
+    { "id":"5", "title":"Kucherak strings together three-hit day for Northwestern", "url":"#",
+      "image":"https://images.unsplash.com/photo-1483721310020-03333e577078?q=80&w=1200&auto=format&fit=crop",
+      "source":"northwestern.edu", "publishedAt":"2025-09-18T13:05:00-07:00", "player":"Ryan Kucherak", "level":"NCAA-D1" },
+
+    { "id":"6", "title":"Garcia homers as Wildcats rally", "url":"#",
+      "image":"https://images.unsplash.com/photo-1521417531039-7433f5b091f8?q=80&w=1200&auto=format&fit=crop",
+      "source":"Arizona Daily", "publishedAt":"2025-09-17T12:12:00-07:00", "player":"Luis Garcia", "level":"NCAA-D1" }
+  ]
+}
+</script>
+
+<script type="application/json" id="scores-json">
+{
+  "thisWeek":[
+    {"name":"Cody Bellinger","date":"9/21 @ BAL","line":"2-4, 2 HR, 4 RBI"},
+    {"name":"Dom Hamel","date":"9/20 vs SWB","line":"6.0 IP, 3 H, 1 ER, 9 K"},
+    {"name":"Drew Swift","date":"9/18 @ ERI","line":"1-3, BB, R"}
+  ],
+  "lastWeek":[
+    {"name":"Patrick Murphy","date":"9/17 | KBO","line":"1.0 IP, SV"}
+  ]
+}
+</script>
+
+<!-- =================== PAGE LOGIC =================== -->
+<script type="module">
+/* ---------- shorthands ---------- */
+const $ = s => document.querySelector(s);
+const $$ = s => Array.from(document.querySelectorAll(s));
+
+/* ---------- theme ---------- */
+(function theme(){
+  const btn = $('#toggleTheme'); if(!btn) return;
+  const apply=()=>{
+    const t = localStorage.getItem('theme') || 'dark';
+    document.body.classList.toggle('light', t==='light');
+    const i = btn.querySelector('i');
+    if (t==='light') i?.classList.replace('ri-sun-line','ri-moon-line');
+    else i?.classList.replace('ri-moon-line','ri-sun-line');
+  };
+  btn.addEventListener('click', ()=>{
+    const cur = localStorage.getItem('theme') || 'dark';
+    localStorage.setItem('theme', cur==='dark' ? 'light':'dark');
+    apply();
+  });
+  apply();
+})();
+
+/* ---------- drawers ---------- */
+function openLeft(){ document.body.classList.add('show-left'); }
+function openRight(id){ document.body.classList.add('show-right'); $$('.drawer.right').forEach(d=>d.style.transform='translateX(110%)'); $(id).style.transform='translateX(0)'; }
+function closeDrawers(){ document.body.classList.remove('show-left','show-right'); }
+$('#openLeft')?.addEventListener('click', openLeft);
+$('#openSearch')?.addEventListener('click', openLeft);
+$('#openFilters')?.addEventListener('click', ()=>openRight('#drawerFilters'));
+$('#openAccount')?.addEventListener('click', ()=>openRight('#drawerAccount'));
+$('#closeLeft')?.addEventListener('click', closeDrawers);
+$('#closeFilters')?.addEventListener('click', closeDrawers);
+$('#closeAccount')?.addEventListener('click', closeDrawers);
+$('#mask')?.addEventListener('click', closeDrawers);
+
+/* ---------- auth (local stub) ---------- */
+(function authStub(){
+  const tabs=$$('.auth-tabs .tab');
+  const msg=$('#authMsg');
+  tabs.forEach(t=>t.addEventListener('click', ()=>{
+    tabs.forEach(x=>x.classList.remove('active'));
+    t.classList.add('active');
+    $$('.auth-form').forEach(f=>f.classList.remove('active'));
+    $('#'+t.dataset.for).classList.add('active');
+    msg.textContent='';
+  }));
+  $('#signin')?.addEventListener('submit', e=>{
+    e.preventDefault(); localStorage.setItem('signedIn','1'); msg.style.color='var(--ok)'; msg.textContent='Signed in (local stub).';
+    setTimeout(closeDrawers, 600);
+  });
+  $('#register')?.addEventListener('submit', e=>{
+    e.preventDefault(); localStorage.setItem('signedIn','1'); msg.style.color='var(--ok)'; msg.textContent='Account created (local stub).';
+    setTimeout(closeDrawers, 600);
+  });
+})();
+
+/* ---------- sticky top calc ---------- */
+function setStickTop(){
+  const header = document.querySelector('.header');
+  const top = (header?.offsetHeight || 120) + 10;
+  document.documentElement.style.setProperty('--stickTop', top+'px');
+}
+addEventListener('resize', setStickTop);
+setStickTop();
+
+/* ---------- live search (dummy) ---------- */
+const DUMMY_PLAYERS = [
+  {name:'Cody Bellinger', level:'MLB'}, {name:'Dom Hamel', level:'AAA'},
+  {name:'Patrick Murphy', level:'KBO'}, {name:'Drew Swift', level:'AA'},
+  {name:'Ryan Kucherak', level:'NCAA-D1'}, {name:'Luis Garcia', level:'NCAA-D1'}
+];
+$('#searchInput')?.addEventListener('input', e=>{
+  const q = e.target.value.trim().toLowerCase();
+  const box = $('#liveResults'); box.innerHTML='';
+  if (!q) return;
+  DUMMY_PLAYERS.filter(p=>p.name.toLowerCase().includes(q)).slice(0,12).forEach(p=>{
+    const row = document.createElement('div');
+    row.className='live-hit';
+    row.innerHTML = `<div class="pfp"></div><div><div style="font-weight:700">${p.name}</div><div style="opacity:.7;font-size:12px">${p.level}</div></div>`;
+    row.addEventListener('click', ()=>alert('Open profile for '+p.name));
+    box.appendChild(row);
+  });
+});
+
+/* ---------- news rendering ---------- */
+const PRO_SET = new Set(['MLB','INTERNATIONAL','TRIPLE-A','AAA','DOUBLE-A','AA','HIGH-A','A+','LOW-A','A','ROOKIE','ROK','INDY']);
+const COL_SET = new Set(['NCAA-D1','NCAA-D2','NCAA-D3','NAIA','JUCO']);
+
+function cardHTML(n, mode){
+  if (mode==='overlay'){
+    return `
+<article class="news-card">
+  <a class="thumb" href="${n.url||'#'}" target="_blank" rel="noopener" style="background-image:url('${n.image||''}')">
+    <span class="shade"></span>
+  </a>
+  <div class="body">
+    <div class="title">${n.title||''}</div>
+    <div class="meta">${n.source||'News'} • ${n.player||''} • ${n.when||''}</div>
+    <div class="badges"><span class="badge">${n.level||''}</span></div>
+    <div class="links">
+      <a href="${n.url||'#'}" target="_blank" rel="noopener" class="badge">READ MORE</a>
+      <a href="#" class="badge">YAT-A-BOY MARKETPLACE</a>
+    </div>
+    <div class="share">
+      <a class="icon-btn" href="https://twitter.com/intent/tweet?text=${encodeURIComponent(n.title||'')}&url=${encodeURIComponent(n.url||location.href)}" target="_blank" rel="noopener"><i class="ri-twitter-x-line"></i></a>
+      <a class="icon-btn" href="#" title="Instagram"><i class="ri-instagram-line"></i></a>
+      <a class="icon-btn" href="#" title="Facebook"><i class="ri-facebook-circle-line"></i></a>
+      <a class="icon-btn" href="#" title="TikTok"><i class="ri-tiktok-line"></i></a>
+      <a class="icon-btn" href="mailto:?subject=${encodeURIComponent(n.title||'Alumni News')}&body=${encodeURIComponent(n.url||location.href)}"><i class="ri-mail-line"></i></a>
+    </div>
+  </div>
+</article>`;
+  }
+  /* side mode */
+  return `
+<article class="news-card">
+  <a class="thumb" href="${n.url||'#'}" target="_blank" rel="noopener" style="background-image:url('${n.image||''}')"></a>
+  <div class="body">
+    <div class="title">${n.title||''}</div>
+    <div class="meta">${n.source||'News'} • ${n.player||''} • ${n.when||''}</div>
+    <div class="badges"><span class="badge">${n.level||''}</span></div>
+    <div class="links">
+      <a href="${n.url||'#'}" target="_blank" rel="noopener" class="badge">READ MORE</a>
+      <a href="#" class="badge">YAT-A-BOY MARKETPLACE</a>
+    </div>
+    <div class="share">
+      <a class="icon-btn" href="https://twitter.com/intent/tweet?text=${encodeURIComponent(n.title||'')}&url=${encodeURIComponent(n.url||location.href)}" target="_blank" rel="noopener"><i class="ri-twitter-x-line"></i></a>
+      <a class="icon-btn" href="#"><i class="ri-instagram-line"></i></a>
+      <a class="icon-btn" href="#"><i class="ri-facebook-circle-line"></i></a>
+      <a class="icon-btn" href="#"><i class="ri-tiktok-line"></i></a>
+      <a class="icon-btn" href="mailto:?subject=${encodeURIComponent(n.title||'Alumni News')}&body=${encodeURIComponent(n.url||location.href)}"><i class="ri-mail-line"></i></a>
+    </div>
+  </div>
+</article>`;
+}
+
+function renderNews(){
+  let raw = {}; try{ raw = JSON.parse($('#news-json').textContent||'{}'); }catch{}
+  const items = (raw.items||[]).map(n=>({
+    ...n,
+    when: n.publishedAt ? new Date(n.publishedAt).toLocaleString() : ''
+  })).sort((a,b)=> new Date(b.publishedAt||0) - new Date(a.publishedAt||0));
+
+  const pros = items.filter(n=>PRO_SET.has((n.level||'').toUpperCase()));
+  const col  = items.filter(n=>COL_SET.has((n.level||'').toUpperCase()));
+
+  /* Determine mode by reading column classes (3a/2a force side via CSS overrides) */
+  const proIsOverlay = $('#pro').classList.contains('overlay') && !window.matchMedia('(min-width:601px) and (max-width:899px)').matches && !window.matchMedia('(min-width:1280px)').matches;
+  const colIsOverlay = $('#college').classList.contains('overlay') && !window.matchMedia('(min-width:601px) and (max-width:899px)').matches && !window.matchMedia('(min-width:1280px)').matches;
+
+  $('#proFeed').innerHTML = pros.map(n=>cardHTML(n, proIsOverlay ? 'overlay' : 'side')).join('') || `<div style="opacity:.7">No pro headlines.</div>`;
+  $('#collegeFeed').innerHTML = col.map(n=>cardHTML(n, colIsOverlay ? 'overlay' : 'side')).join('') || `<div style="opacity:.7">No college headlines.</div>`;
+}
+
+/* ---------- scores rendering (sticky) ---------- */
+function renderScores(){
+  let raw={}; try{ raw = JSON.parse($('#scores-json').textContent||'{}'); }catch{}
+  const mk = (arr, label)=>`
+    <div style="border:1px solid var(--line);border-radius:10px;padding:10px;margin-bottom:10px;background:var(--bg)">
+      <div style="font:400 16px 'Bebas Neue';letter-spacing:.06em;margin-bottom:6px">${label}</div>
+      ${ (arr||[]).map(s=>`
+        <div style="display:flex;gap:8px;align-items:baseline;margin:6px 0">
+          <div style="width:4px;height:16px;background:#2ecc71;border-radius:2px"></div>
+          <div style="flex:1">
+            <div style="font:700 14px/1.1 Oswald">${s.name}</div>
+            <div style="font:300 12px Oswald;color:var(--muted)">${s.date} | ${s.line}</div>
+          </div>
+        </div>`).join('') || `<div style="opacity:.7">No scores.</div>`
+      }
+    </div>`;
+  $('#scoresBox').innerHTML = mk(raw.thisWeek,'THIS WEEK') + mk(raw.lastWeek,'LAST WEEK');
+}
+
+/* ---------- simple filters (name + level) ---------- */
+function applyFilters(){
+  const q = ($('#filterName')?.value||'').trim().toLowerCase();
+  const levels = $$('.lev:checked').map(x=>x.value.toUpperCase());
+  const allCards = $$('.news-card');
+
+  /* naive: hide/show by title text + badge level */
+  allCards.forEach(card=>{
+    const text = card.textContent.trim().toLowerCase();
+    const okName = !q || text.includes(q);
+    let okLev = true;
+    if (levels.length){
+      const badge = (card.querySelector('.badge')?.textContent||'').toUpperCase();
+      okLev = levels.includes(badge);
+    }
+    card.parentElement.style.display = (okName && okLev) ? '' : 'none';
+  });
+}
+$('#filterName')?.addEventListener('input', ()=>{ applyFilters(); });
+$$('.lev').forEach(cb=>cb.addEventListener('change', applyFilters));
+$('#resetFilters')?.addEventListener('click', ()=>{
+  $('#filterName').value=''; $$('.lev').forEach(cb=>cb.checked=false); applyFilters();
+});
+
+/* ---------- boot ---------- */
+document.addEventListener('DOMContentLoaded', ()=>{
+  renderNews();
+  renderScores();
+  applyFilters();
+});
+</script>
 </body>
 </html>
