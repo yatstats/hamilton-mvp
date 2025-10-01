@@ -7,123 +7,104 @@
 <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400&family=Bebas+Neue&display=swap" rel="stylesheet">
 <style>
-/* -------------------- CORE THEME -------------------- */
+/* --- CORE THEME (same as index) --- */
 :root{
   --bg:#0c0c0c; --fg:#f2f2f2; --muted:#c4c4c4; --ink:#e8e8e8; --line:rgba(255,255,255,.08);
   --card-bg:#171717; --header-bg:#000; --drawer-bg:rgba(10,10,10,.65);
-  --shade-end:rgba(0,0,0,.95);
-  --hamSmall:13px; --hamBig:20px; --hamBigger:24px; --tagGrey:#cfd2d6;
-  --crestH:clamp(28px,4.2vw,42px);
+  --hamSmall:13px; --hamBig:20px; --hamBigger:24px;
   --containerPad:16px; --footerH:clamp(56px,8vh,77px);
 }
 body.light-theme{
   --bg:#f4f4f4; --fg:#121212; --muted:#555; --ink:#222; --line:rgba(0,0,0,.1);
   --card-bg:#fff; --header-bg:#fff; --drawer-bg:rgba(255,255,255,.65);
 }
-@font-face{font-family:'Indigo';src:url('assets/fonts/Indigo.otf') format('opentype');font-weight:400;font-style:normal;font-display:swap;}
-* {box-sizing:border-box} html,body{margin:0}
-body{background:var(--bg);color:var(--fg);font-family:Oswald,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;transition:background-color .3s,color .3s;}
-body.drawer-open{overflow:hidden}
+*{box-sizing:border-box} html,body{margin:0}
+body{background:var(--bg);color:var(--fg);font-family:Oswald,system-ui,sans-serif;transition:background-color .3s,color .3s;}
 a{color:inherit;text-decoration:none}
-.container{max-width:1400px;margin:0 auto;padding:0 var(--containerPad)}
-.header{position:sticky;top:0;z-index:50;background:var(--header-bg);transition:background-color .3s;}
 
-/* -------------------- Layout Grid -------------------- */
-.newsgrid {
-  display: grid;
-  grid-template-columns: 1fr clamp(140px, 30vw, 320px); /* default: 2-col (content + scores) */
-  gap: 16px;
-  align-items: start;
+/* --- LAYOUT --- */
+.main{padding:8px 0 calc(var(--footerH) + 12px)}
+.newsgrid{
+  display:grid;
+  grid-template-columns: 1fr clamp(180px,30vw,300px); /* default: 2 cols */
+  gap:16px; align-items:start;
+}
+.news-wrap{display:block;}
+.scores-col{
+  grid-column:2; grid-row:1;
+  position:sticky; top:120px;
+  max-height:calc(100vh - 160px);
+  overflow:auto;
+  border:1px solid var(--line); border-radius:12px;
+  background:var(--card-bg); padding:10px;
 }
 
-.news-wrap {
-  display: block;
+/* ≥900px: 3 columns (Pro | College | Scores) */
+@media (min-width:900px){
+  .newsgrid{ grid-template-columns:1fr 1fr clamp(200px,25vw,320px); }
+  .news-wrap{ display:contents; }
+  #col-pro{ grid-column:1; grid-row:1; }
+  #col-college{ grid-column:2; grid-row:1; }
+  .scores-col{ grid-column:3; grid-row:1; }
 }
 
-/* At ≥900px: Pro & College split into col1/col2, Scores in col3 */
-@media (min-width: 900px) {
-  .newsgrid {
-    grid-template-columns: 1fr 1fr clamp(200px, 26vw, 320px);
+/* ≥1200px: widen */
+@media (min-width:1200px){
+  .newsgrid{ grid-template-columns:1fr 1fr clamp(240px,22vw,360px); gap:24px; }
+}
+
+/* --- HEADLINES --- */
+.news-feed{ display:flex; flex-direction:column; gap:12px; }
+.news-card{
+  background:var(--card-bg);
+  border:1px solid var(--line); border-radius:12px;
+  overflow:hidden; display:flex; gap:12px;
+  align-items:flex-start; padding:10px;
+}
+.news-thumb{
+  display:block; flex-shrink:0;
+  width:120px; aspect-ratio:5/7;
+  background:#000 center/cover no-repeat;
+  border-radius:8px;
+}
+.news-body{ flex:1; padding:0; }
+.news-title{ font:400 22px/1.05 "Bebas Neue",sans-serif; letter-spacing:.03em; display:block; }
+.news-meta{ font:300 12px/1.2 Oswald; color:var(--muted); margin-top:6px; }
+
+/* --- OVERLAY MODE (mobile + laptop) --- */
+@media (max-width:899px), (min-width:900px) and (max-width:1199px){
+  .news-root.overlay-mode .news-card{ display:block; padding:0; position:relative; }
+  .news-root.overlay-mode .news-thumb{ width:100%; border-radius:0; aspect-ratio:16/9; }
+  .news-root.overlay-mode .news-body{
+    position:absolute; left:0; right:0; bottom:0; padding:10px 12px;
+    background:linear-gradient(180deg,rgba(0,0,0,0) 0%, rgba(0,0,0,.4) 50%, rgba(0,0,0,.9) 100%);
   }
-  .news-wrap {
-    display: contents; /* let children participate in grid */
-  }
-  #col-pro   { grid-column: 1; grid-row: 1; }
-  #col-college { grid-column: 2; grid-row: 1; }
-  .scores-col { grid-column: 3; grid-row: 1; }
+  .news-root.overlay-mode .news-title{ color:#fff; text-shadow:0 1px 2px rgba(0,0,0,.6); }
+  .news-root.overlay-mode .news-meta{ color:#e5e7eb; }
 }
 
-/* -------------------- Scores Column -------------------- */
-.scores-col {
-  position: sticky;
-  top: var(--stickyTop, 140px);
-  max-height: calc(100vh - var(--stickyTop,140px) - var(--footerH) - 12px);
-  overflow: auto;
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  background: var(--card-bg);
-  padding: 10px;
-}
-
-/* -------------------- News Cards -------------------- */
-.news-feed {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.news-card {
-  position: relative;
-  background: var(--card-bg);
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  overflow: hidden;
-  display: flex;
-  gap: 12px;
-  align-items: flex-start;
-  padding: 10px;
-}
-
-.news-thumb {
-  display: block;
-  flex-shrink: 0;
-  width: 120px;
-  aspect-ratio: 5/7;
-  background: #000 center/cover no-repeat;
-  border-radius: 8px;
-}
-
-.news-body { flex: 1; padding: 0; }
-
-.news-title {
-  display: block;
-  font: 400 22px/1.05 "Bebas Neue", sans-serif;
-  letter-spacing: .03em;
-}
-
-.news-title:hover { text-decoration: underline; }
-
-.news-meta {
-  font: 300 12px/1.2 Oswald;
-  letter-spacing: .02em;
-  color: var(--muted);
-  margin-top: 6px;
+/* Wide desktop + 2a mode → revert to SIDE */
+@media (min-width:1200px), (min-width:600px) and (max-width:899px){
+  .news-root.overlay-mode .news-card{ display:flex; padding:10px; }
+  .news-root.overlay-mode .news-thumb{ width:120px; border-radius:8px; aspect-ratio:5/7; }
+  .news-root.overlay-mode .news-body{ position:static; background:none; padding:0; }
+  .news-root.overlay-mode .news-title{ color:inherit; text-shadow:none; }
+  .news-root.overlay-mode .news-meta{ color:var(--muted); }
 }
 </style>
 </head>
 <body>
-<!-- HEADER -->
 <header class="header">
   <div class="container topbar">
     <div class="left-icons">
-      <button class="icon-btn" id="btnMenu" aria-label="Menu"><i class="ri-menu-line"></i></button>
+      <button class="icon-btn" id="btnMenu"><i class="ri-menu-line"></i></button>
       <div id="auth-container">
-        <button class="icon-btn" id="btnAccount" aria-label="Account"><i class="ri-user-3-line"></i></button>
-        <button class="icon-btn" id="btnSignOut" style="display:none;" aria-label="Sign out"><i class="ri-logout-box-line"></i></button>
+        <button class="icon-btn" id="btnAccount"><i class="ri-user-3-line"></i></button>
+        <button class="icon-btn" id="btnSignOut" style="display:none;"><i class="ri-logout-box-line"></i></button>
       </div>
-      <button class="icon-btn" id="theme-toggle" aria-label="Toggle Theme"><i class="ri-sun-line"></i></button>
+      <button class="icon-btn" id="theme-toggle"><i class="ri-sun-line"></i></button>
     </div>
-    <nav class="topnav" aria-label="Top Navigation">
+    <nav class="topnav">
       <a href="index.html" class="nav-pair"><span class="thin">WHERE THEY</span><span class="bold">YAT?</span></a>
       <a href="alumni-news.html" class="nav-pair"><span class="thin">ACTIVE ALUMNI</span><span class="bold">NEWS</span></a>
       <a href="all-time-list.html" class="nav-pair"><span class="thin">NEXT-LEVEL</span><span class="bold">ALL-TIME LIST</span></a>
@@ -148,7 +129,7 @@ a{color:inherit;text-decoration:none}
   <div class="hr-y"></div>
   <section class="hero">
     <div class="container hero-grid">
-      <div class="hero-left" aria-live="polite">
+      <div class="hero-left">
         <div class="tag-duo">
           <div class="tag-swap"><span class="tag-grey">ALUMNI</span> <span class="tag-bold">HEADLINES</span></div>
           <div class="tag-swap"><span class="tag-grey">LATEST</span> <span class="tag-bold">NEWS & SCORES</span></div>
@@ -156,9 +137,8 @@ a{color:inherit;text-decoration:none}
         <div class="crumbs hero-crumbs">HAMILTON ▸ ACTIVE ALUMNI NEWS</div>
       </div>
       <div class="hero-right">
-        <button id="openSearch" class="hero-icon icon-btn" aria-label="Open search"><i class="ri-search-line"></i></button>
-        <button id="openFilters" class="hero-icon icon-btn" aria-label="Open filters"><i class="ri-filter-3-line"></i></button>
-        <button id="filtersReset2" class="hero-icon icon-btn" aria-label="Reset"><i class="ri-restart-line"></i></button>
+        <button id="openSearch" class="hero-icon icon-btn"><i class="ri-search-line"></i></button>
+        <button id="openFilters" class="hero-icon icon-btn"><i class="ri-filter-3-line"></i></button>
       </div>
     </div>
   </section>
@@ -179,75 +159,60 @@ a{color:inherit;text-decoration:none}
     </div>
     <aside class="scores-col">
       <h3>WEEKLY LINE SCORES</h3>
-      <div id="scoresMount">
-        <p style="color:var(--muted)">Loading linescores...</p>
-      </div>
+      <div id="scoresMount"><p style="color:var(--muted)">Loading linescores…</p></div>
     </aside>
   </div>
 </main>
 
 <footer class="site-footer">
-  <a href="https://www.americanpromo.com/" target="_blank" rel="noopener noreferrer">
-    <img src="assets/img/partners/american_banner.png" alt="Sponsor Banner">
-  </a>
+  <a href="https://www.americanpromo.com/" target="_blank"><img src="assets/img/partners/american_banner.png" alt="Sponsor Banner"></a>
 </footer>
 
-<!-- Inline mock data -->
-<script type="application/json" id="news-json">
-{
-  "items":[
-    { "id":"1","title":"Bellinger goes deep twice in Baltimore slugfest","url":"#","image":"assets/img/now_players/cody_bellinger.jpg","source":"MLB.com","publishedAt":"2025-09-21T22:15:00-07:00","player_display_name":"Cody Bellinger","tags":{"level":"MLB"} },
-    { "id":"2","title":"Swift flashes leather, reaches twice in SeaWolves win","url":"#","image":"assets/img/now_players/drew_swift.jpg","source":"MiLB.com","publishedAt":"2025-09-19T18:40:00-07:00","player_display_name":"Drew Swift","tags":{"level":"AA"} },
-    { "id":"3","title":"Hamel racks up 9 Ks over six strong","url":"#","image":"assets/img/now_players/dom_hamel.jpg","source":"MiLB.com","publishedAt":"2025-09-20T19:00:00-07:00","player_display_name":"Dom Hamel","tags":{"level":"AAA"} },
-    { "id":"4","title":"Murphy locks down first KBO save","url":"#","image":"assets/img/now_players/patrick_murphy.jpg","source":"Yonhap","publishedAt":"2025-09-22T09:12:00-07:00","player_display_name":"Patrick Murphy","tags":{"level":"INTERNATIONAL"} },
-    { "id":"5","title":"Garcia homers as Wildcats rally","url":"#","image":"assets/img/now_players/luis_garcia.jpg","source":"Arizona Daily","publishedAt":"2025-09-17T12:12:00-07:00","player_display_name":"Luis Garcia","tags":{"level":"NCAA-D1"} },
-    { "id":"6","title":"Kucherak strings together three-hit day for Northwestern","url":"#","image":"assets/img/now_players/ryan_kucherak.jpg","source":"northwestern.edu","publishedAt":"2025-09-18T13:05:00-07:00","player_display_name":"Ryan Kucherak","tags":{"level":"NCAA-D1"} }
-  ]
-}
-</script>
-
-<!-- JS -->
 <script type="module">
 const $ = s => document.querySelector(s);
-const $$ = s => Array.from(document.querySelectorAll(s));
-function firstNameOf(full){ return String(full||'').trim().split(/\s+/)[0] || ''; }
-
-const PRO_LEVELS = new Set(['MLB','INTERNATIONAL','TRIPLE-A','AAA','DOUBLE-A','AA','HIGH-A','A+','LOW-A','A','ROOKIE','ROK','INDY']);
+const PRO_LEVELS = new Set(['MLB','AAA','AA','A+','A','ROOKIE','INTERNATIONAL']);
 const COLLEGE_LEVELS = new Set(['NCAA-D1','NCAA-D2','NCAA-D3','NAIA','JUCO']);
-let ALL_NEWS=[];
 
 function newsCardHTML(n){
   const img=n.image||'assets/img/news/placeholder.jpg';
-  const when=n.publishedAt?new Date(n.publishedAt).toLocaleString():'';
-  const src=n.source||'News';
+  const when=n.publishedAt?new Date(n.publishedAt).toLocaleString():'';  
   return `<article class="news-card">
     <a class="news-thumb" href="${n.url||'#'}" style="background-image:url('${img}')"></a>
     <div class="news-body">
-      <a class="news-title" href="${n.url||'#'}">${n.title||'Read more'}</a>
-      <div class="news-meta">${src} • ${when}</div>
+      <a class="news-title" href="${n.url||'#'}" target="_blank">${n.title||'Read more'}</a>
+      <div class="news-meta">${n.source||'News'} • ${when}</div>
     </div>
   </article>`;
 }
 
-function renderNewsLists(){
-  const from=$('#dateFrom')?.value?new Date($('#dateFrom').value):null;
-  const to=$('#dateTo')?.value?new Date($('#dateTo').value+'T23:59:59'):null;
-  const items=ALL_NEWS.filter(it=>{
-    if(!from&&!to)return true;
-    const d=new Date(it.publishedAt||0);
-    if(from&&d<from)return false;
-    if(to&&d>to)return false;
-    return true;
-  }).sort((a,b)=>new Date(b.publishedAt)-new Date(a.publishedAt));
-  const pros=items.filter(n=>PRO_LEVELS.has((n.tags?.level||'').toUpperCase())).slice(0,5);
-  const college=items.filter(n=>COLLEGE_LEVELS.has((n.tags?.level||'').toUpperCase())).slice(0,5);
+function renderNews(items){
+  const pros=items.filter(n=>PRO_LEVELS.has((n.tags?.level||'').toUpperCase())).slice(0,10);
+  const college=items.filter(n=>COLLEGE_LEVELS.has((n.tags?.level||'').toUpperCase())).slice(0,10);
   $('#proFeed').innerHTML=pros.length?pros.map(newsCardHTML).join(''):`<p style="color:var(--muted)">No pro headlines.</p>`;
   $('#collegeFeed').innerHTML=college.length?college.map(newsCardHTML).join(''):`<p style="color:var(--muted)">No college headlines.</p>`;
 }
 
+async function loadNews(){
+  try{
+    const res=await fetch('assets/news/alumni_news.json?cacheBust='+Date.now());
+    const json=await res.json();
+    renderNews(json.items||[]);
+  }catch(err){
+    console.error('Failed to load news',err);
+  }
+}
+
+async function loadScores(){
+  try{
+    const res=await fetch('assets/news/scores.json?cacheBust='+Date.now());
+    const json=await res.json();
+    $('#scoresMount').innerHTML = json.week.map(line=>`<p>${line.player} — ${line.line}</p>`).join('');
+  }catch{ $('#scoresMount').innerHTML='<p>No scores available.</p>'; }
+}
+
 document.addEventListener('DOMContentLoaded',()=>{
-  try{ALL_NEWS=JSON.parse($('#news-json')?.textContent||'{}').items||[]}catch{ALL_NEWS=[];}
-  renderNewsLists();
+  loadNews();
+  loadScores();
 });
 </script>
 </body>
