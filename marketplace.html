@@ -3,193 +3,141 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Active Alumni News • Hamilton YATSTATS</title>
+<title>Hamilton YATSTATS • Alumni News</title>
 <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400&family=Bebas+Neue&display=swap" rel="stylesheet">
-
 <style>
-/* ---------- THEME ---------- */
-:root{
-  --bg:#0c0c0c; --fg:#f2f2f2; --muted:#c4c4c4; --ink:#e8e8e8; --line:rgba(255,255,255,.08);
-  --card-bg:#171717; --header-bg:#000; --drawer-bg:rgba(10,10,10,.65);
-  --hamSmall:13px; --hamBig:20px; --hamBigger:24px; --containerPad:16px; --footerH:64px;
+:root {
+  --bg:#0c0c0c; --fg:#f2f2f2; --muted:#c4c4c4; --line:rgba(255,255,255,.08);
+  --card-bg:#171717; --header-bg:#000; --accent:#3aff9e;
 }
-body.light-theme{
-  --bg:#f4f4f4; --fg:#121212; --muted:#555; --ink:#222; --line:rgba(0,0,0,.1);
-  --card-bg:#fff; --header-bg:#fff; --drawer-bg:rgba(255,255,255,.65);
+body {margin:0;font-family:Oswald,system-ui;background:var(--bg);color:var(--fg);}
+a {color:inherit;text-decoration:none;}
+.header {background:var(--header-bg);position:sticky;top:0;z-index:100;}
+.topbar {display:flex;align-items:center;justify-content:space-between;padding:10px 16px;}
+.topnav {display:flex;gap:16px;}
+.topnav a {font:400 14px Oswald;text-transform:uppercase;}
+.wordmark {height:28px;}
+.schoolrow {display:flex;align-items:center;gap:12px;padding:8px 16px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);}
+.schoolrow img {height:40px;}
+.schooltext .big1 {font:400 18px "Bebas Neue";}
+.schooltext .big2 {font:400 22px "Bebas Neue";}
+.hero {padding:10px 16px;border-bottom:1px solid var(--line);}
+.hero h2 {margin:0;font:400 22px "Bebas Neue";letter-spacing:.02em;}
+/* Layout */
+.main {display:grid;gap:16px;grid-template-columns:2fr 2fr 1fr;max-width:1400px;margin:0 auto;padding:16px;}
+@media (max-width:1200px){.main{grid-template-columns:1fr 1fr;}}
+@media (max-width:768px){.main{grid-template-columns:1fr;}}
+/* News sections */
+.section h3 {font:400 18px "Bebas Neue";margin:0 0 10px;}
+/* News cards */
+.news-card {background:var(--card-bg);border-radius:8px;overflow:hidden;display:flex;flex-direction:row;min-height:180px;}
+.news-card img {width:40%;object-fit:cover;}
+.news-card-content {padding:12px;flex:1;display:flex;flex-direction:column;justify-content:space-between;}
+.news-title {font:400 18px "Bebas Neue";margin:0;}
+.news-sub {font-size:13px;color:var(--muted);margin:6px 0;}
+.news-meta {font-size:12px;color:var(--muted);}
+.socials {display:flex;gap:10px;margin-top:8px;}
+.socials i{font-size:18px;}
+/* Portrait cards for mobile */
+@media (max-width:768px){
+  .news-card {flex-direction:column;position:relative;}
+  .news-card img {width:100%;height:220px;}
+  .news-card-content {position:absolute;bottom:0;left:0;right:0;
+    background:linear-gradient(transparent,rgba(0,0,0,0.8));
+    color:#fff;padding:12px;}
+  .news-sub,.news-meta{color:#ddd;}
 }
-*{box-sizing:border-box} html,body{margin:0}
-body{background:var(--bg);color:var(--fg);font-family:Oswald,system-ui,sans-serif;}
-
-/* ---------- HEADER ---------- */
-.header{position:sticky;top:0;z-index:50;background:var(--header-bg);}
-.topbar{display:flex;align-items:center;justify-content:space-between;padding:8px 0}
-.left-icons{display:flex;align-items:center;gap:8px}
-.icon-btn{background:none;border:none;color:var(--fg);cursor:pointer}
-.icon-btn i{font-size:20px}
-.topnav{display:flex;gap:18px}
-.nav-pair{white-space:nowrap}
-.nav-pair .thin{font:300 var(--hamSmall) Oswald;color:#cfd2d6;margin-right:2px}
-.nav-pair .bold{font:400 var(--hamSmall) "Bebas Neue",sans-serif}
-.wordmark-img{height:28px;width:auto}
-@media (max-width:1200px){.topnav{display:none !important}}
-.hr-y{border-top:1px solid var(--line)}
-.schoolrow{display:flex;align-items:center;gap:10px;padding:6px var(--containerPad)}
-.ham-logo{height:42px;width:auto;object-fit:contain}
-.schooltext .small{font:300 var(--hamSmall) Oswald;color:var(--muted)}
-.schooltext .big1{font:400 var(--hamBig) "Bebas Neue",sans-serif}
-.schooltext .big2{font:400 var(--hamBigger) "Bebas Neue",sans-serif}
-.hero{padding:4px 0}
-.hero-grid{display:flex;align-items:center;justify-content:space-between}
-.crumbs{font:300 11px Oswald;color:var(--muted);}
-
-/* ---------- LAYOUT ---------- */
-.main{padding:16px 0 calc(var(--footerH) + 12px)}
-.newsgrid{display:grid;gap:16px;grid-template-columns:1fr clamp(220px,28vw,360px);}
-.news-wrap{display:block}
-.news-col h3,.scores-col h3{font:400 18px "Bebas Neue",sans-serif;margin:6px 0 10px}
-
-/* ---------- NEWS CARDS ---------- */
-.news-feed{display:flex;flex-direction:column;gap:12px}
-.news-card{background:var(--card-bg);border:1px solid var(--line);border-radius:12px;overflow:hidden;
-  display:flex;gap:12px;align-items:flex-start;padding:10px;position:relative;}
-.news-thumb{flex-shrink:0;width:120px;aspect-ratio:5/7;background:#000 center/cover no-repeat;border-radius:8px}
-.news-body{flex:1}
-.news-title{font:400 20px "Bebas Neue",sans-serif;line-height:1.2}
-.news-meta{font:300 12px Oswald;color:var(--muted);margin-top:4px}
-.news-links{display:flex;gap:12px;margin-top:6px;font:400 13px "Bebas Neue",sans-serif}
-.news-share{display:flex;gap:10px;margin-top:6px}
-
-/* Overlay mode */
-.overlay .news-card{display:block;padding:0}
-.overlay .news-thumb{width:100%;border-radius:0}
-.overlay .news-body{
-  position:absolute;left:0;right:0;bottom:0;padding:10px;
-  background:linear-gradient(180deg,rgba(0,0,0,0) 0%,rgba(0,0,0,.6) 60%,rgba(0,0,0,.9) 100%);
-}
-.overlay .news-title{color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.6)}
-.overlay .news-meta{color:#e5e7eb}
-
-/* ---------- SCORES ---------- */
-.scores-sticky{position:sticky;top:120px;background:var(--card-bg);padding:12px;border-radius:12px}
-
-/* ---------- BREAKPOINTS (3a > 3b > 2a > 2b) ---------- */
-/* 3a ≥1280px → 3 columns, side cards */
-@media(min-width:1280px){
-  .newsgrid{grid-template-columns:1fr 1fr clamp(240px,24vw,360px);}
-  .news-wrap{display:contents}
-  .overlay .news-card{display:flex;padding:10px}
-  .overlay .news-thumb{width:120px;border-radius:8px}
-  .overlay .news-body{position:static;background:none;color:inherit}
-}
-/* 3b 900–1279px → 3 columns, overlay cards */
-@media(min-width:900px) and (max-width:1279px){
-  .newsgrid{grid-template-columns:1fr 1fr clamp(200px,26vw,320px);}
-  .news-wrap{display:contents}
-}
-/* 2a 601–899px → 2 columns, side cards */
-@media(min-width:601px) and (max-width:899px){
-  .newsgrid{grid-template-columns:1fr clamp(180px,32vw,300px);}
-  .overlay .news-card{display:flex;padding:10px}
-  .overlay .news-thumb{width:120px;border-radius:8px}
-  .overlay .news-body{position:static;background:none;color:inherit}
-}
-/* 2b ≤600px → 2 columns, overlay cards */
-@media(max-width:600px){
-  .newsgrid{grid-template-columns:1fr clamp(140px,36vw,260px);}
-}
-
-/* ---------- FOOTER ---------- */
-.site-footer{position:fixed;left:0;right:0;bottom:0;height:var(--footerH);background:var(--bg);border-top:1px solid var(--line);}
-.site-footer img{height:100%;width:100%;object-fit:contain}
+/* Scores sidebar */
+.scores {background:var(--card-bg);padding:12px;border-radius:8px;}
+.scores h3 {margin-top:0;font:400 18px "Bebas Neue";}
+.score-item {margin-bottom:10px;font-size:14px;}
+/* Footer */
+footer {margin-top:20px;border-top:1px solid var(--line);padding:12px;text-align:center;}
+footer img {max-height:40px;}
 </style>
 </head>
 <body>
-
-<!-- HEADER -->
 <header class="header">
-  <div class="container topbar">
-    <div class="left-icons">
-      <button class="icon-btn" id="btnMenu"><i class="ri-menu-line"></i></button>
-      <button class="icon-btn" id="btnAccount"><i class="ri-user-3-line"></i></button>
-      <button class="icon-btn" id="theme-toggle"><i class="ri-sun-line"></i></button>
+  <div class="topbar">
+    <div class="topnav">
+      <a href="index.html">YAT?</a>
+      <a href="alumni-news.html">News</a>
+      <a href="all-time-list.html">All-Time</a>
     </div>
-    <nav class="topnav">
-      <a href="index.html" class="nav-pair"><span class="thin">WHERE THEY</span><span class="bold">YAT?</span></a>
-      <a href="alumni-news.html" class="nav-pair"><span class="thin">ACTIVE ALUMNI</span><span class="bold">NEWS</span></a>
-    </nav>
-    <img class="wordmark-img" src="https://dummyimage.com/140x40/444/fff&text=YAT%3FSTATS" alt="YAT?STATS">
+    <img class="wordmark" src="https://via.placeholder.com/120x28?text=YATSTATS" alt="YAT?STATS">
   </div>
-  <div class="hr-y"></div>
-  <div class="container schoolrow">
-    <img class="ham-logo" src="https://dummyimage.com/40x40/666/fff&text=H" alt="Hamilton H">
+  <div class="schoolrow">
+    <img src="https://via.placeholder.com/40x40?text=H" alt="School Crest">
     <div class="schooltext">
       <div class="small">CHANDLER, AZ</div>
       <div class="big1">HAMILTON HIGH SCHOOL</div>
       <div class="big2">ACTIVE BASEBALL ALUMNI</div>
     </div>
   </div>
-  <div class="hr-y"></div>
-  <section class="hero">
-    <div class="container hero-grid">
-      <div class="hero-left"><div class="crumbs">HAMILTON ▸ ACTIVE ALUMNI NEWS</div></div>
-      <div class="hero-right"><button class="icon-btn"><i class="ri-search-line"></i></button></div>
-    </div>
-  </section>
+  <div class="hero"><h2>LATEST NEWS & SCORES</h2></div>
 </header>
-
-<!-- MAIN -->
-<main class="main container">
-  <div class="newsgrid">
-    <div class="news-wrap">
-      <section id="col-pro" class="news-col news-root overlay">
-        <h3>ALUMNI HEADLINES (Pros)</h3>
-        <div class="news-feed">
-          <article class="news-card">
-            <a class="news-thumb" style="background-image:url('https://picsum.photos/400/560?1')"></a>
-            <div class="news-body">
-              <a class="news-title">Bellinger goes deep twice in slugfest</a>
-              <div class="news-meta">MLB.com • Sep 21</div>
-              <div class="news-links"><a>READ MORE</a><a>MARKETPLACE</a></div>
-              <div class="news-share"><i class="ri-twitter-x-line"></i><i class="ri-facebook-circle-line"></i></div>
-            </div>
-          </article>
-          <article class="news-card">
-            <a class="news-thumb" style="background-image:url('https://picsum.photos/400/560?2')"></a>
-            <div class="news-body">
-              <a class="news-title">Swift flashes leather in SeaWolves win</a>
-              <div class="news-meta">MiLB.com • Sep 19</div>
-            </div>
-          </article>
+<main class="main">
+  <!-- Pro News -->
+  <section class="section">
+    <h3>Alumni Headlines (Pros)</h3>
+    <article class="news-card">
+      <img src="https://picsum.photos/id/1011/600/400" alt="">
+      <div class="news-card-content">
+        <div>
+          <h4 class="news-title">Murphy Locks Down First KBO Save</h4>
+          <div class="news-sub">Yonhap • 9/22/2025, 9:12 AM</div>
+          <div class="news-meta">Read More • YAT-A-BOY Marketplace</div>
         </div>
-      </section>
-      <section id="col-college" class="news-col news-root overlay">
-        <h3>ALUMNI HEADLINES (College)</h3>
-        <div class="news-feed">
-          <article class="news-card">
-            <a class="news-thumb" style="background-image:url('https://picsum.photos/400/560?3')"></a>
-            <div class="news-body">
-              <a class="news-title">Garcia homers as Wildcats rally</a>
-              <div class="news-meta">Arizona Daily • Sep 17</div>
-            </div>
-          </article>
+        <div class="socials">
+          <i class="ri-twitter-fill"></i><i class="ri-instagram-line"></i><i class="ri-facebook-fill"></i>
         </div>
-      </section>
-    </div>
-    <aside class="scores-col">
-      <h3>WEEKLY LINE SCORES</h3>
-      <div class="scores-sticky"><p style="opacity:.7">No scores available.</p></div>
-    </aside>
-  </div>
+      </div>
+    </article>
+    <article class="news-card">
+      <img src="https://picsum.photos/id/1021/600/400" alt="">
+      <div class="news-card-content">
+        <div>
+          <h4 class="news-title">Bellinger Goes Deep Twice in Slugfest</h4>
+          <div class="news-sub">MLB.com • 9/21/2025, 10:15 PM</div>
+          <div class="news-meta">Read More • YAT-A-BOY Marketplace</div>
+        </div>
+        <div class="socials">
+          <i class="ri-twitter-fill"></i><i class="ri-instagram-line"></i>
+        </div>
+      </div>
+    </article>
+  </section>
+  <!-- College News -->
+  <section class="section">
+    <h3>Alumni Headlines (College)</h3>
+    <article class="news-card">
+      <img src="https://picsum.photos/id/1035/600/400" alt="">
+      <div class="news-card-content">
+        <div>
+          <h4 class="news-title">Kucherak Stays Hot, RBI Single in Win</h4>
+          <div class="news-sub">Northwestern.edu • 9/19/2025</div>
+          <div class="news-meta">Read More • YAT-A-BOY Marketplace</div>
+        </div>
+        <div class="socials">
+          <i class="ri-twitter-fill"></i><i class="ri-tiktok-fill"></i>
+        </div>
+      </div>
+    </article>
+  </section>
+  <!-- Scores Sidebar -->
+  <aside class="scores">
+    <h3>Weekly Line Scores</h3>
+    <div class="score-item"><strong>This Week</strong></div>
+    <div class="score-item">Cody Bellinger – 9/21 @ BAL | 2-4, 2 HR, 4 RBI</div>
+    <div class="score-item">Dom Hamel – 9/20 vs SWB | 6.0 IP, 3 H, 9 K</div>
+    <div class="score-item"><strong>Last Week</strong></div>
+    <div class="score-item">Drew Swift – 9/18 @ ERI | 1-3, BB, R</div>
+    <div class="score-item">Patrick Murphy – 9/17 KBO | 1.0 IP, SV</div>
+  </aside>
 </main>
-
-<!-- FOOTER -->
-<footer class="site-footer">
-  <a href="#"><img src="https://dummyimage.com/728x90/333/fff&text=Sponsor+Banner" alt="Sponsor"></a>
+<footer>
+  <a href="#"><img src="https://via.placeholder.com/300x40?text=Sponsor+Banner"></a>
 </footer>
-
-<script>
-document.getElementById('theme-toggle')?.addEventListener('click',()=>{document.body.classList.toggle('light-theme');});
-</script>
 </body>
 </html>
