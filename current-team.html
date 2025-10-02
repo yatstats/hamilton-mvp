@@ -7,6 +7,7 @@
 <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400&family=Bebas+Neue&display=swap" rel="stylesheet">
 <style>
+/* -------------------- CORE THEME (match index) -------------------- */
 :root{
   --bg:#0c0c0c; --fg:#f2f2f2; --muted:#c4c4c4; --ink:#e8e8e8; --line:rgba(255,255,255,.08);
   --card-bg:#171717; --header-bg:#000; --drawer-bg:rgba(10,10,10,.65);
@@ -18,121 +19,456 @@ body.light-theme{
   --bg:#f4f4f4; --fg:#121212; --muted:#555; --ink:#222; --line:rgba(0,0,0,.1);
   --card-bg:#fff; --header-bg:#fff; --drawer-bg:rgba(255,255,255,.65);
 }
+@font-face{font-family:'Indigo';src:url('assets/fonts/Indigo.otf') format('opentype');font-weight:400;font-style:normal;font-display:swap;}
 *{box-sizing:border-box} html,body{margin:0}
 body{background:var(--bg);color:var(--fg);font-family:Oswald,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;transition:background-color .3s,color .3s;}
 a{color:inherit;text-decoration:none}
 .container{max-width:1400px;margin:0 auto;padding:0 var(--containerPad)}
-.header{position:sticky;top:0;z-index:50;background:var(--header-bg);}
+
+/* Header */
+.header{position:sticky;top:0;z-index:50;background:var(--header-bg);transition:background-color .3s;}
 .topbar{display:flex;align-items:center;justify-content:space-between;padding:8px 0}
 .left-icons{display:flex;align-items:center;gap:8px}
-.icon-btn{background:none;border:none;color:var(--fg);opacity:.92;display:inline-flex;align-items:center;cursor:pointer}
+.icon-btn{background:none;border:none;color:var(--fg);opacity:.92;display:inline-flex;align-items:center;justify-content:center;padding:0;margin:0 2px;cursor:pointer}
 .icon-btn i{font-size:20px}
 .topnav{display:flex;gap:18px;align-items:center}
-.nav-pair .thin{font:300 var(--hamSmall) Oswald;color:#cfd2d6;margin-right:2px}
+.nav-pair{white-space:nowrap}
+.nav-pair .thin{font:300 var(--hamSmall) Oswald;letter-spacing:.02em;color:#cfd2d6;margin-right:2px}
 body.light-theme .nav-pair .thin{color:var(--muted)}
-.nav-pair .bold{font:400 var(--hamSmall) "Bebas Neue",sans-serif}
+.nav-pair .bold{font:400 var(--hamSmall) Indigo,"Bebas Neue",sans-serif}
 .wordmark-wrap{display:flex;align-items:center;justify-content:flex-end;min-width:120px}
-.wordmark-img{height:clamp(18px,3.2vw,28px);width:auto}
+.wordmark-img{height:clamp(18px,3.2vw,28px);width:auto;display:block}
 body.light-theme .wordmark-img{filter:invert(1)}
+@media (max-width:1200px){.topnav{display:none !important}}
 .hr-y{border-top:1px solid var(--line)}
 .schoolrow{display:flex;align-items:center;gap:10px;padding:6px var(--containerPad)}
-.ham-logo{height:var(--crestH);width:auto;object-fit:contain}
-.schooltext .small{font:300 var(--hamSmall) Oswald;color:var(--muted)}
-.schooltext .big1{font:400 var(--hamBig) "Bebas Neue",sans-serif}
-.schooltext .big2{font:400 var(--hamBigger) "Bebas Neue",sans-serif;margin-top:-4px}
-.crumbs{font:300 calc(var(--hamSmall)*.5) Oswald;color:var(--muted);text-transform:uppercase}
+.ham-logo{height:var(--crestH);width:auto;object-fit:contain;display:block;flex-shrink:0}
+.schooltext .small{font:300 var(--hamSmall)/1 Oswald;letter-spacing:.02em;color:var(--muted)}
+.schooltext .big1{font:400 var(--hamBig)/1 "Bebas Neue",sans-serif}
+.schooltext .big2{font:400 var(--hamBigger)/1 "Bebas Neue",sans-serif;margin-top:-4px}
+.crumbs{font:300 calc(var(--hamSmall)*.5)/1 Oswald;letter-spacing:.02em;color:var(--muted);text-transform:uppercase}
 .hero{padding:2px 0}
 .hero-grid{display:flex;align-items:center;justify-content:space-between;gap:16px}
 .hero-left{display:flex;flex-direction:column;gap:4px}
 .hero-right{display:flex;gap:10px}
+
+/* Drawers */
+.drawer-mask{position:fixed;inset:0;background:rgba(0,0,0,.35);opacity:0;pointer-events:none;transition:opacity .2s;z-index:60}
+.drawer{position:fixed;top:0;bottom:0;width:min(360px,82vw);background:var(--drawer-bg);backdrop-filter:blur(4px);color:var(--ink);transform:translateX(-110%);transition:transform .25s,background-color .3s;z-index:70}
+.drawer-right{right:0;left:auto;transform:translateX(110%);display:flex;flex-direction:column;height:100%}
+.drawer h3{margin:18px 16px 8px;padding-right:30px}
+.drawer .pad{padding:10px 16px}
+.drawer .close-btn{position:absolute;top:12px;right:12px}
+.drawer a{color:var(--ink)}
+.drawer a:hover{color:var(--fg)}
+body.drawer-left-open .drawer-mask,body.drawer-right-open .drawer-mask{opacity:1;pointer-events:auto}
+body.drawer-left-open #drawerLeft{transform:translateX(0)}
+body.drawer-right-open .drawer-right{transform:translateX(0)}
+.drawer-content{flex-grow:1;overflow-y:auto;padding:10px 16px}
+.drawer-footer{flex-shrink:0;padding:12px 16px;border-top:1px solid var(--line);background:rgba(10,10,10,.8);display:flex;gap:10px;align-items:center}
+body.light-theme .drawer-footer{background:rgba(255,255,255,.8)}
+
+/* -------------------- PAGE LAYOUT (news + sticky scores) -------------------- */
 .main{padding:8px 0 calc(var(--footerH) + 12px)}
-.newsgrid{display:grid;gap:16px;align-items:start;grid-template-columns: 1fr clamp(220px, 26vw, 360px);} /* base 2a */
-.news-col h3, .scores-col h3{font:400 18px "Bebas Neue",sans-serif;margin:6px 0 10px}
+.newsgrid{display:grid;gap:16px;align-items:start;grid-template-columns: 1fr clamp(220px, 26vw, 360px);} /* base = 2a */
+.news-col h3, .scores-col h3{font:400 18px "Bebas Neue",sans-serif;letter-spacing:.06em;margin:6px 0 10px}
 .news-wrap{display:block}
+
+/* Sticky scores always present */
 .scores-col{position:relative}
-.scores-sticky{position:sticky; top:140px; overflow:auto; border:1px solid var(--line); border-radius:12px; background:var(--card-bg); padding:10px; max-height:calc(100vh - 200px);}
+.scores-sticky{
+  position:sticky; top:var(--stickyTop,140px);
+  max-height:calc(100vh - var(--stickyTop,140px) - var(--footerH) - 12px);
+  overflow:auto;border:1px solid var(--line);border-radius:12px;background:var(--card-bg);padding:10px
+}
 .linescore-week{padding:8px 6px 10px;border-bottom:1px solid var(--line)}
-.linescore-week h4{font:700 12px "Bebas Neue",sans-serif;margin:4px 2px 8px}
+.linescore-week h4{font:700 12px "Bebas Neue",sans-serif;letter-spacing:.06em;opacity:.9;margin:4px 2px 8px}
 .linescore-player{margin:8px 0 12px}
-.linescore-player strong{display:block;margin-bottom:.3rem;font:700 12px "Bebas Neue",sans-serif}
-.linescore-player div{font:300 10px Oswald;color:var(--muted)}
-/* Breakpoints */
-@media (min-width:1280px){.newsgrid{grid-template-columns: 1fr 1fr clamp(240px, 24vw, 360px);} .news-wrap{display:contents}}
-@media (min-width:900px) and (max-width:1279px){.newsgrid{grid-template-columns: 1fr 1fr clamp(200px, 26vw, 320px);} .news-wrap{display:contents}}
-@media (min-width:601px) and (max-width:899px){.newsgrid{grid-template-columns: 1fr clamp(160px, 30vw, 300px);} .news-wrap{display:block}}
-@media (max-width:600px){.newsgrid{grid-template-columns: 1fr clamp(130px, 36vw, 260px);} .news-wrap{display:block}}
+.linescore-player strong{display:block;margin-bottom:.3rem;font:700 12px "Bebas Neue",sans-serif;letter-spacing:.04em}
+.linescore-player div{font:300 10px Oswald;letter-spacing:.02em;color:var(--muted)}
+
+/* -------- Breakpoints: 3a → 3b → 2a → 2b -------- */
+/* 3a: ≥1280 — 3 cols */
+@media (min-width:1280px){
+  .newsgrid{grid-template-columns: 1fr 1fr clamp(240px, 24vw, 360px);}
+  .news-wrap{display:contents}
+  #col-pro{grid-column:1;grid-row:1}
+  #col-college{grid-column:2;grid-row:1}
+  .scores-col{grid-column:3;grid-row:1}
+}
+/* 3b: 900–1279 — 3 cols */
+@media (min-width:900px) and (max-width:1279px){
+  .newsgrid{grid-template-columns: 1fr 1fr clamp(200px, 26vw, 320px);}
+  .news-wrap{display:contents}
+  #col-pro{grid-column:1;grid-row:1}
+  #col-college{grid-column:2;grid-row:1}
+  .scores-col{grid-column:3;grid-row:1}
+}
+/* 2a: 601–899 — 2 cols */
+@media (min-width:601px) and (max-width:899px){
+  .newsgrid{grid-template-columns: 1fr clamp(160px, 30vw, 300px);}
+  .news-wrap{display:block}
+  #col-pro{grid-column:1;grid-row:1}
+  #col-college{grid-column:1;grid-row:2}
+  .scores-col{grid-column:2;grid-row:1 / span 2}
+}
+/* 2b: ≤600 — 2 cols */
+@media (max-width:600px){
+  .newsgrid{grid-template-columns: 1fr clamp(130px, 36vw, 260px);}
+  .news-wrap{display:block}
+  #col-pro{grid-column:1;grid-row:1}
+  #col-college{grid-column:1;grid-row:2}
+  .scores-col{grid-column:2;grid-row:1 / span 2}
+}
+
+/* Footer */
 .site-footer{position:fixed;left:0;right:0;bottom:0;height:var(--footerH);background:var(--bg);border-top:1px solid var(--line);z-index:40}
+.site-footer a{display:block;height:100%;width:100%}
 .site-footer img{height:100%;width:100%;object-fit:contain}
+
+/* Focus */
+.icon-btn:focus,button:focus,input:focus{outline:2px solid var(--fg);outline-offset:2px}
 </style>
 </head>
 <body>
+<!-- HEADER -->
 <header class="header">
   <div class="container topbar">
     <div class="left-icons">
-      <button class="icon-btn"><i class="ri-menu-line"></i></button>
-      <button class="icon-btn"><i class="ri-user-3-line"></i></button>
-      <button class="icon-btn" id="theme-toggle"><i class="ri-sun-line"></i></button>
+      <button class="icon-btn" id="btnMenu" aria-label="Menu"><i class="ri-menu-line"></i></button>
+      <button class="icon-btn" id="btnAccount" aria-label="Account"><i class="ri-user-3-line"></i></button>
+      <button class="icon-btn" id="theme-toggle" aria-label="Toggle Theme"><i class="ri-sun-line"></i></button>
     </div>
-    <nav class="topnav">
+    <nav class="topnav" aria-label="Top Navigation">
       <a href="index.html" class="nav-pair"><span class="thin">WHERE THEY</span><span class="bold">YAT?</span></a>
       <a href="alumni-news.html" class="nav-pair"><span class="thin">ACTIVE ALUMNI</span><span class="bold">NEWS</span></a>
+      <a href="all-time-list.html" class="nav-pair"><span class="thin">NEXT-LEVEL</span><span class="bold">ALL-TIME LIST</span></a>
+      <a href="marketplace.html" class="nav-pair"><span class="thin">NIL & YAT-A-BOY</span><span class="bold">MARKETPLACE</span></a>
+      <a href="current-team.html" class="nav-pair"><span class="thin">THE</span><span class="bold">CURRENT TEAM</span></a>
+      <a href="partner-program.html" class="nav-pair"><span class="thin">PCD ACTION</span><span class="bold">PARTNER PROGRAM</span></a>
+      <a href="faq.html" class="nav-pair"><span class="bold">FAQ’S</span></a>
     </nav>
-    <div class="wordmark-wrap"><img class="wordmark-img" src="assets/img/yatstats-logo.png" alt="YAT?STATS"></div>
+    <div class="wordmark-wrap">
+      <img class="wordmark-img" src="assets/img/yatstats-logo.png" alt="YAT?STATS">
+    </div>
   </div>
   <div class="hr-y"></div>
   <div class="container schoolrow">
     <img class="ham-logo" src="assets/img/schools/az.hamilton.png" alt="Hamilton H">
-    <div class="schooltext"><div class="small">CHANDLER, AZ</div><div class="big1">HAMILTON HIGH SCHOOL</div><div class="big2">ACTIVE BASEBALL ALUMNI</div></div>
+    <div class="schooltext">
+      <div class="small">CHANDLER, AZ</div>
+      <div class="big1">HAMILTON HIGH SCHOOL</div>
+      <div class="big2">ACTIVE BASEBALL ALUMNI</div>
+    </div>
   </div>
   <div class="hr-y"></div>
-  <section class="hero"><div class="container hero-grid"><div class="hero-left"><div class="crumbs">HAMILTON ▸ ACTIVE ALUMNI NEWS</div></div></div></section>
+  <section class="hero">
+    <div class="container hero-grid">
+      <div class="hero-left" aria-live="polite">
+        <div class="crumbs">HAMILTON ▸ ACTIVE ALUMNI NEWS</div>
+      </div>
+      <div class="hero-right">
+        <button id="openSearch" class="hero-icon icon-btn" aria-label="Open search"><i class="ri-search-line"></i></button>
+        <button id="openFilters" class="hero-icon icon-btn" aria-label="Open filters"><i class="ri-filter-3-line"></i></button>
+        <button id="filtersReset2" class="hero-icon icon-btn" aria-label="Reset"><i class="ri-restart-line"></i></button>
+      </div>
+    </div>
+  </section>
 </header>
 
+<!-- DRAWERS -->
+<div class="drawer-mask"></div>
+<aside class="drawer" id="drawerLeft" aria-label="Left drawer">
+  <button class="icon-btn close-btn"><i class="ri-close-line"></i></button>
+  <div class="drawer-content">
+    <h3>PLAYER PROFILE SEARCH</h3>
+    <div class="pad">
+      <input id="playerSearch" placeholder="Type to search…" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--ink)">
+      <div id="liveResults"></div>
+    </div>
+    <h3>NAVIGATION</h3>
+    <div class="pad" style="display:flex;flex-direction:column;gap:12px">
+      <a href="index.html" class="nav-pair"><span class="thin">WHERE THEY</span><span class="bold">YAT?</span></a>
+      <a href="alumni-news.html" class="nav-pair"><span class="thin">ACTIVE ALUMNI</span><span class="bold">NEWS</span></a>
+      <a href="all-time-list.html" class="nav-pair"><span class="thin">NEXT-LEVEL</span><span class="bold">ALL-TIME LIST</span></a>
+      <a href="marketplace.html" class="nav-pair"><span class="thin">NIL & YAT-A-BOY</span><span class="bold">MARKETPLACE</span></a>
+      <a href="current-team.html" class="nav-pair"><span class="thin">THE</span><span class="bold">CURRENT TEAM</span></a>
+      <a href="partner-program.html" class="nav-pair"><span class="thin">PCD ACTION</span><span class="bold">PARTNER PROGRAM</span></a>
+      <a href="faq.html" class="nav-pair"><span class="bold">FAQ’S</span></a>
+    </div>
+  </div>
+</aside>
+<aside class="drawer drawer-right" id="drawerFilters" style="display:flex;">
+  <button class="icon-btn close-btn"><i class="ri-close-line"></i></button>
+  <h3>FILTERS</h3>
+  <div class="drawer-content" id="filters">
+    <details class="filter-group" open>
+      <summary class="filter-title">By Name</summary>
+      <div class="filter-options">
+        <input id="filterName" placeholder="Type a name…" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--ink)"/>
+      </div>
+    </details>
+    <details class="filter-group">
+      <summary class="filter-title">By Level</summary>
+      <div class="filter-options" id="filterLevels">
+        <label class="select-all-label"><input type="checkbox" class="select-all"> Select All</label>
+      </div>
+    </details>
+  </div>
+  <div class="drawer-footer">
+    <button id="filtersReset" class="icon-btn" style="padding:10px 14px;border:1px solid var(--line);border-radius:12px"><i class="ri-restart-line"></i>&nbsp;Reset Filters</button>
+  </div>
+</aside>
+<aside class="drawer drawer-right" id="drawerAccount" style="display:none;">
+  <button class="icon-btn close-btn"><i class="ri-close-line"></i></button>
+  <h3>ACCOUNT</h3>
+  <div class="drawer-content">
+    <div class="auth-tabs">
+      <button class="auth-tab active" data-tab="signIn">Sign In</button>
+      <button class="auth-tab" data-tab="register">Register</button>
+    </div>
+    <div id="auth-forms-container" class="pad">
+      <form id="signInForm" class="auth-form active">
+        <div class="form-field"><label for="signInEmail">Email</label><input type="email" id="signInEmail" required></div>
+        <div class="form-field"><label for="signInPassword">Password</label><input type="password" id="signInPassword" required></div>
+        <button type="submit" class="auth-btn">Sign In</button>
+      </form>
+      <form id="registerForm" class="auth-form">
+        <div class="form-field"><label for="registerEmail">Email</label><input type="email" id="registerEmail" required></div>
+        <div class="form-field"><label for="registerPassword">Password</label><input type="password" id="registerPassword" required></div>
+        <button type="submit" class="auth-btn">Create Account</button>
+      </form>
+      <p id="authMessage"></p>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN -->
 <main class="main container">
   <div class="newsgrid" aria-live="polite">
+    <!-- Left/center columns (headlines mount later) -->
     <div class="news-wrap">
       <section id="col-pro" class="news-col">
         <h3>ALUMNI HEADLINES (Pros)</h3>
-        <div id="proNews"></div>
+        <div class="news-feed" id="proFeed" style="color:var(--muted);font-size:12px">Headlines mount here…</div>
       </section>
       <section id="col-college" class="news-col">
         <h3>ALUMNI HEADLINES (College)</h3>
-        <div id="collegeNews"></div>
+        <div class="news-feed" id="collegeFeed" style="color:var(--muted);font-size:12px">Headlines mount here…</div>
       </section>
     </div>
+
+    <!-- Sticky right column (ALWAYS visible) -->
     <aside class="scores-col">
       <h3>WEEKLY LINE SCORES</h3>
-      <div id="scoresMount" class="scores-sticky"><p style="color:var(--muted)">Loading…</p></div>
+      <div id="scoresMount" class="scores-sticky">
+        <p style="color:var(--muted)">Loading line scores…</p>
+      </div>
     </aside>
   </div>
 </main>
 
 <footer class="site-footer">
-  <a href="https://www.americanpromo.com/" target="_blank"><img src="assets/img/partners/american_banner.png" alt="Sponsor Banner"></a>
+  <a href="https://www.americanpromo.com/" target="_blank" rel="noopener noreferrer">
+    <img src="assets/img/partners/american_banner.png" alt="Sponsor Banner">
+  </a>
 </footer>
 
 <script>
-const STATS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQcWJM6Q6hTdFnES_G5LUy4teCS-sJ5HdAc9F5HSY8DGE9egdGy8yUAe2ShT3tFm-CwUuCYeAYy_YiW/pub?gid=2028135390&output=csv";
+/* ================== CONFIG ================== */
+/* Your published STATS tab (CSV) — from earlier message */
+const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQcWJM6Q6hTdFnES_G5LUy4teCS-sJ5HdAc9F5HSY8DGE9egdGy8yUAe2ShT3tFm-CwUuCYeAYy_YiW/pub?gid=2028135390&output=csv";
 
-async function loadStats(){
-  const res = await fetch(STATS_CSV_URL + "&_=" + Date.now());
-  const text = await res.text();
-  const rows = text.trim().split(/\r?\n/).map(r=>r.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/).map(c=>c.replace(/^"|"$/g,'')));
-  const header = rows.shift();
-  const players = rows.map(r => ({ name: r[0], cells: r.slice(1) }));
+/* Week windows (newest first) */
+const WEEKS = [
+  { label: 'WEEK OF September 28 - October 4', start: '2025-09-28', end: '2025-10-04' },
+  { label: 'WEEK OF September 21 - 27',        start: '2025-09-21', end: '2025-09-27' },
+  { label: 'WEEK OF September 14 - 20',        start: '2025-09-14', end: '2025-09-20' },
+  { label: 'WEEK OF September 7 - 13',         start: '2025-09-07', end: '2025-09-13' },
+  { label: 'WEEK OF August 31 - September 6',  start: '2025-08-31', end: '2025-09-06' },
+  { label: 'WEEK OF August 24 - 30',           start: '2025-08-24', end: '2025-08-30' }
+];
 
-  let html = "";
-  players.forEach(p=>{
-    const nonEmpty = p.cells.filter(x=>x.trim()!=="");
-    if (!nonEmpty.length) return;
-    html += `<div class="linescore-player"><strong>${p.name}</strong>`;
-    p.cells.forEach(c=>{ if(c.trim()) html += `<div>${c}</div>`; });
-    html += `</div>`;
-  });
-  document.getElementById("scoresMount").innerHTML = `<div class="linescore-week"><h4>CURRENT WEEK</h4>${html}</div>`;
+/* ================== UTILITIES ================== */
+const $ = s => document.querySelector(s);
+function toISO(d){ const t = new Date(d); if (isNaN(t)) return null; return t.toISOString().slice(0,10); }
+function fmtMD(d){ const t = new Date(d); if (isNaN(t)) return ''; return (t.getMonth()+1) + '/' + t.getDate(); }
+function daysDesc(startISO, endISO){
+  const a = new Date(startISO), b = new Date(endISO), out = [];
+  for (let t = new Date(b); t >= a; t.setDate(t.getDate()-1)) out.push(toISO(t));
+  return out;
 }
 
-document.addEventListener("DOMContentLoaded", loadStats);
+/* ================== CSV LOADER ================== */
+async function fetchCSV(url){
+  const bust = (url.includes('?')? '&':'?') + '_=' + Date.now();
+  const res = await fetch(url + bust);
+  if(!res.ok) throw new Error('HTTP ' + res.status);
+  return await res.text();
+}
+
+/* Safe CSV split that respects quotes */
+function parseCSV(text){
+  const rows = [];
+  let i=0, cur='', inQ=false, row=[];
+  while(i<text.length){
+    const ch=text[i];
+    if(ch==='\"'){
+      if(inQ && text[i+1]==='\"'){ cur+='\"'; i+=2; continue; }
+      inQ=!inQ; i++; continue;
+    }
+    if(!inQ && (ch===',' || ch==='\n' || ch==='\r')){
+      if(ch===',' ){ row.push(cur); cur=''; i++; continue; }
+      // newline
+      if(ch==='\r' && text[i+1]==='\n'){ i++; } // CRLF
+      row.push(cur); rows.push(row); row=[]; cur=''; i++; continue;
+    }
+    cur+=ch; i++;
+  }
+  if(cur.length || row.length) { row.push(cur); rows.push(row); }
+  return rows;
+}
+
+/* ================== LINESCORE LOGIC ================== */
+/* The STATS sheet has:
+   - column A: display_name
+   - row 1: date headers like 9/29, 9/28, ... 8/21
+   - body cells: fully-prepared strings (either future schedule or stat lines)
+   We DO NOT parse cell contents; we show exactly what’s in the cell.
+   If cell is empty => we skip (don’t print date stub).
+*/
+
+function normalizeHeaderDate(h){
+  // Accept "9/7", "09/07", spaces, etc. Return "M/D" (no leading zeros)
+  const m = String(h || '').trim().match(/^0?(\d{1,2})\/0?(\d{1,2})$/);
+  return m ? (Number(m[1]) + '/' + Number(m[2])) : null;
+}
+
+function mapHeaders(header){
+  const nameIdx = header.findIndex(h => String(h).trim().toLowerCase() === 'display_name');
+  if (nameIdx === -1) throw new Error('No "display_name" column found in STATS CSV header.');
+
+  // Build: { nameIdx, dateCols: { 'M/D': columnIndex } }
+  const dateCols = {};
+  header.forEach((h, i) => {
+    const md = normalizeHeaderDate(h);
+    if (md) dateCols[md] = i;
+  });
+  return { nameIdx, dateCols };
+}
+
+function buildWeeksFromSheet(rows, map){
+  const players = rows.map(r => r[map.nameIdx]).filter(Boolean);
+
+  // For each week, build player → day list (descending date),
+  // but SKIP any day where the cell is empty.
+  const out = WEEKS.map(w => {
+    const daysISO = daysDesc(w.start, w.end); // e.g., 10/4→9/28
+    // Convert ISO days to "M/D" to match header keys
+    const mdKeys = daysISO.map(d => fmtMD(d));
+
+    const playerBlocks = players.map(name => {
+      const row = rows.find(r => r[map.nameIdx] === name) || [];
+      const dayCells = [];
+      for (const md of mdKeys){
+        const col = map.dateCols[md];
+        if (col == null) continue;           // Sheet doesn’t have this date column
+        const val = (row[col] || '').trim();
+        if (!val) continue;                  // Empty => skip entirely (no date stub)
+        dayCells.push({ text: val });
+      }
+      return { name, days: dayCells };
+    });
+
+    return { label: w.label, players: playerBlocks };
+  });
+
+  return out;
+}
+
+function renderWeeks(mount, weeks){
+  if (!weeks.length){ mount.innerHTML = `<p style="color:var(--muted)">No data.</p>`; return; }
+  const html = weeks.map(week => {
+    const playersHTML = week.players.map(pl => {
+      const days = pl.days.map(d => `<div>${d.text}</div>`).join('');
+      return `<div class="linescore-player"><strong>${pl.name}</strong>${days || `<div style="opacity:.6">—</div>`}</div>`;
+    }).join('');
+    return `<div class="linescore-week"><h4>${week.label}</h4>${playersHTML}</div>`;
+  }).join('');
+  mount.innerHTML = html;
+}
+
+/* ================== THEME + DRAWERS ================== */
+function setupTheme(){
+  const btn = document.getElementById('theme-toggle'); if (!btn) return;
+  const icon = btn.querySelector('i');
+  const apply = ()=>{
+    const saved = localStorage.getItem('theme');
+    if (saved === 'light'){ document.body.classList.add('light-theme'); icon?.classList.replace('ri-sun-line','ri-moon-line'); }
+    else { document.body.classList.remove('light-theme'); icon?.classList.replace('ri-moon-line','ri-sun-line'); }
+  };
+  btn.addEventListener('click', ()=>{
+    document.body.classList.toggle('light-theme');
+    localStorage.setItem('theme', document.body.classList.contains('light-theme') ? 'light' : 'dark');
+    apply();
+  });
+  apply();
+}
+function setStickyTop(){
+  const header = document.querySelector('.header');
+  const top = (header?.offsetHeight || 120) + 10;
+  document.documentElement.style.setProperty('--stickyTop', top + 'px');
+}
+function setupDrawers(){
+  const mask = document.querySelector('.drawer-mask');
+  const closeAll = ()=>document.body.classList.remove('drawer-left-open','drawer-right-open','drawer-open');
+  document.getElementById('btnMenu')?.addEventListener('click', ()=>{
+    document.body.classList.add('drawer-left-open','drawer-open');
+  });
+  document.getElementById('openSearch')?.addEventListener('click', ()=>{
+    document.body.classList.add('drawer-left-open','drawer-open');
+  });
+  document.getElementById('openFilters')?.addEventListener('click', ()=>{
+    document.getElementById('drawerFilters').style.display='flex';
+    document.getElementById('drawerAccount').style.display='none';
+    document.body.classList.add('drawer-right-open','drawer-open');
+  });
+  document.getElementById('btnAccount')?.addEventListener('click', ()=>{
+    document.getElementById('drawerAccount').style.display='flex';
+    document.getElementById('drawerFilters').style.display='none';
+    document.body.classList.add('drawer-right-open','drawer-open');
+  });
+  document.querySelectorAll('.close-btn').forEach(b=>b.addEventListener('click', closeAll));
+  mask?.addEventListener('click', closeAll);
+}
+
+/* ================== BOOT ================== */
+document.addEventListener('DOMContentLoaded', async ()=>{
+  setupTheme();
+  setupDrawers();
+  setStickyTop();
+  window.addEventListener('resize', setStickyTop);
+
+  const mount = document.getElementById('scoresMount');
+
+  try{
+    const raw = await fetchCSV(CSV_URL);
+    const rows = parseCSV(raw);
+    if (!rows.length) throw new Error('CSV is empty.');
+
+    const header = rows.shift().map(c => String(c||'').trim());
+    const map = mapHeaders(header);
+
+    // Keep only rows that have a display_name
+    const dataRows = rows.filter(r => (r[map.nameIdx]||'').trim().length);
+
+    const weeks = buildWeeksFromSheet(dataRows, map);
+    renderWeeks(mount, weeks);
+  }catch(err){
+    console.error('Linescore load failed:', err);
+    mount.innerHTML = `<div style="color:#fca5a5;font:300 12px Oswald;">Error loading line scores: ${err.message}</div>`;
+  }
+});
 </script>
 </body>
 </html>
