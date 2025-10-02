@@ -322,43 +322,47 @@ function pick(header, ...cands){
   return -1;
 }
 
-/*** -------- CSV LOAD (your STATS sheet shape) -------- ***/
+// --- CSV LOAD ---
 async function loadStatsCSV(url){
-  const bust = '_=' + Date.now(); // cache-buster
-  const sep = url.includes('?') ? '&' : '?';
-  const res = await fetch(url + sep + bust);
+  const res = await fetch(url);
   if (!res.ok) throw new Error('HTTP ' + res.status);
   const text = await res.text();
   const rows = text.trim().split(/\r?\n/).map(line =>
     line.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/).map(c => c.replace(/^"|"$/g,''))
   );
-  const header = rows.shift() || [];
 
-  // find player column
+  const header = rows.shift(); // Row 1 (date headers etc.)
   const ixName = header.findIndex(h => h.toLowerCase() === 'display_name');
   if (ixName === -1) throw new Error('No display_name column found');
 
-  // find all date columns (e.g. "9/29", "8/31")
-  const dateCols = header.map((h,i)=>({h,i}))
-    .filter(o => /^\d{1,2}\/\d{1,2}$/.test(o.h.trim()));
-
-  // Build records: {name, dateISO, text}
-  const items = [];
-  for (const r of rows){
-    const name = r[ixName];
-    if (!name) continue;
-    for (const {h,i} of dateCols){
-      const statline = r[i].trim();
-      if (!statline) continue;
-      // convert "9/29" into ISO 2025-09-29 (assuming current year)
-      const [m,d] = h.split('/');
-      const iso = new Date(`2025-${m}-${d}T00:00:00`);
-      if (!isNaN(iso)) {
-        items.push({ name, dateISO: iso.toISOString().slice(0,10), text: `${h} ${statline}` });
+  return rows.map(row => {
+    const name = row[ixName];
+    const entries = {};
+    header.forEach((h, i) => {
+      if (i !== ixName) {
+        entries[h] = row[i] || ''; // keep raw text (may be blank)
       }
-    }
-  }
-  return items;
+    });
+    return { name, entries };
+  });
+}
+
+// --- INDEX BUILDER ---
+function buildIndex(players){
+  return WEEKS.map(week => {
+    const days = daysDesc(week.start, week.end); 
+    const playersRows = players.map(p => {
+      const dayCells = days.map(dISO => {
+        // convert ISO "2025-09-30" back to "9/30" (matching header in Sheets)
+        const d = new Date(dISO);
+        const key = (d.getMonth()+1) + '/' + d.getDate();
+        const text = p.entries[key] || '';
+        return text ? { dateISO: dISO, text } : null; // only keep if not empty
+      }).filter(Boolean); // remove nulls
+      return { name: p.name, days: dayCells };
+    });
+    return { label: week.label, players: playersRows };
+  });
 }
 
 /*** ---- GROUP INTO WEEK → PLAYER → DAY (desc) ---- ***/
