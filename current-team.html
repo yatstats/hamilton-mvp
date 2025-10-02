@@ -284,7 +284,7 @@ details[open]>.filter-title::after{transform:rotate(90deg)}
 <script>
 /*** ---------------- CONFIG ---------------- ***/
 // 1) PASTE your published STATS CSV URL here (File → Share → Publish to web → select STATS tab → CSV)
-const STATS_CSV_URL = 'REPLACE_WITH_YOUR_PUBLISHED_STATS_CSV_URL';
+const STATS_CSV_URL = 'https://docs.google.com/spreadsheets/d/1yUNQH9NbpKwOOwH9blf5ZqQfmft796sQl1dqghXP4uA/edit?usp=drivesdk';
 
 // 2) Weeks (2025) — newest first (10/4 → 8/24). Change years/dates if you need.
 const WEEKS = [
@@ -322,9 +322,9 @@ function pick(header, ...cands){
   return -1;
 }
 
-/*** -------- CSV LOAD + FLEXIBLE COLUMN MAP -------- ***/
+/*** -------- CSV LOAD (your STATS sheet shape) -------- ***/
 async function loadStatsCSV(url){
-  const bust = '_=' + Date.now(); // cache-buster so you can force refresh
+  const bust = '_=' + Date.now(); // cache-buster
   const sep = url.includes('?') ? '&' : '?';
   const res = await fetch(url + sep + bust);
   if (!res.ok) throw new Error('HTTP ' + res.status);
@@ -333,24 +333,58 @@ async function loadStatsCSV(url){
     line.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/).map(c => c.replace(/^"|"$/g,''))
   );
   const header = rows.shift() || [];
-  // Try to map likely columns used in your STATS tab
-  const ixDate   = pick(header, 'date', 'game_date');
-  const ixName   = pick(header, 'player', 'display_name', 'name', 'player_display_name');
-  const ixOpp    = pick(header, 'opponent', 'opp');
-  const ixHA     = pick(header, 'home_away', 'ha');
-  const ixTime   = pick(header, 'start_time', 'time');
-  const ixLine   = pick(header, 'line', 'result', 'statline', 'summary');
 
-  const items = rows.map(r => ({
-    dateISO: toISO(safeGet(r, ixDate)),
-    name: safeGet(r, ixName),
-    opp: safeGet(r, ixOpp),
-    ha: safeGet(r, ixHA).toLowerCase(),
-    time: safeGet(r, ixTime),
-    line: safeGet(r, ixLine)
-  })).filter(x => x.name && x.dateISO);
+  // find player column
+  const ixName = header.findIndex(h => h.toLowerCase() === 'display_name');
+  if (ixName === -1) throw new Error('No display_name column found');
 
+  // find all date columns (e.g. "9/29", "8/31")
+  const dateCols = header.map((h,i)=>({h,i}))
+    .filter(o => /^\d{1,2}\/\d{1,2}$/.test(o.h.trim()));
+
+  // Build records: {name, dateISO, text}
+  const items = [];
+  for (const r of rows){
+    const name = r[ixName];
+    if (!name) continue;
+    for (const {h,i} of dateCols){
+      const statline = r[i].trim();
+      if (!statline) continue;
+      // convert "9/29" into ISO 2025-09-29 (assuming current year)
+      const [m,d] = h.split('/');
+      const iso = new Date(`2025-${m}-${d}T00:00:00`);
+      if (!isNaN(iso)) {
+        items.push({ name, dateISO: iso.toISOString().slice(0,10), text: `${h} ${statline}` });
+      }
+    }
+  }
   return items;
+}
+
+/*** ---- GROUP INTO WEEK → PLAYER → DAY (desc) ---- ***/
+function buildIndex(stats){
+  // Unique player list
+  const players = Array.from(new Set(stats.map(s => s.name))).sort((a,b)=>a.localeCompare(b));
+  // Index by player+date
+  const byKey = new Map();
+  for (const s of stats){
+    byKey.set(s.name + '|' + s.dateISO, s.text);
+  }
+
+  // Build weeks
+  const weeks = WEEKS.map(w => {
+    const days = daysDesc(w.start, w.end); // 7 days in this week
+    const playersRows = players.map(pname => {
+      const dayCells = days.map(dISO => {
+        const key = pname + '|' + dISO;
+        const text = byKey.get(key) || fmtMD(dISO);
+        return {dateISO: dISO, text};
+      });
+      return { name: pname, days: dayCells };
+    });
+    return { label: w.label, players: playersRows };
+  });
+  return weeks;
 }
 
 /*** ---- GROUP INTO WEEK → PLAYER → DAY (desc) ---- ***/
