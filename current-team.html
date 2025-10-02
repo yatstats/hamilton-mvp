@@ -29,24 +29,141 @@ a{color:inherit;text-decoration:none}
 .header{position:sticky;top:0;z-index:50;background:var(--header-bg);transition:background-color .3s;}
 .topbar{display:flex;align-items:center;justify-content:space-between;padding:8px 0}
 .left-icons{display:flex;align-items:center;gap:8px}
-.icon-btn{background:none;border:none;color:var(--fg);opacity:.92;display:inline-flex;align-items:center;justify-content:center;padding:0;margin:0 2px;cursor:pointer}
-.icon-btn i{font-size:20px}
-.topnav{display:flex;gap:18px;align-items:center}
-.nav-pair{white-space:nowrap}
-.nav-pair .thin{font:300 var(--hamSmall) Oswald;letter-spacing:.02em;color:#cfd2d6;margin-right:2px}
-body.light-theme .nav-pair .thin{color:var(--muted)}
-.nav-pair .bold{font:400 var(--hamSmall) Indigo,"Bebas Neue",sans-serif}
-.wordmark-wrap{display:flex;align-items:center;justify-content:flex-end;min-width:120px}
-.wordmark-img{height:clamp(18px,3.2vw,28px);width:auto;display:block}
-body.light-theme .wordmark-img{filter:invert(1)}
-@media (max-width:1200px){.topnav{display:none !important}}
-.hr-y{border-top:1px solid var(--line)}
-.schoolrow{display:flex;align-items:center;gap:10px;padding:6px var(--containerPad)}
-.ham-logo{height:var(--crestH);width:auto;object-fit:contain;display:block;flex-shrink:0}
-.schooltext .small{font:300 var(--hamSmall)/1 Oswald;letter-spacing:.02em;color:var(--muted)}
-.schooltext .big1{font:400 var(--hamBig)/1 "Bebas Neue",sans-serif}
-.schooltext .big2{font:400 var(--hamBigger)/1 "Bebas Neue",sans-serif;margin-top:-4px}
-.crumbs{font:300 calc(var(--hamSmall)*.5)/1 Oswald;letter-spacing:.02em;color:var(--muted);text-transform:uppercase}
+.icon-btn{background:none;border:none;color:var(--fg);opacity:.92;display:inline-flex;align-items:center;justify-content:cente<script>
+/*** ---------------- CONFIG ---------------- ***/
+// PUBLISHED CSV for the STATS tab (File → Share → Publish to web → choose STATS sheet → CSV).
+// Example form: https://docs.google.com/spreadsheets/d/e/<pubid>/pub?gid=<stats_gid>&output=csv
+const STATS_CSV_URL = "PASTE_YOUR_PUBLISHED_STATS_CSV_HERE";
+
+// Weeks (newest first). These define where each header date (e.g. 9/29) lands.
+const WEEKS = [
+  { label: 'WEEK OF September 28 - October 4', start: '2025-09-28', end: '2025-10-04' },
+  { label: 'WEEK OF September 21 - 27',        start: '2025-09-21', end: '2025-09-27' },
+  { label: 'WEEK OF September 14 - 20',        start: '2025-09-14', end: '2025-09-20' },
+  { label: 'WEEK OF September 7 - 13',         start: '2025-09-07', end: '2025-09-13' },
+  { label: 'WEEK OF August 31 - September 6',  start: '2025-08-31', end: '2025-09-06' },
+  { label: 'WEEK OF August 24 - 30',           start: '2025-08-24', end: '2025-08-30' }
+];
+
+/*** --------------- HELPERS --------------- ***/
+const $ = s => document.querySelector(s);
+const seasonYear = WEEKS[0].start.slice(0,4);
+const toISO = d => new Date(d).toISOString().slice(0,10);
+function daysDesc(startISO, endISO){
+  const a = new Date(startISO), b = new Date(endISO), out = [];
+  for (let t = new Date(b); t >= a; t.setDate(t.getDate()-1)) out.push(toISO(t));
+  return out;
+}
+
+/*** -------- CSV LOAD (use raw cell text) -------- ***/
+async function loadStatsCSV(url){
+  if (!url || url.includes('/edit')) {
+    throw new Error('STATS_CSV_URL must be the PUBLISHED CSV (not an /edit link).');
+  }
+  const sep = url.includes('?') ? '&' : '?';
+  const res = await fetch(url + sep + '_=' + Date.now()); // no-cache
+  if (!res.ok) throw new Error('HTTP ' + res.status);
+  const text = await res.text();
+
+  const rows = text.trim().split(/\r?\n/).map(line =>
+    line.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/).map(c => c.replace(/^"|"$/g,''))
+  );
+  const header = rows.shift() || [];
+
+  // required columns
+  const ixName = header.findIndex(h => h.trim().toLowerCase() === 'display_name');
+  if (ixName === -1) throw new Error('No "display_name" column in STATS CSV.');
+
+  // date columns look like 9/29, 10/4, etc.
+  const dateCols = header
+    .map((h,i)=>({h:h.trim(), i}))
+    .filter(o => /^\d{1,2}\/\d{1,2}$/.test(o.h));
+
+  if (!dateCols.length) {
+    throw new Error('No M/D date columns found in header row.');
+  }
+
+  // Build: { name, dateISO, text } using raw cell content
+  const items = [];
+  for (const r of rows){
+    const name = (r[ixName] || '').trim();
+    if (!name) continue;
+    for (const {h,i} of dateCols){
+      const cell = (r[i] || '').trim();
+      if (!cell) continue; // skip empties entirely
+      const [m, d] = h.split('/');
+      const iso = new Date(`${seasonYear}-${m}-${d}T00:00:00`);
+      if (!isNaN(iso)) {
+        items.push({ name, dateISO: iso.toISOString().slice(0,10), text: cell });
+      }
+    }
+  }
+  return items;
+}
+
+/*** ---- GROUP → WEEK → PLAYER (skip empty days) ---- ***/
+function buildIndex(stats){
+  // Index by player+date, keep raw text
+  const byKey = new Map();
+  const players = new Set();
+  for (const s of stats){
+    players.add(s.name);
+    byKey.set(s.name + '|' + s.dateISO, s.text);
+  }
+
+  const weeks = WEEKS.map(w => {
+    const days = daysDesc(w.start, w.end);
+    const weekPlayers = [];
+
+    for (const pname of players){
+      const dayCells = [];
+      for (const dISO of days){
+        const key = pname + '|' + dISO;
+        const txt = byKey.get(key);
+        if (txt) dayCells.push({ dateISO: dISO, text: txt }); // RAW TEXT ONLY
+      }
+      // Only include this player in the week if at least one day has content
+      if (dayCells.length) weekPlayers.push({ name: pname, days: dayCells });
+    }
+
+    // Alphabetical player order within the week (you can change if needed)
+    weekPlayers.sort((a,b)=>a.name.localeCompare(b.name));
+
+    return { label: w.label, players: weekPlayers };
+  });
+
+  return weeks;
+}
+
+/*** ------------- RENDER TO DOM ------------- ***/
+function renderWeeks(mount, weeks){
+  if (!weeks.length){ mount.innerHTML = `<p style="color:var(--muted)">No data.</p>`; return; }
+  const html = weeks.map(week => {
+    if (!week.players.length) return '';
+    const playersHTML = week.players.map(pl => {
+      const rows = pl.days.map(d => `<div>${d.text}</div>`).join('');
+      return `<div class="linescore-player"><strong>${pl.name}</strong>${rows}</div>`;
+    }).join('');
+    return `<div class="linescore-week"><h4>${week.label}</h4>${playersHTML}</div>`;
+  }).join('');
+  mount.innerHTML = html || `<p style="color:var(--muted)">No weekly linescores.</p>`;
+}
+
+/*** ----------------- BOOT ----------------- ***/
+document.addEventListener('DOMContentLoaded', async ()=>{
+  const mount = document.getElementById('scoresMount');
+  try{
+    const stats = await loadStatsCSV(STATS_CSV_URL);
+    const weeks = buildIndex(stats);
+    renderWeeks(mount, weeks);
+  }catch(err){
+    console.error(err);
+    mount.innerHTML = `<div style="color:#fca5a5;font:300 11px Oswald;">
+      Linescore load failed: ${err.message}
+    </div>`;
+  }
+});
+</script> Oswald;letter-spacing:.02em;color:var(--muted);text-transform:uppercase}
 .hero{padding:2px 0}
 .hero-grid{display:flex;align-items:center;justify-content:space-between;gap:16px}
 .hero-left{display:flex;flex-direction:column;gap:4px}
