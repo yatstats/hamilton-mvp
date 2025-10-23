@@ -247,35 +247,10 @@ body.light-theme .form-field input{background:rgba(0,0,0,.06)}
 /* Accessibility focus */
 .icon-btn:focus,button:focus,input:focus,details summary:focus{outline:2px solid var(--fg);outline-offset:2px}
 
-/* Splash */
-#splashScreen{position:fixed;top:0;left:0;width:100%;height:100vh;background:#000;z-index:1000;opacity:1;transition:opacity .8s ease-out;pointer-events:auto;overflow:hidden}
-#splashScreen.is-hidden{opacity:0;pointer-events:none}
-.splash-top{position:absolute;width:100%;top:33%;left:50%;transform:translate(-50%,-50%);text-align:center}
-.splash-bottom{position:absolute;width:100%;bottom:33%;left:50%;transform:translate(-50%,50%);display:flex;align-items:center;justify-content:center;gap:clamp(12px,4vw,20px)}
-.splash-top .logo-container{position:relative;display:inline-block;overflow:hidden}
-.splash-top .splash-logo-main{width:clamp(280px,70vw,450px);height:auto;filter:drop-shadow(0 0 15px rgba(255,255,255,.2));animation:pulse-glow 2.5s infinite ease-in-out}
-.shimmer::after{content:'';position:absolute;top:0;left:-150%;width:70%;height:100%;background:linear-gradient(90deg,rgba(255,255,255,0) 0%,rgba(255,255,255,.2) 50%,rgba(255,255,255,0) 100%);transform:skewX(-25deg);animation:shimmer-effect 4s infinite;animation-delay:1.5s}
-.splash-bottom .splash-logo-h{height:clamp(45px,15vw,65px);width:auto;animation:fadeInDelayed 1s ease-in-out forwards;animation-delay:1.2s;opacity:0}
-.splash-bottom .splash-logo-ne{height:clamp(35px,12vw,50px);width:auto;animation:fadeInDelayed 1s ease-in-out forwards;animation-delay:1.2s;opacity:0}
-@keyframes fadeInDelayed{to{opacity:1}}
-@keyframes pulse-glow{0%{filter:drop-shadow(0 0 15px rgba(255,255,255,.2))}50%{filter:drop-shadow(0 0 25px rgba(255,255,255,.4))}100%{filter:drop-shadow(0 0 15px rgba(255,255,255,.2))}}
-@keyframes shimmer-effect{100%{left:150%}}
 </style>
 </head>
 
 <body>
-<!-- Splash -->
-<div id="splashScreen">
-  <div class="splash-top">
-    <div class="logo-container shimmer">
-      <img src="assets/img/yatstats-logo.png" alt="YAT?STATS Logo" class="splash-logo-main">
-    </div>
-  </div>
-  <div class="splash-bottom">
-    <img src="assets/img/hamilton-logo.png" alt="Hamilton Huskies Logo" class="splash-logo-h">
-    <img src="assets/img/partners/american_logo.png" alt="American Logo" class="splash-logo-ne">
-  </div>
-</div>
 
 <!-- Header -->
 <header class="header">
@@ -591,14 +566,28 @@ function firstNameOf(full){ return String(full||'').trim().split(/\s+/)[0] || ''
 function setupTheme(){
   const themeToggle=$('#theme-toggle'); if(!themeToggle) return;
   const body=document.body, icon=themeToggle.querySelector('i');
+  const getTheme = () => {
+    try {
+      return localStorage.getItem('theme');
+    } catch (e) {
+      return null;
+    }
+  };
+  const setTheme = (theme) => {
+    try {
+      localStorage.setItem('theme', theme);
+    } catch (e) {
+      // Ignore storage errors
+    }
+  };
   const applyTheme=()=>{
-    const saved=localStorage.getItem('theme');
+    const saved = getTheme();
     if (saved==='light'){ body.classList.add('light-theme'); icon?.classList.replace('ri-sun-line','ri-moon-line'); }
     else { body.classList.remove('light-theme'); icon?.classList.replace('ri-moon-line','ri-sun-line'); }
   };
   themeToggle.addEventListener('click', ()=>{
     body.classList.toggle('light-theme');
-    localStorage.setItem('theme', body.classList.contains('light-theme') ? 'light' : 'dark');
+    setTheme(body.classList.contains('light-theme') ? 'light' : 'dark');
     applyTheme();
   });
   applyTheme();
@@ -639,8 +628,8 @@ function setupEventListeners(){
   window.addEventListener('resize', setStickyTop);
 
   // Filters — reset (both buttons)
-  $('#filtersReset')?.addEventListener('click', (e)=>{ e.preventDefault(); resetFilters(); applyPlayerFilters(); applyNewsFilters(); });
-  $('#filtersReset2')?.addEventListener('click', (e)=>{ e.preventDefault(); resetFilters(); applyPlayerFilters(); applyNewsFilters(); });
+  $('#filtersReset')?.addEventListener('click', (e)=>{ e.preventDefault(); resetFilters(); applyNewsFilters(); });
+  $('#filtersReset2')?.addEventListener('click', (e)=>{ e.preventDefault(); resetFilters(); applyNewsFilters(); });
 
   // Date filter quick buttons
   $('#quick7')?.addEventListener('click', (e)=>{ e.preventDefault(); setDateRangeDays(7); applyNewsFilters(); });
@@ -650,18 +639,17 @@ function setupEventListeners(){
   $('#dateFrom')?.addEventListener('change', applyNewsFilters);
   $('#dateTo')?.addEventListener('change', applyNewsFilters);
 
-  // Name filter live
-  $('#filterName')?.addEventListener('input', applyNewsFilters);
-
   // “Select All” behavior + any checkbox change in filters
   $('#filters')?.addEventListener('change',e=>{
     if (e.target.classList?.contains('select-all')){
       const on = e.target.checked;
       e.target.closest('.filter-options')?.querySelectorAll('input[type="checkbox"]:not(.select-all)').forEach(cb=>cb.checked=on);
     }
-    applyPlayerFilters();
     applyNewsFilters();
   });
+
+  // Name filter live
+  $('#filterName')?.addEventListener('input', applyNewsFilters);
 }
 
 /* --------- CSV for live player search --------- */
@@ -675,7 +663,8 @@ async function loadCSV(url){
     slug:r[idx('slug')], display_name:r[idx('display_name')],
     first:r[idx('first')], last:r[idx('last')],
     grad_class:r[idx('grad_class')], level:r[idx('level')],
-    letter_years:r[idx('letter_years')]
+    letter_years:r[idx('letter_years')],
+    status:r[idx('status')]
   }));
 }
 function imageNameOf(p){
@@ -690,7 +679,7 @@ function makeHit(p){
   el.innerHTML=`<img src="${hsImgJpg}" onerror="this.onerror=null;this.src='${hsImgPng}';" alt="">
                 <div><div style="font-weight:700">${p.display_name}</div>
                 <div style="opacity:.7;font-size:.92em">${p.level||''} • Class of ${p.grad_class||''}</div></div>`;
-  const go=()=>{ window.location.href = \`./profile.html?player=\${encodeURIComponent((p.slug||name))}\`; };
+  const go=()=>{ window.location.href = `./profile.html?player=${encodeURIComponent((p.slug||name))}`; };
   el.onclick=go;
   el.onkeyup=(e)=>{ if(e.key==='Enter' || e.key===' ') go(); };
   return el;
@@ -750,7 +739,7 @@ function renderNewsLists(){
   const picks = id => {
     const box = $(id);
     if (!box) return null;
-    const vals = Array.from(box.querySelectorAll('input[type="checkbox"]:not(.select-all):checked')).map(i=>i.value);
+    const vals = Array.from(box.querySelectorAll('input[type="checkbox"]:not(.select-all):checked')).map(i=>i.value.toUpperCase());
     return vals.length ? new Set(vals) : null;
   };
   const selStatus = picks('#filterStatus');
@@ -769,19 +758,22 @@ function renderNewsLists(){
   const items = (ALL_NEWS || [])
     .filter(n=>{
       const title = (n.title||'').toLowerCase();
-      const player = (n.player_display_name||'').toLowerCase();
-      if (nameQ && !title.includes(nameQ) && !player.includes(nameQ)) return false;
+      const playerName = (n.player_display_name||'').toLowerCase();
+      if (nameQ && !title.includes(nameQ) && !playerName.includes(nameQ)) return false;
       if (!inDate(n.publishedAt)) return false;
 
-      const level  = String(n.tags?.level||'').toUpperCase();
-      const status = String(n.tags?.status||'').toUpperCase();
-      const grad   = String(n.tags?.grad_class||'');
-      const roster = String(n.tags?.roster_year||'');
+      const player = (window.PLAYERS || []).find(p => (p.display_name || '').toLowerCase() === playerName);
+      if (!player) return false; // Skip if no matching player
+
+      const level = String(n.tags?.level || '').toUpperCase();
+      const status = String(player.status || '').toUpperCase();
+      const grad = String(player.grad_class || '');
+      const roster_years = (player.letter_years || '').split(',').map(y => y.trim()).filter(Boolean);
 
       if (selLevels && !selLevels.has(level)) return false;
       if (selStatus && !selStatus.has(status)) return false;
       if (selGrad && !selGrad.has(grad)) return false;
-      if (selRoster && !selRoster.has(roster)) return false;
+      if (selRoster && !roster_years.some(y => selRoster.has(y))) return false;
       return true;
     })
     .sort((a,b)=> new Date(b.publishedAt||0)-new Date(a.publishedAt||0));
@@ -834,30 +826,29 @@ function renderScores(containerSel, data){
 
 /* --------- Filters populate (optional parity with index) --------- */
 function populateFilters(players){
-  const levels = [...new Set(players.map(p=>p.level).filter(Boolean))];
+  const levels = [...new Set(players.map(p=>p.level).filter(Boolean))].sort();
   $('#filterLevels').innerHTML =
     '<label class="select-all-label"><input type="checkbox" class="select-all"> Select All</label>' +
-    levels.map(level=>`<label><input type="checkbox" value="${level}"> ${level}</label>`).join('');
+    levels.map(level=>`<label><input type="checkbox" value="${level.toUpperCase()}"> ${level.toUpperCase()}</label>`).join('');
 
   const gradClasses = [...new Set(players.map(p=>p.grad_class).filter(Boolean))].sort((a,b)=>b-a);
   $('#filterGradClass').innerHTML =
     '<label class="select-all-label"><input type="checkbox" class="select-all"> Select All</label>' +
     gradClasses.map(y=>`<label><input type="checkbox" value="${y}"> ${y}</label>`).join('');
 
-  const rosterYears = [...new Set(players.flatMap(p=>(p.letter_years||'').split(',')).map(y=>y.trim()).filter(Boolean))].sort((a,b)=>b-a);
+  const rosterYears = [...new Set(players.flatMap(p=>(p.letter_years||'').split(',').map(y=>y.trim())).filter(Boolean))].sort((a,b)=>b-a);
   $('#filterRosterYear').innerHTML =
     '<label class="select-all-label"><input type="checkbox" class="select-all"> Select All</label>' +
     rosterYears.map(y=>`<label><input type="checkbox" value="${y}"> ${y}</label>`).join('');
+
+  // For status, if column exists and has values, populate dynamically; else keep hardcoded
+  const statuses = [...new Set(players.map(p=>p.status).filter(Boolean))].sort();
+  if (statuses.length > 0) {
+    $('#filterStatus').innerHTML =
+      '<label class="select-all-label"><input type="checkbox" class="select-all"> Select All</label>' +
+      statuses.map(s=>`<label><input type="checkbox" value="${s.toUpperCase()}"> ${s.toUpperCase()}</label>`).join('');
+  }
 }
-function readPlayerFilters(){
-  const name=($('#filterName')?.value||'').trim().toLowerCase();
-  const levels = $$('#filterLevels input:checked:not(.select-all)').map(i=>i.value);
-  const status = $$('#filterStatus input:checked:not(.select-all)').map(i=>i.value);
-  const classes = $$('#filterGradClass input:checked:not(.select-all)').map(i=>i.value);
-  const rosterYears = $$('#filterRosterYear input:checked:not(.select-all)').map(i=>i.value);
-  return { name, levels, status, classes, rosterYears };
-}
-function applyPlayerFilters(){ /* reserved for future player lists */ }
 function resetFilters(){
   $$('#filters input').forEach(i=>{
     if(i.type==='checkbox') i.checked=false;
@@ -868,28 +859,42 @@ function resetFilters(){
 
 /* --------- Boot --------- */
 document.addEventListener('DOMContentLoaded', async ()=>{
-  // Splash once per session
+  // Splash logic (skipped if no element)
   const splash = $('#splashScreen');
-  if (sessionStorage.getItem('splashShown')) { if (splash) splash.style.display='none'; }
-  else {
-    if (splash){
-      setTimeout(()=>{
-        splash.classList.add('is-hidden');
-        splash.addEventListener('transitionend', (e)=>{ if(e.target===splash) splash.style.display='none'; }, {once:true});
-      }, 1800);
+  if (splash) {
+    let splashShown = false;
+    try {
+      splashShown = sessionStorage.getItem('splashShown') === 'true';
+    } catch (e) {
+      // Ignore
     }
-    sessionStorage.setItem('splashShown','true');
+    if (splashShown) {
+      splash.style.display = 'none';
+    } else {
+      setTimeout(() => {
+        splash.classList.add('is-hidden');
+        splash.addEventListener('transitionend', (e) => {
+          if (e.target === splash) splash.style.display = 'none';
+        }, { once: true });
+      }, 1800);
+      try {
+        sessionStorage.setItem('splashShown', 'true');
+      } catch (e) {
+        // Ignore
+      }
+    }
   }
 
   setupTheme();
   setupEventListeners();
   setStickyTop();
 
-  // CSV for search drawer
+  // CSV for search drawer and filters
+  let players = [];
   try{
-    const players = await loadCSV(CSV_URL);
-    window.PLAYERS = players||[];
-    populateFilters(players||[]);
+    players = await loadCSV(CSV_URL);
+    window.PLAYERS = players;
+    populateFilters(players);
     $('#playerSearch')?.addEventListener('input', debounce(liveSearch, 200));
   }catch{ /* silent */ }
 
@@ -899,9 +904,9 @@ document.addEventListener('DOMContentLoaded', async ()=>{
     const data = JSON.parse(raw);
     ALL_NEWS = Array.isArray(data.items) ? data.items : [];
   }catch{ ALL_NEWS = []; }
-  renderNewsLists();
+  applyNewsFilters();
 
-  // Load scores
+  // Load scores (unfiltered)
   let scores;
   try{
     const raw = $('#scores-json')?.textContent || '{}';
