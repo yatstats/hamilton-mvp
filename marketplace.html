@@ -834,17 +834,21 @@ function setDateRangeDays(days){
 
 /* --------- Line scores rendering --------- */
 function lineRowHTML(g){
-  const cls = (g.status||'final').toLowerCase();
-  const line = (g.status==='final' && g.line) ? g.line :
-               (g.status==='inprogress') ? 'GAME IN PROGRESS' :
-               (g.status==='scheduled') ? (g.time||'TBD') : 'DNP';
-  const segs = [
-    `<span class="date">${g.date}</span>`,
-    `<span class="opp">${g.opp}</span>`,
-    `<span class="sep">|</span>`,
-    `<span class="line">${line}</span>`
-  ];
-  return `<li class="${cls}"><div class="games-line">${segs.join(' ')}</div></li>`;
+  const cls = (g.status || 'final').toLowerCase();
+  const line =
+    (g.status === 'final'      && g.line) ? g.line :
+    (g.status === 'inprogress' && g.line) ? g.line :
+    (g.status === 'scheduled')            ? (g.time || 'TBD') :
+                                            (g.line || 'DNP');
+
+  return `<li class="${cls}">
+    <div class="games-line">
+      <span class="date">${g.date}</span>
+      <span class="opp">${g.opp}</span>
+      <span class="sep">|</span>
+      <span class="line">${line}</span>
+    </div>
+  </li>`;
 }
 function renderScores(containerSel, data){
   const el = $(containerSel); if(!el) return;
