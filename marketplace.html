@@ -16,7 +16,9 @@
     const firebaseConfig = JSON.parse(window.__firebase_config || '{}');
     const app = initializeApp(firebaseConfig);
     window.auth = getAuth(app);
-    onAuthStateChanged(window.auth, user => { document.dispatchEvent(new CustomEvent('authStateChanged', { detail: { user } })); });
+    onAuthStateChanged(window.auth, user => {
+      document.dispatchEvent(new CustomEvent('authStateChanged', { detail: { user } }));
+    });
     if (window.__initial_auth_token) {
       await signInWithCustomToken(window.auth, window.__initial_auth_token);
     } else {
@@ -44,6 +46,11 @@ body.light-theme{
 body{background:var(--bg);color:var(--fg);font-family:Oswald,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;transition:background-color .3s,color .3s;}
 body.drawer-open{overflow:hidden}
 a{color:inherit;text-decoration:none}
+
+/* FIX mobile/visited purple */
+.topnav a, .topnav a:visited, .topnav a:active { color: var(--fg); text-decoration:none; }
+.topnav a:hover, .topnav a:focus { color: var(--ink); opacity:.9; text-decoration:none; }
+
 .container{max-width:1400px;margin:0 auto;padding:0 var(--containerPad)}
 .header{position:sticky;top:0;z-index:50;background:var(--header-bg);transition:background-color .3s;}
 .topbar{display:flex;align-items:center;justify-content:space-between;padding:8px 0}
@@ -68,15 +75,22 @@ body.light-theme .wordmark-img{filter:invert(1)}
 .schooltext .big2{font:400 var(--hamBigger)/1 "Bebas Neue",sans-serif;margin-top:-4px}
 .crumbs{font:300 calc(var(--hamSmall)*.5)/1 Oswald;letter-spacing:.02em;color:var(--muted);text-transform:uppercase}
 
+/* HERO */
 .hero{padding:2px 0}
 .hero-grid{display:flex;align-items:center;justify-content:space-between;gap:16px}
 .hero-left{display:flex;flex-direction:column;gap:4px}
 .hero-crumbs{margin:0;text-align:left;white-space:nowrap}
 @media (max-width:768px){.topbar .crumbs{display:block}.hero-left .crumbs{display:none}}
 @media (min-width:769px){.topbar .crumbs{display:none}.hero-left .crumbs{display:block}}
-.tag-line{font:400 1.2rem/1 Indigo,"Bebas Neue",sans-serif;letter-spacing:.02em}
-.tag-line .grey{color:var(--tagGrey);font-family:Oswald,sans-serif;font-weight:300}
-.tag-line .bold{font-weight:400}
+
+/* HERO swap animation (same behavior as index) */
+.tag-duo{position:relative;height:1.8em}
+.tag-swap{position:absolute;left:0;top:0;right:0;opacity:0;animation:swap 6s infinite;white-space:nowrap}
+.tag-swap:nth-child(1){animation-delay:0s}
+.tag-swap:nth-child(2){animation-delay:3s}
+.tag-grey{font:300 1.05rem Oswald,sans-serif;letter-spacing:.02em;color:var(--tagGrey)}
+.tag-bold{font:400 1.15rem Indigo,"Bebas Neue",sans-serif}
+@keyframes swap{0%{opacity:0}5%{opacity:1}45%{opacity:1}50%{opacity:0}100%{opacity:0}}
 
 .hero-right{display:flex;gap:10px}
 .hero-icon i{font-size:20px}
@@ -107,7 +121,7 @@ details[open]>.filter-title::after{transform:rotate(90deg)}
 .filter-options input[type=checkbox]{margin-right:8px;transform:scale(1.1)}
 .select-all-label{font-weight:700;border-bottom:1px solid var(--line);padding-bottom:8px !important;margin-bottom:12px !important}
 
-/* Auth (same as your index) */
+/* Auth (same as index) */
 .auth-tabs{display:flex;border-bottom:1px solid var(--line)}
 .auth-tab{flex:1;text-align:center;padding:10px;cursor:pointer;background:transparent;border:none;color:var(--muted);font-family:"Bebas Neue",sans-serif;font-size:16px;letter-spacing:.05em}
 .auth-tab.active{color:var(--fg);border-bottom:2px solid var(--fg)}
@@ -122,7 +136,8 @@ body.light-theme .form-field input{background:rgba(0,0,0,.06)}
 .error{color:#fca5a5}
 .success{color:#86efac}
 
-/* Footer */
+/* Main + Footer */
+.main{padding:8px 0 calc(var(--footerH) + 12px)}
 .site-footer{position:fixed;left:0;right:0;bottom:0;height:var(--footerH);background:var(--bg);border-top:1px solid var(--line);z-index:40}
 .site-footer a{display:block;height:100%;width:100%}
 .site-footer img{height:100%;width:100%;object-fit:contain}
@@ -169,11 +184,15 @@ body.light-theme .form-field input{background:rgba(0,0,0,.06)}
 
   <div class="hr-y"></div>
 
-  <!--<div class="tag-duo">
-  <div class="tag-swap"><span class="tag-bold">NIL Marketplace.</span></div>
-  <div class="tag-swap"><span class="tag-grey">Send a</span> <span class="tag-bold">YAT-A-BOY</span></div>
-</div>
-<div class="crumbs hero-crumbs">HAMILTON ▸ NIL MARKETPLACE</div>
+  <!-- HERO with animated swap -->
+  <section class="hero">
+    <div class="container hero-grid">
+      <div class="hero-left" aria-live="polite">
+        <div class="tag-duo">
+          <div class="tag-swap"><span class="tag-bold">NIL Marketplace.</span></div>
+          <div class="tag-swap"><span class="tag-grey">Send a</span> <span class="tag-bold">YAT-A-BOY</span></div>
+        </div>
+        <div class="crumbs hero-crumbs">HAMILTON ▸ NIL MARKETPLACE</div>
       </div>
       <div class="hero-right">
         <button id="openSearch" class="hero-icon icon-btn" aria-label="Open search"><i class="ri-search-line"></i></button>
@@ -186,7 +205,7 @@ body.light-theme .form-field input{background:rgba(0,0,0,.06)}
 
 <div class="drawer-mask"></div>
 
-<!-- LEFT DRAWER: Search + Nav (player profile search WORKS here) -->
+<!-- LEFT DRAWER: Search + Nav -->
 <aside class="drawer" id="drawerLeft" aria-label="Left drawer">
   <button class="icon-btn close-btn" aria-label="Close"><i class="ri-close-line"></i></button>
   <div class="drawer-content">
@@ -208,7 +227,7 @@ body.light-theme .form-field input{background:rgba(0,0,0,.06)}
   </div>
 </aside>
 
-<!-- RIGHT DRAWER: Filters (kept for UI parity, harmless here) -->
+<!-- RIGHT DRAWER: Filters (kept for consistency) -->
 <aside class="drawer drawer-right" id="drawerFilters" style="display:flex;">
   <button class="icon-btn close-btn" aria-label="Close"><i class="ri-close-line"></i></button>
   <h3>FILTERS</h3>
@@ -251,7 +270,7 @@ body.light-theme .form-field input{background:rgba(0,0,0,.06)}
   </div>
 </aside>
 
-<!-- RIGHT DRAWER: Account (identical UX to your index) -->
+<!-- RIGHT DRAWER: Account -->
 <aside class="drawer drawer-right" id="drawerAccount" style="display:none;">
   <button class="icon-btn close-btn" aria-label="Close"><i class="ri-close-line"></i></button>
   <h3>ACCOUNT</h3>
@@ -277,9 +296,7 @@ body.light-theme .form-field input{background:rgba(0,0,0,.06)}
 </aside>
 
 <!-- BLANK MAIN -->
-<main class="main container" aria-live="polite">
-  <!-- Content TBD for marketplace -->
-</main>
+<main class="main container" aria-live="polite"></main>
 
 <footer class="site-footer">
   <a href="https://www.americanpromo.com/" target="_blank" rel="noopener noreferrer">
@@ -290,7 +307,6 @@ body.light-theme .form-field input{background:rgba(0,0,0,.06)}
 <script type="module">
 /* ---- YATSTATS Marketplace Shell ---- */
 
-/* Config (same CSV used by index so search has real data) */
 const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQcWJM6Q6hTdFnES_G5LUy4teCS-sJ5HdAc9F5HSY8DGE9egdGy8yUAe2ShT3tFm-CwUuCYeAYy_YiW/pub?gid=2028135390&output=csv";
 
 /* Dom utils */
@@ -333,11 +349,9 @@ function setupEventListeners(){
   $$('.close-btn').forEach(b=>b.addEventListener('click',closeDrawers));
   $('.drawer-mask')?.addEventListener('click',closeDrawers);
 
-  // Reset buttons (no-op for blank content)
   $('#filtersReset')?.addEventListener('click',resetFilters);
   $('#filtersReset2')?.addEventListener('click',resetFilters);
 
-  // Live search
   $('#playerSearch')?.addEventListener('input', debounce(liveSearch, 200));
 }
 
@@ -349,7 +363,7 @@ function resetFilters(){
   });
 }
 
-/* CSV loader (same behavior as index) */
+/* CSV loader for search */
 async function loadCSV(url){
   const res = await fetch(url);
   if(!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -363,67 +377,33 @@ async function loadCSV(url){
   const header = rows.shift().map(h => h.trim());
   const idx = name => header.indexOf(name);
 
-  const statKeys = ['avg','obp','slg','ops','ab','h','r','rbi','2b','3b','hr','sb','bb','era','k/9','k/bb','whip','ip','er','ko','gp','w-l','saves','fip'];
-
-  return rows.map(r=>{
-    const player = {
-      slug:r[idx('slug')], display_name:r[idx('display_name')],
-      first:r[idx('first')], last:r[idx('last')],
-      grad_class:r[idx('grad_class')], letter_years:r[idx('letter_years')],
-      status:r[idx('status')], level:r[idx('level')],
-      team:r[idx('team')], org:r[idx('org')], position:r[idx('position')],
-      height:r[idx('height')], weight:r[idx('weight')], bats:r[idx('bats')], throws:r[idx('throws')],
-      draft_info:r[idx('Draft_Info')] ?? r[idx('draft_info')],
-      colleges:r[idx('Colleges')] ?? r[idx('colleges')],
-      last_game_1:r[idx('last_game_1')], last_game_2:r[idx('last_game_2')], last_game_3:r[idx('last_game_3')],
-      x_handle:r[idx('x_handle')], ig_handle:r[idx('ig_handle')],
-      video_url:r[idx('video_url')], nil_score:r[idx('nil_score')],
-      stats:{}
-    };
-    for(const key of statKeys){
-      const sIdx = idx(key);
-      if (sIdx > -1 && r[sIdx]) player.stats[key.toUpperCase()] = r[sIdx];
-    }
-    return player;
-  });
+  return rows.map(r=>({
+    slug:r[idx('slug')], display_name:r[idx('display_name')],
+    first:r[idx('first')], last:r[idx('last')],
+    grad_class:r[idx('grad_class')], status:r[idx('status')], level:r[idx('level')]
+  }));
 }
 
-/* Helpers for search results */
-function slugOf(p){
-  if (!p) return '';
-  const s=(p.slug||'').trim();
-  if(s) return s;
-  return (p.display_name||'').trim().toLowerCase().replace(/[^a-z0-9]+/g,'-');
-}
+function slugOf(p){const s=(p.slug||'').trim();return s ? s : (p.display_name||'').trim().toLowerCase().replace(/[^a-z0-9]+/g,'-');}
 function profileURL(p){ return `./profile.html?player=${slugOf(p)}`; }
 function imageNameOf(p){
   const isSponsor = (p.status && p.status.toUpperCase()==='SPONSOR');
-  if (isSponsor && p.slug){
-    return p.slug.trim().toLowerCase().replace(/\s+/g,'_').replace(/[^a-z0-9_]/g,'');
-  }
-  const first = (p.first || '').toLowerCase().replace(/\s+/g,'_');
-  const last = (p.last || '').toLowerCase().replace(/\s+/g,'_');
-  if (first || last) return [first,last].filter(Boolean).join('_');
-  return (p.slug || p.display_name || '').toLowerCase().replace(/\s+/g,'_').replace(/[^a-z0-9_]/g,'');
+  if (isSponsor && p.slug) return p.slug.trim().toLowerCase().replace(/\s+/g,'_').replace(/[^a-z0-9_]/g,'');
+  const first=(p.first||'').toLowerCase().replace(/\s+/g,'_'); const last=(p.last||'').toLowerCase().replace(/\s+/g,'_');
+  return (first||last) ? [first,last].filter(Boolean).join('_') : (p.slug||p.display_name||'').toLowerCase().replace(/\s+/g,'_').replace(/[^a-z0-9_]/g,'');
 }
 function makeHit(p){
   const el=document.createElement('div'); el.className='live-hit';
   el.style.cssText='padding:10px 12px;display:flex;align-items:center;gap:10px;border-radius:10px;cursor:pointer;';
   el.onmouseenter=()=>el.style.background='var(--line)';
   el.onmouseleave=()=>el.style.background='transparent';
-
-  const imageName=imageNameOf(p);
-  const hsImgJpg=`assets/img/hs_players/${imageName}.jpg`;
-  const hsImgPng=`assets/img/hs_players/${imageName}.png`;
-
-  el.innerHTML=`<img src="${hsImgJpg}" onerror="this.onerror=null;this.src='${hsImgPng}';" style="width:36px;height:36px;border-radius:6px;object-fit:cover">
+  const imgJ=`assets/img/hs_players/${imageNameOf(p)}.jpg`, imgP=`assets/img/hs_players/${imageNameOf(p)}.png`;
+  el.innerHTML=`<img src="${imgJ}" onerror="this.onerror=null;this.src='${imgP}';" style="width:36px;height:36px;border-radius:6px;object-fit:cover">
                 <div><div style="font-weight:700">${p.display_name}</div>
                 <div style="opacity:.7;font-size:.92em">${p.level||''} • Class of ${p.grad_class||''}</div></div>`;
   el.onclick=()=>window.location.href=profileURL(p);
   return el;
 }
-
-/* Live search */
 function liveSearch(){
   const q=($('#playerSearch')?.value||'').trim().toLowerCase();
   const box=$('#liveResults'); if(!box) return;
@@ -432,7 +412,7 @@ function liveSearch(){
   box.innerHTML=''; hits.forEach(p=>box.appendChild(makeHit(p)));
 }
 
-/* Auth UI (same behavior as index) */
+/* Auth UI */
 function setupAuth(){
   if (!window.firebaseAuth || !window.auth){ return; }
   const { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } = window.firebaseAuth;
@@ -466,7 +446,6 @@ function setupAuth(){
     else { accountBtn.style.display='inline-flex'; soBtn.style.display='none'; }
   });
 
-  // Tabs
   $$('.auth-tab').forEach(tab=>{
     tab.addEventListener('click', ()=>{
       const target=tab.dataset.tab;
@@ -483,27 +462,13 @@ document.addEventListener('DOMContentLoaded', async ()=>{
   setupTheme();
   setupEventListeners();
   setupAuth();
-
-  // Load players specifically to power the LEFT DRAWER search
   try{
-    const data = await loadCSV(CSV_URL);
-    window.PLAYERS = data;
+    window.PLAYERS = await loadCSV(CSV_URL); // powers the left-drawer search
   }catch(err){
     console.error('Search data load failed:', err);
-    const box=$('#liveResults');
-    if (box) box.innerHTML = `<div style="opacity:.8;">Search unavailable right now.</div>`;
+    const box=$('#liveResults'); if (box) box.innerHTML = `<div style="opacity:.8;">Search unavailable right now.</div>`;
   }
 });
-
-/* Hero swap animation — match index */
-.tag-duo{position:relative;height:1.8em}
-.tag-swap{position:absolute;left:0;top:0;right:0;opacity:0;animation:swap 6s infinite;white-space:nowrap}
-.tag-swap:nth-child(1){animation-delay:0s}
-.tag-swap:nth-child(2){animation-delay:3s}
-.tag-grey{font:300 1em Oswald,sans-serif;letter-spacing:.02em;color:var(--tagGrey)}
-.tag-bold{font:400 1em Indigo,"Bebas Neue",sans-serif}
-@keyframes swap{0%{opacity:0}5%{opacity:1}45%{opacity:1}50%{opacity:0}100%{opacity:0}}
-
 </script>
 </body>
 </html>
