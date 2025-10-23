@@ -1,3 +1,4 @@
+```html
 <!doctype html>
 <html lang="en">
 <head>
@@ -246,12 +247,10 @@ body.light-theme .form-field input{background:rgba(0,0,0,.06)}
 
 /* Accessibility focus */
 .icon-btn:focus,button:focus,input:focus,details summary:focus{outline:2px solid var(--fg);outline-offset:2px}
-
 </style>
 </head>
 
 <body>
-
 <!-- Header -->
 <header class="header">
   <div class="container topbar">
@@ -514,185 +513,180 @@ body.light-theme .form-field input{background:rgba(0,0,0,.06)}
 }
 </script>
 
-<script type="application/json" id="scores-json">
-{
-  "weeks":[
-    {
-      "label":"This Week",
-      "players":[
-        {"name":"CODY BELLINGER","games":[
-          {"date":"9/21","opp":"@ BAL","status":"final","line":"2-4, 2 HR, 4 RBI"},
-          {"date":"9/20","opp":"@ BAL","status":"final","line":"1-3, BB"}
-        ]},
-        {"name":"DOM HAMEL","games":[
-          {"date":"9/20","opp":"vs SWB","status":"final","line":"6.0 IP, 3 H, 1 ER, 9 K"}
-        ]}
-      ]
-    },
-    {
-      "label":"Last Week",
-      "players":[
-        {"name":"DREW SWIFT","games":[
-          {"date":"9/18","opp":"@ ERI","status":"final","line":"1-3, BB, R"}
-        ]},
-        {"name":"PATRICK MURPHY","games":[
-          {"date":"9/17","opp":"KBO","status":"final","line":"1.0 IP, SV"}
-        ]}
-      ]
-    }
-  ]
-}
-</script>
+<script>
+/*** ---------------- CONFIG ---------------- ***/
+// 1) OPTIONAL: set to your published STATS CSV URL (File → Share → Publish to web → STATS tab → CSV)
+const STATS_CSV_URL = 'REPLACE_WITH_YOUR_PUBLISHED_STATS_CSV_URL';
 
-<!-- MAIN APP SCRIPT -->
-<script type="module">
-/* ---- Alumni News • working drawers + live search + wider scores • build 1.1 ---- */
+// 2) Weeks (2025) — newest first (10/4 → 8/24)
+const WEEKS = [
+  { label: 'SEPT 28 - OCT 4', start: '2025-09-28', end: '2025-10-04' },
+  { label: 'SEPT 21 - 27', start: '2025-09-21', end: '2025-09-27' },
+  { label: 'SEPT 14 - 20', start: '2025-09-14', end: '2025-09-20' },
+  { label: 'SEPT 7 - 13', start: '2025-09-07', end: '2025-09-13' },
+  { label: 'AUG 31 - SEPT 6', start: '2025-08-31', end: '2025-09-06' },
+  { label: 'AUG 24 - 30', start: '2025-08-24', end: '2025-08-30' }
+];
 
-/* --------- Config (players CSV only used for search drawer) --------- */
-const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQcWJM6Q6hTdFnES_G5LUy4teCS-sJ5HdAc9F5HSY8DGE9egdGy8yUAe2ShT3tFm-CwUuCYeAYy_YiW/pub?gid=2028135390&single=true&output=csv";
+// Optional TZ label
+const TZ_LABEL = 'AZ';
 
-/* --------- Helpers --------- */
+/*** --------------- SMALL UTILS --------------- ***/
 const $ = s => document.querySelector(s);
 const $$ = s => Array.from(document.querySelectorAll(s));
-const debounce = (fn, ms=300)=>{ let t; return (...a)=>{ clearTimeout(t); t=setTimeout(()=>fn(...a),ms); }; };
+function toISO(d){ const t = new Date(d); if (isNaN(t)) return null; return t.toISOString().slice(0,10); }
+function fmtMD(d){ const t = new Date(d); if (isNaN(t)) return ''; return (t.getMonth()+1) + '/' + t.getDate(); }
+function daysDesc(startISO, endISO){ const a = new Date(startISO), b = new Date(endISO), out = []; for (let t = new Date(b); t >= a; t.setDate(t.getDate()-1)) out.push(toISO(t)); return out; }
+function safeGet(row, idx){ return (idx>=0 && idx<row.length) ? row[idx].trim() : ''; }
+function pick(header, ...cands){
+  const lc = header.map(h => h.toLowerCase());
+  for (const c of cands){ const i = lc.indexOf(c.toLowerCase()); if (i !== -1) return i; }
+  for (let i=0;i<lc.length;i++){ if (cands.some(c => lc[i].includes(c.toLowerCase()))) return i; }
+  return -1;
+}
+
+/*** ------------- THEME + DRAWERS ------------- ***/
+function setupTheme(){
+  const btn = $('#theme-toggle'); if (!btn) return;
+  const icon = btn.querySelector('i');
+  const apply = ()=>{
+    const saved = localStorage.getItem('theme');
+    if (saved === 'light'){ document.body.classList.add('light-theme'); icon?.classList.replace('ri-sun-line','ri-moon-line'); }
+    else { document.body.classList.remove('light-theme'); icon?.classList.replace('ri-moon-line','ri-sun-line'); }
+  };
+  btn.addEventListener('click', ()=>{
+    document.body.classList.toggle('light-theme');
+    localStorage.setItem('theme', document.body.classList.contains('light-theme') ? 'light' : 'dark');
+    apply();
+  });
+  apply();
+}
 function setStickyTop(){
   const header = document.querySelector('.header');
   const top = (header?.offsetHeight || 120) + 10;
-  document.documentElement.style.setProperty('--stickyTop', top+'px');
+  document.documentElement.style.setProperty('--stickyTop', top + 'px');
 }
-function firstNameOf(full){ return String(full||'').trim().split(/\s+/)[0] || ''; }
-
-/* --------- Theme --------- */
-function setupTheme(){
-  const themeToggle=$('#theme-toggle'); if(!themeToggle) return;
-  const body=document.body, icon=themeToggle.querySelector('i');
-  const getTheme = () => {
-    try {
-      return localStorage.getItem('theme');
-    } catch (e) {
-      return null;
-    }
-  };
-  const setTheme = (theme) => {
-    try {
-      localStorage.setItem('theme', theme);
-    } catch (e) {
-      // Ignore storage errors
-    }
-  };
-  const applyTheme=()=>{
-    const saved = getTheme();
-    if (saved==='light'){ body.classList.add('light-theme'); icon?.classList.replace('ri-sun-line','ri-moon-line'); }
-    else { body.classList.remove('light-theme'); icon?.classList.replace('ri-moon-line','ri-sun-line'); }
-  };
-  themeToggle.addEventListener('click', ()=>{
-    body.classList.toggle('light-theme');
-    setTheme(body.classList.contains('light-theme') ? 'light' : 'dark');
-    applyTheme();
+function setupDrawers(){
+  const mask = document.querySelector('.drawer-mask');
+  const closeAll = ()=>document.body.classList.remove('drawer-left-open','drawer-right-open','drawer-open');
+  $('#btnMenu')?.addEventListener('click', ()=>{ document.body.classList.add('drawer-left-open','drawer-open'); });
+  $('#openSearch')?.addEventListener('click', ()=>{ document.body.classList.add('drawer-left-open','drawer-open'); });
+  $('#openFilters')?.addEventListener('click', ()=>{
+    $('#drawerFilters').style.display='flex';
+    $('#drawerAccount').style.display='none';
+    document.body.classList.add('drawer-right-open','drawer-open');
   });
-  applyTheme();
-}
-
-/* --------- Drawers --------- */
-function closeDrawers(){
-  document.body.classList.remove('drawer-left-open','drawer-right-open','drawer-open');
-  $('#drawerFilters') && ($('#drawerFilters').style.display='none');
-  $('#drawerAccount') && ($('#drawerAccount').style.display='none');
-}
-function openLeft(){
-  document.body.classList.add('drawer-left-open','drawer-open');
-  setTimeout(()=>$('#playerSearch')?.focus(), 0);
-}
-function openRight(whichId){
-  ['#drawerFilters','#drawerAccount'].forEach(sel=>{ const el=$(sel); if (el) el.style.display='none'; });
-  const el = $(whichId);
-  if (!el) return;
-  el.style.display='flex';
-  document.body.classList.add('drawer-right-open','drawer-open');
-  const focusable = el.querySelector('input,button,select,details,summary,a[href]');
-  setTimeout(()=>focusable?.focus(), 0);
-}
-function setupEventListeners(){
-  // openers
-  $('#btnMenu')?.addEventListener('click', (e)=>{ e.preventDefault(); openLeft(); });
-  $('#openSearch')?.addEventListener('click', (e)=>{ e.preventDefault(); openLeft(); });
-  $('#openFilters')?.addEventListener('click', (e)=>{ e.preventDefault(); openRight('#drawerFilters'); });
-  $('#btnAccount')?.addEventListener('click', (e)=>{ e.preventDefault(); openRight('#drawerAccount'); });
-
-  // closers
-  $$('.close-btn').forEach(b=>b.addEventListener('click', (e)=>{ e.preventDefault(); closeDrawers(); }));
-  $('.drawer-mask')?.addEventListener('click', closeDrawers);
-  document.addEventListener('keydown', (e)=>{ if (e.key==='Escape') closeDrawers(); });
-
-  // Resizing could change sticky offset
-  window.addEventListener('resize', setStickyTop);
-
-  // Filters — reset (both buttons)
-  $('#filtersReset')?.addEventListener('click', (e)=>{ e.preventDefault(); resetFilters(); applyNewsFilters(); });
-  $('#filtersReset2')?.addEventListener('click', (e)=>{ e.preventDefault(); resetFilters(); applyNewsFilters(); });
-
-  // Date filter quick buttons
-  $('#quick7')?.addEventListener('click', (e)=>{ e.preventDefault(); setDateRangeDays(7); applyNewsFilters(); });
-  $('#quick30')?.addEventListener('click', (e)=>{ e.preventDefault(); setDateRangeDays(30); applyNewsFilters(); });
-  $('#clearDates')?.addEventListener('click', (e)=>{ e.preventDefault(); $('#dateFrom') && ($('#dateFrom').value=''); $('#dateTo') && ($('#dateTo').value=''); applyNewsFilters(); });
-
-  $('#dateFrom')?.addEventListener('change', applyNewsFilters);
-  $('#dateTo')?.addEventListener('change', applyNewsFilters);
-
-  // “Select All” behavior + any checkbox change in filters
-  $('#filters')?.addEventListener('change',e=>{
-    if (e.target.classList?.contains('select-all')){
-      const on = e.target.checked;
-      e.target.closest('.filter-options')?.querySelectorAll('input[type="checkbox"]:not(.select-all)').forEach(cb=>cb.checked=on);
-    }
-    applyNewsFilters();
+  $('#btnAccount')?.addEventListener('click', ()=>{
+    $('#drawerAccount').style.display='flex';
+    $('#drawerFilters').style.display='none';
+    document.body.classList.add('drawer-right-open','drawer-open');
   });
-
-  // Name filter live
-  $('#filterName')?.addEventListener('input', applyNewsFilters);
+  $$('.close-btn').forEach(b=>b.addEventListener('click', closeAll));
+  mask?.addEventListener('click', closeAll);
+  document.addEventListener('keydown', (e)=>{ if (e.key==='Escape') closeAll(); });
 }
 
-/* --------- CSV for live player search --------- */
-async function loadCSV(url){
-  const res = await fetch(url); if(!res.ok) throw new Error(`HTTP ${res.status}`);
-  const text = await res.text(); if(!text.trim()) throw new Error('Empty CSV');
-  const rows = text.trim().split(/\r?\n/).map(line => line.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/).map(c=>c.replace(/^"|"$/g,'')));
-  const header = rows.shift().map(h => h.trim().toLowerCase());
-  const idx = n => header.indexOf(n.toLowerCase());
-  return rows.map(r=>({
-    slug:r[idx('slug')], display_name:r[idx('display_name')],
-    first:r[idx('first')], last:r[idx('last')],
-    grad_class:r[idx('grad_class')], level:r[idx('level')],
-    letter_years:r[idx('letter_years')],
-    status:r[idx('status')]
-  }));
+/*** -------- CSV LOAD + LINESCORE RENDER -------- ***/
+async function loadStatsCSV(url){
+  const bust = '_=' + Date.now(); const sep = url.includes('?') ? '&' : '?';
+  const res = await fetch(url + sep + bust);
+  if (!res.ok) throw new Error('HTTP ' + res.status);
+  const text = await res.text();
+  const rows = text.trim().split(/\r?\n/).map(line =>
+    line.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/).map(c => c.replace(/^"|"$/g,''))
+  );
+  const header = rows.shift() || [];
+  const ixDate = pick(header, 'date','game_date');
+  const ixName = pick(header, 'player','display_name','name','player_display_name');
+  const ixOpp  = pick(header, 'opponent','opp');
+  const ixHA   = pick(header, 'home_away','ha');
+  const ixTime = pick(header, 'start_time','time');
+  const ixLine = pick(header, 'line','result','statline','summary');
+
+  const items = rows.map(r => ({
+    dateISO: toISO(safeGet(r, ixDate)),
+    name: safeGet(r, ixName).toUpperCase(),
+    opp: safeGet(r, ixOpp),
+    ha: safeGet(r, ixHA).toLowerCase(),
+    time: safeGet(r, ixTime),
+    line: safeGet(r, ixLine)
+  })).filter(x => x.name && x.dateISO);
+
+  return items;
 }
-function imageNameOf(p){
-  const first=(p.first||'').toLowerCase(), last=(p.last||'').toLowerCase();
-  return (first && last) ? `${first}_${last}` : (p.display_name||'').toLowerCase().replace(/[^a-z0-9]+/g,'-');
+function buildIndex(stats){
+  const players = Array.from(new Set(stats.map(s => s.name))).sort((a,b)=>a.localeCompare(b));
+  const byKey = new Map();
+  for (const s of stats){
+    const key = s.name + '|' + s.dateISO;
+    const prev = byKey.get(key);
+    if (!prev) byKey.set(key, [s]); else prev.push(s);
+  }
+  const weeks = WEEKS.map(w => {
+    const days = daysDesc(w.start, w.end);
+    const playersRows = players.map(pname => {
+      const dayCells = days.map(dISO => {
+        const rows = byKey.get(pname + '|' + dISO) || [];
+        if (!rows.length) return { dateISO: dISO, text: fmtMD(dISO) };
+        const merged = rows.map(r => {
+          const md = fmtMD(r.dateISO);
+          const vsAt = (r.ha && r.ha.startsWith('a')) ? '@' : 'vs';
+          if (r.line){
+            const opp = r.opp ? `${vsAt} ${r.opp}` : '';
+            return `${md} ${opp} | ${r.line}`;
+          } else {
+            const opp = r.opp ? `${vsAt} ${r.opp}` : '';
+            const time = r.time ? ` - ${r.time} ${TZ_LABEL}` : '';
+            return `${md} ${opp}${time}`;
+          }
+        }).join('; ');
+        return { dateISO: dISO, text: merged };
+      });
+      return { name: pname, days: dayCells };
+    });
+    return { label: w.label, players: playersRows };
+  });
+  return weeks;
 }
-function makeHit(p){
-  const el=document.createElement('div'); el.className='live-hit'; el.tabIndex=0;
-  const name=imageNameOf(p);
-  const hsImgJpg=`assets/img/hs_players/${name}.jpg`;
-  const hsImgPng=`assets/img/hs_players/${name}.png`;
-  el.innerHTML=`<img src="${hsImgJpg}" onerror="this.onerror=null;this.src='${hsImgPng}';" alt="">
-                <div><div style="font-weight:700">${p.display_name}</div>
-                <div style="opacity:.7;font-size:.92em">${p.level||''} • Class of ${p.grad_class||''}</div></div>`;
-  const go=()=>{ window.location.href = `./profile.html?player=${encodeURIComponent((p.slug||name))}`; };
-  el.onclick=go;
-  el.onkeyup=(e)=>{ if(e.key==='Enter' || e.key===' ') go(); };
-  return el;
+function renderWeeks(mount, weeks){
+  if (!weeks.length){ mount.innerHTML = `<p style="color:var(--muted)">No data.</p>`; return; }
+  const html = weeks.map(week => {
+    const playersHTML = week.players.map(pl => {
+      const days = pl.days.map(d => `<div>${d.text}</div>`).join('');
+      return `<div class="linescore-player"><strong>${pl.name}</strong>${days}</div>`;
+    }).join('');
+    return `<div class="linescore-week"><h4>${week.label}</h4>${playersHTML}</div>`;
+  }).join('');
+  mount.innerHTML = html;
 }
-function liveSearch(){
-  const q=($('#playerSearch')?.value||'').trim().toLowerCase();
-  const box=$('#liveResults'); if(!box) return;
-  if(!q){ box.innerHTML=''; return; }
-  const hits=(window.PLAYERS||[]).filter(p=>(p.display_name||'').toLowerCase().includes(q)).slice(0,25);
-  box.innerHTML=''; hits.forEach(p=>box.appendChild(makeHit(p)));
+function fallbackWeeks(){
+  const week = {
+    label: 'SEPT 28 - OCT 4',
+    players: [
+      { name: 'CODY BELLINGER', days: [
+        {text:'10/4 vs BOS - 5:30 PM AZ'},
+        {text:'10/3 vs BOS - 5:30 PM AZ'},
+        {text:'10/2 vs BOS | 3-4 | 2B, 2RBI, 2R, K, BB'},
+        {text:'10/1 vs CHC | 3-4 | 2B, 2RBI, 2R, K, BB'},
+        {text:'9/30 vs CHC | 3-4 | 2B, 2RBI, 2R, K, BB'},
+        {text:'9/29 vs CHC | 3-4 | 2B, 2RBI, 2R, K, BB'},
+        {text:'9/28'}
+      ]},
+      { name: 'DREW SWIFT', days: [
+        {text:'10/4 vs RIC - 5:05 PM AZ'},
+        {text:'10/3 vs RIC - 5:05 PM AZ'},
+        {text:'10/2 vs RIC | 1-3 | 2B, RBI'},
+        {text:'10/1 vs ERI | 0-4'},
+        {text:'9/30 vs ERI | 1-4'},
+        {text:'9/29 vs ERI | 2-4 | R, SB'},
+        {text:'9/28'}
+      ]}
+    ]
+  };
+  return WEEKS.map(w => ({ label: w.label.toUpperCase(), players: week.players }));
 }
 
-/* --------- News rendering + filtering --------- */
+/*** ---------------- NEWS FEED ---------------- */
 const PRO_LEVELS = new Set(['MLB','INTERNATIONAL','TRIPLE-A','AAA','DOUBLE-A','AA','HIGH-A','A+','LOW-A','A','ROOKIE','ROK','INDY']);
 const COLLEGE_LEVELS = new Set(['NCAA-D1','NCAA-D2','NCAA-D3','NAIA','JUCO']);
 let ALL_NEWS = [];
@@ -792,39 +786,23 @@ function setDateRangeDays(days){
   $('#dateTo') && ($('#dateTo').value = iso(to));
 }
 
-/* --------- Line scores rendering --------- */
-function lineRowHTML(g){
-  const cls = (g.status||'final').toLowerCase();
-  const line = (g.status==='final' && g.line) ? g.line :
-               (g.status==='inprogress') ? 'GAME IN PROGRESS' :
-               (g.status==='scheduled') ? (g.time||'TBD') : 'DNP';
-  const segs = [
-    `<span class="date">${g.date}</span>`,
-    `<span class="opp">${g.opp}</span>`,
-    `<span class="sep">|</span>`,
-    `<span class="line">${line}</span>`
-  ];
-  return `<li class="${cls}"><div class="games-line">${segs.join(' ')}</div></li>`;
-}
-function renderScores(containerSel, data){
-  const el = $(containerSel); if(!el) return;
-  if (!data?.weeks?.length){ el.innerHTML = `<p style="color:var(--muted)">No scores available.</p>`; return; }
-  el.innerHTML = data.weeks.map(week=>{
-    const playersHTML = (week.players||[]).map(p=>{
-      const gamesHTML = (p.games||[]).map(lineRowHTML).join('');
-      return `<div class="player-block">
-        <div class="player-name">${p.name}</div>
-        <ul class="games-list">${gamesHTML}</ul>
-      </div>`;
-    }).join('');
-    return `<div class="week-block">
-      <div class="week-title">${week.label}</div>
-      ${playersHTML}
-    </div>`;
-  }).join('');
-}
+/*** --------- PLAYER CSV for search + filters --------- ***/
+const PLAYER_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQcWJM6Q6hTdFnES_G5LUy4teCS-sJ5HdAc9F5HSY8DGE9egdGy8yUAe2ShT3tFm-CwUuCYeAYy_YiW/pub?gid=2028135390&single=true&output=csv";
 
-/* --------- Filters populate (optional parity with index) --------- */
+async function loadPlayerCSV(url){
+  const res = await fetch(url); if(!res.ok) throw new Error(`HTTP ${res.status}`);
+  const text = await res.text(); if(!text.trim()) throw new Error('Empty CSV');
+  const rows = text.trim().split(/\r?\n/).map(line => line.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/).map(c=>c.replace(/^"|"$/g,'')));
+  const header = rows.shift().map(h => h.trim().toLowerCase());
+  const idx = n => header.indexOf(n.toLowerCase());
+  return rows.map(r=>({
+    slug:r[idx('slug')], display_name:r[idx('display_name')],
+    first:r[idx('first')], last:r[idx('last')],
+    grad_class:r[idx('grad_class')], level:r[idx('level')],
+    letter_years:r[idx('letter_years')],
+    status:r[idx('status')]
+  }));
+}
 function populateFilters(players){
   const levels = [...new Set(players.map(p=>p.level).filter(Boolean))].sort();
   $('#filterLevels').innerHTML =
@@ -849,6 +827,30 @@ function populateFilters(players){
       statuses.map(s=>`<label><input type="checkbox" value="${s.toUpperCase()}"> ${s.toUpperCase()}</label>`).join('');
   }
 }
+function imageNameOf(p){
+  const first=(p.first||'').toLowerCase(), last=(p.last||'').toLowerCase();
+  return (first && last) ? `${first}_${last}` : (p.display_name||'').toLowerCase().replace(/[^a-z0-9]+/g,'-');
+}
+function makeHit(p){
+  const el=document.createElement('div'); el.className='live-hit'; el.tabIndex=0;
+  const name=imageNameOf(p);
+  const hsImgJpg=`assets/img/hs_players/${name}.jpg`;
+  const hsImgPng=`assets/img/hs_players/${name}.png`;
+  el.innerHTML=`<img src="${hsImgJpg}" onerror="this.onerror=null;this.src='${hsImgPng}';" alt="">
+                <div><div style="font-weight:700">${p.display_name}</div>
+                <div style="opacity:.7;font-size:.92em">${p.level||''} • Class of ${p.grad_class||''}</div></div>`;
+  const go=()=>{ window.location.href = `./profile.html?player=${encodeURIComponent((p.slug||name))}`; };
+  el.onclick=go;
+  el.onkeyup=(e)=>{ if(e.key==='Enter' || e.key===' ') go(); };
+  return el;
+}
+function liveSearch(){
+  const q=($('#playerSearch')?.value||'').trim().toLowerCase();
+  const box=$('#liveResults'); if(!box) return;
+  if(!q){ box.innerHTML=''; return; }
+  const hits=(window.PLAYERS||[]).filter(p=>(p.display_name||'').toLowerCase().includes(q)).slice(0,25);
+  box.innerHTML=''; hits.forEach(p=>box.appendChild(makeHit(p)));
+}
 function resetFilters(){
   $$('#filters input').forEach(i=>{
     if(i.type==='checkbox') i.checked=false;
@@ -857,48 +859,38 @@ function resetFilters(){
   $$('#filterStatus input[value^="ACTIVE"]').forEach(i=>i.checked=true);
 }
 
-/* --------- Boot --------- */
+/*** ----------------- BOOT ----------------- ***/
 document.addEventListener('DOMContentLoaded', async ()=>{
-  // Splash logic (skipped if no element)
-  const splash = $('#splashScreen');
-  if (splash) {
-    let splashShown = false;
-    try {
-      splashShown = sessionStorage.getItem('splashShown') === 'true';
-    } catch (e) {
-      // Ignore
-    }
-    if (splashShown) {
-      splash.style.display = 'none';
-    } else {
-      setTimeout(() => {
-        splash.classList.add('is-hidden');
-        splash.addEventListener('transitionend', (e) => {
-          if (e.target === splash) splash.style.display = 'none';
-        }, { once: true });
-      }, 1800);
-      try {
-        sessionStorage.setItem('splashShown', 'true');
-      } catch (e) {
-        // Ignore
-      }
-    }
-  }
-
   setupTheme();
-  setupEventListeners();
+  setupDrawers();
   setStickyTop();
+  window.addEventListener('resize', setStickyTop);
 
-  // CSV for search drawer and filters
+  // Filters interaction (checkbox select-all and name search live)
+  $('#filters')?.addEventListener('change',e=>{
+    if (e.target.classList?.contains('select-all')){
+      const on = e.target.checked;
+      e.target.closest('.filter-options')?.querySelectorAll('input[type="checkbox"]:not(.select-all)').forEach(cb=>cb.checked=on);
+    }
+    applyNewsFilters();
+  });
+  $('#filterName')?.addEventListener('input', applyNewsFilters);
+  $('#quick7')?.addEventListener('click', (e)=>{ e.preventDefault(); setDateRangeDays(7); applyNewsFilters(); });
+  $('#quick30')?.addEventListener('click', (e)=>{ e.preventDefault(); setDateRangeDays(30); applyNewsFilters(); });
+  $('#clearDates')?.addEventListener('click', (e)=>{ e.preventDefault(); $('#dateFrom').value=''; $('#dateTo').value=''; applyNewsFilters(); });
+  $('#filtersReset')?.addEventListener('click', (e)=>{ e.preventDefault(); resetFilters(); applyNewsFilters(); });
+  $('#filtersReset2')?.addEventListener('click', (e)=>{ e.preventDefault(); resetFilters(); applyNewsFilters(); });
+
+  // Load players CSV for search and filters
   let players = [];
   try{
-    players = await loadCSV(CSV_URL);
+    players = await loadPlayerCSV(PLAYER_CSV_URL);
     window.PLAYERS = players;
     populateFilters(players);
     $('#playerSearch')?.addEventListener('input', debounce(liveSearch, 200));
   }catch{ /* silent */ }
 
-  // Load news
+  // Load headlines (demo JSON inline to guarantee visuals)
   try{
     const raw = $('#news-json')?.textContent || '{}';
     const data = JSON.parse(raw);
@@ -906,13 +898,17 @@ document.addEventListener('DOMContentLoaded', async ()=>{
   }catch{ ALL_NEWS = []; }
   applyNewsFilters();
 
-  // Load scores (unfiltered)
-  let scores;
+  // Load linescores from CSV or fallback
+  const mount = $('#scoresMount');
   try{
-    const raw = $('#scores-json')?.textContent || '{}';
-    scores = JSON.parse(raw);
-  }catch{ scores = { weeks:[] }; }
-  renderScores('#scoresMount', scores);
+    if (!STATS_CSV_URL || STATS_CSV_URL.startsWith('REPLACE_')) throw new Error('Set STATS_CSV_URL');
+    const stats = await loadStatsCSV(STATS_CSV_URL);
+    const weeks = buildIndex(stats);
+    renderWeeks(mount, weeks);
+  }catch(err){
+    console.error('Linescore load failed:', err);
+    renderWeeks(mount, fallbackWeeks());
+  }
 });
 </script>
 </body>
