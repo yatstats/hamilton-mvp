@@ -381,31 +381,31 @@ body.light-theme .drawer-footer{background:rgba(255,255,255,.8)}
 <script>
 /*** ---------------- CONFIG ---------------- ***/
 const STATS_CSV_URL = 'REPLACE_WITH_YOUR_PUBLISHED_STATS_CSV_URL';
+
 const WEEKS = [
   { label: 'Sept 28 - Oct 4', start: '2025-09-28', end: '2025-10-04' },
   { label: 'Sept 21 - 27', start: '2025-09-21', end: '2025-09-27' },
   { label: 'Sept 14 - 20', start: '2025-09-14', end: '2025-09-20' },
-  { label: 'Sept 7 - 13', start: '2025-09-07', end: '2025-09-13' },
+  { label: 'Sept 7 - 13',  start: '2025-09-07', end: '2025-09-13' },
   { label: 'Aug 31 - Sept 6', start: '2025-08-31', end: '2025-09-06' },
   { label: 'Aug 24 - 30', start: '2025-08-24', end: '2025-08-30' }
 ];
 const TZ_LABEL = 'AZ';
 
 /*** --------------- SMALL UTILS --------------- ***/
-const $  = s => document.querySelector(s);
+const $ = s => document.querySelector(s);
 const $$ = s => Array.from(document.querySelectorAll(s));
 function toISO(d){ const t = new Date(d); if (isNaN(t)) return null; return t.toISOString().slice(0,10); }
 function fmtMD(d){ const t = new Date(d); if (isNaN(t)) return ''; return (t.getMonth()+1) + '/' + t.getDate(); }
 function daysDesc(startISO, endISO){ const a = new Date(startISO), b = new Date(endISO), out = []; for (let t = new Date(b); t >= a; t.setDate(t.getDate()-1)) out.push(toISO(t)); return out; }
-function safeGet(row, idx){ return (idx>=0 && idx<row.length) ? row[idx].trim() : ''; }
+function safeGet(row, idx){ return (idx>=0 && idx<row.length) ? (row[idx]||'').trim() : ''; }
 function pick(header, ...cands){
-  const lc = header.map(h => h.toLowerCase());
-  for (const c of cands){ const i = lc.indexOf(c.toLowerCase()); if (i !== -1) return i; }
-  for (let i=0;i<lc.length;i++){ if (cands.some(c => lc[i].includes(c.toLowerCase()))) return i; }
+  const lc = header.map(h => (h||'').toLowerCase());
+  for (const c of cands){ const i = lc.indexOf(String(c).toLowerCase()); if (i !== -1) return i; }
+  for (let i=0;i<lc.length;i++){ if (cands.some(c => lc[i].includes(String(c).toLowerCase()))) return i; }
   return -1;
 }
-
-/* Helpers used by the filter drawer */
+/* Filters helpers (from News1) */
 function setDateRangeDays(days){
   const to = new Date(); const from = new Date(); from.setDate(to.getDate()-days);
   const iso = d => d.toISOString().slice(0,10);
@@ -418,7 +418,7 @@ function resetFilters(){
     if (i.type==='checkbox') i.checked=false;
     if (i.type==='text' || i.type==='date') i.value='';
   });
-  // optional: default some statuses on
+  // optional: default ACTIVE statuses on
   $$('#filterStatus input[value^="ACTIVE"]').forEach(i=>i.checked=true);
 }
 
@@ -449,13 +449,13 @@ function setupDrawers(){
   $('#btnMenu')?.addEventListener('click', ()=>{ document.body.classList.add('drawer-left-open','drawer-open'); });
   $('#openSearch')?.addEventListener('click', ()=>{ document.body.classList.add('drawer-left-open','drawer-open'); });
   $('#openFilters')?.addEventListener('click', ()=>{
-    $('#drawerFilters').style.display='flex';
-    $('#drawerAccount').style.display='none';
+    const f = $('#drawerFilters'); if (f) f.style.display='flex';
+    const a = $('#drawerAccount'); if (a) a.style.display='none';
     document.body.classList.add('drawer-right-open','drawer-open');
   });
   $('#btnAccount')?.addEventListener('click', ()=>{
-    $('#drawerAccount').style.display='flex';
-    $('#drawerFilters').style.display='none';
+    const a = $('#drawerAccount'); if (a) a.style.display='flex';
+    const f = $('#drawerFilters'); if (f) f.style.display='none';
     document.body.classList.add('drawer-right-open','drawer-open');
   });
   $$('.close-btn').forEach(b=>b.addEventListener('click', closeAll));
@@ -562,7 +562,7 @@ function fallbackWeeks(){
   return WEEKS.map(w => ({ label: w.label, players: week.players }));
 }
 
-/*** ---------------- NEWS FEED ---------------- */
+/*** ---------------- NEWS FEED + FILTERS ---------------- */
 const PRO_LEVELS = new Set(['MLB','INTERNATIONAL','TRIPLE-A','AAA','DOUBLE-A','AA','HIGH-A','A+','LOW-A','A','ROOKIE','ROK','INDY']);
 const COLLEGE_LEVELS = new Set(['NCAA-D1','NCAA-D2','NCAA-D3','NAIA','JUCO']);
 let ALL_NEWS = [];
@@ -598,20 +598,16 @@ function newsCardHTML(n){
   </article>`;
 }
 function renderNewsLists(){
-  // current selections
   const nameQ = ($('#filterName')?.value || '').trim().toLowerCase();
 
-  // date range (headlines only)
   const from = $('#dateFrom')?.value ? new Date($('#dateFrom').value) : null;
   const to   = $('#dateTo')?.value ? new Date($('#dateTo').value + 'T23:59:59') : null;
 
-  // gather checkbox selections if those groups exist
   const selected = selector => {
     const box = document.querySelector(selector);
-    if (!box) return null; // group not present -> ignore
-    const picks = Array.from(box.querySelectorAll('input[type="checkbox"]:not(.select-all):checked'))
-      .map(i=>i.value);
-    return picks.length ? new Set(picks) : null; // empty => no filter
+    if (!box) return null;
+    const picks = Array.from(box.querySelectorAll('input[type="checkbox"]:not(.select-all):checked')).map(i=>i.value);
+    return picks.length ? new Set(picks) : null;
   };
   const selStatus = selected('#filterStatus');
   const selLevels = selected('#filterLevels');
@@ -658,7 +654,7 @@ document.addEventListener('DOMContentLoaded', async ()=>{
   setStickyTop();
   window.addEventListener('resize', setStickyTop);
 
-  // Filter drawer wiring
+  /* Wire up News1-style filters */
   $('#quick7')?.addEventListener('click', (e)=>{ e.preventDefault(); setDateRangeDays(7);  applyNewsFilters(); });
   $('#quick30')?.addEventListener('click', (e)=>{ e.preventDefault(); setDateRangeDays(30); applyNewsFilters(); });
   $('#clearDates')?.addEventListener('click', (e)=>{ e.preventDefault(); if($('#dateFrom')) $('#dateFrom').value=''; if($('#dateTo')) $('#dateTo').value=''; applyNewsFilters(); });
@@ -668,9 +664,9 @@ document.addEventListener('DOMContentLoaded', async ()=>{
 
   // Reset buttons (top-right + drawer)
   $('#filtersReset')?.addEventListener('click', (e)=>{ e.preventDefault(); resetFilters(); applyNewsFilters(); });
-  $('#filtersReset2')?.addEventListener('click', ()=>{ resetFilters(); applyNewsFilters(); });
+  $('#filtersReset2')?.addEventListener('click', (e)=>{ e.preventDefault(); resetFilters(); applyNewsFilters(); });
 
-  // “Select All” behavior + any checkbox change
+  // “Select All” groups + any checkbox change
   $('#filters')?.addEventListener('change', e=>{
     if (e.target.classList?.contains('select-all')){
       const on = e.target.checked;
@@ -687,7 +683,7 @@ document.addEventListener('DOMContentLoaded', async ()=>{
   }catch{ ALL_NEWS = []; }
   renderNewsLists();
 
-  // Load linescores from CSV or fallback (no red banner)
+  // Line scores: CSV or fallback
   const mount = document.getElementById('scoresMount');
   try{
     if (!STATS_CSV_URL || STATS_CSV_URL.startsWith('REPLACE_')) throw new Error('Set STATS_CSV_URL');
