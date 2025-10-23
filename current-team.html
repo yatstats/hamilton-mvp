@@ -1,7 +1,3 @@
-Got it. I took your latest page, baked in the “no-wrap” + consistent gutters, removed the fallback warning, and made the right linescore column wider across all breakpoints (so the lines don’t get clipped). I also kept the news cards’ proportions intact.
-
-Paste this whole thing over your current file:
-
 <!doctype html>
 <html lang="en">
 <head>
@@ -468,6 +464,24 @@ function pick(header, ...cands){
   for (const c of cands){ const i = lc.indexOf(c.toLowerCase()); if (i !== -1) return i; }
   for (let i=0;i<lc.length;i++){ if (cands.some(c => lc[i].includes(c.toLowerCase()))) return i; }
   return -1;
+
+function setDateRangeDays(days){
+  const to = new Date(); const from = new Date(); from.setDate(to.getDate()-days);
+  const iso = d => d.toISOString().slice(0,10);
+  if ($('#dateFrom')) $('#dateFrom').value = iso(from);
+  if ($('#dateTo')) $('#dateTo').value = iso(to);
+}
+function applyNewsFilters(){ renderNewsLists(); }
+function resetFilters(){
+  $$('#filters input').forEach(i=>{
+    if (i.type==='checkbox') i.checked=false;
+    if (i.type==='text' || i.type==='date') i.value='';
+  });
+  // optional: default some statuses on
+  $$('#filterStatus input[value^="ACTIVE"]').forEach(i=>i.checked=true);
+}
+
+
 }
 
 /*** ------------- THEME + DRAWERS ------------- ***/
@@ -646,11 +660,58 @@ function newsCardHTML(n){
   </article>`;
 }
 function renderNewsLists(){
-  const items = ALL_NEWS.slice().sort((a,b)=> new Date(b.publishedAt||0)-new Date(a.publishedAt||0));
+  // current selections
+  const nameQ = ($('#filterName')?.value || '').trim().toLowerCase();
+
+  // date range (headlines only)
+  const from = $('#dateFrom')?.value ? new Date($('#dateFrom').value) : null;
+  const to   = $('#dateTo')?.value ? new Date($('#dateTo').value + 'T23:59:59') : null;
+
+  // gather checkbox selections if those groups exist
+  const selected = ids => {
+    const box = $(ids);
+    if (!box) return null; // group not present -> ignore
+    const picks = Array.from(box.querySelectorAll('input[type="checkbox"]:not(.select-all):checked'))
+      .map(i=>i.value);
+    return picks.length ? new Set(picks) : null; // empty => no filter
+  };
+  const selStatus = selected('#filterStatus');
+  const selLevels = selected('#filterLevels');
+  const selGrad   = selected('#filterGradClass');
+  const selRoster = selected('#filterRosterYear');
+
+  const inDate = d => {
+    if (!from && !to) return true;
+    const t = new Date(d || 0);
+    if (from && t < from) return false;
+    if (to && t > to) return false;
+    return true;
+  };
+
+  const items = (ALL_NEWS || []).filter(n=>{
+    const title = (n.title||'').toLowerCase();
+    const player = (n.player_display_name||'').toLowerCase();
+    const level = String(n.tags?.level||'').toUpperCase();
+    const status = String(n.tags?.status||'').toUpperCase();
+    const grad = String(n.tags?.grad_class||'');
+    const roster = String(n.tags?.roster_year||'');
+
+    if (nameQ && !title.includes(nameQ) && !player.includes(nameQ)) return false;
+    if (!inDate(n.publishedAt)) return false;
+    if (selLevels && !selLevels.has(level)) return false;
+    if (selStatus && !selStatus.has(status)) return false;
+    if (selGrad && !selGrad.has(grad)) return false;
+    if (selRoster && !selRoster.has(roster)) return false;
+
+    return true;
+  }).sort((a,b)=> new Date(b.publishedAt||0)-new Date(a.publishedAt||0));
+
+  // reuse your existing constants
   const pros = items.filter(n=> PRO_LEVELS.has(String(n.tags?.level||'').toUpperCase()) );
   const college = items.filter(n=> COLLEGE_LEVELS.has(String(n.tags?.level||'').toUpperCase()) );
-  $('#proFeed').innerHTML = pros.length ? pros.map(newsCardHTML).join('') : `<p style="color:var(--muted)">No pro headlines.</p>`;
-  $('#collegeFeed').innerHTML = college.length ? college.map(newsCardHTML).join('') : `<p style="color:var(--muted)">No college headlines.</p>`;
+
+  $('#proFeed').innerHTML = pros.length ? pros.map(newsCardHTML).join('') : `<p style="color:var(--muted)">No pro headlines in range.</p>`;
+  $('#collegeFeed').innerHTML = college.length ? college.map(newsCardHTML).join('') : `<p style="color:var(--muted)">No college headlines in range.</p>`;
 }
 
 /*** ----------------- BOOT ----------------- ***/
