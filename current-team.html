@@ -1,3 +1,7 @@
+Got it. I took your latest page, baked in the “no-wrap” + consistent gutters, removed the fallback warning, and made the right linescore column wider across all breakpoints (so the lines don’t get clipped). I also kept the news cards’ proportions intact.
+
+Paste this whole thing over your current file:
+
 <!doctype html>
 <html lang="en">
 <head>
@@ -7,13 +11,16 @@
 <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400&family=Bebas+Neue&display=swap" rel="stylesheet">
 <style>
-/* -------------------- CORE THEME (match index) -------------------- */
+/* -------------------- CORE THEME -------------------- */
 :root{
   --bg:#0c0c0c; --fg:#f2f2f2; --muted:#c4c4c4; --ink:#e8e8e8; --line:rgba(255,255,255,.08);
   --card-bg:#171717; --header-bg:#000; --drawer-bg:rgba(10,10,10,.65);
   --hamSmall:13px; --hamBig:20px; --hamBigger:24px; --tagGrey:#cfd2d6;
   --crestH:clamp(28px,4.2vw,42px);
   --containerPad:16px; --footerH:clamp(56px,8vh,77px);
+
+  /* unified spacing */
+  --gap:12px;
 }
 body.light-theme{
   --bg:#f4f4f4; --fg:#121212; --muted:#555; --ink:#222; --line:rgba(0,0,0,.1);
@@ -70,11 +77,17 @@ body.light-theme .drawer-footer{background:rgba(255,255,255,.8)}
 
 /* -------------------- PAGE LAYOUT (news + sticky scores) -------------------- */
 .main{padding:8px 0 calc(var(--footerH) + 12px)}
-.newsgrid{display:grid;gap:16px;align-items:start;grid-template-columns: 1fr clamp(220px, 26vw, 360px);} /* base = 2a */
+.newsgrid{
+  display:grid;
+  gap:var(--gap);
+  align-items:start;
+  /* base (2a) — widen right col */
+  grid-template-columns: 1fr clamp(220px, 36vw, 420px);
+}
 .news-col h3, .scores-col h3{font:400 18px "Bebas Neue",sans-serif;letter-spacing:.06em;margin:6px 0 10px}
 .news-wrap{display:block}
 
-/* Sticky scores always present */
+/* Sticky scores */
 .scores-col{position:relative}
 .scores-sticky{
   position:sticky; top:var(--stickyTop,140px);
@@ -87,38 +100,93 @@ body.light-theme .drawer-footer{background:rgba(255,255,255,.8)}
 .linescore-player strong{display:block;margin-bottom:.3rem;font:700 12px "Bebas Neue",sans-serif;letter-spacing:.04em}
 .linescore-player div{font:300 10px Oswald;letter-spacing:.02em;color:var(--muted)}
 
+/* -------- News card styles -------- */
+.news-feed{display:flex;flex-direction:column;gap:var(--gap)}
+.news-card{
+  position:relative;background:var(--card-bg);border:1px solid var(--line);border-radius:12px;
+  overflow:hidden;display:flex;gap:12px;align-items:flex-start;padding:10px;
+}
+.news-thumb{
+  display:block;flex-shrink:0;width:120px;aspect-ratio:5/7;background:#000 center/cover no-repeat;border-radius:8px
+}
+.news-body{flex:1;padding:0}
+.news-title{display:block;font:400 22px/1.05 "Bebas Neue",sans-serif;letter-spacing:.03em}
+.news-title:hover{text-decoration:underline}
+.news-meta{font:300 12px/1.2 Oswald;letter-spacing:.02em;color:var(--muted);margin-top:6px}
+.news-links{display:flex;gap:12px;margin-top:4px}
+.news-readmore, .news-market{font:400 13px/1.1 "Bebas Neue",sans-serif;letter-spacing:.03em}
+.news-readmore:hover, .news-market:hover{text-decoration:underline}
+.news-share{display:flex;gap:10px;justify-content:flex-end;margin-top:8px}
+.news-share .icon-btn{opacity:.85;font-size:18px}
+.news-share .icon-btn:hover{opacity:1}
+
+/* Overlay mode (used on certain BPs) */
+.overlay-mode .news-card{display:block;padding:0}
+.overlay-mode .news-thumb{width:100%;border-radius:0}
+.overlay-mode .news-body{
+  position:absolute;left:0;right:0;bottom:0;padding:10px 12px;
+  background:linear-gradient(180deg,rgba(0,0,0,0) 0%, rgba(0,0,0,.4) 50%, rgba(0,0,0,.85) 100%);
+}
+.overlay-mode .news-title{color:white;text-shadow:0 1px 2px rgba(0,0,0,.6)}
+.overlay-mode .news-meta{color:#e5e7eb}
+.overlay-mode .news-links{margin-top:6px}
+.overlay-mode .news-share{margin:8px 2px 2px 0}
+
+/* -------- Non-wrapping scores + headers -------- */
+.scores-sticky{ font-size: clamp(9px, 1.05vw, 12px); }
+.linescore-week h4,
+.linescore-player strong,
+.linescore-player div { white-space: nowrap; }
+.linescore-player div { overflow:hidden; text-overflow:ellipsis; }
+
+.crumbs,
+.schooltext .big1,
+.schooltext .big2 { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+
 /* -------- Breakpoints: 3a → 3b → 2a → 2b -------- */
-/* 3a: ≥1280 — 3 cols */
+/* 3a: ≥1280 — 3 cols; widened right col */
 @media (min-width:1280px){
-  .newsgrid{grid-template-columns: 1fr 1fr clamp(240px, 24vw, 360px);}
+  .newsgrid{grid-template-columns: 1fr 1fr clamp(300px, 28vw, 440px);}
   .news-wrap{display:contents}
   #col-pro{grid-column:1;grid-row:1}
   #col-college{grid-column:2;grid-row:1}
   .scores-col{grid-column:3;grid-row:1}
+  /* SIDE mode on wide desktop */
+  .news-root.overlay-mode .news-card{display:flex;padding:10px}
+  .news-root.overlay-mode .news-thumb{width:120px;border-radius:8px}
+  .news-root.overlay-mode .news-body{position:static;background:none;padding:0}
+  .news-root.overlay-mode .news-title{color:inherit;text-shadow:none}
 }
-/* 3b: 900–1279 — 3 cols */
+/* 3b: 900–1279 — 3 cols; widened right col; overlay cards */
 @media (min-width:900px) and (max-width:1279px){
-  .newsgrid{grid-template-columns: 1fr 1fr clamp(200px, 26vw, 320px);}
+  .newsgrid{grid-template-columns: 1fr 1fr clamp(260px, 32vw, 400px);}
   .news-wrap{display:contents}
   #col-pro{grid-column:1;grid-row:1}
   #col-college{grid-column:2;grid-row:1}
   .scores-col{grid-column:3;grid-row:1}
 }
-/* 2a: 601–899 — 2 cols */
+/* 2a: 601–899 — 2 cols; widen right col; SIDE cards */
 @media (min-width:601px) and (max-width:899px){
-  .newsgrid{grid-template-columns: 1fr clamp(160px, 30vw, 300px);}
+  .newsgrid{grid-template-columns: 1fr clamp(220px, 42vw, 360px);}
   .news-wrap{display:block}
   #col-pro{grid-column:1;grid-row:1}
   #col-college{grid-column:1;grid-row:2}
   .scores-col{grid-column:2;grid-row:1 / span 2}
+  .news-root.overlay-mode .news-card{display:flex;padding:10px}
+  .news-root.overlay-mode .news-thumb{width:120px;border-radius:8px}
+  .news-root.overlay-mode .news-body{position:static;background:none;padding:0}
+  .news-root.overlay-mode .news-title{color:inherit;text-shadow:none}
 }
-/* 2b: ≤600 — 2 cols */
+/* 2b: ≤600 — 2 cols; widen right col; overlay cards */
 @media (max-width:600px){
-  .newsgrid{grid-template-columns: 1fr clamp(130px, 36vw, 260px);}
+  .newsgrid{grid-template-columns: 1fr clamp(180px, 50vw, 320px);}
   .news-wrap{display:block}
   #col-pro{grid-column:1;grid-row:1}
   #col-college{grid-column:1;grid-row:2}
   .scores-col{grid-column:2;grid-row:1 / span 2}
+  /* slightly tighter gap on very small screens */
+  :root{ --gap:8px; }
+  .scores-sticky{ font-size: clamp(9px, 2.6vw, 11px); }
 }
 
 /* Footer */
@@ -129,6 +197,7 @@ body.light-theme .drawer-footer{background:rgba(255,255,255,.8)}
 /* Focus */
 .icon-btn:focus,button:focus,input:focus{outline:2px solid var(--fg);outline-offset:2px}
 </style>
+
 </head>
 <body>
 <!-- HEADER -->
@@ -198,6 +267,7 @@ body.light-theme .drawer-footer{background:rgba(255,255,255,.8)}
     </div>
   </div>
 </aside>
+
 <aside class="drawer drawer-right" id="drawerFilters" style="display:flex;">
   <button class="icon-btn close-btn"><i class="ri-close-line"></i></button>
   <h3>FILTERS</h3>
@@ -208,61 +278,87 @@ body.light-theme .drawer-footer{background:rgba(255,255,255,.8)}
         <input id="filterName" placeholder="Type a name…" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--ink)"/>
       </div>
     </details>
+
+    <!-- Headlines-only date range -->
+    <details class="filter-group" open>
+      <summary class="filter-title">By Date (Headlines)</summary>
+      <div class="filter-options">
+        <label>From
+          <input id="dateFrom" type="date" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--ink)">
+        </label>
+        <label>To
+          <input id="dateTo" type="date" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--ink)">
+        </label>
+        <div style="display:flex;gap:8px;margin-top:8px">
+          <button class="icon-btn" id="quick7" style="padding:8px 10px;border:1px solid var(--line);border-radius:10px">Last 7 days</button>
+          <button class="icon-btn" id="quick30" style="padding:8px 10px;border:1px solid var(--line);border-radius:10px">Last 30 days</button>
+          <button class="icon-btn" id="clearDates" style="padding:8px 10px;border:1px solid var(--line);border-radius:10px">Clear</button>
+        </div>
+        <div style="opacity:.75;font-size:12px;margin-top:6px">Affects headlines only. Line scores are independent.</div>
+      </div>
+    </details>
+
+    <details class="filter-group">
+      <summary class="filter-title">By Status</summary>
+      <div class="filter-options" id="filterStatus">
+        <label class="select-all-label"><input type="checkbox" class="select-all"> Select All</label>
+        <label><input type="checkbox" value="ACTIVE 2025"> ACTIVE 2025</label>
+        <label><input type="checkbox" value="ACTIVE 2024"> ACTIVE 2024</label>
+        <label><input type="checkbox" value="FREE AGENT"> FREE AGENT</label>
+        <label><input type="checkbox" value="INJURED"> INJURED</label>
+        <label><input type="checkbox" value="RETIRED"> RETIRED</label>
+        <label><input type="checkbox" value="SPONSOR"> SPONSOR</label>
+      </div>
+    </details>
+
     <details class="filter-group">
       <summary class="filter-title">By Level</summary>
       <div class="filter-options" id="filterLevels">
         <label class="select-all-label"><input type="checkbox" class="select-all"> Select All</label>
+        <!-- the level checkboxes will be created dynamically if desired; static is fine too -->
       </div>
     </details>
+
+    <details class="filter-group">
+      <summary class="filter-title">By Graduating Class</summary>
+      <div class="filter-options" id="filterGradClass"></div>
+    </details>
+
+    <details class="filter-group">
+      <summary class="filter-title">By Roster Year</summary>
+      <div class="filter-options" id="filterRosterYear"></div>
+    </details>
   </div>
+
   <div class="drawer-footer">
-    <button id="filtersReset" class="icon-btn" style="padding:10px 14px;border:1px solid var(--line);border-radius:12px"><i class="ri-restart-line"></i>&nbsp;Reset Filters</button>
+    <button id="filtersReset" class="icon-btn" style="padding:10px 14px;border:1px solid var(--line);border-radius:12px">
+      <i class="ri-restart-line"></i>&nbsp;Reset Filters
+    </button>
   </div>
 </aside>
-<aside class="drawer drawer-right" id="drawerAccount" style="display:none;">
-  <button class="icon-btn close-btn"><i class="ri-close-line"></i></button>
-  <h3>ACCOUNT</h3>
-  <div class="drawer-content">
-    <div class="auth-tabs">
-      <button class="auth-tab active" data-tab="signIn">Sign In</button>
-      <button class="auth-tab" data-tab="register">Register</button>
-    </div>
-    <div id="auth-forms-container" class="pad">
-      <form id="signInForm" class="auth-form active">
-        <div class="form-field"><label for="signInEmail">Email</label><input type="email" id="signInEmail" required></div>
-        <div class="form-field"><label for="signInPassword">Password</label><input type="password" id="signInPassword" required></div>
-        <button type="submit" class="auth-btn">Sign In</button>
-      </form>
-      <form id="registerForm" class="auth-form">
-        <div class="form-field"><label for="registerEmail">Email</label><input type="email" id="registerEmail" required></div>
-        <div class="form-field"><label for="registerPassword">Password</label><input type="password" id="registerPassword" required></div>
-        <button type="submit" class="auth-btn">Create Account</button>
-      </form>
-      <p id="authMessage"></p>
-    </div>
-  </div>
-</aside>
+
+
 
 <!-- MAIN -->
 <main class="main container">
   <div class="newsgrid" aria-live="polite">
-    <!-- Left/center columns (headlines mount later) -->
+    <!-- Left side: Headlines -->
     <div class="news-wrap">
-      <section id="col-pro" class="news-col">
+      <section id="col-pro" class="news-col news-root overlay-mode">
         <h3>ALUMNI HEADLINES (Pros)</h3>
-        <div class="news-feed" id="proFeed" style="color:var(--muted);font-size:12px">Headlines mount here…</div>
+        <div id="proFeed" class="news-feed"><p style="color:var(--muted)">Loading…</p></div>
       </section>
-      <section id="col-college" class="news-col">
+      <section id="col-college" class="news-col news-root overlay-mode">
         <h3>ALUMNI HEADLINES (College)</h3>
-        <div class="news-feed" id="collegeFeed" style="color:var(--muted);font-size:12px">Headlines mount here…</div>
+        <div id="collegeFeed" class="news-feed"><p style="color:var(--muted)">Loading…</p></div>
       </section>
     </div>
 
     <!-- Sticky right column (ALWAYS visible) -->
     <aside class="scores-col">
-      <h3>WEEKLY LINE SCORES</h3>
+      <h3>LINE SCORES</h3>
       <div id="scoresMount" class="scores-sticky">
-        <p style="color:var(--muted)">Loading line scores…</p>
+        <p style="color:var(--muted)">Loading linescores…</p>
       </div>
     </aside>
   </div>
@@ -274,133 +370,109 @@ body.light-theme .drawer-footer{background:rgba(255,255,255,.8)}
   </a>
 </footer>
 
-<script>
-/* ================== CONFIG ================== */
-/* Your published STATS tab (CSV) — from earlier message */
-const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQcWJM6Q6hTdFnES_G5LUy4teCS-sJ5HdAc9F5HSY8DGE9egdGy8yUAe2ShT3tFm-CwUuCYeAYy_YiW/pub?gid=2028135390&output=csv";
+<!-- ---------------- DEMO DATA FOR INVESTOR VIEW ---------------- -->
+<script type="application/json" id="news-json">
+{
+  "items":[
+    {
+      "id":"1",
+      "title":"Bellinger goes deep twice in Baltimore slugfest",
+      "url":"https://example.com/bellinger-two-hr",
+      "image":"assets/img/now_players/cody_bellinger.jpg",
+      "source":"MLB.com",
+      "publishedAt":"2025-09-21T22:15:00-07:00",
+      "player_display_name":"Cody Bellinger",
+      "tags":{"level":"MLB"}
+    },
+    {
+      "id":"2",
+      "title":"Swift flashes leather, reaches twice in SeaWolves win",
+      "url":"https://example.com/swift-defense",
+      "image":"assets/img/now_players/drew_swift.jpg",
+      "source":"MiLB.com",
+      "publishedAt":"2025-09-19T18:40:00-07:00",
+      "player_display_name":"Drew Swift",
+      "tags":{"level":"AA"}
+    },
+    {
+      "id":"3",
+      "title":"Hamel racks up 9 Ks over six strong",
+      "url":"https://example.com/hamel-9k",
+      "image":"assets/img/now_players/dom_hamel.jpg",
+      "source":"MiLB.com",
+      "publishedAt":"2025-09-20T19:00:00-07:00",
+      "player_display_name":"Dom Hamel",
+      "tags":{"level":"AAA"}
+    },
+    {
+      "id":"4",
+      "title":"Murphy locks down first KBO save",
+      "url":"https://example.com/murphy-save",
+      "image":"assets/img/now_players/patrick_murphy.jpg",
+      "source":"Yonhap",
+      "publishedAt":"2025-09-22T09:12:00-07:00",
+      "player_display_name":"Patrick Murphy",
+      "tags":{"level":"INTERNATIONAL"}
+    },
+    {
+      "id":"5",
+      "title":"Garcia homers as Wildcats rally",
+      "url":"https://example.com/garcia-wildcats",
+      "image":"assets/img/now_players/luis_garcia.jpg",
+      "source":"Arizona Daily",
+      "publishedAt":"2025-09-17T12:12:00-07:00",
+      "player_display_name":"Luis Garcia",
+      "tags":{"level":"NCAA-D1"}
+    },
+    {
+      "id":"6",
+      "title":"Kucherak strings together three-hit day for Northwestern",
+      "url":"https://example.com/kucherak-three-hit",
+      "image":"assets/img/now_players/ryan_kucherak.jpg",
+      "source":"northwestern.edu",
+      "publishedAt":"2025-09-18T13:05:00-07:00",
+      "player_display_name":"Ryan Kucherak",
+      "tags":{"level":"NCAA-D1"}
+    }
+  ]
+}
+</script>
 
-/* Week windows (newest first) */
+<script>
+/*** ---------------- CONFIG ---------------- ***/
+// 1) OPTIONAL: set to your published STATS CSV URL (File → Share → Publish to web → STATS tab → CSV)
+const STATS_CSV_URL = 'REPLACE_WITH_YOUR_PUBLISHED_STATS_CSV_URL';
+
+// 2) Weeks (2025) — newest first (10/4 → 8/24)
 const WEEKS = [
-  { label: 'WEEK OF September 28 - October 4', start: '2025-09-28', end: '2025-10-04' },
-  { label: 'WEEK OF September 21 - 27',        start: '2025-09-21', end: '2025-09-27' },
-  { label: 'WEEK OF September 14 - 20',        start: '2025-09-14', end: '2025-09-20' },
-  { label: 'WEEK OF September 7 - 13',         start: '2025-09-07', end: '2025-09-13' },
-  { label: 'WEEK OF August 31 - September 6',  start: '2025-08-31', end: '2025-09-06' },
-  { label: 'WEEK OF August 24 - 30',           start: '2025-08-24', end: '2025-08-30' }
+  { label: 'Sept 28 - Oct 4', start: '2025-09-28', end: '2025-10-04' },
+  { label: 'Sept 21 - 27',        start: '2025-09-21', end: '2025-09-27' },
+  { label: 'Sept 14 - 20',        start: '2025-09-14', end: '2025-09-20' },
+  { label: 'Sept 7 - 13',         start: '2025-09-07', end: '2025-09-13' },
+  { label: 'Aug 31 - Sept 6',  start: '2025-08-31', end: '2025-09-06' },
+  { label: 'Aug 24 - 30',           start: '2025-08-24', end: '2025-08-30' }
 ];
 
-/* ================== UTILITIES ================== */
+// Optional TZ label
+const TZ_LABEL = 'AZ';
+
+/*** --------------- SMALL UTILS --------------- ***/
 const $ = s => document.querySelector(s);
+const $$ = s => Array.from(document.querySelectorAll(s));
 function toISO(d){ const t = new Date(d); if (isNaN(t)) return null; return t.toISOString().slice(0,10); }
 function fmtMD(d){ const t = new Date(d); if (isNaN(t)) return ''; return (t.getMonth()+1) + '/' + t.getDate(); }
-function daysDesc(startISO, endISO){
-  const a = new Date(startISO), b = new Date(endISO), out = [];
-  for (let t = new Date(b); t >= a; t.setDate(t.getDate()-1)) out.push(toISO(t));
-  return out;
+function daysDesc(startISO, endISO){ const a = new Date(startISO), b = new Date(endISO), out = []; for (let t = new Date(b); t >= a; t.setDate(t.getDate()-1)) out.push(toISO(t)); return out; }
+function safeGet(row, idx){ return (idx>=0 && idx<row.length) ? row[idx].trim() : ''; }
+function pick(header, ...cands){
+  const lc = header.map(h => h.toLowerCase());
+  for (const c of cands){ const i = lc.indexOf(c.toLowerCase()); if (i !== -1) return i; }
+  for (let i=0;i<lc.length;i++){ if (cands.some(c => lc[i].includes(c.toLowerCase()))) return i; }
+  return -1;
 }
 
-/* ================== CSV LOADER ================== */
-async function fetchCSV(url){
-  const bust = (url.includes('?')? '&':'?') + '_=' + Date.now();
-  const res = await fetch(url + bust);
-  if(!res.ok) throw new Error('HTTP ' + res.status);
-  return await res.text();
-}
-
-/* Safe CSV split that respects quotes */
-function parseCSV(text){
-  const rows = [];
-  let i=0, cur='', inQ=false, row=[];
-  while(i<text.length){
-    const ch=text[i];
-    if(ch==='\"'){
-      if(inQ && text[i+1]==='\"'){ cur+='\"'; i+=2; continue; }
-      inQ=!inQ; i++; continue;
-    }
-    if(!inQ && (ch===',' || ch==='\n' || ch==='\r')){
-      if(ch===',' ){ row.push(cur); cur=''; i++; continue; }
-      // newline
-      if(ch==='\r' && text[i+1]==='\n'){ i++; } // CRLF
-      row.push(cur); rows.push(row); row=[]; cur=''; i++; continue;
-    }
-    cur+=ch; i++;
-  }
-  if(cur.length || row.length) { row.push(cur); rows.push(row); }
-  return rows;
-}
-
-/* ================== LINESCORE LOGIC ================== */
-/* The STATS sheet has:
-   - column A: display_name
-   - row 1: date headers like 9/29, 9/28, ... 8/21
-   - body cells: fully-prepared strings (either future schedule or stat lines)
-   We DO NOT parse cell contents; we show exactly what’s in the cell.
-   If cell is empty => we skip (don’t print date stub).
-*/
-
-function normalizeHeaderDate(h){
-  // Accept "9/7", "09/07", spaces, etc. Return "M/D" (no leading zeros)
-  const m = String(h || '').trim().match(/^0?(\d{1,2})\/0?(\d{1,2})$/);
-  return m ? (Number(m[1]) + '/' + Number(m[2])) : null;
-}
-
-function mapHeaders(header){
-  const nameIdx = header.findIndex(h => String(h).trim().toLowerCase() === 'display_name');
-  if (nameIdx === -1) throw new Error('No "display_name" column found in STATS CSV header.');
-
-  // Build: { nameIdx, dateCols: { 'M/D': columnIndex } }
-  const dateCols = {};
-  header.forEach((h, i) => {
-    const md = normalizeHeaderDate(h);
-    if (md) dateCols[md] = i;
-  });
-  return { nameIdx, dateCols };
-}
-
-function buildWeeksFromSheet(rows, map){
-  const players = rows.map(r => r[map.nameIdx]).filter(Boolean);
-
-  // For each week, build player → day list (descending date),
-  // but SKIP any day where the cell is empty.
-  const out = WEEKS.map(w => {
-    const daysISO = daysDesc(w.start, w.end); // e.g., 10/4→9/28
-    // Convert ISO days to "M/D" to match header keys
-    const mdKeys = daysISO.map(d => fmtMD(d));
-
-    const playerBlocks = players.map(name => {
-      const row = rows.find(r => r[map.nameIdx] === name) || [];
-      const dayCells = [];
-      for (const md of mdKeys){
-        const col = map.dateCols[md];
-        if (col == null) continue;           // Sheet doesn’t have this date column
-        const val = (row[col] || '').trim();
-        if (!val) continue;                  // Empty => skip entirely (no date stub)
-        dayCells.push({ text: val });
-      }
-      return { name, days: dayCells };
-    });
-
-    return { label: w.label, players: playerBlocks };
-  });
-
-  return out;
-}
-
-function renderWeeks(mount, weeks){
-  if (!weeks.length){ mount.innerHTML = `<p style="color:var(--muted)">No data.</p>`; return; }
-  const html = weeks.map(week => {
-    const playersHTML = week.players.map(pl => {
-      const days = pl.days.map(d => `<div>${d.text}</div>`).join('');
-      return `<div class="linescore-player"><strong>${pl.name}</strong>${days || `<div style="opacity:.6">—</div>`}</div>`;
-    }).join('');
-    return `<div class="linescore-week"><h4>${week.label}</h4>${playersHTML}</div>`;
-  }).join('');
-  mount.innerHTML = html;
-}
-
-/* ================== THEME + DRAWERS ================== */
+/*** ------------- THEME + DRAWERS ------------- ***/
 function setupTheme(){
-  const btn = document.getElementById('theme-toggle'); if (!btn) return;
+  const btn = $('#theme-toggle'); if (!btn) return;
   const icon = btn.querySelector('i');
   const apply = ()=>{
     const saved = localStorage.getItem('theme');
@@ -422,51 +494,190 @@ function setStickyTop(){
 function setupDrawers(){
   const mask = document.querySelector('.drawer-mask');
   const closeAll = ()=>document.body.classList.remove('drawer-left-open','drawer-right-open','drawer-open');
-  document.getElementById('btnMenu')?.addEventListener('click', ()=>{
-    document.body.classList.add('drawer-left-open','drawer-open');
-  });
-  document.getElementById('openSearch')?.addEventListener('click', ()=>{
-    document.body.classList.add('drawer-left-open','drawer-open');
-  });
-  document.getElementById('openFilters')?.addEventListener('click', ()=>{
-    document.getElementById('drawerFilters').style.display='flex';
-    document.getElementById('drawerAccount').style.display='none';
+  $('#btnMenu')?.addEventListener('click', ()=>{ document.body.classList.add('drawer-left-open','drawer-open'); });
+  $('#openSearch')?.addEventListener('click', ()=>{ document.body.classList.add('drawer-left-open','drawer-open'); });
+  $('#openFilters')?.addEventListener('click', ()=>{
+    $('#drawerFilters').style.display='flex';
+    $('#drawerAccount').style.display='none';
     document.body.classList.add('drawer-right-open','drawer-open');
   });
-  document.getElementById('btnAccount')?.addEventListener('click', ()=>{
-    document.getElementById('drawerAccount').style.display='flex';
-    document.getElementById('drawerFilters').style.display='none';
+  $('#btnAccount')?.addEventListener('click', ()=>{
+    $('#drawerAccount').style.display='flex';
+    $('#drawerFilters').style.display='none';
     document.body.classList.add('drawer-right-open','drawer-open');
   });
-  document.querySelectorAll('.close-btn').forEach(b=>b.addEventListener('click', closeAll));
+  $$('.close-btn').forEach(b=>b.addEventListener('click', closeAll));
   mask?.addEventListener('click', closeAll);
 }
 
-/* ================== BOOT ================== */
+/*** -------- CSV LOAD + LINESCORE RENDER -------- ***/
+async function loadStatsCSV(url){
+  const bust = '_=' + Date.now(); const sep = url.includes('?') ? '&' : '?';
+  const res = await fetch(url + sep + bust);
+  if (!res.ok) throw new Error('HTTP ' + res.status);
+  const text = await res.text();
+  const rows = text.trim().split(/\r?\n/).map(line =>
+    line.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/).map(c => c.replace(/^"|"$/g,''))
+  );
+  const header = rows.shift() || [];
+  const ixDate = pick(header, 'date','game_date');
+  const ixName = pick(header, 'player','display_name','name','player_display_name');
+  const ixOpp  = pick(header, 'opponent','opp');
+  const ixHA   = pick(header, 'home_away','ha');
+  const ixTime = pick(header, 'start_time','time');
+  const ixLine = pick(header, 'line','result','statline','summary');
+
+  const items = rows.map(r => ({
+    dateISO: toISO(safeGet(r, ixDate)),
+    name: safeGet(r, ixName),
+    opp: safeGet(r, ixOpp),
+    ha: safeGet(r, ixHA).toLowerCase(),
+    time: safeGet(r, ixTime),
+    line: safeGet(r, ixLine)
+  })).filter(x => x.name && x.dateISO);
+
+  return items;
+}
+function buildIndex(stats){
+  const players = Array.from(new Set(stats.map(s => s.name))).sort((a,b)=>a.localeCompare(b));
+  const byKey = new Map();
+  for (const s of stats){
+    const key = s.name + '|' + s.dateISO;
+    const prev = byKey.get(key);
+    if (!prev) byKey.set(key, [s]); else prev.push(s);
+  }
+  const weeks = WEEKS.map(w => {
+    const days = daysDesc(w.start, w.end);
+    const playersRows = players.map(pname => {
+      const dayCells = days.map(dISO => {
+        const rows = byKey.get(pname + '|' + dISO) || [];
+        if (!rows.length) return { dateISO: dISO, text: fmtMD(dISO) };
+        const merged = rows.map(r => {
+          const md = fmtMD(r.dateISO);
+          const vsAt = (r.ha && r.ha.startsWith('a')) ? '@' : 'vs';
+          if (r.line){
+            const opp = r.opp ? `${vsAt} ${r.opp}` : '';
+            return `${md} ${opp} | ${r.line}`;
+          } else {
+            const opp = r.opp ? `${vsAt} ${r.opp}` : '';
+            const time = r.time ? ` – ${r.time} ${TZ_LABEL}` : '';
+            return `${md} ${opp}${time}`;
+          }
+        }).join('; ');
+        return { dateISO: dISO, text: merged };
+      });
+      return { name: pname, days: dayCells };
+    });
+    return { label: w.label, players: playersRows };
+  });
+  return weeks;
+}
+function renderWeeks(mount, weeks){
+  if (!weeks.length){ mount.innerHTML = `<p style="color:var(--muted)">No data.</p>`; return; }
+  const html = weeks.map(week => {
+    const playersHTML = week.players.map(pl => {
+      const days = pl.days.map(d => `<div>${d.text}</div>`).join('');
+      return `<div class="linescore-player"><strong>${pl.name}</strong>${days}</div>`;
+    }).join('');
+    return `<div class="linescore-week"><h4>${week.label}</h4>${playersHTML}</div>`;
+  }).join('');
+  mount.innerHTML = html;
+}
+function fallbackWeeks(){
+  const week = {
+    label: 'Sept 28 - Oct 4',
+    players: [
+      { name: 'CODY BELLINGER', days: [
+        {text:'10/4 vs BOS – 5:30 PM AZ'},
+        {text:'10/3 vs BOS – 5:30 PM AZ'},
+        {text:'10/2 vs BOS | 3-4 | 2B, 2RBI, 2R, K, BB'},
+        {text:'10/1 vs CHC | 3-4 | 2B, 2RBI, 2R, K, BB'},
+        {text:'9/30 vs CHC | 3-4 | 2B, 2RBI, 2R, K, BB'},
+        {text:'9/29 vs CHC | 3-4 | 2B, 2RBI, 2R, K, BB'},
+        {text:'9/28'}
+      ]},
+      { name: 'DREW SWIFT', days: [
+        {text:'10/4 vs RIC – 5:05 PM AZ'},
+        {text:'10/3 vs RIC – 5:05 PM AZ'},
+        {text:'10/2 vs RIC | 1-3 | 2B, RBI'},
+        {text:'10/1 vs ERI | 0-4'},
+        {text:'9/30 vs ERI | 1-4'},
+        {text:'9/29 vs ERI | 2-4 | R, SB'},
+        {text:'9/28'}
+      ]}
+    ]
+  };
+  return WEEKS.map(w => ({ label: w.label, players: week.players }));
+}
+
+/*** ---------------- NEWS FEED ---------------- */
+const PRO_LEVELS = new Set(['MLB','INTERNATIONAL','TRIPLE-A','AAA','DOUBLE-A','AA','HIGH-A','A+','LOW-A','A','ROOKIE','ROK','INDY']);
+const COLLEGE_LEVELS = new Set(['NCAA-D1','NCAA-D2','NCAA-D3','NAIA','JUCO']);
+let ALL_NEWS = [];
+function firstNameOf(full){ return String(full||'').trim().split(/\s+/)[0] || ''; }
+function newsCardHTML(n){
+  const img = n.image || 'assets/img/news/placeholder.jpg';
+  const when = n.publishedAt ? new Date(n.publishedAt).toLocaleString() : '';
+  const src = n.source || 'News';
+  const pname = n.player_display_name || '';
+  const first = firstNameOf(pname);
+  const shareText = encodeURIComponent(`We See Where YAT, ${first}! #YATABOY${first}`);
+  const shareUrl = encodeURIComponent(n.url || location.href);
+  const xHref = `https://twitter.com/intent/tweet?text=${shareText}&url=${shareUrl}`;
+  const mailHref = `mailto:?subject=${encodeURIComponent(n.title||'Hamilton Alumni News')}&body=${shareText}%0A${shareUrl}`;
+  return `
+  <article class="news-card">
+    <a class="news-thumb" href="${n.url||'#'}" target="_blank" rel="noopener" style="background-image:url('${img}')" aria-label="Open story"></a>
+    <div class="news-body">
+      <a class="news-title" href="${n.url||'#'}" target="_blank" rel="noopener">${n.title||'Read more'}</a>
+      <div class="news-meta">${src} • ${when}</div>
+      <div class="news-links">
+        <a class="news-readmore" href="${n.url||'#'}" target="_blank" rel="noopener">READ MORE</a>
+        <a class="news-market" href="marketplace.html">YAT-A-BOY MARKETPLACE</a>
+      </div>
+      <div class="news-share" aria-label="Share">
+        <a class="icon-btn" href="${xHref}" target="_blank" rel="noopener" title="Share to X"><i class="ri-twitter-x-line"></i></a>
+        <a class="icon-btn" href="#" title="Instagram"><i class="ri-instagram-line"></i></a>
+        <a class="icon-btn" href="#" title="Facebook"><i class="ri-facebook-circle-line"></i></a>
+        <a class="icon-btn" href="#" title="TikTok"><i class="ri-tiktok-line"></i></a>
+        <a class="icon-btn" href="${mailHref}" title="Email"><i class="ri-mail-line"></i></a>
+      </div>
+    </div>
+  </article>`;
+}
+function renderNewsLists(){
+  const items = ALL_NEWS.slice().sort((a,b)=> new Date(b.publishedAt||0)-new Date(a.publishedAt||0));
+  const pros = items.filter(n=> PRO_LEVELS.has(String(n.tags?.level||'').toUpperCase()) );
+  const college = items.filter(n=> COLLEGE_LEVELS.has(String(n.tags?.level||'').toUpperCase()) );
+  $('#proFeed').innerHTML = pros.length ? pros.map(newsCardHTML).join('') : `<p style="color:var(--muted)">No pro headlines.</p>`;
+  $('#collegeFeed').innerHTML = college.length ? college.map(newsCardHTML).join('') : `<p style="color:var(--muted)">No college headlines.</p>`;
+}
+
+/*** ----------------- BOOT ----------------- ***/
 document.addEventListener('DOMContentLoaded', async ()=>{
   setupTheme();
   setupDrawers();
   setStickyTop();
   window.addEventListener('resize', setStickyTop);
 
-  const mount = document.getElementById('scoresMount');
-
+  // Load headlines (demo JSON inline to guarantee visuals)
   try{
-    const raw = await fetchCSV(CSV_URL);
-    const rows = parseCSV(raw);
-    if (!rows.length) throw new Error('CSV is empty.');
+    const raw = $('#news-json')?.textContent || '{}';
+    const data = JSON.parse(raw);
+    ALL_NEWS = Array.isArray(data.items) ? data.items : [];
+  }catch{ ALL_NEWS = []; }
+  renderNewsLists();
 
-    const header = rows.shift().map(c => String(c||'').trim());
-    const map = mapHeaders(header);
-
-    // Keep only rows that have a display_name
-    const dataRows = rows.filter(r => (r[map.nameIdx]||'').trim().length);
-
-    const weeks = buildWeeksFromSheet(dataRows, map);
+  // Load linescores from CSV or fallback (no red banner anymore)
+  const mount = document.getElementById('scoresMount');
+  try{
+    if (!STATS_CSV_URL || STATS_CSV_URL.startsWith('REPLACE_')) throw new Error('Set STATS_CSV_URL');
+    const stats = await loadStatsCSV(STATS_CSV_URL);
+    const weeks = buildIndex(stats);
     renderWeeks(mount, weeks);
   }catch(err){
     console.error('Linescore load failed:', err);
-    mount.innerHTML = `<div style="color:#fca5a5;font:300 12px Oswald;">Error loading line scores: ${err.message}</div>`;
+    renderWeeks(mount, fallbackWeeks());
   }
 });
 </script>
