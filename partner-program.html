@@ -3,36 +3,132 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>PCD ACTION Partner • Hamilton YATSTATS</title>
+<title>NIL Marketplace • Hamilton YATSTATS</title>
 <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400&family=Bebas+Neue&display=swap" rel="stylesheet">
-<!-- include the same Firebase <script type="module"> init block as in faq.html -->
+
+<!-- Firebase init (same pattern as your index) -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, signInWithCustomToken, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+  window.firebaseAuth = { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, signInWithCustomToken, signInAnonymously };
+  try {
+    const firebaseConfig = JSON.parse(window.__firebase_config || '{}');
+    const app = initializeApp(firebaseConfig);
+    window.auth = getAuth(app);
+    onAuthStateChanged(window.auth, user => { document.dispatchEvent(new CustomEvent('authStateChanged', { detail: { user } })); });
+    if (window.__initial_auth_token) {
+      await signInWithCustomToken(window.auth, window.__initial_auth_token);
+    } else {
+      await signInAnonymously(window.auth);
+    }
+  } catch (e) {
+    console.warn("Firebase init skipped or failed (ok if not configured):", e?.message || e);
+  }
+</script>
+
 <style>
-/* reuse the same CSS from faq.html; hero lines below differ */
-:root{--bg:#0c0c0c;--fg:#f2f2f2;--muted:#c4c4c4;--ink:#e8e8e8;--line:rgba(255,255,255,.08);--header-bg:#000;--hamSmall:13px;--hamBig:20px;--hamBigger:24px;--tagGrey:#cfd2d6;--crestH:clamp(28px,4.2vw,42px);--containerPad:16px;--footerH:clamp(56px,8vh,77px)}
-*{box-sizing:border-box}html,body{margin:0}body{background:var(--bg);color:var(--fg);font-family:Oswald,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
+:root{
+  --bg:#0c0c0c; --fg:#f2f2f2; --muted:#c4c4c4; --ink:#e8e8e8; --line:rgba(255,255,255,.08);
+  --card-bg:#171717; --header-bg:#000; --drawer-bg:rgba(10,10,10,.65);
+  --hamSmall:13px; --hamBig:20px; --hamBigger:24px; --tagGrey:#cfd2d6;
+  --crestH:clamp(28px,4.2vw,42px);
+  --containerPad:16px; --footerH:clamp(56px,8vh,77px);
+}
+body.light-theme{
+  --bg:#f4f4f4; --fg:#121212; --muted:#555; --ink:#222; --line:rgba(0,0,0,.1);
+  --card-bg:#fff; --header-bg:#fff; --drawer-bg:rgba(255,255,255,.65);
+}
+@font-face{font-family:'Indigo';src:url('assets/fonts/Indigo.otf') format('opentype');font-weight:400;font-style:normal;font-display:swap;}
+*{box-sizing:border-box} html,body{margin:0}
+body{background:var(--bg);color:var(--fg);font-family:Oswald,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;transition:background-color .3s,color .3s;}
+body.drawer-open{overflow:hidden}
+a{color:inherit;text-decoration:none}
 .container{max-width:1400px;margin:0 auto;padding:0 var(--containerPad)}
-.header{position:sticky;top:0;z-index:50;background:var(--header-bg)}
+.header{position:sticky;top:0;z-index:50;background:var(--header-bg);transition:background-color .3s;}
 .topbar{display:flex;align-items:center;justify-content:space-between;padding:8px 0}
-.left-icons{display:flex;gap:8px}.icon-btn{background:none;border:none;color:var(--fg);display:inline-flex;align-items:center;justify-content:center;cursor:pointer}
+.left-icons{display:flex;align-items:center;gap:8px}
+.icon-btn{background:none;border:none;color:var(--fg);opacity:.92;display:inline-flex;align-items:center;justify-content:center;padding:0;margin:0 2px;cursor:pointer}
 .icon-btn i{font-size:20px}
 .topnav{display:flex;gap:18px;align-items:center}
-.nav-pair .thin{font:300 var(--hamSmall) Oswald;color:#cfd2d6}.nav-pair .bold{font:400 var(--hamSmall) Indigo,"Bebas Neue"}
-.wordmark-img{height:clamp(18px,3.2vw,28px)}
+.nav-pair{white-space:nowrap}
+.nav-pair .thin{font:300 var(--hamSmall) Oswald,sans-serif;letter-spacing:.02em;color:#cfd2d6;margin-right:2px}
+body.light-theme .nav-pair .thin{color:var(--muted)}
+.nav-pair .bold{font:400 var(--hamSmall) Indigo,"Bebas Neue",sans-serif}
+.wordmark-wrap{display:flex;align-items:center;justify-content:flex-end;min-width:120px}
+.wordmark-img{height:clamp(18px,3.2vw,28px);width:auto;display:block}
+body.light-theme .wordmark-img{filter:invert(1)}
+@media (max-width:1200px){.topnav{display:none !important}}
 .hr-y{border-top:1px solid var(--line)}
 .schoolrow{display:flex;align-items:center;gap:10px;padding:6px var(--containerPad)}
-.ham-logo{height:var(--crestH)}
-.schooltext .small{font:300 var(--hamSmall)/1 Oswald;color:var(--muted)}
-.schooltext .big1{font:400 var(--hamBig)/1 "Bebas Neue"}
-.schooltext .big2{font:400 var(--hamBigger)/1 "Bebas Neue";margin-top:-4px}
-.crumbs{font:300 calc(var(--hamSmall)*.5)/1 Oswald;color:var(--muted);text-transform:uppercase}
+.ham-logo{height:var(--crestH);width:auto;object-fit:contain;display:block;flex-shrink:0}
+.schooltext{line-height:1}
+.schooltext .small{font:300 var(--hamSmall)/1 Oswald;letter-spacing:.02em;color:var(--muted)}
+.schooltext .big1{font:400 var(--hamBig)/1 "Bebas Neue",sans-serif}
+.schooltext .big2{font:400 var(--hamBigger)/1 "Bebas Neue",sans-serif;margin-top:-4px}
+.crumbs{font:300 calc(var(--hamSmall)*.5)/1 Oswald;letter-spacing:.02em;color:var(--muted);text-transform:uppercase}
+
 .hero{padding:2px 0}
 .hero-grid{display:flex;align-items:center;justify-content:space-between;gap:16px}
 .hero-left{display:flex;flex-direction:column;gap:4px}
-.hero-line{font:400 1.3rem/1.1 Indigo,"Bebas Neue";letter-spacing:.02em}
-.hero-line .grey{color:var(--tagGrey);font:300 1.1rem Oswald}
-.hero-right{display:flex;gap:10px}.hero-icon i{font-size:20px}
-/* copy drawers/auth/footer/a11y from faq.html */
+.hero-crumbs{margin:0;text-align:left;white-space:nowrap}
+@media (max-width:768px){.topbar .crumbs{display:block}.hero-left .crumbs{display:none}}
+@media (min-width:769px){.topbar .crumbs{display:none}.hero-left .crumbs{display:block}}
+.tag-line{font:400 1.2rem/1 Indigo,"Bebas Neue",sans-serif;letter-spacing:.02em}
+.tag-line .grey{color:var(--tagGrey);font-family:Oswald,sans-serif;font-weight:300}
+.tag-line .bold{font-weight:400}
+
+.hero-right{display:flex;gap:10px}
+.hero-icon i{font-size:20px}
+
+/* Drawers */
+.drawer-mask{position:fixed;inset:0;background:rgba(0,0,0,.35);opacity:0;pointer-events:none;transition:opacity .2s;z-index:60}
+.drawer{position:fixed;top:0;bottom:0;width:min(360px,82vw);background:var(--drawer-bg);backdrop-filter:blur(4px);color:var(--ink);transform:translateX(-110%);transition:transform .25s,background-color .3s;z-index:70}
+.drawer-right{right:0;left:auto;transform:translateX(110%);display:flex;flex-direction:column;height:100%}
+.drawer h3{margin:18px 16px 8px;padding-right:30px}
+.drawer .pad{padding:10px 16px}
+.drawer .close-btn{position:absolute;top:12px;right:12px}
+.drawer a{color:var(--ink)}
+.drawer a:hover{color:var(--fg)}
+body.drawer-left-open .drawer-mask,body.drawer-right-open .drawer-mask{opacity:1;pointer-events:auto}
+body.drawer-left-open #drawerLeft{transform:translateX(0)}
+body.drawer-right-open .drawer-right{transform:translateX(0)}
+.drawer-content{flex-grow:1;overflow-y:auto;padding:10px 16px}
+.drawer-footer{flex-shrink:0;padding:12px 16px;border-top:1px solid var(--line);background:rgba(10,10,10,.8);display:flex;gap:10px;align-items:center}
+body.light-theme .drawer-footer{background:rgba(255,255,255,.8)}
+.filter-group{border-bottom:1px solid var(--line)}
+.filter-group:last-of-type{border-bottom:none}
+.filter-title{padding:14px 0;cursor:pointer;font-weight:700;font-family:"Bebas Neue",sans-serif;letter-spacing:.05em;list-style:none;display:flex;justify-content:space-between;align-items:center}
+.filter-title::-webkit-details-marker{display:none}
+.filter-title::after{content:'▸';font-size:1.2em;transition:transform .2s}
+details[open]>.filter-title::after{transform:rotate(90deg)}
+.filter-options{padding:4px 0 16px 0}
+.filter-options label{display:block;margin-bottom:8px;padding-left:4px}
+.filter-options input[type=checkbox]{margin-right:8px;transform:scale(1.1)}
+.select-all-label{font-weight:700;border-bottom:1px solid var(--line);padding-bottom:8px !important;margin-bottom:12px !important}
+
+/* Auth (same as your index) */
+.auth-tabs{display:flex;border-bottom:1px solid var(--line)}
+.auth-tab{flex:1;text-align:center;padding:10px;cursor:pointer;background:transparent;border:none;color:var(--muted);font-family:"Bebas Neue",sans-serif;font-size:16px;letter-spacing:.05em}
+.auth-tab.active{color:var(--fg);border-bottom:2px solid var(--fg)}
+.auth-form{display:none}
+.auth-form.active{display:block}
+.form-field{margin-bottom:15px}
+.form-field label{display:block;margin-bottom:5px;font-size:12px}
+.form-field input{width:100%;padding:10px;border-radius:8px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--ink)}
+body.light-theme .form-field input{background:rgba(0,0,0,.06)}
+.auth-btn{width:100%;padding:12px;background:var(--fg);color:var(--bg);border:none;border-radius:8px;font-family:"Bebas Neue",sans-serif;font-size:16px;letter-spacing:.08em;cursor:pointer}
+#authMessage{margin-top:15px;text-align:center;font-size:13px}
+.error{color:#fca5a5}
+.success{color:#86efac}
+
+/* Footer */
+.site-footer{position:fixed;left:0;right:0;bottom:0;height:var(--footerH);background:var(--bg);border-top:1px solid var(--line);z-index:40}
+.site-footer a{display:block;height:100%;width:100%}
+.site-footer img{height:100%;width:100%;object-fit:contain}
+
+/* A11y */
+.icon-btn:focus,button:focus,input:focus,details summary:focus{outline:2px solid var(--fg);outline-offset:2px}
 </style>
 </head>
 <body>
@@ -55,25 +151,29 @@
       <a href="partner-program.html" class="nav-pair"><span class="thin">PCD ACTION</span><span class="bold">PARTNER PROGRAM</span></a>
       <a href="faq.html" class="nav-pair"><span class="bold">FAQ’S</span></a>
     </nav>
-    <div class="wordmark-wrap"><img class="wordmark-img" src="assets/img/yatstats-logo.png" alt="YAT?STATS"></div>
+    <div class="wordmark-wrap">
+      <img class="wordmark-img" src="assets/img/yatstats-logo.png" alt="YAT?STATS">
+    </div>
   </div>
+
   <div class="hr-y"></div>
+
   <div class="container schoolrow">
-    <img class="ham-logo" src="assets/img/schools/az.hamilton.png" alt="Hamilton H" onerror="this.src='assets/img/placeholder.png';">
+    <img id="hamLogo" class="ham-logo" src="assets/img/schools/az.hamilton.png" alt="Hamilton H" onerror="this.src='assets/img/placeholder.png';">
     <div class="schooltext">
       <div class="small">CHANDLER, AZ</div>
       <div class="big1">HAMILTON HIGH SCHOOL</div>
       <div class="big2">ACTIVE BASEBALL ALUMNI</div>
     </div>
   </div>
+
   <div class="hr-y"></div>
 
-  <section class="hero">
-    <div class="container hero-grid">
-      <div class="hero-left" aria-live="polite">
-        <div class="hero-line"><span class="bold">Want a Piece of the ACTION?</span></div>
-        <div class="hero-line"><span class="grey">Be a</span> <span class="bold">PCDACTION Partner.</span></div>
-        <div class="crumbs hero-crumbs">HAMILTON ▸ PCD ACTION PARTNER</div>
+  <!--<div class="tag-duo">
+  <div class="tag-swap"><span class="tag-bold">NIL Marketplace.</span></div>
+  <div class="tag-swap"><span class="tag-grey">Send a</span> <span class="tag-bold">YAT-A-BOY</span></div>
+</div>
+<div class="crumbs hero-crumbs">HAMILTON ▸ NIL MARKETPLACE</div>
       </div>
       <div class="hero-right">
         <button id="openSearch" class="hero-icon icon-btn" aria-label="Open search"><i class="ri-search-line"></i></button>
@@ -84,7 +184,326 @@
   </section>
 </header>
 
-<!-- Left/Right drawers, Account drawer, blank main, footer, and the same JS from faq.html -->
-<!-- Copy the exact drawers + main + footer + <script type="module"> block from faq.html to complete this page. -->
+<div class="drawer-mask"></div>
+
+<!-- LEFT DRAWER: Search + Nav (player profile search WORKS here) -->
+<aside class="drawer" id="drawerLeft" aria-label="Left drawer">
+  <button class="icon-btn close-btn" aria-label="Close"><i class="ri-close-line"></i></button>
+  <div class="drawer-content">
+    <h3>PLAYER PROFILE SEARCH</h3>
+    <div class="pad">
+      <input id="playerSearch" placeholder="Type to search…" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--ink)">
+      <div id="liveResults" style="margin-top:10px;max-height:55vh;overflow:auto;"></div>
+    </div>
+    <h3>NAVIGATION</h3>
+    <div class="pad" style="display:flex;flex-direction:column;gap:12px">
+      <a href="index.html" class="nav-pair"><span class="thin">WHERE THEY</span><span class="bold">YAT?</span></a>
+      <a href="alumni-news.html" class="nav-pair"><span class="thin">ACTIVE ALUMNI</span><span class="bold">NEWS</span></a>
+      <a href="all-time-list.html" class="nav-pair"><span class="thin">NEXT-LEVEL</span><span class="bold">ALL-TIME LIST</span></a>
+      <a href="marketplace.html" class="nav-pair"><span class="thin">NIL & YAT-A-BOY</span><span class="bold">MARKETPLACE</span></a>
+      <a href="current-team.html" class="nav-pair"><span class="thin">THE</span><span class="bold">CURRENT TEAM</span></a>
+      <a href="partner-program.html" class="nav-pair"><span class="thin">PCD ACTION</span><span class="bold">PARTNER PROGRAM</span></a>
+      <a href="faq.html" class="nav-pair"><span class="bold">FAQ’S</span></a>
+    </div>
+  </div>
+</aside>
+
+<!-- RIGHT DRAWER: Filters (kept for UI parity, harmless here) -->
+<aside class="drawer drawer-right" id="drawerFilters" style="display:flex;">
+  <button class="icon-btn close-btn" aria-label="Close"><i class="ri-close-line"></i></button>
+  <h3>FILTERS</h3>
+  <div class="drawer-content" id="filters">
+    <details class="filter-group" open>
+      <summary class="filter-title">By Name</summary>
+      <div class="filter-options">
+        <input id="filterName" placeholder="Type a name…" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--ink)"/>
+      </div>
+    </details>
+    <details class="filter-group">
+      <summary class="filter-title">By Status</summary>
+      <div class="filter-options" id="filterStatus">
+        <label class="select-all-label"><input type="checkbox" class="select-all"> Select All</label>
+        <label><input type="checkbox" value="ACTIVE 2025"> ACTIVE 2025</label>
+        <label><input type="checkbox" value="ACTIVE 2024"> ACTIVE 2024</label>
+        <label><input type="checkbox" value="FREE AGENT"> FREE AGENT</label>
+        <label><input type="checkbox" value="INJURED"> INJURED</label>
+        <label><input type="checkbox" value="RETIRED"> RETIRED</label>
+        <label><input type="checkbox" value="SPONSOR"> SPONSOR</label>
+      </div>
+    </details>
+    <details class="filter-group">
+      <summary class="filter-title">By Level</summary>
+      <div class="filter-options" id="filterLevels">
+        <label class="select-all-label"><input type="checkbox" class="select-all"> Select All</label>
+      </div>
+    </details>
+    <details class="filter-group">
+      <summary class="filter-title">By Graduating Class</summary>
+      <div class="filter-options" id="filterGradClass"></div>
+    </details>
+    <details class="filter-group">
+      <summary class="filter-title">By Roster Year</summary>
+      <div class="filter-options" id="filterRosterYear"></div>
+    </details>
+  </div>
+  <div class="drawer-footer">
+    <button id="filtersReset" class="icon-btn" style="padding:10px 14px;border:1px solid var(--line);border-radius:12px"><i class="ri-restart-line"></i>&nbsp;Reset Filters</button>
+  </div>
+</aside>
+
+<!-- RIGHT DRAWER: Account (identical UX to your index) -->
+<aside class="drawer drawer-right" id="drawerAccount" style="display:none;">
+  <button class="icon-btn close-btn" aria-label="Close"><i class="ri-close-line"></i></button>
+  <h3>ACCOUNT</h3>
+  <div class="drawer-content">
+    <div class="auth-tabs">
+      <button class="auth-tab active" data-tab="signIn">Sign In</button>
+      <button class="auth-tab" data-tab="register">Register</button>
+    </div>
+    <div id="auth-forms-container" class="pad">
+      <form id="signInForm" class="auth-form active">
+        <div class="form-field"><label for="signInEmail">Email</label><input type="email" id="signInEmail" required></div>
+        <div class="form-field"><label for="signInPassword">Password</label><input type="password" id="signInPassword" required></div>
+        <button type="submit" class="auth-btn">Sign In</button>
+      </form>
+      <form id="registerForm" class="auth-form">
+        <div class="form-field"><label for="registerEmail">Email</label><input type="email" id="registerEmail" required></div>
+        <div class="form-field"><label for="registerPassword">Password</label><input type="password" id="registerPassword" required></div>
+        <button type="submit" class="auth-btn">Create Account</button>
+      </form>
+      <p id="authMessage"></p>
+    </div>
+  </div>
+</aside>
+
+<!-- BLANK MAIN -->
+<main class="main container" aria-live="polite">
+  <!-- Content TBD for marketplace -->
+</main>
+
+<footer class="site-footer">
+  <a href="https://www.americanpromo.com/" target="_blank" rel="noopener noreferrer">
+    <img src="assets/img/partners/american_banner.png" alt="Sponsor Banner">
+  </a>
+</footer>
+
+<script type="module">
+/* ---- YATSTATS Marketplace Shell ---- */
+
+/* Config (same CSV used by index so search has real data) */
+const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQcWJM6Q6hTdFnES_G5LUy4teCS-sJ5HdAc9F5HSY8DGE9egdGy8yUAe2ShT3tFm-CwUuCYeAYy_YiW/pub?gid=2028135390&output=csv";
+
+/* Dom utils */
+const $ = s => document.querySelector(s);
+const $$ = s => Array.from(document.querySelectorAll(s));
+const debounce = (fn, ms=300)=>{ let t; return (...a)=>{ clearTimeout(t); t=setTimeout(()=>fn(...a),ms); }; };
+
+/* Theme */
+function setupTheme(){
+  const toggle=$('#theme-toggle'); if(!toggle) return;
+  const body=document.body, icon=toggle.querySelector('i');
+  const apply=()=>{
+    const saved=localStorage.getItem('theme');
+    if (saved==='light'){ body.classList.add('light-theme'); icon?.classList.replace('ri-sun-line','ri-moon-line'); }
+    else { body.classList.remove('light-theme'); icon?.classList.replace('ri-moon-line','ri-sun-line'); }
+  };
+  toggle.addEventListener('click', ()=>{
+    body.classList.toggle('light-theme');
+    localStorage.setItem('theme', body.classList.contains('light-theme') ? 'light' : 'dark');
+    apply();
+  });
+  apply();
+}
+
+/* Drawers */
+function closeDrawers(){ document.body.classList.remove('drawer-left-open','drawer-right-open','drawer-open'); }
+function setupEventListeners(){
+  $('#btnMenu')?.addEventListener('click',()=>{ document.body.classList.add('drawer-left-open','drawer-open'); });
+  $('#openSearch')?.addEventListener('click',()=>{ document.body.classList.add('drawer-left-open','drawer-open'); });
+  $('#openFilters')?.addEventListener('click',()=>{
+    $('#drawerFilters').style.display='flex';
+    $('#drawerAccount').style.display='none';
+    document.body.classList.add('drawer-right-open','drawer-open');
+  });
+  $('#btnAccount')?.addEventListener('click',()=>{
+    $('#drawerAccount').style.display='flex';
+    $('#drawerFilters').style.display='none';
+    document.body.classList.add('drawer-right-open','drawer-open');
+  });
+  $$('.close-btn').forEach(b=>b.addEventListener('click',closeDrawers));
+  $('.drawer-mask')?.addEventListener('click',closeDrawers);
+
+  // Reset buttons (no-op for blank content)
+  $('#filtersReset')?.addEventListener('click',resetFilters);
+  $('#filtersReset2')?.addEventListener('click',resetFilters);
+
+  // Live search
+  $('#playerSearch')?.addEventListener('input', debounce(liveSearch, 200));
+}
+
+/* Filters placeholders */
+function resetFilters(){
+  $$('#filters input').forEach(i=>{
+    if(i.type==='checkbox') i.checked=false;
+    if(i.type==='text') i.value='';
+  });
+}
+
+/* CSV loader (same behavior as index) */
+async function loadCSV(url){
+  const res = await fetch(url);
+  if(!res.ok) throw new Error(`HTTP ${res.status}`);
+  const text = await res.text();
+  if(!text.trim()) throw new Error('Empty CSV');
+
+  const rows = text.trim()
+    .split(/\r?\n/)
+    .map(line => line.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/).map(c=>c.replace(/^"|"$/g,'')));
+
+  const header = rows.shift().map(h => h.trim());
+  const idx = name => header.indexOf(name);
+
+  const statKeys = ['avg','obp','slg','ops','ab','h','r','rbi','2b','3b','hr','sb','bb','era','k/9','k/bb','whip','ip','er','ko','gp','w-l','saves','fip'];
+
+  return rows.map(r=>{
+    const player = {
+      slug:r[idx('slug')], display_name:r[idx('display_name')],
+      first:r[idx('first')], last:r[idx('last')],
+      grad_class:r[idx('grad_class')], letter_years:r[idx('letter_years')],
+      status:r[idx('status')], level:r[idx('level')],
+      team:r[idx('team')], org:r[idx('org')], position:r[idx('position')],
+      height:r[idx('height')], weight:r[idx('weight')], bats:r[idx('bats')], throws:r[idx('throws')],
+      draft_info:r[idx('Draft_Info')] ?? r[idx('draft_info')],
+      colleges:r[idx('Colleges')] ?? r[idx('colleges')],
+      last_game_1:r[idx('last_game_1')], last_game_2:r[idx('last_game_2')], last_game_3:r[idx('last_game_3')],
+      x_handle:r[idx('x_handle')], ig_handle:r[idx('ig_handle')],
+      video_url:r[idx('video_url')], nil_score:r[idx('nil_score')],
+      stats:{}
+    };
+    for(const key of statKeys){
+      const sIdx = idx(key);
+      if (sIdx > -1 && r[sIdx]) player.stats[key.toUpperCase()] = r[sIdx];
+    }
+    return player;
+  });
+}
+
+/* Helpers for search results */
+function slugOf(p){
+  if (!p) return '';
+  const s=(p.slug||'').trim();
+  if(s) return s;
+  return (p.display_name||'').trim().toLowerCase().replace(/[^a-z0-9]+/g,'-');
+}
+function profileURL(p){ return `./profile.html?player=${slugOf(p)}`; }
+function imageNameOf(p){
+  const isSponsor = (p.status && p.status.toUpperCase()==='SPONSOR');
+  if (isSponsor && p.slug){
+    return p.slug.trim().toLowerCase().replace(/\s+/g,'_').replace(/[^a-z0-9_]/g,'');
+  }
+  const first = (p.first || '').toLowerCase().replace(/\s+/g,'_');
+  const last = (p.last || '').toLowerCase().replace(/\s+/g,'_');
+  if (first || last) return [first,last].filter(Boolean).join('_');
+  return (p.slug || p.display_name || '').toLowerCase().replace(/\s+/g,'_').replace(/[^a-z0-9_]/g,'');
+}
+function makeHit(p){
+  const el=document.createElement('div'); el.className='live-hit';
+  el.style.cssText='padding:10px 12px;display:flex;align-items:center;gap:10px;border-radius:10px;cursor:pointer;';
+  el.onmouseenter=()=>el.style.background='var(--line)';
+  el.onmouseleave=()=>el.style.background='transparent';
+
+  const imageName=imageNameOf(p);
+  const hsImgJpg=`assets/img/hs_players/${imageName}.jpg`;
+  const hsImgPng=`assets/img/hs_players/${imageName}.png`;
+
+  el.innerHTML=`<img src="${hsImgJpg}" onerror="this.onerror=null;this.src='${hsImgPng}';" style="width:36px;height:36px;border-radius:6px;object-fit:cover">
+                <div><div style="font-weight:700">${p.display_name}</div>
+                <div style="opacity:.7;font-size:.92em">${p.level||''} • Class of ${p.grad_class||''}</div></div>`;
+  el.onclick=()=>window.location.href=profileURL(p);
+  return el;
+}
+
+/* Live search */
+function liveSearch(){
+  const q=($('#playerSearch')?.value||'').trim().toLowerCase();
+  const box=$('#liveResults'); if(!box) return;
+  if(!q){ box.innerHTML=''; return; }
+  const hits=(window.PLAYERS||[]).filter(p=>(p.display_name||'').toLowerCase().includes(q)).slice(0,25);
+  box.innerHTML=''; hits.forEach(p=>box.appendChild(makeHit(p)));
+}
+
+/* Auth UI (same behavior as index) */
+function setupAuth(){
+  if (!window.firebaseAuth || !window.auth){ return; }
+  const { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } = window.firebaseAuth;
+  const auth = window.auth;
+  const signInForm=$('#signInForm'), registerForm=$('#registerForm'), signOutBtn=$('#btnSignOut'), authMessage=$('#authMessage');
+
+  signInForm?.addEventListener('submit', async e=>{
+    e.preventDefault();
+    try{
+      await signInWithEmailAndPassword(auth, $('#signInEmail').value, $('#signInPassword').value);
+      authMessage.textContent='Sign in successful!'; authMessage.className='success';
+      setTimeout(()=>{ closeDrawers(); authMessage.textContent=''; },1200);
+    }catch(err){ authMessage.textContent=err.message; authMessage.className='error'; }
+  });
+
+  registerForm?.addEventListener('submit', async e=>{
+    e.preventDefault();
+    try{
+      await createUserWithEmailAndPassword(auth, $('#registerEmail').value, $('#registerPassword').value);
+      authMessage.textContent='Registration successful!'; authMessage.className='success';
+      setTimeout(()=>{ closeDrawers(); authMessage.textContent=''; },1200);
+    }catch(err){ authMessage.textContent=err.message; authMessage.className='error'; }
+  });
+
+  signOutBtn?.addEventListener('click', async ()=>{ await signOut(auth); });
+
+  document.addEventListener('authStateChanged', ({detail})=>{
+    const { user } = detail;
+    const accountBtn=$('#btnAccount'), soBtn=$('#btnSignOut');
+    if (user && !user.isAnonymous){ accountBtn.style.display='none'; soBtn.style.display='inline-flex'; }
+    else { accountBtn.style.display='inline-flex'; soBtn.style.display='none'; }
+  });
+
+  // Tabs
+  $$('.auth-tab').forEach(tab=>{
+    tab.addEventListener('click', ()=>{
+      const target=tab.dataset.tab;
+      $$('.auth-tab').forEach(t=>t.classList.remove('active'));
+      tab.classList.add('active');
+      $$('.auth-form').forEach(form=>form.style.display = (form.id===`${target}Form`) ? 'block' : 'none');
+      if ($('#authMessage')) $('#authMessage').textContent='';
+    });
+  });
+}
+
+/* Boot */
+document.addEventListener('DOMContentLoaded', async ()=>{
+  setupTheme();
+  setupEventListeners();
+  setupAuth();
+
+  // Load players specifically to power the LEFT DRAWER search
+  try{
+    const data = await loadCSV(CSV_URL);
+    window.PLAYERS = data;
+  }catch(err){
+    console.error('Search data load failed:', err);
+    const box=$('#liveResults');
+    if (box) box.innerHTML = `<div style="opacity:.8;">Search unavailable right now.</div>`;
+  }
+});
+
+/* Hero swap animation — match index */
+.tag-duo{position:relative;height:1.8em}
+.tag-swap{position:absolute;left:0;top:0;right:0;opacity:0;animation:swap 6s infinite;white-space:nowrap}
+.tag-swap:nth-child(1){animation-delay:0s}
+.tag-swap:nth-child(2){animation-delay:3s}
+.tag-grey{font:300 1em Oswald,sans-serif;letter-spacing:.02em;color:var(--tagGrey)}
+.tag-bold{font:400 1em Indigo,"Bebas Neue",sans-serif}
+@keyframes swap{0%{opacity:0}5%{opacity:1}45%{opacity:1}50%{opacity:0}100%{opacity:0}}
+
+</script>
 </body>
 </html>
