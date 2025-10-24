@@ -233,7 +233,7 @@ body.light-theme .card{box-shadow:0 4px 12px rgba(0,0,0,.1)}
       <a href="index.html" class="nav-pair"><span class="thin">WHERE THEY</span><span class="bold">YAT?</span></a>
       <a href="alumni-news.html" class="nav-pair"><span class="thin">ACTIVE ALUMNI</span><span class="bold">NEWS</span></a>
       <a href="all-time-list.html" class="nav-pair"><span class="thin">NEXT-LEVEL</span><span class="bold">ALL-TIME LIST</span></a>
-      <a href="marketplace.html" class="nav-pair"><span class="thin">NIL & YAT-A-BOY</span><span class="bold">MARKETPLACE</span></a>
+      <a href="marketplace.html" class="nav-pair"><span class="thin">MENTORSHIP</span><span class="bold">MARKETPLACE</span></a>
       <a href="current-team.html" class="nav-pair"><span class="thin">THE</span><span class="bold">CURRENT TEAM</span></a>
       <a href="partner-program.html" class="nav-pair"><span class="thin">PCD ACTION</span><span class="bold">PARTNER PROGRAM</span></a>
       <a href="faq.html" class="nav-pair"><span class="bold">FAQ’S</span></a>
@@ -283,7 +283,7 @@ body.light-theme .card{box-shadow:0 4px 12px rgba(0,0,0,.1)}
       <a href="index.html" class="nav-pair"><span class="thin">WHERE THEY</span><span class="bold">YAT?</span></a>
       <a href="alumni-news.html" class="nav-pair"><span class="thin">ACTIVE ALUMNI</span><span class="bold">NEWS</span></a>
       <a href="all-time-list.html" class="nav-pair"><span class="thin">NEXT-LEVEL</span><span class="bold">ALL-TIME LIST</span></a>
-      <a href="marketplace.html" class="nav-pair"><span class="thin">NIL & YAT-A-BOY</span><span class="bold">MARKETPLACE</span></a>
+      <a href="marketplace.html" class="nav-pair"><span class="thin">MENTORSHIP</span><span class="bold">MARKETPLACE</span></a>
       <a href="current-team.html" class="nav-pair"><span class="thin">THE</span><span class="bold">CURRENT TEAM</span></a>
       <a href="partner-program.html" class="nav-pair"><span class="thin">PCD ACTION</span><span class="bold">PARTNER PROGRAM</span></a>
       <a href="faq.html" class="nav-pair"><span class="bold">FAQ’S</span></a>
@@ -360,7 +360,7 @@ body.light-theme .card{box-shadow:0 4px 12px rgba(0,0,0,.1)}
   </div>
 </main>
 <footer class="site-footer">
-  <a href="https://www.americanpromo.com/" target="_blank" rel="noopener noreferrer">
+  <a href="https://www.flowpage.com/petedeluca" target="_blank" rel="noopener noreferrer">
     <img src="assets/img/partners/american_banner.png" alt="Sponsor Banner">
   </a>
 </footer>
@@ -368,7 +368,7 @@ body.light-theme .card{box-shadow:0 4px 12px rgba(0,0,0,.1)}
 <script type="module">
 /* ---- YATSTATS • Hamilton • build 5.0.36 ---- */
 /* Config */
-const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQcWJM6Q6hTdFnES_G5LUy4teCS-sJ5HdAc9F5HSY8DGE9egdGy8yUAe2ShT3tFm-CwUuCYeAYy_YiW/pub?gid=2028135390&single=true&output=csv";
+const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQcWJM6Q6hTdFnES_G5LUy4teCS-sJ5HdAc9F5HSY8DGE9egdGy8yUAe2ShT3tFm-CwUuCYeAYy_YiW/pub?gid=2028135390&output=csv";
 /* Shorthand & utils */
 const $ = s => document.querySelector(s);
 const $$ = s => Array.from(document.querySelectorAll(s));
@@ -472,10 +472,15 @@ function formatNextGame(p){
 function cardHTML(p){
   const name = p.display_name || 'Player Name';
   const imageName = imageNameOf(p);
-  const bg_now_jpg = `assets/img/now_players/${imageName}.jpg`;
-  const bg_now_png = `assets/img/now_players/${imageName}.png`;
-  const bg_hs_jpg = `assets/img/hs_players/${imageName}.jpg`;
-  const bg_hs_png = `assets/img/hs_players/${imageName}.png`;
+  const isSponsor = (p.status||'').toUpperCase() === 'SPONSOR';
+  const nowFolder = isSponsor ? 'partners' : 'now_players';
+  const hsFolder = isSponsor ? 'partners' : 'hs_players';
+  const nowExt = isSponsor ? 'png' : 'jpg';
+  const nowFallbackExt = isSponsor ? 'jpg' : 'png';
+  const bg_now = `assets/img/${nowFolder}/${imageName}.${nowExt}`;
+  const bg_now_fallback = `assets/img/${nowFolder}/${imageName}.${nowFallbackExt}`;
+  const bg_hs = `assets/img/${hsFolder}/${imageName}.${nowExt}`;
+  const bg_hs_fallback = `assets/img/${hsFolder}/${imageName}.${nowFallbackExt}`;
   const klass = p.grad_class || '';
   const org = p.org ? p.org : (p.conference || '');
   const playerInfo = JSON.stringify(p).replace(/'/g,"&apos;");
@@ -488,8 +493,8 @@ function cardHTML(p){
       <div class="flip">
         <!-- FRONT -->
         <div class="face front">
-          <div class="bg" style="background-image:url('${bg_now_jpg}')"
-               onerror="this.onerror=null; this.style.backgroundImage='url(${bg_now_png})'"></div>
+          <div class="bg" style="background-image:url('${bg_now}')"
+               onerror="this.onerror=null; this.style.backgroundImage='url(${bg_now_fallback})'"></div>
           <div class="shade"></div>
           <div class="front-bottom-content">
             <div class="front-chips-row">
@@ -536,19 +541,17 @@ function cardHTML(p){
             </div>
             <div class="back-photo-right">
               <a href="${profileURL(p)}">
-                <img src="${bg_hs_jpg}" class="back-player-photo" alt="${name}"
-                     onerror="this.onerror=null; this.src='${bg_hs_png}'">
+                <img src="${bg_hs}" class="back-player-photo" alt="${name}"
+                     onerror="this.onerror=null; this.src='${bg_hs_fallback}'">
               </a>
             </div>
           </div>
           <nav class="back-nav">
-            <button class="back-nav-link active" data-content="stats">STATS</button>
-            <button class="back-nav-link" data-content="bio">BIO</button>
-            <button class="back-nav-link" data-content="news">NEWS</button>
-            <button class="back-nav-link" data-content="social">SOCIAL</button>
-            <button class="back-nav-link" data-content="nil">NIL PTS</button>
-            <button class="back-nav-link" data-content="video">VIDEO</button>
-            <button class="back-nav-link" data-content="pics">FAN PICS</button>
+            <button class="back-nav-link active" data-content="stats">SEASON & CAREER STATS</button>
+            <button class="back-nav-link" data-content="news">NEWS/HIGHLIGHTS</button>
+            <button class="back-nav-link" data-content="social">SOCIAL MEDIA</button>
+            <button class="back-nav-link" data-content="mentor">MENTORSHIP MARKETPLACE</button>
+            <button class="back-nav-link" data-content="pics">GALLERY</button>
           </nav>
           <div class="fun-zone">${generateStatsGridHTML(p)}</div>
         </div>
@@ -690,14 +693,15 @@ async function handleFunZone(button){
       : `<p style="padding:12px;text-align:center;">No video available for ${player.display_name}.</p>`;
     return;
   }
-  if (content === 'nil'){
+  if (content === 'mentor'){
     funZone.innerHTML = player.nil_score
-      ? `<div class="stats-header-bar">YAT-A-BOY NIL SCORE</div>
+      ? `<div class="stats-header-bar">MENTORSHIP MARKETPLACE</div>
          <div class="nil-score-container">
            <div class="nil-score-value">${player.nil_score}</div>
-           <div class="nil-score-label">Points</div>
-         </div>`
-      : `<p style="padding:12px;text-align:center;">NIL Score not available for ${player.display_name}.</p>`;
+           <div class="nil-score-label">MENTORSHIP VALUE</div>
+         </div>
+         <p style="padding:12px;text-align:center;">Upload your baseball video (hitting, throwing, fielding, etc.) and get personalized feedback, coaching, and encouragement from ${player.display_name}! YAT?STATS brokers the deal with a small processing fee.</p>`
+      : `<p style="padding:12px;text-align:center;">Mentorship not available for ${player.display_name}.</p>`;
     return;
   }
   if (content === 'bio'){
@@ -706,7 +710,7 @@ async function handleFunZone(button){
       funZone.innerHTML = `<p style="padding:12px;text-align:center;">AI service unavailable.</p>`;
       return;
     }
-    const prompt = `Act as an optimistic but knowledgeable high school baseball scout. Write a brief, 2-3 sentence scouting report for ${player.display_name}. Highlight his journey and potential future in a positive, "Yat-A-Boy!" style.`;
+    const prompt = `Act as an optimistic but knowledgeable high school baseball scout. Write a brief, 2-3 sentence scouting report for ${player.display_name}. Highlight his journey and potential future in a positive, "YAT-A-BOY!" style.`;
     try{
       const text = await generateGeminiText(prompt);
       funZone.innerHTML = `<div style="padding:12px;line-height:1.4;">${text}</div>`;
@@ -870,21 +874,17 @@ window.gemini = {
 };
 /* Boot */
 document.addEventListener('DOMContentLoaded', ()=>{
-  // Splash once per session
+  console.log('Script starting - hiding splash');
   const splash = $('#splashScreen');
-  if (sessionStorage.getItem('splashShown')) {
-    if (splash) splash.style.display='none';
-  } else {
-    if (splash){
-      setTimeout(()=>{
-        splash.classList.add('is-hidden');
-        splash.addEventListener('transitionend', (e)=>{ if(e.target===splash) splash.style.display='none'; }, {once:true});
-      }, 2000); // Reduced timeout for faster hide
-      // Fallback force-hide if stuck
-      setTimeout(() => { if (splash.style.display !== 'none') splash.style.display = 'none'; }, 5000);
-    }
-    sessionStorage.setItem('splashShown','true');
+  // Temporarily always show and hide for testing - remove session check
+  if (splash){
+    setTimeout(()=>{
+      splash.classList.add('is-hidden');
+      splash.addEventListener('transitionend', (e)=>{ if(e.target===splash) splash.style.display='none'; console.log('Splash hidden via transition'); }, {once:true});
+    }, 2000);
+    setTimeout(() => { if (splash.style.display !== 'none') { splash.style.display = 'none'; console.log('Splash force hidden'); } }, 5000);
   }
+  sessionStorage.setItem('splashShown','true');
   (async ()=>{
     try{
       setupTheme();
