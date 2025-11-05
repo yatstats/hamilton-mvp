@@ -608,6 +608,7 @@ function defaultSort(a,b){
   if (cA !== cB) return cA - cB;
   return (a.display_name||'').localeCompare(b.display_name||'');
 }
+```javascript
 /* Filters */
 function populateFilters(players){
   const levels = [...new Set(players.map(p=>p.level).filter(Boolean))]
@@ -615,6 +616,11 @@ function populateFilters(players){
   $('#filterLevels').innerHTML =
     '<label class="select-all-label"><input type="checkbox" class="select-all"> Select All</label>' +
     levels.map(level=>`<label><input type="checkbox" value="${level}"> ${level}</label>`).join('');
+  // Dynamic statuses
+  const statuses = [...new Set(players.map(p => p.status).filter(Boolean))].sort();
+  $('#filterStatus').innerHTML =
+    '<label class="select-all-label"><input type="checkbox" class="select-all"> Select All</label>' +
+    statuses.map(status => `<label><input type="checkbox" value="${status}"> ${status}</label>`).join('');
   const gradClasses = [...new Set(players.map(p=>p.grad_class).filter(Boolean))].sort((a,b)=>b-a);
   $('#filterGradClass').innerHTML =
     '<label class="select-all-label"><input type="checkbox" class="select-all"> Select All</label>' +
@@ -653,11 +659,12 @@ function resetFilters(){
     if(i.type==='checkbox') i.checked=false;
     if(i.type==='text') i.value='';
   });
-  $$('#filterStatus input[value^="ACTIVE"]').forEach(i=>i.checked=true);
-  const sponsorInput = $$('#filterStatus input[value="SPONSOR"]')[0];
-  if (sponsorInput) sponsorInput.checked = true;
+  $$('#filterStatus input[type="checkbox"]:not(.select-all)').forEach(i => {
+    if (i.value.startsWith('ACTIVE') || i.value === 'SPONSOR') i.checked = true;
+  });
   applyFilters();
 }
+```
 /* Live search */
 function makeHit(p){
   const el=document.createElement('div'); el.className='live-hit';
@@ -890,9 +897,10 @@ document.addEventListener('DOMContentLoaded', ()=>{
       const data = await loadCSV(CSV_URL);
       window.PLAYERS = data;
       populateFilters(data);
-      $$('#filterStatus input[value^="ACTIVE"]').forEach(i=>i.checked=true);
-      const sponsorInput = $$('#filterStatus input[value="SPONSOR"]')[0];
-      if (sponsorInput) sponsorInput.checked = true;
+      // Dynamically check ACTIVE and SPONSOR statuses
+      $$('#filterStatus input[type="checkbox"]:not(.select-all)').forEach(i => {
+        if (i.value.startsWith('ACTIVE') || i.value === 'SPONSOR') i.checked = true;
+      });
       applyFilters();
     }catch(err){
       console.error('Initialization failed', err);
