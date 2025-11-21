@@ -638,17 +638,44 @@ function readFilters(){
   return { name, levels, status, classes, rosterYears };
 }
 function applyFilters(){
-  if(!window.PLAYERS) return;
-  const F=readFilters();
-  const filtered = window.PLAYERS.filter(p=>{
-    const nm=(p.display_name||'').toLowerCase();
-    const nameOk = !F.name || nm.includes(F.name);
-    const lvlOk = !F.levels.length || F.levels.includes(p.level);
-    const statOk = !F.status.length || F.status.includes(p.status);
-    const classOk= !F.classes.length || F.classes.includes(p.grad_class);
-    const rosterOk = !F.rosterYears.length || (p.letter_years||'').split(',').some(y=>F.rosterYears.includes(y.trim()));
+  if (!window.PLAYERS) return;
+
+  const F = readFilters();
+
+  // --- detect "select all" in each group ---
+  const statusBoxes = $$('#filterStatus input[type="checkbox"]:not(.select-all)');
+  const allStatusSelected = statusBoxes.length && statusBoxes.every(cb => cb.checked);
+
+  const levelBoxes = $$('#filterLevels input[type="checkbox"]:not(.select-all)');
+  const allLevelsSelected = levelBoxes.length && levelBoxes.every(cb => cb.checked);
+
+  const gradBoxes = $$('#filterGradClass input[type="checkbox"]:not(.select-all)');
+  const allGradSelected = gradBoxes.length && gradBoxes.every(cb => cb.checked);
+
+  const rosterBoxes = $$('#filterRosterYear input[type="checkbox"]:not(.select-all)');
+  const allRosterSelected = rosterBoxes.length && rosterBoxes.every(cb => cb.checked);
+
+  // if a group is "select all", treat it as NO filter
+  if (allStatusSelected)   F.status      = [];
+  if (allLevelsSelected)   F.levels      = [];
+  if (allGradSelected)     F.classes     = [];
+  if (allRosterSelected)   F.rosterYears = [];
+
+  const filtered = window.PLAYERS.filter(p => {
+    const nm      = (p.display_name || '').toLowerCase();
+    const nameOk  = !F.name || nm.includes(F.name);
+    const lvlOk   = !F.levels.length  || F.levels.includes(p.level);
+    const statOk  = !F.status.length  || F.status.includes(p.status);
+    const classOk = !F.classes.length || F.classes.includes(p.grad_class);
+    const rosterOk =
+      !F.rosterYears.length ||
+      (p.letter_years || '')
+        .split(',')
+        .some(y => F.rosterYears.includes(y.trim()));
+
     return nameOk && lvlOk && statOk && classOk && rosterOk;
   });
+
   const sorted = filtered.sort(defaultSort);
   renderCards(sorted);
 }
