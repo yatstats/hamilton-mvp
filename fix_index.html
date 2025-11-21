@@ -308,7 +308,12 @@ body.light-theme .card{box-shadow:0 4px 12px rgba(0,0,0,.1)}
         <label><input type="checkbox" value="ACTIVE 2024"> ACTIVE 2024</label>
         <label><input type="checkbox" value="FREE AGENT"> FREE AGENT</label>
         <label><input type="checkbox" value="INJURED"> INJURED</label>
-        <label><input type="checkbox" value="RETIRED"> RETIRED</label>
+        <!-- RETIRED acts as umbrella for ALL retired statuses -->
+        <label><input type="checkbox" value="RETIRED"> RETIRED (ALL)</label>
+        <!-- Specific retired flavours that match your new CSV statuses -->
+        <label><input type="checkbox" value="RETIRED-COLLEGE"> RETIRED – COLLEGE</label>
+        <label><input type="checkbox" value="RETIRED-DRAFTED"> RETIRED – DRAFTED</label>
+        <label><input type="checkbox" value="RETIRED-SIGNED"> RETIRED – SIGNED</label>
         <label><input type="checkbox" value="SPONSOR"> SPONSOR</label>
       </div>
     </details>
@@ -366,7 +371,7 @@ body.light-theme .card{box-shadow:0 4px 12px rgba(0,0,0,.1)}
 </footer>
 <!-- MAIN APP SCRIPT (single module, no nested <script> tags) -->
 <script type="module">
-/* ---- YATSTATS • Hamilton • build 5.0.36 ---- */
+/* ---- YATSTATS • Hamilton • build 5.0.36 (retired-status fix) ---- */
 /* Config */
 const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQcWJM6Q6hTdFnES_G5LUy4teCS-sJ5HdAc9F5HSY8DGE9egdGy8yUAe2ShT3tFm-CwUuCYeAYy_YiW/pub?gid=2028135390&output=csv";
 /* Shorthand & utils */
@@ -472,7 +477,12 @@ function formatNextGame(p){
 function cardHTML(p){
   const name = p.display_name || 'Player Name';
   const imageName = imageNameOf(p);
-  const isSponsor = (p.status||'').toUpperCase() === 'SPONSOR';
+
+  // normalized status & flags
+  const statusUpper = (p.status || '').toUpperCase();
+  const isSponsor = statusUpper === 'SPONSOR';
+  const isRetired = statusUpper.startsWith('RETIRED');
+
   const nowFolder = isSponsor ? 'partners' : 'now_players';
   const hsFolder = isSponsor ? 'partners' : 'hs_players';
   const nowExt = isSponsor ? 'png' : 'jpg';
@@ -485,8 +495,8 @@ function cardHTML(p){
   const org = p.org ? p.org : (p.conference || '');
   const playerInfo = JSON.stringify(p).replace(/'/g,"&apos;");
   const letterYears = (p.letter_years || '').split(',').map(y=>y.trim().slice(-2)).filter(Boolean);
-  const isRetired = (p.status||'').toUpperCase()==='RETIRED';
   const nextGameText = formatNextGame(p);
+
   return `
   <article class="card" aria-label="${name}" data-player-info='${playerInfo}'>
     <div class="card-inner">
@@ -639,7 +649,21 @@ function applyFilters(){
     const nm=(p.display_name||'').toLowerCase();
     const nameOk = !F.name || nm.includes(F.name);
     const lvlOk = !F.levels.length || F.levels.includes(p.level);
-    const statOk = !F.status.length || F.status.includes(p.status);
+
+    // ---- STATUS FILTER (handles RETIRED, RETIRED-COLLEGE, etc.) ----
+    const statusFilters = F.status.map(s => s.toUpperCase());
+    const playerStatus = (p.status || '').toUpperCase();
+    const statOk =
+      !statusFilters.length ||
+      statusFilters.some(f => {
+        if (f === 'RETIRED') {
+          // umbrella: match any retired sub-status, e.g. RETIRED-COLLEGE
+          return playerStatus.startsWith('RETIRED');
+        }
+        // otherwise require exact match
+        return playerStatus === f;
+      });
+
     const classOk= !F.classes.length || F.classes.includes(p.grad_class);
     const rosterOk = !F.rosterYears.length || (p.letter_years||'').split(',').some(y=>F.rosterYears.includes(y.trim()));
     return nameOk && lvlOk && statOk && classOk && rosterOk;
