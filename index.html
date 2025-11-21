@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Where They YAT? • Hamilton YAT?STATS</title>
+<ALL-TIME NEXT-LEVEL LIST</title>
 <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400&family=Bebas+Neue&display=swap" rel="stylesheet">
 <!-- Firebase init (separate script) -->
@@ -215,7 +215,7 @@ body.light-theme .card{box-shadow:0 4px 12px rgba(0,0,0,.1)}
     </div>
   </div>
   <div class="splash-bottom">
-    <img src="assets/img/schools/hamilton.az.png" alt="Hamilton Huskies Logo" class="splash-logo-h">
+    <img src="assets/img/schools/az.hamilton.png" alt="Hamilton Huskies Logo" class="splash-logo-h">
     <img src="assets/img/partners/american_logo.png" alt="American Logo" class="splash-logo-ne">
   </div>
 </div>
@@ -233,8 +233,8 @@ body.light-theme .card{box-shadow:0 4px 12px rgba(0,0,0,.1)}
       <a href="index.html" class="nav-pair"><span class="thin">WHERE THEY</span><span class="bold">YAT?</span></a>
       <a href="alumni-news.html" class="nav-pair"><span class="thin">ACTIVE ALUMNI</span><span class="bold">NEWS</span></a>
       <a href="all-time-list.html" class="nav-pair"><span class="thin">NEXT-LEVEL</span><span class="bold">ALL-TIME LIST</span></a>
-      <a href="current-team.html" class="nav-pair"><span class="thin">THE</span><span class="bold">CURRENT TEAM</span></a>
       <a href="marketplace.html" class="nav-pair"><span class="thin">MENTORSHIP</span><span class="bold">MARKETPLACE</span></a>
+      <a href="current-team.html" class="nav-pair"><span class="thin">THE</span><span class="bold">CURRENT TEAM</span></a>
       <a href="partner-program.html" class="nav-pair"><span class="thin">PCD ACTION</span><span class="bold">PARTNER PROGRAM</span></a>
       <a href="faq.html" class="nav-pair"><span class="bold">FAQ’S</span></a>
     </nav>
@@ -244,7 +244,7 @@ body.light-theme .card{box-shadow:0 4px 12px rgba(0,0,0,.1)}
   </div>
   <div class="hr-y"></div>
   <div class="container schoolrow">
-    <img id="hamLogo" class="ham-logo" src="assets/img/schools/hamilton.az.png" alt="Hamilton H" onerror="this.src='assets/img/placeholder.png';">
+    <img id="hamLogo" class="ham-logo" src="assets/img/schools/az.hamilton.png" alt="Hamilton H" onerror="this.src='assets/img/placeholder.png';">
     <div class="schooltext">
       <div class="small">CHANDLER, AZ</div>
       <div class="big1">HAMILTON HIGH SCHOOL</div>
@@ -308,7 +308,10 @@ body.light-theme .card{box-shadow:0 4px 12px rgba(0,0,0,.1)}
         <label><input type="checkbox" value="ACTIVE 2024"> ACTIVE 2024</label>
         <label><input type="checkbox" value="FREE AGENT"> FREE AGENT</label>
         <label><input type="checkbox" value="INJURED"> INJURED</label>
-        <label><input type="checkbox" value="RETIRED"> RETIRED</label>
+        <label><input type="checkbox" value="RETIRED-COLLEGE"> RETIRED-COLLEGE</label>
+        <label><input type="checkbox" value="RETIRED-DRAFTED"> RETIRED-DRAFTED</label>
+        <label><input type="checkbox" value="RETIRED-SIGNED"> RETIRED-SIGNED</label>
+        <label><input type="checkbox" value="RETIRED-SPONSOR"> RETIRED-SPONSOR</label>
         <label><input type="checkbox" value="SPONSOR"> SPONSOR</label>
       </div>
     </details>
@@ -366,8 +369,7 @@ body.light-theme .card{box-shadow:0 4px 12px rgba(0,0,0,.1)}
 </footer>
 <!-- MAIN APP SCRIPT (single module, no nested <script> tags) -->
 <script type="module">
-/* ---- YATSTATS • Hamilton • build 5.0.36 ---- */
-/* Config */
+/* ---- YATSTATS • Hamilton • build 5.0.37 ---- */
 const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQcWJM6Q6hTdFnES_G5LUy4teCS-sJ5HdAc9F5HSY8DGE9egdGy8yUAe2ShT3tFm-CwUuCYeAYy_YiW/pub?gid=2028135390&output=csv";
 /* Shorthand & utils */
 const $ = s => document.querySelector(s);
@@ -400,11 +402,10 @@ async function loadCSV(url){
       height:r[idx('height')], weight:r[idx('weight')], bats:r[idx('bats')], throws:r[idx('throws')],
       draft_info:r[idx('Draft_Info')] ?? r[idx('draft_info')],
       colleges:r[idx('Colleges')] ?? r[idx('colleges')],
-      /* NEW: split next-game fields + fallback */
       next_game_date: r[idx('next_game_date')],
       next_game_time: r[idx('next_game_time')],
       next_game_opponent: r[idx('next_game_opponent')],
-      next_game_datetime: r[idx('next_game_datetime')], /* legacy fallback */
+      next_game_datetime: r[idx('next_game_datetime')],
       last_game_1:r[idx('last_game_1')], last_game_2:r[idx('last_game_2')], last_game_3:r[idx('last_game_3')],
       x_handle:r[idx('x_handle')], ig_handle:r[idx('ig_handle')],
       video_url:r[idx('video_url')], nil_score:r[idx('nil_score')],
@@ -425,12 +426,13 @@ function slugOf(p){
   return (p.display_name||'').trim().toLowerCase().replace(/[^a-z0-9]+/g,'-');
 }
 function imageNameOf(p){
-  // Sponsors: force slug
-  if (p.status && p.status.toUpperCase() === 'SPONSOR' && p.slug) {
+  const statusUpper = (p.status || '').toUpperCase();
+  // Sponsors (active + retired): force slug for image naming
+  if ((statusUpper === 'SPONSOR' || statusUpper === 'RETIRED-SPONSOR') && p.slug) {
     return p.slug.trim()
       .toLowerCase()
-      .replace(/\s+/g, '_') // spaces → underscores
-      .replace(/[^a-z0-9_]/g,''); // strip invalid chars
+      .replace(/\s+/g, '_')
+      .replace(/[^a-z0-9_]/g,'');
   }
   // Everyone else: first + last
   const first = (p.first || '').toLowerCase().replace(/\s+/g,'_');
@@ -456,13 +458,12 @@ function formatStatValue(key, value){
   }
   return value;
 }
-/* Build "NEXT GAME" text from new split fields (fallback to legacy) */
 function formatNextGame(p){
   const date = (p.next_game_date||'').trim();
   const time = (p.next_game_time||'').trim();
   const opp = (p.next_game_opponent||'').trim();
   if (!date && !time && !opp && p.next_game_datetime) {
-    return p.next_game_datetime; // legacy one-liner
+    return p.next_game_datetime;
   }
   const when = [date, time].filter(Boolean).join(' ').trim();
   const parts = [when || 'TBD', opp].filter(Boolean);
@@ -472,11 +473,12 @@ function formatNextGame(p){
 function cardHTML(p){
   const name = p.display_name || 'Player Name';
   const imageName = imageNameOf(p);
-  const isSponsor = (p.status||'').toUpperCase() === 'SPONSOR';
-  const nowFolder = isSponsor ? 'partners' : 'now_players';
-  const hsFolder = isSponsor ? 'partners' : 'hs_players';
-  const nowExt = isSponsor ? 'png' : 'jpg';
-  const nowFallbackExt = isSponsor ? 'jpg' : 'png';
+  const statusUpper = (p.status || '').toUpperCase();
+  const isSponsorImage = (statusUpper === 'SPONSOR' || statusUpper === 'RETIRED-SPONSOR');
+  const nowFolder = isSponsorImage ? 'partners' : 'now_players';
+  const hsFolder = isSponsorImage ? 'partners' : 'hs_players';
+  const nowExt = isSponsorImage ? 'png' : 'jpg';
+  const nowFallbackExt = isSponsorImage ? 'jpg' : 'png';
   const bg_now = `assets/img/${nowFolder}/${imageName}.${nowExt}`;
   const bg_now_fallback = `assets/img/${nowFolder}/${imageName}.${nowFallbackExt}`;
   const bg_hs = `assets/img/${hsFolder}/${imageName}.${nowExt}`;
@@ -485,7 +487,7 @@ function cardHTML(p){
   const org = p.org ? p.org : (p.conference || '');
   const playerInfo = JSON.stringify(p).replace(/'/g,"&apos;");
   const letterYears = (p.letter_years || '').split(',').map(y=>y.trim().slice(-2)).filter(Boolean);
-  const isRetired = (p.status||'').toUpperCase()==='RETIRED';
+  const isRetired = statusUpper.startsWith('RETIRED');  // covers RETIRED-*
   const nextGameText = formatNextGame(p);
   return `
   <article class="card" aria-label="${name}" data-player-info='${playerInfo}'>
@@ -559,9 +561,9 @@ function cardHTML(p){
     </div>
   </article>`;
 }
-/* Stats grid */
+/* Stats grid – YES, this is where we detect pitchers */
 function generateStatsGridHTML(player){
-  const isPitcher = player.stats['ERA'] !== undefined;
+  const isPitcher = player.stats['ERA'] !== undefined;  // if ERA exists, treat as pitcher
   const batterStats = ['AVG','OBP','SLG','OPS','H','R','HR','RBI','AB','2B','3B','SB'];
   const pitcherStats = ['ERA','K/9','K/BB','WHIP','IP','ER','KO','BB','GP','W-L','SAVES','FIP'];
   const statsToShow = isPitcher ? pitcherStats : batterStats;
@@ -585,12 +587,15 @@ function renderCards(list){
 }
 /* Sorting */
 function defaultSort(a,b){
-  const aIsSponsor = (a.status||'').toUpperCase()==='SPONSOR';
-  const bIsSponsor = (b.status||'').toUpperCase()==='SPONSOR';
+  const aStatus = (a.status||'').toUpperCase();
+  const bStatus = (b.status||'').toUpperCase();
+  // Only ACTIVE sponsor gets priority; RETIRED-SPONSOR behaves like retired
+  const aIsSponsor = aStatus === 'SPONSOR';
+  const bIsSponsor = bStatus === 'SPONSOR';
   if (aIsSponsor && !bIsSponsor) return -1;
   if (!aIsSponsor && bIsSponsor) return 1;
-  const aIsPriority = (a.status||'').toUpperCase().includes('ACTIVE') || (a.status||'').toUpperCase()==='FREE AGENT';
-  const bIsPriority = (b.status||'').toUpperCase().includes('ACTIVE') || (b.status||'').toUpperCase()==='FREE AGENT';
+  const aIsPriority = aStatus.includes('ACTIVE') || aStatus === 'FREE AGENT';
+  const bIsPriority = bStatus.includes('ACTIVE') || bStatus === 'FREE AGENT';
   if (aIsPriority && !bIsPriority) return -1;
   if (!aIsPriority && bIsPriority) return 1;
   if (aIsPriority && bIsPriority){
@@ -633,19 +638,45 @@ function readFilters(){
   return { name, levels, status, classes, rosterYears };
 }
 function applyFilters(){
-  if(!window.PLAYERS) return;
-  const F=readFilters();
-  const filtered = window.PLAYERS.filter(p=>{
-    const nm=(p.display_name||'').toLowerCase();
-    const nameOk = !F.name || nm.includes(F.name);
-    const lvlOk = !F.levels.length || F.levels.includes(p.level);
-    const statOk = !F.status.length || F.status.includes(p.status);
-    const classOk= !F.classes.length || F.classes.includes(p.grad_class);
-    const rosterOk = !F.rosterYears.length || (p.letter_years||'').split(',').some(y=>F.rosterYears.includes(y.trim()));
+  if (!window.PLAYERS) return;
+
+  const F = readFilters();
+
+  // --- detect "select all" in each group ---
+  const statusBoxes = $$('#filterStatus input[type="checkbox"]:not(.select-all)');
+  const allStatusSelected = statusBoxes.length && statusBoxes.every(cb => cb.checked);
+
+  const levelBoxes = $$('#filterLevels input[type="checkbox"]:not(.select-all)');
+  const allLevelsSelected = levelBoxes.length && levelBoxes.every(cb => cb.checked);
+
+  const gradBoxes = $$('#filterGradClass input[type="checkbox"]:not(.select-all)');
+  const allGradSelected = gradBoxes.length && gradBoxes.every(cb => cb.checked);
+
+  const rosterBoxes = $$('#filterRosterYear input[type="checkbox"]:not(.select-all)');
+  const allRosterSelected = rosterBoxes.length && rosterBoxes.every(cb => cb.checked);
+
+  // if a group is "select all", treat it as NO filter
+  if (allStatusSelected)   F.status      = [];
+  if (allLevelsSelected)   F.levels      = [];
+  if (allGradSelected)     F.classes     = [];
+  if (allRosterSelected)   F.rosterYears = [];
+
+  const filtered = window.PLAYERS.filter(p => {
+    const nm      = (p.display_name || '').toLowerCase();
+    const nameOk  = !F.name || nm.includes(F.name);
+    const lvlOk   = !F.levels.length  || F.levels.includes(p.level);
+    const statOk  = !F.status.length  || F.status.includes(p.status);
+    const classOk = !F.classes.length || F.classes.includes(p.grad_class);
+    const rosterOk =
+      !F.rosterYears.length ||
+      (p.letter_years || '')
+        .split(',')
+        .some(y => F.rosterYears.includes(y.trim()));
+
     return nameOk && lvlOk && statOk && classOk && rosterOk;
   });
+
   const sorted = filtered.sort(defaultSort);
-  console.log('Sorted players:', sorted); // Debug log for sorting
   renderCards(sorted);
 }
 function resetFilters(){
@@ -653,12 +684,13 @@ function resetFilters(){
     if(i.type==='checkbox') i.checked=false;
     if(i.type==='text') i.value='';
   });
+  // Initial load: ACTIVEs + SPONSOR only (no retired or retired-sponsor)
   $$('#filterStatus input[value^="ACTIVE"]').forEach(i=>i.checked=true);
   const sponsorInput = $$('#filterStatus input[value="SPONSOR"]')[0];
   if (sponsorInput) sponsorInput.checked = true;
   applyFilters();
 }
-/* Live search */
+/* Live search (optional, same as before) */
 function makeHit(p){
   const el=document.createElement('div'); el.className='live-hit';
   const imageName=imageNameOf(p);
@@ -677,7 +709,7 @@ function liveSearch(){
   const hits=(window.PLAYERS||[]).filter(p=>(p.display_name||'').toLowerCase().includes(q)).slice(0,25);
   box.innerHTML=''; hits.forEach(p=>box.appendChild(makeHit(p)));
 }
-/* Fun Zone (no nested <script> tags!) */
+/* Fun Zone */
 async function handleFunZone(button){
   const card = button.closest('.card') || document.body;
   const funZone = card.querySelector('.fun-zone');
@@ -871,17 +903,29 @@ window.gemini = {
 };
 /* Boot */
 document.addEventListener('DOMContentLoaded', ()=>{
-  console.log('Script starting - hiding splash');
   const splash = $('#splashScreen');
-  // Temporarily always show and hide for testing - remove session check
   if (splash){
-    setTimeout(()=>{
+    const alreadyShown = sessionStorage.getItem('splashShown') === 'true';
+    if (alreadyShown){
+      // Hide immediately on repeat visits from this tab
       splash.classList.add('is-hidden');
-      splash.addEventListener('transitionend', (e)=>{ if(e.target===splash) splash.style.display='none'; console.log('Splash hidden via transition'); }, {once:true});
-    }, 2000);
-    setTimeout(() => { if (splash.style.display !== 'none') { splash.style.display = 'none'; console.log('Splash force hidden'); } }, 5000);
+      splash.style.display='none';
+    } else {
+      // First visit: show ~3 seconds, then hide and remember
+      setTimeout(()=>{
+        splash.classList.add('is-hidden');
+        splash.addEventListener('transitionend', (e)=>{
+          if(e.target===splash) splash.style.display='none';
+        }, {once:true});
+      }, 3000);
+      setTimeout(() => {
+        if (splash.style.display !== 'none') {
+          splash.style.display = 'none';
+        }
+      }, 6000);
+      sessionStorage.setItem('splashShown','true');
+    }
   }
-  sessionStorage.setItem('splashShown','true');
   (async ()=>{
     try{
       setupTheme();
@@ -890,6 +934,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
       const data = await loadCSV(CSV_URL);
       window.PLAYERS = data;
       populateFilters(data);
+      // Initial default selection
       $$('#filterStatus input[value^="ACTIVE"]').forEach(i=>i.checked=true);
       const sponsorInput = $$('#filterStatus input[value="SPONSOR"]')[0];
       if (sponsorInput) sponsorInput.checked = true;
