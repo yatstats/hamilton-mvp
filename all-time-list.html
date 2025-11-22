@@ -1,52 +1,3 @@
-You’re right – that screenshot makes it obvious what’s wrong:
-
-I fixed the “Boston Kellner first” issue by sorting oldest → newest, but I didn’t special-case pre-2000 records, so your 1985 sponsor (you) floats to the very top. You want:
-
-> page loads should start with Class of 2000 retired players and then march forward to 2025.
-
-
-
-So the sort rules need to be:
-
-1. Era bucket first:
-
-Bucket 0: players with grad_class >= 2000
-
-Bucket 1: everyone else (1985 sponsor, blanks, etc.) → these go after the 2000–2025 list.
-
-
-
-2. Within the 2000+ bucket:
-
-Grad year ascending (2000 → 2025)
-
-Retired before Active in the same class
-
-Higher level first
-
-More varsity years
-
-Alphabetical name
-
-
-
-3. Within the “non-era” bucket (like 1985): same as above, but they’ll always be at the bottom.
-
-
-
-Everything else from the last version stays the same:
-
-All 89 players are loaded from the CSV – no rows are filtered out on page load.
-
-Status + level filters are dynamic from the sheet.
-
-Retired players’ “NEXT GAME” = link to https://yatstats.com/sponsors with “WHERE ARE YOU NOW?”.
-
-Active players show next game from CSV.
-
-
-Here is the full all-time-list.html with the corrected allTimeSort (that’s the only logic change, but I’m giving you the whole file so you can just drop it in).
-
 <!doctype html>
 <html lang="en">
 <head>
@@ -1135,5 +1086,3 @@ document.addEventListener('DOMContentLoaded', async ()=>{
 </script>
 </body>
 </html>
-
-(If you don’t want to paste the whole file again, you can just swap in the new allTimeSort function I highlighted – but this version is complete if you’d rather overwrite.)
