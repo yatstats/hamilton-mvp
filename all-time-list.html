@@ -56,7 +56,6 @@
   --card-bg:#171717; --header-bg:#000; --drawer-bg:rgba(10,10,10,.65);
   --shade-end:rgba(0,0,0,.95);
   --hamSmall:13px; --hamBig:20px; --hamBigger:24px; --tagGrey:#cfd2d6;
-  /* match index crest size */
   --crestH:clamp(42px,6.3vw,74px);
   --containerPad:16px; --footerH:clamp(56px,8vh,77px);
 }
@@ -478,25 +477,14 @@ body.light-theme .card{box-shadow:0 4px 12px rgba(0,0,0,.1)}
     <details class="filter-group" open>
       <summary class="filter-title">By Status</summary>
       <div class="filter-options" id="filterStatus">
-        <label class="select-all-label"><input type="checkbox" class="select-all"> Select All</label>
-        <label><input type="checkbox" value="ACTIVE 2026"> ACTIVE 2026</label>
-        <label><input type="checkbox" value="ACTIVE 2025"> ACTIVE 2025</label>
-        <label><input type="checkbox" value="ACTIVE 2024"> ACTIVE 2024</label>
-        <label><input type="checkbox" value="FREE AGENT"> FREE AGENT</label>
-        <label><input type="checkbox" value="INJURED"> INJURED</label>
-        <label><input type="checkbox" value="RETIRED-COLLEGE"> RETIRED-COLLEGE</label>
-        <label><input type="checkbox" value="RETIRED-DRAFTED"> RETIRED-DRAFTED</label>
-        <label><input type="checkbox" value="RETIRED-SIGNED"> RETIRED-SIGNED</label>
-        <label><input type="checkbox" value="RETIRED-SPONSOR"> RETIRED-SPONSOR</label>
-        <label><input type="checkbox" value="RETIRED"> RETIRED</label>
-        <label><input type="checkbox" value="SPONSOR"> SPONSOR</label>
+        <!-- dynamically populated from CSV -->
       </div>
     </details>
 
     <details class="filter-group" open>
       <summary class="filter-title">By Level</summary>
       <div class="filter-options" id="filterLevels">
-        <label class="select-all-label"><input type="checkbox" class="select-all"> Select All</label>
+        <!-- dynamically populated from CSV -->
       </div>
     </details>
 
@@ -671,7 +659,7 @@ function formatStatValue(key, value){
   return value;
 }
 
-/* NEXT GAME */
+/* NEXT GAME (for active players only) */
 function formatNextGame(p){
   const date = (p.next_game_date || '').trim();
   const time = (p.next_game_time || '').trim();
@@ -735,7 +723,7 @@ function cardHTML(p){
     .map(y=>y.trim().slice(-2))
     .filter(Boolean);
 
-  const nextGameText = isRetired ? '' : formatNextGame(p);
+  const nextGameText = !isRetired ? formatNextGame(p) : '';
 
   return `
   <article class="card" aria-label="${name}" data-player-info='${playerInfo}'>
@@ -831,9 +819,9 @@ function renderCards(list){
   grid.innerHTML = list.map(cardHTML).join('');
 }
 
-/* ALL-TIME SORT (DEFAULT LOAD ORDER)
-   1) Grad class (ASC – oldest first, so 2000 at top)
-   2) Retired before active within same class
+/* ALL-TIME SORT:
+   1) Grad class (ASC – oldest first)
+   2) Retired before active in same class
    3) Level (levelOrder DESC)
    4) # of varsity years (DESC)
    5) Alphabetical display_name
@@ -841,7 +829,7 @@ function renderCards(list){
 function allTimeSort(a,b){
   const gradA = parseInt(a.grad_class,10) || 0;
   const gradB = parseInt(b.grad_class,10) || 0;
-  if (gradA !== gradB) return gradA - gradB; // oldest first
+  if (gradA !== gradB) return gradA - gradB; // 2000 -> 2025
 
   const isRetiredA = (a.status || '').toUpperCase().startsWith('RETIRED');
   const isRetiredB = (b.status || '').toUpperCase().startsWith('RETIRED');
@@ -860,38 +848,60 @@ function allTimeSort(a,b){
 
 /* Filters */
 function populateFilters(players){
+  // STATUS – dynamic from CSV
+  const statuses = [...new Set(players.map(p=>p.status).filter(Boolean))].sort();
+  $('#filterStatus').innerHTML =
+    '<label class="select-all-label"><input type="checkbox" class="select-all" checked> Select All</label>' +
+    statuses.map(s=>`<label><input type="checkbox" value="${s}" checked> ${s}</label>`).join('');
+
+  // LEVELS
   const levels = [...new Set(players.map(p=>p.level).filter(Boolean))]
     .sort((a,b)=>(levelOrder[b?.toUpperCase()]??-1)-(levelOrder[a?.toUpperCase()]??-1));
   $('#filterLevels').innerHTML =
-    '<label class="select-all-label"><input type="checkbox" class="select-all"> Select All</label>' +
-    levels.map(level=>`<label><input type="checkbox" value="${level}"> ${level}</label>`).join('');
+    '<label class="select-all-label"><input type="checkbox" class="select-all" checked> Select All</label>' +
+    levels.map(level=>`<label><input type="checkbox" value="${level}" checked> ${level}</label>`).join('');
 
+  // GRAD CLASS (2000 -> 2025)
   const gradClasses = [...new Set(players.map(p=>p.grad_class).filter(Boolean))]
-    .sort((a,b)=>a-b); // 2000 -> 2025
+    .sort((a,b)=>a-b);
   $('#filterGradClass').innerHTML =
-    '<label class="select-all-label"><input type="checkbox" class="select-all"> Select All</label>' +
-    gradClasses.map(y=>`<label><input type="checkbox" value="${y}"> ${y}</label>`).join('');
+    '<label class="select-all-label"><input type="checkbox" class="select-all" checked> Select All</label>' +
+    gradClasses.map(y=>`<label><input type="checkbox" value="${y}" checked> ${y}</label>`).join('');
 
+  // ROSTER YEARS
   const rosterYears = [...new Set(
     players.flatMap(p=>(p.letter_years||'').split(',')).map(y=>y.trim()).filter(Boolean)
   )].sort((a,b)=>a-b);
   $('#filterRosterYear').innerHTML =
-    '<label class="select-all-label"><input type="checkbox" class="select-all"> Select All</label>' +
-    rosterYears.map(y=>`<label><input type="checkbox" value="${y}"> ${y}</label>`).join('');
+    '<label class="select-all-label"><input type="checkbox" class="select-all" checked> Select All</label>' +
+    rosterYears.map(y=>`<label><input type="checkbox" value="${y}" checked> ${y}</label>`).join('');
 }
 
-/* All-Time default filters = EVERYTHING ON */
+/* All-Time default filters = "everything selected" == NO FILTER */
 function setAllTimeDefaults(){
-  $$('#filters input[type="checkbox"]:not(.select-all)').forEach(cb=>{ cb.checked = true; });
-  $$('#filters input.select-all').forEach(cb=>{ cb.checked = true; });
+  $$('#filters input[type="checkbox"]').forEach(cb=>{ cb.checked = true; });
 }
 
+/* Treat "all boxes checked" as no filter so everyone shows */
 function readFilters(){
+  const players = window.PLAYERS || [];
   const name = ($('#filterName')?.value||'').trim().toLowerCase();
-  const levels = $$('#filterLevels input:checked:not(.select-all)').map(i=>i.value);
-  const status = $$('#filterStatus input:checked:not(.select-all)').map(i=>i.value);
-  const classes = $$('#filterGradClass input:checked:not(.select-all)').map(i=>i.value);
-  const rosterYears = $$('#filterRosterYear input:checked:not(.select-all)').map(i=>i.value);
+
+  const selectedLevels  = $$('#filterLevels input:checked:not(.select-all)').map(i=>i.value);
+  const selectedStatus  = $$('#filterStatus input:checked:not(.select-all)').map(i=>i.value);
+  const selectedClasses = $$('#filterGradClass input:checked:not(.select-all)').map(i=>i.value);
+  const selectedRoster  = $$('#filterRosterYear input:checked:not(.select-all)').map(i=>i.value);
+
+  const allLevels   = [...new Set(players.map(p=>p.level).filter(Boolean))];
+  const allStatuses = [...new Set(players.map(p=>p.status).filter(Boolean))];
+  const allClasses  = [...new Set(players.map(p=>p.grad_class).filter(Boolean))];
+  const allRoster   = [...new Set(players.flatMap(p=>(p.letter_years||'').split(',')).map(y=>y.trim()).filter(Boolean))];
+
+  const levels      = (selectedLevels.length  === allLevels.length  ) ? [] : selectedLevels;
+  const status      = (selectedStatus.length  === allStatuses.length) ? [] : selectedStatus;
+  const classes     = (selectedClasses.length === allClasses.length ) ? [] : selectedClasses;
+  const rosterYears = (selectedRoster.length  === allRoster.length  ) ? [] : selectedRoster;
+
   return { name, levels, status, classes, rosterYears };
 }
 
@@ -908,7 +918,7 @@ function applyFilters(){
       (p.letter_years||'').split(',').some(y=>F.rosterYears.includes(y.trim()));
     return nameOk && lvlOk && statOk && classOk && rosterOk;
   });
-  const sorted = filtered.sort(allTimeSort);
+  const sorted = filtered.slice().sort(allTimeSort);
   renderCards(sorted);
 }
 
@@ -1190,8 +1200,8 @@ document.addEventListener('DOMContentLoaded', async ()=>{
     window.PLAYERS = data;       // all rows from sheet
 
     populateFilters(data);
-    setAllTimeDefaults();        // all statuses/levels/years ON
-    applyFilters();              // shows all players, sorted 2000 → 2025
+    setAllTimeDefaults();        // everything visually checked
+    applyFilters();              // shows ALL players, sorted 2000 → 2025, retired first per class
   }catch(err){
     console.error('Initialization failed', err);
     $('#cardGrid').innerHTML =
