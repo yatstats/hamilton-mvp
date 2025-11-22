@@ -951,7 +951,7 @@ function liveSearch(){
   box.innerHTML=''; hits.forEach(p=>box.appendChild(makeHit(p)));
 }
 
-/* Fun-zone tabs (unchanged) */
+/* Fun-zone tabs */
 async function handleFunZone(button){
   const card = button.closest('.card') || document.body;
   const funZone = card.querySelector('.fun-zone');
@@ -1037,11 +1037,137 @@ async function handleFunZone(button){
   funZone.innerHTML = `<p style="padding:12px;text-align:center;">Content for ${content} coming soon.</p>`;
 }
 
-/* Auth UI / Theme / Drawers (unchanged from previous full file) */
-function setupAuth(){ /* same as before */ }
-function setupTheme(){ /* same as before */ }
-function closeDrawers(){ document.body.classList.remove('drawer-left-open','drawer-right-open','drawer-open'); }
-function setupEventListeners(){ /* same as before; omitted for brevity in this block */ }
+/* Auth UI */
+function setupAuth(){
+  if (!window.firebaseAuth){ console.warn("Firebase auth script not ready yet, skipping auth setup."); return; }
+  const { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } = window.firebaseAuth;
+  const auth = window.auth;
+
+  const signInForm  = $('#signInForm');
+  const registerForm= $('#registerForm');
+  const signOutBtn  = $('#btnSignOut');
+  const authMessage = $('#authMessage');
+
+  signInForm?.addEventListener('submit', async e=>{
+    e.preventDefault();
+    try{
+      await signInWithEmailAndPassword(auth, $('#signInEmail').value, $('#signInPassword').value);
+      authMessage.textContent='Sign in successful!'; authMessage.className='success';
+      setTimeout(()=>{ closeDrawers(); authMessage.textContent=''; },1500);
+    }catch(err){
+      authMessage.textContent=err.message; authMessage.className='error';
+    }
+  });
+
+  registerForm?.addEventListener('submit', async e=>{
+    e.preventDefault();
+    try{
+      await createUserWithEmailAndPassword(auth, $('#registerEmail').value, $('#registerPassword').value);
+      authMessage.textContent='Registration successful!'; authMessage.className='success';
+      setTimeout(()=>{ closeDrawers(); authMessage.textContent=''; },1500);
+    }catch(err){
+      authMessage.textContent=err.message; authMessage.className='error';
+    }
+  });
+
+  signOutBtn?.addEventListener('click', async ()=>{ await signOut(auth); });
+
+  document.addEventListener('authStateChanged', ({detail})=>{
+    const { user } = detail;
+    const accountBtn=$('#btnAccount'), soBtn=$('#btnSignOut');
+    if (user && !user.isAnonymous){
+      accountBtn.style.display='none'; soBtn.style.display='inline-flex';
+    } else {
+      accountBtn.style.display='inline-flex'; soBtn.style.display='none';
+    }
+  });
+
+  $$('.auth-tab').forEach(tab=>{
+    tab.addEventListener('click', ()=>{
+      const target=tab.dataset.tab;
+      $$('.auth-tab').forEach(t=>t.classList.remove('active'));
+      tab.classList.add('active');
+      $$('.auth-form').forEach(form=>{
+        form.style.display = (form.id===`${target}Form`) ? 'block' : 'none';
+      });
+      authMessage.textContent='';
+    });
+  });
+}
+
+/* Theme */
+function setupTheme(){
+  const themeToggle=$('#theme-toggle'); if(!themeToggle) return;
+  const body=document.body, icon=themeToggle.querySelector('i');
+  const applyTheme=()=>{
+    const saved=localStorage.getItem('theme');
+    if (saved==='light'){
+      body.classList.add('light-theme');
+      icon?.classList.replace('ri-sun-line','ri-moon-line');
+    } else {
+      body.classList.remove('light-theme');
+      icon?.classList.replace('ri-moon-line','ri-sun-line');
+    }
+  };
+  themeToggle.addEventListener('click', ()=>{
+    body.classList.toggle('light-theme');
+    localStorage.setItem('theme', body.classList.contains('light-theme') ? 'light' : 'dark');
+    applyTheme();
+  });
+  applyTheme();
+}
+
+/* Drawers & events */
+function closeDrawers(){
+  document.body.classList.remove('drawer-left-open','drawer-right-open','drawer-open');
+}
+
+function setupEventListeners(){
+  $('#btnMenu')?.addEventListener('click',()=>{
+    document.body.classList.add('drawer-left-open','drawer-open');
+  });
+  $('#openSearch')?.addEventListener('click',()=>{
+    document.body.classList.add('drawer-left-open','drawer-open');
+  });
+  $('#openFilters')?.addEventListener('click',()=>{
+    $('#drawerFilters').style.display='flex';
+    $('#drawerAccount').style.display='none';
+    document.body.classList.add('drawer-right-open','drawer-open');
+  });
+  $('#btnAccount')?.addEventListener('click',()=>{
+    $('#drawerAccount').style.display='flex';
+    $('#drawerFilters').style.display='none';
+    document.body.classList.add('drawer-right-open','drawer-open');
+  });
+  $$('.close-btn').forEach(b=>b.addEventListener('click',closeDrawers));
+  $('.drawer-mask')?.addEventListener('click',closeDrawers);
+
+  $('#filtersReset')?.addEventListener('click',resetFilters);
+  $('#filtersReset2')?.addEventListener('click',resetFilters);
+
+  $('#filterName')?.addEventListener('input',debounce(applyFilters));
+  $('#playerSearch')?.addEventListener('input',debounce(liveSearch));
+
+  $('#filters')?.addEventListener('change',e=>{
+    if (e.target.classList.contains('select-all')){
+      const on = e.target.checked;
+      e.target.closest('.filter-options')
+        ?.querySelectorAll('input[type="checkbox"]:not(.select-all)')
+        .forEach(cb=>cb.checked=on);
+    }
+    applyFilters();
+  });
+
+  $('#cardGrid').addEventListener('click', e=>{
+    const card = e.target.closest('.card'); if(!card) return;
+    if (e.target.closest('.back-nav-link')){
+      handleFunZone(e.target.closest('.back-nav-link'));
+      return;
+    }
+    if (e.target.closest('a')) return;
+    card.classList.toggle('is-flipped');
+  });
+}
 
 /* Gemini stub */
 window.gemini = {
@@ -1076,7 +1202,7 @@ document.addEventListener('DOMContentLoaded', async ()=>{
 
     populateFilters(data);
     setAllTimeDefaults();    // everything visually checked
-    applyFilters();          // all 89 players; 2000 retired guys at the top
+    applyFilters();          // all 89 players; 2000+ retired guys at the top of that era
   }catch(err){
     console.error('Initialization failed', err);
     $('#cardGrid').innerHTML =
