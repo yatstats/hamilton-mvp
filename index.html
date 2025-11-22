@@ -486,6 +486,27 @@ const levelOrder = {
   'NCAA-D1':5,'NCAA-D2':4,'NCAA-D3':3,'NAIA':2,'JUCO':1
 };
 
+/* DEFAULT STATUS FILTERS FOR INITIAL LOAD & RESET */
+const DEFAULT_STATUSES = ['ACTIVE 2025', 'ACTIVE 2024', 'INJURED', 'FREE AGENT'];
+
+function setDefaultStatusFilter() {
+  const container = $('#filterStatus');
+  if (!container) return;
+
+  const allBoxes = Array.from(
+    container.querySelectorAll('input[type="checkbox"]:not(.select-all)')
+  );
+
+  // Check ONLY the default ones
+  allBoxes.forEach(cb => {
+    cb.checked = DEFAULT_STATUSES.includes(cb.value);
+  });
+
+  // Make sure the "Select All" checkbox is *not* checked
+  const selectAll = container.querySelector('.select-all');
+  if (selectAll) selectAll.checked = false;
+}
+
 /* CSV loader */
 async function loadCSV(url){
   const res = await fetch(url);
@@ -849,14 +870,18 @@ function applyFilters(){
   renderCards(sorted);
 }
 
-/* RESET FILTERS – check ALL boxes in every group (which with our logic = “no filtering”) */
+/* RESET FILTERS – back to the "default active" view */
 function resetFilters(){
+  // Clear all checkboxes and text inputs
   $$('#filters input').forEach(i=>{
     if(i.type==='checkbox') i.checked=false;
     if(i.type==='text') i.value='';
   });
 
-  selectAllInGroup('#filterStatus');
+  // Status: ONLY default 4 (ACTIVE 2025, ACTIVE 2024, INJURED, FREE AGENT)
+  setDefaultStatusFilter();
+
+  // Other groups: "no restriction" by selecting all
   selectAllInGroup('#filterLevels');
   selectAllInGroup('#filterGradClass');
   selectAllInGroup('#filterRosterYear');
@@ -1150,8 +1175,11 @@ document.addEventListener('DOMContentLoaded', ()=>{
 
       populateFilters(data);
 
-      // Default: all boxes checked (which with our logic = show everyone)
-      selectAllInGroup('#filterStatus');
+      // DEFAULT VIEW:
+      // Status = ONLY ACTIVE 2025, ACTIVE 2024, INJURED, FREE AGENT
+      setDefaultStatusFilter();
+
+      // Other groups: no restriction (select all)
       selectAllInGroup('#filterLevels');
       selectAllInGroup('#filterGradClass');
       selectAllInGroup('#filterRosterYear');
