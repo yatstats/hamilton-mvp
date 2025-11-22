@@ -671,12 +671,8 @@ function formatStatValue(key, value){
   return value;
 }
 
-/* NEXT GAME + RETIRED LINK */
+/* NEXT GAME */
 function formatNextGame(p){
-  const statusUpper = (p.status || '').toUpperCase();
-  const isRetired = statusUpper.startsWith('RETIRED');
-  if (isRetired) return ''; // retired uses WHERE THEY YAT NOW link instead
-
   const date = (p.next_game_date || '').trim();
   const time = (p.next_game_time || '').trim();
   const opp  = (p.next_game_opponent || '').trim();
@@ -691,13 +687,6 @@ function formatNextGame(p){
   let text = parts.join(' ');
   if (time) text += (text ? ' – ' : '') + time;
   return text || 'TBD';
-}
-
-function retiredWhereNowURL(p){
-  const name = (p.display_name || ((p.first||'') + ' ' + (p.last||''))).trim();
-  if (!name) return '#';
-  const q = encodeURIComponent(`${name} baseball where are they now`);
-  return `https://www.google.com/search?q=${q}`;
 }
 
 /* Stats grid */
@@ -746,7 +735,7 @@ function cardHTML(p){
     .map(y=>y.trim().slice(-2))
     .filter(Boolean);
 
-  const nextGameText = formatNextGame(p);
+  const nextGameText = isRetired ? '' : formatNextGame(p);
 
   return `
   <article class="card" aria-label="${name}" data-player-info='${playerInfo}'>
@@ -771,11 +760,11 @@ function cardHTML(p){
                 ${letterYears.map(y=>`<div class="varsity-dot">${y}</div>`).join('')}
               </div>
               <div class="front-game-block">
-                <div class="game-title-pill">${statusUpper.startsWith('RETIRED') ? 'WHERE THEY YAT NOW?' : 'NEXT GAME'}</div>
+                <div class="game-title-pill">NEXT GAME</div>
                 <div class="game-data-text">
                   ${
-                    statusUpper.startsWith('RETIRED')
-                      ? `<span><a class="where-link" href="${retiredWhereNowURL(p)}" target="_blank" rel="noopener">CLICK TO FIND OUT</a></span>`
+                    isRetired
+                      ? `<span><a class="where-link" href="https://yatstats.com/sponsors" target="_blank" rel="noopener">WHERE ARE YOU NOW?</a></span>`
                       : `<span>${nextGameText}</span>`
                   }
                 </div>
@@ -842,16 +831,21 @@ function renderCards(list){
   grid.innerHTML = list.map(cardHTML).join('');
 }
 
-/* ALL-TIME SORT:
-   1) Grad class (DESC – newest first)
-   2) Level (levelOrder DESC)
-   3) # of varsity years (DESC)
-   4) Alphabetical display_name
+/* ALL-TIME SORT (DEFAULT LOAD ORDER)
+   1) Grad class (ASC – oldest first, so 2000 at top)
+   2) Retired before active within same class
+   3) Level (levelOrder DESC)
+   4) # of varsity years (DESC)
+   5) Alphabetical display_name
 */
 function allTimeSort(a,b){
   const gradA = parseInt(a.grad_class,10) || 0;
   const gradB = parseInt(b.grad_class,10) || 0;
-  if (gradA !== gradB) return gradB - gradA; // newer grad year first
+  if (gradA !== gradB) return gradA - gradB; // oldest first
+
+  const isRetiredA = (a.status || '').toUpperCase().startsWith('RETIRED');
+  const isRetiredB = (b.status || '').toUpperCase().startsWith('RETIRED');
+  if (isRetiredA !== isRetiredB) return isRetiredA ? -1 : 1;
 
   const lvlA = levelOrder[(a.level||'').toUpperCase()] ?? -1;
   const lvlB = levelOrder[(b.level||'').toUpperCase()] ?? -1;
@@ -873,14 +867,14 @@ function populateFilters(players){
     levels.map(level=>`<label><input type="checkbox" value="${level}"> ${level}</label>`).join('');
 
   const gradClasses = [...new Set(players.map(p=>p.grad_class).filter(Boolean))]
-    .sort((a,b)=>b-a);
+    .sort((a,b)=>a-b); // 2000 -> 2025
   $('#filterGradClass').innerHTML =
     '<label class="select-all-label"><input type="checkbox" class="select-all"> Select All</label>' +
     gradClasses.map(y=>`<label><input type="checkbox" value="${y}"> ${y}</label>`).join('');
 
   const rosterYears = [...new Set(
     players.flatMap(p=>(p.letter_years||'').split(',')).map(y=>y.trim()).filter(Boolean)
-  )].sort((a,b)=>b-a);
+  )].sort((a,b)=>a-b);
   $('#filterRosterYear').innerHTML =
     '<label class="select-all-label"><input type="checkbox" class="select-all"> Select All</label>' +
     rosterYears.map(y=>`<label><input type="checkbox" value="${y}"> ${y}</label>`).join('');
@@ -1193,11 +1187,11 @@ document.addEventListener('DOMContentLoaded', async ()=>{
     setupAuth();
 
     const data = await loadCSV(CSV_URL);
-    window.PLAYERS = data;
+    window.PLAYERS = data;       // all rows from sheet
 
     populateFilters(data);
-    setAllTimeDefaults();   // everyone visible on initial load (retired + active)
-    applyFilters();
+    setAllTimeDefaults();        // all statuses/levels/years ON
+    applyFilters();              // shows all players, sorted 2000 → 2025
   }catch(err){
     console.error('Initialization failed', err);
     $('#cardGrid').innerHTML =
