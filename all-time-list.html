@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>All-Time List • Hamilton YAT?STATS</title>
+<title>Next-Level All-Time List • Hamilton YAT?STATS</title>
 
 <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400&family=Bebas+Neue&display=swap" rel="stylesheet">
@@ -56,7 +56,8 @@
   --card-bg:#171717; --header-bg:#000; --drawer-bg:rgba(10,10,10,.65);
   --shade-end:rgba(0,0,0,.95);
   --hamSmall:13px; --hamBig:20px; --hamBigger:24px; --tagGrey:#cfd2d6;
-  --crestH:clamp(28px,4.2vw,42px);
+  /* match index crest size */
+  --crestH:clamp(42px,6.3vw,74px);
   --containerPad:16px; --footerH:clamp(56px,8vh,77px);
 }
 body.light-theme{
@@ -108,12 +109,12 @@ body.light-theme .wordmark-img{filter:invert(1)}
 @media (max-width:1200px){.topnav{display:none !important}}
 .hr-y{border-top:1px solid var(--line)}
 
-.schoolrow{display:flex;align-items:center;gap:10px;padding:6px var(--containerPad)}
+/* SCHOOL ROW – MATCH INDEX */
+.schoolrow{display:flex;align-items:center;gap:12px;padding:6px var(--containerPad)}
 .ham-logo{height:var(--crestH);width:auto;object-fit:contain;display:block;flex-shrink:0}
-.schooltext{line-height:1}
 .schooltext .small{font:300 var(--hamSmall)/1 Oswald;letter-spacing:.02em;color:var(--muted)}
-.schooltext .big1{font:400 var(--hamBig)/1 "Bebas Neue",sans-serif}
-.schooltext .big2{font:400 var(--hamBigger)/1 "Bebas Neue",sans-serif;margin-top:-4px}
+.schooltext .big1{font:400 var(--hamBig)/1 "Bebas Neue",sans-serif;letter-spacing:.09em}
+.schooltext .big2{font:400 var(--hamBigger)/1 "Bebas Neue",sans-serif;letter-spacing:.09em;margin-top:-2px}
 
 /* HERO */
 .crumbs{
@@ -288,6 +289,8 @@ body.light-theme .card{box-shadow:0 4px 12px rgba(0,0,0,.1)}
   padding:2px 6px;font-weight:700;font-family:Oswald,sans-serif;
   border:1px solid rgba(255,255,255,.15);text-transform:uppercase
 }
+.where-link{text-decoration:underline}
+.where-link:hover{text-decoration:none}
 
 /* TYPOGRAPHY SCALE */
 .name{font-size:28px}
@@ -416,10 +419,16 @@ body.light-theme .card{box-shadow:0 4px 12px rgba(0,0,0,.1)}
     <div class="container hero-grid">
       <div class="hero-left" aria-live="polite">
         <div class="tag-duo">
-          <div class="tag-swap"><span class="tag-grey">WHERE THEY</span> <span class="tag-bold">YAT NOW?</span></div>
-          <div class="tag-swap"><span class="tag-grey">NOSTALGIA TIME</span> <span class="tag-bold">BOYS!</span></div>
+          <div class="tag-swap">
+            <span class="tag-grey">WHERE THEY YAT</span>
+            <span class="tag-bold">NOW?</span>
+          </div>
+          <div class="tag-swap">
+            <span class="tag-grey">NOSTALGIA TIME</span>
+            <span class="tag-bold">BOYS!</span>
+          </div>
         </div>
-        <div class="crumbs hero-crumbs">HAMILTON ▸ ALL-TIME LIST</div>
+        <div class="crumbs hero-crumbs">HAMILTON ▸ NEXT-LEVEL ALL-TIME LIST</div>
       </div>
       <div class="hero-right">
         <button id="openSearch" class="hero-icon icon-btn" aria-label="Open search"><i class="ri-search-line"></i></button>
@@ -549,18 +558,18 @@ body.light-theme .card{box-shadow:0 4px 12px rgba(0,0,0,.1)}
 
 <main class="main container">
   <div id="cardGrid" class="grid" aria-live="polite">
-    <p style="color:var(--muted);grid-column:1 / -1;">Loading YATSTATS players...</p>
+    <p style="color:var(--muted);grid-column:1 / -1;">Loading all-time alumni list...</p>
   </div>
 </main>
 
 <footer class="site-footer">
-  <a href="https://www.flowpage.com/petedeluca" target="_blank" rel="noopener noreferrer">
+  <a href="https://www.americanpromo.com/" target="_blank" rel="noopener noreferrer">
     <img src="assets/img/partners/american_banner.png" alt="Sponsor Banner">
   </a>
 </footer>
 
 <script type="module">
-/* ---- YATSTATS • Hamilton • ALL-TIME LIST ---- */
+/* ---- YATSTATS • Hamilton • NEXT-LEVEL ALL-TIME LIST ---- */
 const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQcWJM6Q6hTdFnES_G5LUy4teCS-sJ5HdAc9F5HSY8DGE9egdGy8yUAe2ShT3tFm-CwUuCYeAYy_YiW/pub?gid=2028135390&output=csv";
 
 /* Shorthand & utils */
@@ -568,7 +577,7 @@ const $  = s => document.querySelector(s);
 const $$ = s => Array.from(document.querySelectorAll(s));
 const debounce = (fn, ms=300)=>{ let t; return (...a)=>{ clearTimeout(t); t=setTimeout(()=>fn(...a),ms); }; };
 
-/* Level priority */
+/* Level priority (higher = better) */
 const levelOrder = {
   'MLB':13,'INTERNATIONAL':12,'TRIPLE-A':11,'AAA':11,'DOUBLE-A':10,'AA':10,
   'HIGH-A':9,'A+':9,'LOW-A':8,'A':8,'ROOKIE':7,'ROK':7,'INDY':6,
@@ -585,7 +594,14 @@ async function loadCSV(url){
     .split(/\r?\n/)
     .map(line => line.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/).map(c=>c.replace(/^"|"$/g,'')));
   const header = rows.shift().map(h => h.trim());
-  const idx = name => header.indexOf(name);
+
+  const idx = (...names) => {
+    for (const n of names){
+      const i = header.indexOf(n);
+      if (i !== -1) return i;
+    }
+    return -1;
+  };
 
   const statKeys = [
     'avg','obp','slg','ops','ab','h','r','rbi','2b','3b','hr','sb','bb',
@@ -602,11 +618,11 @@ async function loadCSV(url){
       team:r[idx('team')], org:r[idx('org')], position:r[idx('position')],
       height:r[idx('height')], weight:r[idx('weight')],
       bats:r[idx('bats')], throws:r[idx('throws')],
-      draft_info:r[idx('Draft_Info')] ?? r[idx('draft_info')],
-      colleges:r[idx('Colleges')] ?? r[idx('colleges')],
+      draft_info:r[idx('Draft_Info','draft_info')],
+      colleges:r[idx('Colleges','colleges')],
       next_game_date: r[idx('next_game_date')],
       next_game_time: r[idx('next_game_time')],
-      next_game_opponent: r[idx('next_game_opponent')],
+      next_game_opponent: r[idx('next_game_opponent','next_game_oppon')],
       next_game_datetime: r[idx('next_game_datetime')],
       last_game_1:r[idx('last_game_1')],
       last_game_2:r[idx('last_game_2')],
@@ -654,17 +670,37 @@ function formatStatValue(key, value){
   }
   return value;
 }
+
+/* NEXT GAME + RETIRED LINK */
 function formatNextGame(p){
-  const date=(p.next_game_date||'').trim();
-  const time=(p.next_game_time||'').trim();
-  const opp =(p.next_game_opponent||'').trim();
-  if (!date && !time && !opp && p.next_game_datetime) return p.next_game_datetime;
-  const when=[date,time].filter(Boolean).join(' ').trim();
-  const parts=[when || 'TBD', opp].filter(Boolean);
-  return parts.join(' ').trim() || 'TBD';
+  const statusUpper = (p.status || '').toUpperCase();
+  const isRetired = statusUpper.startsWith('RETIRED');
+  if (isRetired) return ''; // retired uses WHERE THEY YAT NOW link instead
+
+  const date = (p.next_game_date || '').trim();
+  const time = (p.next_game_time || '').trim();
+  const opp  = (p.next_game_opponent || '').trim();
+
+  if (!date && !time && !opp && p.next_game_datetime){
+    return p.next_game_datetime.trim();
+  }
+
+  const parts = [];
+  if (date) parts.push(date);
+  if (opp)  parts.push(opp);
+  let text = parts.join(' ');
+  if (time) text += (text ? ' – ' : '') + time;
+  return text || 'TBD';
 }
 
-/* Card HTML */
+function retiredWhereNowURL(p){
+  const name = (p.display_name || ((p.first||'') + ' ' + (p.last||''))).trim();
+  if (!name) return '#';
+  const q = encodeURIComponent(`${name} baseball where are they now`);
+  return `https://www.google.com/search?q=${q}`;
+}
+
+/* Stats grid */
 function generateStatsGridHTML(player){
   const isPitcher = player.stats['ERA'] !== undefined; // pitcher if ERA exists
   const batterStats  = ['AVG','OBP','SLG','OPS','H','R','HR','RBI','AB','2B','3B','SB'];
@@ -684,11 +720,14 @@ function generateStatsGridHTML(player){
   return grid;
 }
 
+/* Card HTML */
 function cardHTML(p){
   const name = p.display_name || 'Player Name';
   const imageName = imageNameOf(p);
   const statusUpper = (p.status || '').toUpperCase();
+  const isRetired = statusUpper.startsWith('RETIRED'); // includes RETIRED-SPONSOR
   const isSponsorImage = (statusUpper === 'SPONSOR' || statusUpper === 'RETIRED-SPONSOR');
+
   const nowFolder = isSponsorImage ? 'partners'   : 'now_players';
   const hsFolder  = isSponsorImage ? 'partners'   : 'hs_players';
   const nowExt = isSponsorImage ? 'png' : 'jpg';
@@ -707,7 +746,6 @@ function cardHTML(p){
     .map(y=>y.trim().slice(-2))
     .filter(Boolean);
 
-  const isRetired = statusUpper.startsWith('RETIRED'); // includes RETIRED-SPONSOR
   const nextGameText = formatNextGame(p);
 
   return `
@@ -733,6 +771,16 @@ function cardHTML(p){
                 ${letterYears.map(y=>`<div class="varsity-dot">${y}</div>`).join('')}
               </div>
               <div class="front-game-block">
+                <div class="game-title-pill">${statusUpper.startsWith('RETIRED') ? 'WHERE THEY YAT NOW?' : 'NEXT GAME'}</div>
+                <div class="game-data-text">
+                  ${
+                    statusUpper.startsWith('RETIRED')
+                      ? `<span><a class="where-link" href="${retiredWhereNowURL(p)}" target="_blank" rel="noopener">CLICK TO FIND OUT</a></span>`
+                      : `<span>${nextGameText}</span>`
+                  }
+                </div>
+              </div>
+              <div class="front-game-block">
                 <div class="game-title-pill">LAST 3 GAMES</div>
                 <div class="game-data-text">
                   <span class="game-log">${p.last_game_1 || '--'}</span>
@@ -740,11 +788,6 @@ function cardHTML(p){
                   <span class="game-log">${p.last_game_3 || '--'}</span>
                 </div>
               </div>
-              ${!isRetired ? `
-              <div class="front-game-block">
-                <div class="game-title-pill">NEXT GAME</div>
-                <div class="game-data-text"><span>${nextGameText}</span></div>
-              </div>` : ''}
             </div>
           </div>
         </div>
@@ -800,25 +843,23 @@ function renderCards(list){
 }
 
 /* ALL-TIME SORT:
-   1) Grad year (older first)
-   2) Level (MLB/AAA/etc)
-   3) Varsity letter count (more first)
-   4) Alphabetical name
+   1) Grad class (DESC – newest first)
+   2) Level (levelOrder DESC)
+   3) # of varsity years (DESC)
+   4) Alphabetical display_name
 */
-function defaultSort(a,b){
-  const gradA = +a.grad_class || 9999;
-  const gradB = +b.grad_class || 9999;
-  if (gradA !== gradB) return gradA - gradB; // 2004 before 2010
+function allTimeSort(a,b){
+  const gradA = parseInt(a.grad_class,10) || 0;
+  const gradB = parseInt(b.grad_class,10) || 0;
+  if (gradA !== gradB) return gradB - gradA; // newer grad year first
 
-  const levelTextA=(a.level||'').toUpperCase().trim();
-  const levelTextB=(b.level||'').toUpperCase().trim();
-  const levelA=levelOrder[levelTextA] ?? -1;
-  const levelB=levelOrder[levelTextB] ?? -1;
-  if (levelA !== levelB) return levelB - levelA; // MLB above JUCO etc
+  const lvlA = levelOrder[(a.level||'').toUpperCase()] ?? -1;
+  const lvlB = levelOrder[(b.level||'').toUpperCase()] ?? -1;
+  if (lvlA !== lvlB) return lvlB - lvlA;
 
   const lettersA=(a.letter_years||'').split(',').filter(Boolean).length;
   const lettersB=(b.letter_years||'').split(',').filter(Boolean).length;
-  if (lettersA !== lettersB) return lettersB - lettersA; // more letters first
+  if (lettersA !== lettersB) return lettersB - lettersA;
 
   return (a.display_name||'').localeCompare(b.display_name||'');
 }
@@ -832,20 +873,20 @@ function populateFilters(players){
     levels.map(level=>`<label><input type="checkbox" value="${level}"> ${level}</label>`).join('');
 
   const gradClasses = [...new Set(players.map(p=>p.grad_class).filter(Boolean))]
-    .sort((a,b)=>a-b); // keep chronological for nostalgia
+    .sort((a,b)=>b-a);
   $('#filterGradClass').innerHTML =
     '<label class="select-all-label"><input type="checkbox" class="select-all"> Select All</label>' +
     gradClasses.map(y=>`<label><input type="checkbox" value="${y}"> ${y}</label>`).join('');
 
   const rosterYears = [...new Set(
     players.flatMap(p=>(p.letter_years||'').split(',')).map(y=>y.trim()).filter(Boolean)
-  )].sort((a,b)=>a-b);
+  )].sort((a,b)=>b-a);
   $('#filterRosterYear').innerHTML =
     '<label class="select-all-label"><input type="checkbox" class="select-all"> Select All</label>' +
     rosterYears.map(y=>`<label><input type="checkbox" value="${y}"> ${y}</label>`).join('');
 }
 
-/* All-Time defaults = EVERYONE ON (including RETIRED) */
+/* All-Time default filters = EVERYTHING ON */
 function setAllTimeDefaults(){
   $$('#filters input[type="checkbox"]:not(.select-all)').forEach(cb=>{ cb.checked = true; });
   $$('#filters input.select-all').forEach(cb=>{ cb.checked = true; });
@@ -873,7 +914,7 @@ function applyFilters(){
       (p.letter_years||'').split(',').some(y=>F.rosterYears.includes(y.trim()));
     return nameOk && lvlOk && statOk && classOk && rosterOk;
   });
-  const sorted = filtered.sort(defaultSort);
+  const sorted = filtered.sort(allTimeSort);
   renderCards(sorted);
 }
 
@@ -883,7 +924,7 @@ function resetFilters(){
   applyFilters();
 }
 
-/* Live search (drawer) */
+/* Live search */
 function makeHit(p){
   const el=document.createElement('div'); el.className='live-hit';
   const imageName=imageNameOf(p);
@@ -1123,7 +1164,7 @@ function setupEventListeners(){
   });
 }
 
-/* Gemini stub (compat) */
+/* Gemini stub (kept for compatibility) */
 window.gemini = {
   async generateGeminiText(prompt) {
     const apiUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=' + (window.__gemini_api_key || '');
@@ -1155,7 +1196,7 @@ document.addEventListener('DOMContentLoaded', async ()=>{
     window.PLAYERS = data;
 
     populateFilters(data);
-    setAllTimeDefaults();   // EVERY status on, including all RETIRED
+    setAllTimeDefaults();   // everyone visible on initial load (retired + active)
     applyFilters();
   }catch(err){
     console.error('Initialization failed', err);
