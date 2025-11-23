@@ -7,23 +7,6 @@
 <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400&family=Bebas+Neue&display=swap" rel="stylesheet">
 
-<!-- Firebase (same pattern you use elsewhere) -->
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-  import { getAuth, onAuthStateChanged, signInWithCustomToken, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-  window.firebaseAuth = { getAuth, onAuthStateChanged, signInWithCustomToken, signInAnonymously };
-  try {
-    const firebaseConfig = JSON.parse(window.__firebase_config || '{}');
-    const app = initializeApp(firebaseConfig);
-    window.auth = getAuth(app);
-    onAuthStateChanged(window.auth, user => {
-      document.dispatchEvent(new CustomEvent('authStateChanged', { detail: { user } }));
-    });
-    if (window.__initial_auth_token) await signInWithCustomToken(window.auth, window.__initial_auth_token);
-    else await signInAnonymously(window.auth);
-  } catch (e) { console.error('Firebase init error:', e); }
-</script>
-
 <style>
 :root{
   --bg:#0c0c0c; --fg:#f2f2f2; --muted:#c4c4c4; --ink:#e8e8e8; --line:rgba(255,255,255,.08);
@@ -40,7 +23,7 @@ body.light-theme{
 body{background:var(--bg);color:var(--fg);font-family:Oswald,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;transition:background-color .3s,color .3s;}
 a{color:inherit;text-decoration:none}
 
-/* Header (parity with index top area) */
+/* Header */
 .container{max-width:1400px;margin:0 auto;padding:0 var(--containerPad)}
 .header{position:sticky;top:0;z-index:50;background:var(--header-bg);transition:background-color .3s;}
 .topbar{display:flex;align-items:center;justify-content:space-between;padding:8px 0}
@@ -54,7 +37,6 @@ body.light-theme .nav-pair .thin{color:var(--muted)}
 @media (max-width:1200px){ .topnav{display:none !important} }
 .hr-y{border-top:1px solid var(--line);transition:border-color .3s;}
 .schoolrow{display:flex;align-items:center;gap:16px;padding:6px var(--containerPad)}
-/* Profile header photo uses 5:7 portrait aspect */
 .ham-logo{width:auto;height:140px;aspect-ratio:5/7;object-fit:cover;border-radius:10px;background:#000}
 .schooltext .small{font:300 var(--hamSmall)/1 Oswald;color:var(--muted);transition:color .3s;}
 .schooltext .big1{font:400 var(--hamBig)/1 "Bebas Neue",sans-serif}
@@ -92,10 +74,9 @@ body.light-theme .nav-pair .thin{color:var(--muted)}
 .profile-nav-link{background:none;border:none;color:var(--muted);font:700 clamp(10px, 2.5vw, 13px) "Bebas Neue",sans-serif;letter-spacing:.08em;cursor:pointer;padding:8px 10px;border-bottom:2px solid transparent;transition:color .3s;}
 .profile-nav-link.active{color:var(--fg);border-bottom-color:var(--fg)}
 
-/* Drawers */
+/* Drawer */
 .drawer-mask{position:fixed;inset:0;background:rgba(0,0,0,.35);opacity:0;pointer-events:none;transition:opacity .2s;z-index:60}
 .drawer{position:fixed;top:0;bottom:0;width:min(360px,82vw);background:var(--drawer-bg);backdrop-filter:blur(4px);color:var(--ink);transform:translateX(-110%);transition:transform .25s,background-color .3s;z-index:70}
-.drawer-right{right:0;left:auto;transform:translateX(110%);display:flex;flex-direction:column;height:100%}
 .drawer h3{margin:18px 16px 8px}
 .drawer .pad{padding:10px 16px}
 .drawer .close-btn{position:absolute;top:12px;right:12px}
@@ -116,7 +97,7 @@ body.drawer-left-open #drawerLeft{transform:translateX(0)}
 .stat-label{font-size:11px;text-transform:uppercase;opacity:.7;margin-bottom:4px}
 .stat-value{font-size:18px;font-weight:700;line-height:1}
 
-/* News list in Profile > News */
+/* News list */
 .news-card{display:flex;gap:10px;margin:10px 0;padding:8px;border-radius:10px;border:1px solid var(--line);align-items:center;transition:border-color .3s;}
 .news-card-thumb{width:110px;aspect-ratio:5/7;border-radius:8px;background:#000 center/cover no-repeat;flex:0 0 110px}
 .news-title{font:700 18px "Bebas Neue",sans-serif;letter-spacing:.03em;line-height:1.1;margin-bottom:4px}
@@ -269,28 +250,19 @@ body.drawer-left-open #drawerLeft{transform:translateX(0)}
 <div id="superfanMask" class="superfan-panel-mask">
   <div class="superfan-panel">
     <h2>SuperFan Sign-Up</h2>
-    <p>Enter your email so we can connect your SuperFan account to ARMS and send you personalized daily summaries.</p>
+    <p>Enter your email so we can connect your SuperFan account later and send you personalized daily summaries.</p>
     <input id="superfanEmail" type="email" placeholder="you@example.com">
     <button id="superfanSaveBtn" type="button">Save &amp; Continue</button>
-    <div class="small-note">You’ll be SuperFan #1. Payments / upgrades handled later through ARMS.</div>
+    <div class="small-note">This is just for testing right now – you’re SuperFan #1.</div>
   </div>
 </div>
 
 <script type="module">
-import {
-  getFirestore,
-  doc,
-  getDoc,
-  setDoc,
-  updateDoc,
-  arrayUnion,
-  arrayRemove
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
 /* ----- CONFIG ----- */
 const CSV_URL  = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQcWJM6Q6hTdFnES_G5LUy4teCS-sJ5HdAc9F5HSY8DGE9egdGy8yUAe2ShT3tFm-CwUuCYeAYy_YiW/pub?gid=2028135390&single=true&output=csv";
-const JSON_URL = "assets/news/alumni_news.json";           // seed for news cache (if empty)
+const JSON_URL = "assets/news/alumni_news.json";
 const CACHE_KEY = "YAT_NEWS_CACHE_V1";
+const FOLLOW_KEY = "YAT_SUPERFAN_FOLLOWS_V1";
 
 /* ----- SHORTHANDS ----- */
 const $ = s => document.querySelector(s);
@@ -323,6 +295,30 @@ function formatStatValue(key, value){
     return (num>-1 && num<1) ? s.substring(1) : s;
   }
   return value;
+}
+
+/* ----- FOLLOW STORAGE (local only for now) ----- */
+function getFollowed(){
+  try{
+    const raw = localStorage.getItem(FOLLOW_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  }catch{ return []; }
+}
+function setFollowed(list){
+  localStorage.setItem(FOLLOW_KEY, JSON.stringify(list));
+}
+function isFollowing(slug){
+  return getFollowed().includes(slug);
+}
+function toggleFollowing(slug){
+  const list = getFollowed();
+  const idx = list.indexOf(slug);
+  if (idx === -1) list.push(slug);
+  else list.splice(idx,1);
+  setFollowed(list);
+  return list.includes(slug);
 }
 
 /* ----- CSV LOADER ----- */
@@ -443,7 +439,7 @@ function newsListForPlayer(name){
   }).join('');
 }
 
-/* ----- LIVE SEARCH (left drawer) ----- */
+/* ----- LIVE SEARCH ----- */
 function makeHit(p){
   const nm=imageNameOf(p);
   const jp=`assets/img/hs_players/${nm}.jpg`, png=`assets/img/hs_players/${nm}.png`;
@@ -538,172 +534,57 @@ function setupTheme(){
   applyTheme();
 }
 
-/* ----- SUPERFAN / FIRESTORE ----- */
-const db = getFirestore();
-
-/** Wait for Firebase auth user (anonymous or custom-token) */
-async function getCurrentUser() {
-  if (window.auth?.currentUser) return window.auth.currentUser;
-
-  return new Promise(resolve => {
-    const handler = (e) => {
-      document.removeEventListener('authStateChanged', handler);
-      resolve(e.detail.user || null);
-    };
-    document.addEventListener('authStateChanged', handler);
-  });
-}
-
-/** SuperFan user doc: "superfan_users/{uid}" */
-async function saveSuperfanEmail(user, email) {
-  if (!user) throw new Error("No user");
-  const ref = doc(db, "superfan_users", user.uid);
-  await setDoc(ref, {
-    email,
-    createdAt: new Date().toISOString()
-  }, { merge: true });
-
-  // ARMS (GHL) webhook – replace with your real inbound webhook URL when ready.
-  const webhookUrl = "YOUR_ARMS_WEBHOOK_URL";
-  if (webhookUrl && webhookUrl !== "YOUR_ARMS_WEBHOOK_URL") {
-    try {
-      await fetch(webhookUrl, {
-        method:"POST",
-        headers:{ "Content-Type":"application/json" },
-        body: JSON.stringify({
-          event: "superfan_signup",
-          firebase_uid: user.uid,
-          email,
-          source: "hamilton_profile",
-          time: new Date().toISOString()
-        })
-      });
-    } catch (err) {
-      console.warn("ARMS webhook failed (ok for local dev):", err);
-    }
-  }
-}
-
-/** Follows doc: "superfan_follows/{uid}" */
-async function loadFollowState(user, playerSlug) {
-  if (!user) return { isFollowing:false };
-
-  const ref = doc(db, "superfan_follows", user.uid);
-  const snap = await getDoc(ref);
-  if (!snap.exists()) return { isFollowing:false };
-
-  const data = snap.data() || {};
-  const list = Array.isArray(data.players) ? data.players : [];
-  return { isFollowing: list.includes(playerSlug), list };
-}
-
-async function toggleFollow(user, playerSlug) {
-  if (!user) throw new Error("No user");
-  const ref = doc(db, "superfan_follows", user.uid);
-  const snap = await getDoc(ref);
-
-  if (!snap.exists()) {
-    await setDoc(ref, {
-      players: [playerSlug],
-      createdAt: new Date().toISOString()
-    });
-    return true;
-  } else {
-    const data = snap.data() || {};
-    const list = Array.isArray(data.players) ? data.players : [];
-    if (list.includes(playerSlug)) {
-      await updateDoc(ref, { players: arrayRemove(playerSlug) });
-      return false;
-    } else {
-      await updateDoc(ref, { players: arrayUnion(playerSlug) });
-      return true;
-    }
-  }
-}
-
-async function setupFollowButton(player) {
-  const btn = document.getElementById("followBtn");
-  const openLink = document.getElementById("superfanOpenLink");
-  const mask = document.getElementById("superfanMask");
-  const saveBtn = document.getElementById("superfanSaveBtn");
-  const emailInput = document.getElementById("superfanEmail");
+/* ----- SUPERFAN (LOCAL ONLY) ----- */
+function setupSuperfanUI(player){
+  const btn = $('#followBtn');
+  const openLink = $('#superfanOpenLink');
+  const mask = $('#superfanMask');
+  const saveBtn = $('#superfanSaveBtn');
+  const emailInput = $('#superfanEmail');
   if (!btn) return;
 
   const playerSlug = slugOf(player);
-  const user = await getCurrentUser();
 
-  // Open/close SuperFan panel
-  if (openLink && mask && saveBtn && emailInput) {
-    openLink.onclick = () => { mask.style.display = "flex"; };
-    mask.onclick = (e) => {
-      if (e.target === mask) mask.style.display = "none";
-    };
-    saveBtn.onclick = async () => {
-      const email = emailInput.value.trim();
-      if (!email) {
-        alert("Please enter an email address.");
-        return;
-      }
-      try {
-        saveBtn.disabled = true;
-        await saveSuperfanEmail(user, email);
-        alert("SuperFan email saved. You’re officially SuperFan #1.");
-        mask.style.display = "none";
-      } catch (err) {
-        console.error(err);
-        alert("Could not save SuperFan email. Check console for details.");
-      } finally {
-        saveBtn.disabled = false;
-      }
-    };
-  }
-
-  // Follow button logic
-  btn.disabled = true;
-  btn.textContent = "CHECKING…";
-
-  const applyState = (following) => {
+  // initial follow state
+  const applyState = () => {
+    const following = isFollowing(playerSlug);
     if (following) {
-      btn.classList.add("following");
+      btn.classList.add('following');
       btn.textContent = "FOLLOWING ✓";
     } else {
-      btn.classList.remove("following");
+      btn.classList.remove('following');
       btn.textContent = "+ FOLLOW PLAYER";
     }
   };
+  applyState();
 
-  if (!user) {
-    applyState(false);
-    btn.disabled = false;
-    btn.onclick = () => {
-      alert("We couldn’t detect a SuperFan session. Please refresh and try again.");
-    };
-    return;
-  }
-
-  const { isFollowing } = await loadFollowState(user, playerSlug);
-  applyState(isFollowing);
-  btn.disabled = false;
-
-  btn.onclick = async () => {
-    try {
-      btn.disabled = true;
-      const nowFollowing = await toggleFollow(user, playerSlug);
-      applyState(nowFollowing);
-    } catch (err) {
-      console.error(err);
-      alert("Sorry, something went wrong updating your SuperFan list.");
-    } finally {
-      btn.disabled = false;
+  btn.onclick = () => {
+    const now = toggleFollowing(playerSlug);
+    applyState();
+    if (now) {
+      // first time they follow anything? optionally prompt for email
+      const emailRaw = localStorage.getItem("YAT_SUPERFAN_EMAIL") || "";
+      if (!emailRaw && mask) mask.style.display = "flex";
     }
   };
+
+  if (openLink && mask && saveBtn && emailInput) {
+    openLink.onclick = () => { mask.style.display = "flex"; };
+    mask.onclick = (e) => { if (e.target === mask) mask.style.display = "none"; };
+    saveBtn.onclick = () => {
+      const email = emailInput.value.trim();
+      if (!email) { alert("Please enter an email."); return; }
+      localStorage.setItem("YAT_SUPERFAN_EMAIL", email);
+      alert("Saved! You’re SuperFan #1 on this device.");
+      mask.style.display = "none";
+    };
+  }
 }
 
 /* ----- BOOT ----- */
 document.addEventListener('DOMContentLoaded', async ()=>{
   try{
     setupTheme();
-    // Open/close search drawer
     $('#btnMenu')?.addEventListener('click', ()=>{ document.body.classList.add('drawer-left-open','drawer-open'); });
     $('.close-btn')?.addEventListener('click', ()=>{ document.body.classList.remove('drawer-left-open','drawer-open'); });
     $('.drawer-mask')?.addEventListener('click', ()=>{ document.body.classList.remove('drawer-left-open','drawer-open'); });
@@ -711,10 +592,9 @@ document.addEventListener('DOMContentLoaded', async ()=>{
     const players = await loadCSV(CSV_URL);
     if (!players.length) throw new Error('No roster rows');
 
-    // Find requested player
     const p = resolvePlayer(players);
 
-    // Header fill
+    // header
     $('#breadcrumbs').innerHTML = `<a href="index.html">HAMILTON</a> ▸ ${clean(p.display_name)}`;
     $('#playerFirstName').textContent = clean(p.first);
     $('#playerLastName').textContent  = clean(p.last);
@@ -723,20 +603,19 @@ document.addEventListener('DOMContentLoaded', async ()=>{
     const nowJ=`assets/img/now_players/${nm}.jpg`, nowP=`assets/img/now_players/${nm}.png`;
     const img = $('#playerLogo'); img.src = nowJ; img.onerror = function(){ this.onerror=null; this.src = nowP; };
 
-    // SuperFan follow button hookup
-    setupFollowButton(p);
+    // SuperFan local follow
+    setupSuperfanUI(p);
 
-    // Search in drawer
+    // search drawer
     $('#playerSearch')?.addEventListener('input', ()=> liveSearch(players));
 
-    // Tabs
+    // tabs
     $('#profileNav').addEventListener('click', (e)=>{
       const btn = e.target.closest('.profile-nav-link'); if(!btn) return;
       $$('.profile-nav-link').forEach(b=> b.classList.remove('active')); btn.classList.add('active');
       renderTab(p, btn.dataset.content);
     });
 
-    // Default tab or deep-link (?tab=news)
     const tabParam = (getParam('tab')||'stats').toLowerCase();
     const valid = ['stats','news','social','mentor','gallery'];
     renderTab(p, valid.includes(tabParam)?tabParam:'stats');
