@@ -61,6 +61,31 @@ body.light-theme .nav-pair .thin{color:var(--muted)}
 .schooltext .big2{font:400 var(--hamBigger)/1 "Bebas Neue",sans-serif;margin-top:-4px}
 .crumbs{font:300 calc(var(--hamSmall)*.8)/1 Oswald;color:var(--muted);text-transform:uppercase;white-space:nowrap;transition:color .3s;}
 
+/* Follow button + SuperFan link */
+.follow-btn{
+  margin-top:8px;
+  padding:6px 12px;
+  border-radius:999px;
+  border:1px solid var(--line);
+  background:transparent;
+  color:var(--fg);
+  font:400 11px "Bebas Neue",sans-serif;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  cursor:pointer;
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+}
+.follow-btn.following{
+  background:var(--fg);
+  color:var(--bg);
+}
+.follow-btn[disabled]{
+  opacity:.5;
+  cursor:default;
+}
+
 /* Tabs */
 .hero{padding:2px 0}
 .profile-nav{display:flex;justify-content:space-around;border-bottom:1px solid var(--line);padding:4px 0;transition:border-color .3s;}
@@ -101,6 +126,62 @@ body.drawer-left-open #drawerLeft{transform:translateX(0)}
 .site-footer{position:fixed;left:0;right:0;bottom:0;height:var(--footerH);background:var(--bg);border-top:1px solid var(--line);z-index:40;transition:background-color .3s,border-color .3s;}
 .site-footer a{display:block;height:100%;width:100%}
 .site-footer img{height:100%;width:100%;object-fit:contain}
+
+/* SuperFan registration overlay */
+.superfan-panel-mask{
+  position:fixed;inset:0;
+  background:rgba(0,0,0,.5);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:80;
+}
+.superfan-panel{
+  background:var(--card-bg);
+  border-radius:16px;
+  padding:20px;
+  max-width:360px;
+  width:90%;
+  color:var(--ink);
+  box-shadow:0 18px 40px rgba(0,0,0,.6);
+}
+.superfan-panel h2{
+  margin:0 0 8px;
+  font:400 20px "Bebas Neue",sans-serif;
+  letter-spacing:.08em;
+}
+.superfan-panel p{
+  margin:0 0 12px;
+  font-size:13px;
+  opacity:.85;
+}
+.superfan-panel input{
+  width:100%;
+  padding:10px;
+  border-radius:10px;
+  border:1px solid var(--line);
+  background:rgba(255,255,255,.04);
+  color:var(--ink);
+  margin-bottom:10px;
+}
+.superfan-panel button{
+  width:100%;
+  padding:10px;
+  border-radius:10px;
+  border:none;
+  background:var(--fg);
+  color:var(--bg);
+  font:400 14px "Bebas Neue",sans-serif;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  cursor:pointer;
+}
+.superfan-panel .small-note{
+  margin-top:8px;
+  font-size:11px;
+  opacity:.7;
+  text-align:center;
+}
 </style>
 </head>
 
@@ -128,6 +209,12 @@ body.drawer-left-open #drawerLeft{transform:translateX(0)}
       <div id="playerTeamOrg" class="small">LOADING PLAYER…</div>
       <div id="playerFirstName" class="big1"></div>
       <div id="playerLastName" class="big2"></div>
+      <button id="followBtn" class="follow-btn" type="button">
+        + FOLLOW PLAYER
+      </button>
+      <div style="margin-top:4px;font-size:11px;opacity:.7;">
+        <a href="javascript:void(0)" id="superfanOpenLink">Become a SuperFan</a>
+      </div>
     </div>
   </div>
   <div class="hr-y"></div>
@@ -178,7 +265,28 @@ body.drawer-left-open #drawerLeft{transform:translateX(0)}
   </a>
 </footer>
 
+<!-- SuperFan registration overlay -->
+<div id="superfanMask" class="superfan-panel-mask">
+  <div class="superfan-panel">
+    <h2>SuperFan Sign-Up</h2>
+    <p>Enter your email so we can connect your SuperFan account to ARMS and send you personalized daily summaries.</p>
+    <input id="superfanEmail" type="email" placeholder="you@example.com">
+    <button id="superfanSaveBtn" type="button">Save &amp; Continue</button>
+    <div class="small-note">You’ll be SuperFan #1. Payments / upgrades handled later through ARMS.</div>
+  </div>
+</div>
+
 <script type="module">
+import {
+  getFirestore,
+  doc,
+  getDoc,
+  setDoc,
+  updateDoc,
+  arrayUnion,
+  arrayRemove
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
 /* ----- CONFIG ----- */
 const CSV_URL  = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQcWJM6Q6hTdFnES_G5LUy4teCS-sJ5HdAc9F5HSY8DGE9egdGy8yUAe2ShT3tFm-CwUuCYeAYy_YiW/pub?gid=2028135390&single=true&output=csv";
 const JSON_URL = "assets/news/alumni_news.json";           // seed for news cache (if empty)
@@ -188,7 +296,7 @@ const CACHE_KEY = "YAT_NEWS_CACHE_V1";
 const $ = s => document.querySelector(s);
 const $$ = s => Array.from(document.querySelectorAll(s));
 
-/* ----- UTILITIES (robust + identical slugging) ----- */
+/* ----- UTILITIES ----- */
 const clean = s => String(s||'').trim();
 function normalizeSlugStr(s){
   return clean(s).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g,'');
@@ -217,7 +325,7 @@ function formatStatValue(key, value){
   return value;
 }
 
-/* ----- CSV LOADER (case-insensitive headers, safe commas-in-quotes) ----- */
+/* ----- CSV LOADER ----- */
 async function loadCSV(url){
   const res = await fetch(url, {cache:'no-store'});
   if(!res.ok) throw new Error('CSV '+res.status);
@@ -354,28 +462,22 @@ function liveSearch(players){
   box.innerHTML=''; hits.forEach(p=> box.appendChild(makeHit(p)));
 }
 
-/* ----- PLAYER RESOLUTION (robust) ----- */
+/* ----- PLAYER RESOLUTION ----- */
 function resolvePlayer(players){
-  // Accept ?player= (slug), ?slug=, ?id=, or ?name=
   const rawPlayer = getParam('player') || getParam('slug');
   const idParam   = getParam('id');
   const nameParam = getParam('name');
 
-  // Try slug first (from cards/search)
   if (rawPlayer){
     const want = normalizeSlugStr(rawPlayer);
     const hit = players.find(p => slugOf(p) === want);
     if (hit) return hit;
   }
-
-  // Try id (sheet id or fallback row id)
   if (idParam){
     const want = String(idParam).toLowerCase();
     const byId = players.find(p => String(p.id||'').toLowerCase() === want);
     if (byId) return byId;
   }
-
-  // Try name match: exact "First Last" or display_name
   if (nameParam){
     const wantName = clean(nameParam).toLowerCase();
     let hit = players.find(p => clean(p.display_name).toLowerCase() === wantName);
@@ -385,9 +487,6 @@ function resolvePlayer(players){
     }
     if (hit) return hit;
   }
-
-  // LAST CHANCE: if query looked like /profile.html?cody-bellinger
-  // (no key, only value), parse location.search manually:
   if (!rawPlayer && !idParam && !nameParam){
     const q = location.search.replace(/^\?/,'');
     if (q && !q.includes('=')){
@@ -396,8 +495,6 @@ function resolvePlayer(players){
       if (hit) return hit;
     }
   }
-
-  // Fallback: first row (so it never blanks)
   return players[0];
 }
 
@@ -441,6 +538,167 @@ function setupTheme(){
   applyTheme();
 }
 
+/* ----- SUPERFAN / FIRESTORE ----- */
+const db = getFirestore();
+
+/** Wait for Firebase auth user (anonymous or custom-token) */
+async function getCurrentUser() {
+  if (window.auth?.currentUser) return window.auth.currentUser;
+
+  return new Promise(resolve => {
+    const handler = (e) => {
+      document.removeEventListener('authStateChanged', handler);
+      resolve(e.detail.user || null);
+    };
+    document.addEventListener('authStateChanged', handler);
+  });
+}
+
+/** SuperFan user doc: "superfan_users/{uid}" */
+async function saveSuperfanEmail(user, email) {
+  if (!user) throw new Error("No user");
+  const ref = doc(db, "superfan_users", user.uid);
+  await setDoc(ref, {
+    email,
+    createdAt: new Date().toISOString()
+  }, { merge: true });
+
+  // ARMS (GHL) webhook – replace with your real inbound webhook URL when ready.
+  const webhookUrl = "YOUR_ARMS_WEBHOOK_URL";
+  if (webhookUrl && webhookUrl !== "YOUR_ARMS_WEBHOOK_URL") {
+    try {
+      await fetch(webhookUrl, {
+        method:"POST",
+        headers:{ "Content-Type":"application/json" },
+        body: JSON.stringify({
+          event: "superfan_signup",
+          firebase_uid: user.uid,
+          email,
+          source: "hamilton_profile",
+          time: new Date().toISOString()
+        })
+      });
+    } catch (err) {
+      console.warn("ARMS webhook failed (ok for local dev):", err);
+    }
+  }
+}
+
+/** Follows doc: "superfan_follows/{uid}" */
+async function loadFollowState(user, playerSlug) {
+  if (!user) return { isFollowing:false };
+
+  const ref = doc(db, "superfan_follows", user.uid);
+  const snap = await getDoc(ref);
+  if (!snap.exists()) return { isFollowing:false };
+
+  const data = snap.data() || {};
+  const list = Array.isArray(data.players) ? data.players : [];
+  return { isFollowing: list.includes(playerSlug), list };
+}
+
+async function toggleFollow(user, playerSlug) {
+  if (!user) throw new Error("No user");
+  const ref = doc(db, "superfan_follows", user.uid);
+  const snap = await getDoc(ref);
+
+  if (!snap.exists()) {
+    await setDoc(ref, {
+      players: [playerSlug],
+      createdAt: new Date().toISOString()
+    });
+    return true;
+  } else {
+    const data = snap.data() || {};
+    const list = Array.isArray(data.players) ? data.players : [];
+    if (list.includes(playerSlug)) {
+      await updateDoc(ref, { players: arrayRemove(playerSlug) });
+      return false;
+    } else {
+      await updateDoc(ref, { players: arrayUnion(playerSlug) });
+      return true;
+    }
+  }
+}
+
+async function setupFollowButton(player) {
+  const btn = document.getElementById("followBtn");
+  const openLink = document.getElementById("superfanOpenLink");
+  const mask = document.getElementById("superfanMask");
+  const saveBtn = document.getElementById("superfanSaveBtn");
+  const emailInput = document.getElementById("superfanEmail");
+  if (!btn) return;
+
+  const playerSlug = slugOf(player);
+  const user = await getCurrentUser();
+
+  // Open/close SuperFan panel
+  if (openLink && mask && saveBtn && emailInput) {
+    openLink.onclick = () => { mask.style.display = "flex"; };
+    mask.onclick = (e) => {
+      if (e.target === mask) mask.style.display = "none";
+    };
+    saveBtn.onclick = async () => {
+      const email = emailInput.value.trim();
+      if (!email) {
+        alert("Please enter an email address.");
+        return;
+      }
+      try {
+        saveBtn.disabled = true;
+        await saveSuperfanEmail(user, email);
+        alert("SuperFan email saved. You’re officially SuperFan #1.");
+        mask.style.display = "none";
+      } catch (err) {
+        console.error(err);
+        alert("Could not save SuperFan email. Check console for details.");
+      } finally {
+        saveBtn.disabled = false;
+      }
+    };
+  }
+
+  // Follow button logic
+  btn.disabled = true;
+  btn.textContent = "CHECKING…";
+
+  const applyState = (following) => {
+    if (following) {
+      btn.classList.add("following");
+      btn.textContent = "FOLLOWING ✓";
+    } else {
+      btn.classList.remove("following");
+      btn.textContent = "+ FOLLOW PLAYER";
+    }
+  };
+
+  if (!user) {
+    applyState(false);
+    btn.disabled = false;
+    btn.onclick = () => {
+      alert("We couldn’t detect a SuperFan session. Please refresh and try again.");
+    };
+    return;
+  }
+
+  const { isFollowing } = await loadFollowState(user, playerSlug);
+  applyState(isFollowing);
+  btn.disabled = false;
+
+  btn.onclick = async () => {
+    try {
+      btn.disabled = true;
+      const nowFollowing = await toggleFollow(user, playerSlug);
+      applyState(nowFollowing);
+    } catch (err) {
+      console.error(err);
+      alert("Sorry, something went wrong updating your SuperFan list.");
+    } finally {
+      btn.disabled = false;
+    }
+  };
+}
+
 /* ----- BOOT ----- */
 document.addEventListener('DOMContentLoaded', async ()=>{
   try{
@@ -464,6 +722,9 @@ document.addEventListener('DOMContentLoaded', async ()=>{
     const nm=imageNameOf(p);
     const nowJ=`assets/img/now_players/${nm}.jpg`, nowP=`assets/img/now_players/${nm}.png`;
     const img = $('#playerLogo'); img.src = nowJ; img.onerror = function(){ this.onerror=null; this.src = nowP; };
+
+    // SuperFan follow button hookup
+    setupFollowButton(p);
 
     // Search in drawer
     $('#playerSearch')?.addEventListener('input', ()=> liveSearch(players));
