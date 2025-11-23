@@ -545,8 +545,17 @@ function setupSuperfanUI(player){
 
   const playerSlug = slugOf(player);
 
-  // initial follow state
+  // Are they a paid SuperFan? (for now, this is just a local flag)
+  const isSuperfan = () => localStorage.getItem("YAT_IS_SUPERFAN") === "true";
+
   const applyState = () => {
+    if (!isSuperfan()) {
+      // Not a SuperFan: button is just a CTA, not a real follow
+      btn.classList.remove('following');
+      btn.textContent = "+ FOLLOW PLAYER";
+      return;
+    }
+    // SuperFan: show actual follow state
     const following = isFollowing(playerSlug);
     if (following) {
       btn.classList.add('following');
@@ -558,15 +567,35 @@ function setupSuperfanUI(player){
   };
   applyState();
 
+  // Click on follow button
   btn.onclick = () => {
+    if (!isSuperfan()) {
+      // Not paid: show upgrade message / SuperFan overlay
+      if (mask) mask.style.display = "flex";
+      else alert("You must be a paid SuperFan to follow players.");
+      return;
+    }
     const now = toggleFollowing(playerSlug);
     applyState();
-    if (now) {
-      // first time they follow anything? optionally prompt for email
-      const emailRaw = localStorage.getItem("YAT_SUPERFAN_EMAIL") || "";
-      if (!emailRaw && mask) mask.style.display = "flex";
-    }
   };
+
+  // "Become a SuperFan" link + panel
+  if (openLink && mask && saveBtn && emailInput) {
+    openLink.onclick = () => { mask.style.display = "flex"; };
+    mask.onclick = (e) => { if (e.target === mask) mask.style.display = "none"; };
+    saveBtn.onclick = () => {
+      const email = emailInput.value.trim();
+      if (!email) { alert("Please enter an email."); return; }
+      // For now: store email and mark this device as SuperFan.
+      // In the real system, ARMS would only set this after payment.
+      localStorage.setItem("YAT_SUPERFAN_EMAIL", email);
+      localStorage.setItem("YAT_IS_SUPERFAN", "true");
+      alert("Saved! On this device you’re treated as a SuperFan for testing.");
+      mask.style.display = "none";
+      applyState();
+    };
+  }
+}
 
   if (openLink && mask && saveBtn && emailInput) {
     openLink.onclick = () => { mask.style.display = "flex"; };
