@@ -180,6 +180,12 @@
       100%{opacity:0;transform:translateY(-10px)}
     }
 
+    .hero-line{
+      display:flex;
+      align-items:center;
+      gap:6px;
+    }
+
     .fav-toggle{
       border:none;
       background:none;
@@ -193,19 +199,28 @@
     .fav-toggle i{font-size:18px;}
     .fav-toggle.is-favorite{color:#facc15;}
 
-    .superfan-cta{
-      padding:4px 10px;
-      border-radius:999px;
-      border:1px solid var(--fg);
-      background:transparent;
-      color:var(--fg);
-      font:700 11px "Bebas Neue",sans-serif;
+    /* CTA line: skinny + fat text, no pill */
+    .hero-cta{
+      background:none;
+      border:none;
+      padding:0;
+      margin:0;
+      cursor:pointer;
+      display:inline-flex;
+      align-items:baseline;
+      gap:4px;
+    }
+    .hero-cta .thin-hero{
+      font:300 11px Oswald,sans-serif;
       letter-spacing:.18em;
       text-transform:uppercase;
-      cursor:pointer;
-      white-space:nowrap;
+      color:var(--muted);
     }
-    .superfan-cta.small{font-size:10px;padding:3px 10px;}
+    .hero-cta .bold-hero{
+      font:400 11px "Bebas Neue",sans-serif;
+      letter-spacing:.2em;
+      text-transform:uppercase;
+    }
 
     .hero-right{display:flex;gap:10px;align-items:center;}
     .hero-icon i{font-size:20px;}
@@ -313,13 +328,9 @@
 
     .profile-photo-wrap{
       position:relative;
-      width:100%;
-      max-width:210px;           /* thumbnail size like the card */
-      aspect-ratio:5/7;          /* similar proportion to card back */
-      margin:0 auto;             /* center in its column */
-      border-radius:12px;
+      border-radius:18px;
       overflow:hidden;
-      box-shadow:0 10px 22px rgba(0,0,0,.22);
+      box-shadow:0 14px 30px rgba(0,0,0,.18);
       background:#000;
     }
     .profile-photo-wrap img{
@@ -426,8 +437,7 @@
       text-transform:uppercase;
       color:var(--muted);
       border-bottom:3px solid transparent;
-      white-space:normal;   /* allow labels to wrap like card back */
-      line-height:1.1;
+      white-space:nowrap;
     }
     .tab-btn.active{
       color:var(--fg);
@@ -727,7 +737,8 @@
           <span class="thin">MENTORSHIP</span><span class="bold">MARKETPLACE</span>
         </a>
         <a href="all-time-list.html" class="drawer-nav-item nav-pair">
-          <span class="thin">NEXT-LEVEL</span><span class="bold">ALL-TIME LIST</span></a>
+          <span class="thin">NEXT-LEVEL</span><span class="bold">ALL-TIME LIST</span>
+        </a>
         <a href="partner-program.html" class="drawer-nav-item nav-pair">
           <span class="thin">PCD ACTION</span><span class="bold">PARTNER PROGRAM</span>
         </a>
@@ -782,39 +793,28 @@
       <div class="container hero-grid">
         <div class="hero-left">
           <div class="tag-duo">
-           <div class="tag-duo">
-
-  <!-- STATE A — Breadcrumbs + Star (no animation, no vertical movement) -->
-  <div class="tag-block tagA">
-    <div class="crumbs">
-      HAMILTON ▸ <span class="crumb-name" id="crumbPlayerName">PLAYER</span>
-    </div>
-    <button class="fav-toggle" id="favToggle" aria-label="Mark as favorite player">
-      <i class="ri-star-line"></i>
-    </button>
-  </div>
-
-  <!-- STATE B — SuperFan CTA (Skinny + Fat text) -->
-  <div class="tag-block tagB">
-    <span class="skinny-text">ADD <span id="ctaPlayerName">PLAYER</span> TO MY</span>
-    <span class="fat-text">SUPERFAN DASHBOARD</span>
-  </div>
-
-</div>
-              </div>
-              <button class="fav-toggle" id="favToggle" aria-label="Mark as favorite player">
-                <i class="ri-star-line"></i>
-              </button>
-            </div>
-            <!-- state 2: SuperFan CTA -->
+            <!-- State 1: breadcrumbs + star (hero line 1) -->
             <div class="tag-swap">
-              <button class="superfan-cta small js-superfan-cta">ADD TO MY SUPERFAN DASHBOARD</button>
+              <div class="hero-line">
+                <div class="crumbs">
+                  HAMILTON ▸ <span class="crumb-name" id="crumbPlayerName">PLAYER</span>
+                </div>
+                <button class="fav-toggle" id="favToggle" aria-label="Mark as favorite player">
+                  <i class="ri-star-line"></i>
+                </button>
+              </div>
+            </div>
+            <!-- State 2: skinny/fat CTA line (hero line 2) -->
+            <div class="tag-swap">
+              <button class="hero-cta js-superfan-cta" aria-label="Add player to my SuperFan dashboard">
+                <span class="thin-hero" id="ctaSkinnyText">ADD PLAYER TO MY</span>
+                <span class="bold-hero">SUPERFAN DASHBOARD</span>
+              </button>
             </div>
           </div>
         </div>
         <div class="hero-right">
           <button id="openSearch" class="hero-icon icon-btn" aria-label="Search players"><i class="ri-search-line"></i></button>
-          <!-- Filters / reset not super relevant on profile, but left here for consistency / future -->
         </div>
       </div>
     </section>
@@ -859,8 +859,8 @@
     <!-- TABS STICKY WRAPPER -->
     <div class="tabs-wrapper">
       <div class="tabs-row" role="tablist">
-        <button class="tab-btn active" data-tab="stats">SEASON &amp; CAREER STATISTICS</button>
-        <button class="tab-btn" data-tab="news">NEWS &amp; VIDEO CLIPS</button>
+        <button class="tab-btn active" data-tab="stats">SEASON & CAREER STATISTICS</button>
+        <button class="tab-btn" data-tab="news">NEWS & VIDEO CLIPS</button>
         <button class="tab-btn" data-tab="social">SOCIAL MEDIA</button>
         <button class="tab-btn" data-tab="mentor">MENTORSHIP MARKETPLACE</button>
         <button class="tab-btn" data-tab="gallery">TIMELINE GALLERY</button>
@@ -1189,6 +1189,12 @@
         `<div class="profile-line"><strong>Draft:</strong> ${player.draft_info || 'N/A'}</div>`+
         `<div class="profile-line"><strong>Colleges:</strong> ${player.colleges || 'N/A'}</div>`;
 
+      // SuperFan CTA skinny text with player name
+      const ctaSkinny = $('#ctaSkinnyText');
+      if (ctaSkinny){
+        ctaSkinny.textContent = `ADD ${name.toUpperCase()} TO MY`;
+      }
+
       // Sticky bar content
       $('#stickyThumb').src = nowJpg;
       $('#stickyThumb').onerror = function(){
@@ -1485,21 +1491,14 @@
       try{
         const params = new URLSearchParams(location.search);
         const slugParam = params.get('player');
-
         const players = await loadCSV(CSV_URL);
         window.__PLAYERS = players;
         setupSearch(players);
 
-        let player = null;
-
-        // Only pick a player if the ?player= slug matches.
-        if (slugParam) {
-          player = players.find(p => slugOf(p) === slugParam);
-        }
-
-        if (!player) {
+        const player = players.find(p => slugOf(p) === slugParam) || players[0];
+        if(!player){
           $('#profileMain').innerHTML =
-            '<p style="padding:18px;font-size:14px;">Player not found. Check the player link or slug in the URL.</p>';
+            '<p style="padding:18px;font-size:14px;">Player not found.</p>';
           return;
         }
 
@@ -1513,4 +1512,3 @@
   </script>
 </body>
 </html>
-```0
