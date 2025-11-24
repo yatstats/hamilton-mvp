@@ -313,9 +313,13 @@
 
     .profile-photo-wrap{
       position:relative;
-      border-radius:18px;
+      width:100%;
+      max-width:210px;           /* thumbnail size like the card */
+      aspect-ratio:5/7;          /* similar proportion to card back */
+      margin:0 auto;             /* center in its column */
+      border-radius:12px;
       overflow:hidden;
-      box-shadow:0 14px 30px rgba(0,0,0,.18);
+      box-shadow:0 10px 22px rgba(0,0,0,.22);
       background:#000;
     }
     .profile-photo-wrap img{
@@ -422,7 +426,8 @@
       text-transform:uppercase;
       color:var(--muted);
       border-bottom:3px solid transparent;
-      white-space:nowrap;
+      white-space:normal;   /* allow labels to wrap like card back */
+      line-height:1.1;
     }
     .tab-btn.active{
       color:var(--fg);
@@ -722,8 +727,7 @@
           <span class="thin">MENTORSHIP</span><span class="bold">MARKETPLACE</span>
         </a>
         <a href="all-time-list.html" class="drawer-nav-item nav-pair">
-          <span class="thin">NEXT-LEVEL</span><span class="bold">ALL-TIME LIST</span>
-        </a>
+          <span class="thin">NEXT-LEVEL</span><span class="bold">ALL-TIME LIST</span></a>
         <a href="partner-program.html" class="drawer-nav-item nav-pair">
           <span class="thin">PCD ACTION</span><span class="bold">PARTNER PROGRAM</span>
         </a>
@@ -840,8 +844,8 @@
     <!-- TABS STICKY WRAPPER -->
     <div class="tabs-wrapper">
       <div class="tabs-row" role="tablist">
-        <button class="tab-btn active" data-tab="stats">SEASON & CAREER STATISTICS</button>
-        <button class="tab-btn" data-tab="news">NEWS & VIDEO CLIPS</button>
+        <button class="tab-btn active" data-tab="stats">SEASON &amp; CAREER STATISTICS</button>
+        <button class="tab-btn" data-tab="news">NEWS &amp; VIDEO CLIPS</button>
         <button class="tab-btn" data-tab="social">SOCIAL MEDIA</button>
         <button class="tab-btn" data-tab="mentor">MENTORSHIP MARKETPLACE</button>
         <button class="tab-btn" data-tab="gallery">TIMELINE GALLERY</button>
@@ -1466,14 +1470,21 @@
       try{
         const params = new URLSearchParams(location.search);
         const slugParam = params.get('player');
+
         const players = await loadCSV(CSV_URL);
         window.__PLAYERS = players;
         setupSearch(players);
 
-        const player = players.find(p => slugOf(p) === slugParam) || players[0];
-        if(!player){
+        let player = null;
+
+        // Only pick a player if the ?player= slug matches.
+        if (slugParam) {
+          player = players.find(p => slugOf(p) === slugParam);
+        }
+
+        if (!player) {
           $('#profileMain').innerHTML =
-            '<p style="padding:18px;font-size:14px;">Player not found.</p>';
+            '<p style="padding:18px;font-size:14px;">Player not found. Check the player link or slug in the URL.</p>';
           return;
         }
 
@@ -1487,3 +1498,4 @@
   </script>
 </body>
 </html>
+```0
