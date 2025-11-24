@@ -32,7 +32,7 @@ a{color:inherit;text-decoration:none}
 .header{position:sticky;top:0;z-index:50;background:var(--header-bg);transition:background-color .3s;}
 .topbar{display:flex;align-items:center;justify-content:space-between;padding:8px 0}
 .left-icons,.right-icons{display:flex;gap:8px;align-items:center}
-/* 🔧 move hamburger row right to align with rest of content */
+/* Move hamburger row in to align with rest of content */
 .left-icons{padding-left:var(--containerPad);}
 .icon-btn{background:none;border:none;color:var(--fg);opacity:.92;display:inline-flex;align-items:center;justify-content:center;padding:0;margin:0 2px;cursor:pointer}
 .icon-btn i{font-size:20px}
@@ -95,11 +95,13 @@ body.light-theme .nav-pair .thin{color:var(--muted)}
   text-decoration:underline;
 }
 
-/* Section header – matches “Hamilton Active Alumni Baseball” feel */
+/* (You can later replace this with the full logo/school header block) */
 .subheader{
-  background:linear-gradient(to right,#111, #222);
-  border-bottom:1px solid var(--line);
+  background:#fafafa;
+  color:#000;
+  border-bottom:1px solid #e3e3e3;
 }
+body.light-theme .subheader{background:#fdfdfd;}
 .subheader-inner{
   padding:10px var(--containerPad) 6px;
 }
@@ -217,7 +219,7 @@ body.light-theme .nav-pair .thin{color:var(--muted)}
   <div class="container schoolrow">
     <div class="player-photo-wrap">
       <img id="playerLogo" class="ham-logo" src="assets/img/placeholder.png" alt="Player Photo">
-      <!-- overlay CTA: same action as follow star / SuperFan -->
+      <!-- Overlay CTA: SuperFan dashboard -->
       <button id="superfanOverlayBtn" class="superfan-overlay-link">
         <span>ADD TO MY SUPERFAN DASHBOARD</span>
       </button>
@@ -231,10 +233,10 @@ body.light-theme .nav-pair .thin{color:var(--muted)}
   <div class="hr-y"></div>
 </header>
 
-<!-- 🔹 Hamilton Active Alumni Baseball header (same language as cards/list) -->
+<!-- Temporary simple header; later swap with full logo/location header -->
 <section class="subheader">
   <div class="container subheader-inner">
-    <div class="subheader-title">HAMILTON ACTIVE ALUMNI BASEBALL</div>
+    <div class="subheader-title">HAMILTON ACTIVE BASEBALL ALUMNI</div>
   </div>
 </section>
 
@@ -283,6 +285,10 @@ body.light-theme .nav-pair .thin{color:var(--muted)}
 <script>
 /* ---------- CONFIG ---------- */
 const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQcWJM6Q6hTdFnES_G5LUy4teCS-sJ5HdAc9F5HSY8DGE9egdGy8yUAe2ShT3tFm-CwUuCYeAYy_YiW/pub?gid=2028135390&single=true&output=csv";
+
+/* Favorites (Fan-only) + SuperFan price */
+const FAVORITES_KEY = "YAT_FAN_FAVORITES_HAMILTON";
+const SUPERFAN_PRICE = "$4.99"; // 🔧 change this to whatever monthly price you decide
 
 /* ---------- HELPERS ---------- */
 const $  = s => document.querySelector(s);
@@ -396,49 +402,53 @@ async function loadCSV(url){
   });
 }
 
-/* ---------- FIND THE PLAYER ---------- */
-function resolvePlayer(players){
-  const byParam = getParam("player");
-  const byId    = getParam("id");
-  const byName  = getParam("name");
-
-  if (byParam){
-    const want = normalizeSlugStr(byParam);
-    const hit = players.find(p => slugOf(p) === want);
-    if (hit) return hit;
-  }
-
-  if (byId){
-    const want = String(byId).toLowerCase();
-    const hit = players.find(p => String(p.id || "").toLowerCase() === want);
-    if (hit) return hit;
-  }
-
-  if (byName){
-    const want = clean(byName).toLowerCase();
-    const hit = players.find(p => clean(p.display_name).toLowerCase() === want);
-    if (hit) return hit;
-  }
-
-  if (!byParam && !byId && !byName){
-    const q = window.location.search.replace(/^\?/,"");
-    if (q && !q.includes("=")){
-      const want = normalizeSlugStr(q);
-      const hit = players.find(p => slugOf(p) === want);
-      if (hit) return hit;
+/* ---------- FAVORITES (Fan-only, star) ---------- */
+function getFavorites(){
+  try { return JSON.parse(localStorage.getItem(FAVORITES_KEY) || "[]"); }
+  catch { return []; }
+}
+function saveFavorites(arr){
+  localStorage.setItem(FAVORITES_KEY, JSON.stringify(arr));
+}
+function isFavorite(player){
+  const slug = slugOf(player);
+  return getFavorites().includes(slug);
+}
+function toggleFavorite(player){
+  const slug = slugOf(player);
+  if (!slug) return;
+  const arr = getFavorites();
+  const idx = arr.indexOf(slug);
+  if (idx === -1) arr.push(slug);
+  else arr.splice(idx,1);
+  saveFavorites(arr);
+  return arr.indexOf(slug) !== -1; // true if now favorite
+}
+function setStarState(btn, active){
+  if (!btn) return;
+  const icon = btn.querySelector("i");
+  btn.classList.toggle("active", active);
+  if (icon){
+    if (active){
+      icon.classList.remove("ri-star-line");
+      icon.classList.add("ri-star-fill");
+    } else {
+      icon.classList.remove("ri-star-fill");
+      icon.classList.add("ri-star-line");
     }
   }
-
-  return players[0];
 }
 
-/* ---------- SUPERFAN Upsell STUB ---------- */
+/* ---------- SUPERFAN Upsell (overlay CTA) ---------- */
 function showSuperFanUpsell(player){
-  const first = clean(player.first) || clean(player.display_name).split(" ")[0] || "this player";
   alert(
-    "Add " + first + " to your SuperFan dashboard.\n\n" +
-    "Congratulations! Once your SuperFan transaction is completed, " +
-    "the players you follow will be loaded onto your dashboard."
+    "SuperFan Subscription\n\n" +
+    "Become a SuperFan for " + SUPERFAN_PRICE + " / month.\n" +
+    "This will add a SuperFan subscription to your cart. " +
+    "Once your SuperFan transaction is completed, " +
+    "any players you follow with this button will appear " +
+    "on your personal SuperFan dashboard (including players " +
+    "from other schools)."
   );
 }
 
@@ -579,6 +589,42 @@ function setupDrawer(){
   if (close) close.addEventListener("click", shut);
 }
 
+/* ---------- FIND THE PLAYER ---------- */
+function resolvePlayer(players){
+  const byParam = getParam("player");
+  const byId    = getParam("id");
+  const byName  = getParam("name");
+
+  if (byParam){
+    const want = normalizeSlugStr(byParam);
+    const hit = players.find(p => slugOf(p) === want);
+    if (hit) return hit;
+  }
+
+  if (byId){
+    const want = String(byId).toLowerCase();
+    const hit = players.find(p => String(p.id || "").toLowerCase() === want);
+    if (hit) return hit;
+  }
+
+  if (byName){
+    const want = clean(byName).toLowerCase();
+    const hit = players.find(p => clean(p.display_name).toLowerCase() === want);
+    if (hit) return hit;
+  }
+
+  if (!byParam && !byId && !byName){
+    const q = window.location.search.replace(/^\?/,"");
+    if (q && !q.includes("=")){
+      const want = normalizeSlugStr(q);
+      const hit = players.find(p => slugOf(p) === want);
+      if (hit) return hit;
+    }
+  }
+
+  return players[0];
+}
+
 /* ---------- BOOT ---------- */
 document.addEventListener("DOMContentLoaded", async () => {
   try {
@@ -599,7 +645,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       const nameHTML = `
         <a href="index.html">HAMILTON</a> ▸
         <span class="crumb-player-name">${clean(player.display_name)}</span>
-        <button id="starFollowBtn" class="crumb-star" aria-label="Add to SuperFan dashboard">
+        <button id="starFollowBtn" class="crumb-star" aria-label="Mark as favorite">
           <i class="ri-star-line"></i>
         </button>
       `;
@@ -622,21 +668,31 @@ document.addEventListener("DOMContentLoaded", async () => {
       };
     }
 
-    // SuperFan overlay text personalize
+    // SuperFan overlay click
     const overlayBtn = $("#superfanOverlayBtn");
     if (overlayBtn){
-      const first = clean(player.first) || clean(player.display_name).split(" ")[0] || "PLAYER";
-      overlayBtn.querySelector("span").textContent =
-        `ADD ${first.toUpperCase()} TO MY SUPERFAN DASHBOARD`;
       overlayBtn.addEventListener("click", () => showSuperFanUpsell(player));
     }
 
-    // Star follow click
+    // Star favorite click
     const starBtn = $("#starFollowBtn");
     if (starBtn){
+      // initial state (if already favorited)
+      setStarState(starBtn, isFavorite(player));
+
       starBtn.addEventListener("click", () => {
-        starBtn.classList.toggle("active");
-        showSuperFanUpsell(player);
+        const nowFavorite = toggleFavorite(player);
+        setStarState(starBtn, nowFavorite);
+        if (nowFavorite){
+          alert(
+            "Added to your Hamilton Favorites.\n\n" +
+            "When you register for a free Fan account, " +
+            "you’ll be able to toggle 'Favorites only' " +
+            "to see just the players you’ve starred."
+          );
+        } else {
+          alert("Removed from your Hamilton Favorites.");
+        }
       });
     }
 
