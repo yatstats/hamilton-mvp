@@ -3,1487 +3,895 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Player Profile – Hamilton Active Baseball Alumni</title>
+  <title>Hamilton Active Baseball Alumni • Player Profile</title>
 
-  <!-- Icons + Fonts -->
+  <!-- ICONS & FONTS -->
   <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400&family=Bebas+Neue&display=swap" rel="stylesheet">
-
-  <!-- (Optional) Firebase init – same pattern as index.html. Safe to leave even if config is empty. -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import {
-      getAuth,
-      createUserWithEmailAndPassword,
-      signInWithEmailAndPassword,
-      signOut,
-      onAuthStateChanged,
-      signInWithCustomToken,
-      signInAnonymously
-    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-
-    window.firebaseAuth = {
-      getAuth,
-      createUserWithEmailAndPassword,
-      signInWithEmailAndPassword,
-      signOut,
-      onAuthStateChanged,
-      signInWithCustomToken,
-      signInAnonymously
-    };
-
-    try {
-      const firebaseConfig = JSON.parse(window.__firebase_config || '{}');
-      const app = initializeApp(firebaseConfig);
-      window.auth = getAuth(app);
-
-      onAuthStateChanged(window.auth, user => {
-        document.dispatchEvent(new CustomEvent('authStateChanged', { detail: { user } }));
-      });
-
-      if (window.__initial_auth_token) {
-        await signInWithCustomToken(window.auth, window.__initial_auth_token);
-      } else {
-        await signInAnonymously(window.auth);
-      }
-    } catch (e) {
-      console.error("Firebase initialization error:", e);
-    }
-  </script>
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500&family=Bebas+Neue&display=swap" rel="stylesheet">
 
   <style>
-    :root{
-      --bg:#f4f4f4;
-      --fg:#121212;
-      --muted:#666;
-      --ink:#222;
-      --line:rgba(0,0,0,.08);
-      --header-bg:#fff;
-      --drawer-bg:rgba(0,0,0,.75);
-      --hamSmall:13px;
-      --hamBig:20px;
-      --hamBigger:24px;
-      --tagGrey:#cfd2d6;
-      --crestH:clamp(42px,6.3vw,74px);
-      --containerPad:16px;
-      --stickyTabsTop:140px;
-      --stickyBarTop:96px;
-    }
-    body.light-theme{
-      --bg:#0c0c0c;
-      --fg:#f5f5f5;
-      --muted:#b3b3b3;
-      --ink:#f5f5f5;
-      --line:rgba(255,255,255,.1);
-      --header-bg:#000;
-      --drawer-bg:rgba(10,10,10,.85);
-    }
-    *{box-sizing:border-box}
-    html,body{margin:0;padding:0}
-    body{
-      background:var(--bg);
-      color:var(--fg);
-      font-family:Oswald,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
-      transition:background-color .3s,color .3s;
-    }
-    a{color:inherit;text-decoration:none}
-    .container{max-width:1200px;margin:0 auto;padding:0 var(--containerPad)}
+  :root{
+    --bg:#0c0c0c; --fg:#f2f2f2; --muted:#c4c4c4; --ink:#e8e8e8; --line:rgba(255,255,255,.08);
+    --card-bg:#171717; --header-bg:#000;
+    --hamSmall:13px; --hamBig:20px; --hamBigger:24px; --tagGrey:#cfd2d6;
+    --crestH:clamp(42px,6.3vw,74px);
+    --containerPad:16px;
+    --footerH:clamp(56px,8vh,77px);
+  }
+  body.light-theme{
+    --bg:#f4f4f4; --fg:#121212; --muted:#555; --ink:#222; --line:rgba(0,0,0,.1);
+    --card-bg:#fff; --header-bg:#fff;
+  }
+  @font-face{
+    font-family:'Indigo';
+    src:url('assets/fonts/Indigo.otf') format('opentype');
+    font-weight:400;
+    font-style:normal;
+    font-display:swap;
+  }
 
-    /* HEADER / TOPBAR */
-    .header{position:sticky;top:0;z-index:50;background:var(--header-bg);box-shadow:0 1px 0 var(--line);}
-    .topbar{display:flex;align-items:center;justify-content:space-between;padding:8px 0}
-    .left-icons{display:flex;align-items:center;gap:8px}
-    .icon-btn{
-      background:none;border:none;color:var(--fg);opacity:.92;
-      display:inline-flex;align-items:center;justify-content:center;
-      padding:0;margin:0 2px;cursor:pointer;
-    }
-    .icon-btn i{font-size:20px}
-    .topnav{display:flex;gap:18px;align-items:center}
-    .nav-pair{white-space:nowrap}
-    .nav-pair .thin{
-      font:300 var(--hamSmall) Oswald,sans-serif;
-      letter-spacing:.02em;
-      color:#cfd2d6;
-      margin-right:2px;
-    }
-    body.light-theme .nav-pair .thin{color:var(--muted)}
-    .nav-pair .bold{
-      font:400 var(--hamSmall) "Bebas Neue",sans-serif;
-      letter-spacing:.09em;
-    }
-    .wordmark-wrap{
-      display:flex;align-items:center;justify-content:flex-end;min-width:120px;
-    }
-    .wordmark-img{
-      height:clamp(18px,3.2vw,28px);width:auto;display:block;
-    }
-    body.light-theme .wordmark-img{filter:invert(1)}
-    @media (max-width:1100px){.topnav{display:none}}
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    background:var(--bg);
+    color:var(--fg);
+    font-family:Oswald,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+    transition:background-color .3s,color .3s;
+  }
+  a{color:inherit;text-decoration:none}
+  .container{max-width:1400px;margin:0 auto;padding:0 var(--containerPad)}
 
-    .hr-y{border-top:1px solid var(--line);}
+  /* ===== GLOBAL HEADER (same as index) ===== */
+  .header{
+    position:sticky;
+    top:0;
+    z-index:40;
+    background:var(--header-bg);
+    transition:background-color .3s;
+  }
+  .topbar{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:8px 0;
+  }
+  .left-icons{
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .icon-btn{
+    background:none;
+    border:none;
+    color:var(--fg);
+    opacity:.92;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    padding:4px;
+    margin:0 2px;
+    cursor:pointer;
+  }
+  .icon-btn i{font-size:20px}
+  /* nudge the hamburger right to line up with logo/hero */
+  #btnMenu{margin-left:2px;}
 
-    /* SCHOOL BANNER */
-    .schoolrow{
-      display:flex;align-items:center;gap:12px;
-      padding:6px var(--containerPad);
-    }
-    .ham-logo{
-      height:var(--crestH);width:auto;object-fit:contain;display:block;flex-shrink:0;
-    }
-    .schooltext{line-height:1}
-    .schooltext .small{
-      font:300 var(--hamSmall)/1 Oswald;
-      letter-spacing:.18em;
-      text-transform:uppercase;
-      color:var(--muted);
-    }
-    .schooltext .big1{
-      font:400 var(--hamBig)/1 "Bebas Neue",sans-serif;
-      letter-spacing:.08em;
-    }
-    .schooltext .big2{
-      font:400 var(--hamBigger)/1 "Bebas Neue",sans-serif;
-      letter-spacing:.08em;
-      margin-top:-2px;
-    }
+  .topnav{
+    display:flex;
+    gap:18px;
+    align-items:center;
+  }
+  .nav-pair{white-space:nowrap}
+  .nav-pair .thin{
+    font:300 var(--hamSmall) Oswald,sans-serif;
+    letter-spacing:.02em;
+    color:#cfd2d6;
+    margin-right:2px;
+  }
+  body.light-theme .nav-pair .thin{color:var(--muted);}
+  .nav-pair .bold{
+    font:400 var(--hamSmall) Indigo,"Bebas Neue",sans-serif;
+  }
+  .wordmark-wrap{
+    display:flex;
+    align-items:center;
+    justify-content:flex-end;
+    min-width:120px;
+  }
+  .wordmark-img{
+    height:clamp(18px,3.2vw,28px);
+    width:auto;
+    display:block;
+  }
+  body.light-theme .wordmark-img{filter:invert(1);}
+  @media (max-width:1200px){
+    .topnav{display:none !important;}
+  }
 
-    /* HERO / BREADCRUMBS + SUPERFAN CTA ROTATOR */
-    .hero{padding:4px 0 6px}
-    .hero-grid{
-      display:flex;align-items:center;justify-content:space-between;gap:16px;
-    }
-    .hero-left{display:flex;flex-direction:column;gap:2px;min-width:0}
-    .crumbs{
-      font:300 11px Oswald,sans-serif;
-      letter-spacing:.18em;
-      text-transform:uppercase;
-      color:var(--muted);
-      white-space:nowrap;
-    }
-    .crumbs span.crumb-name{color:var(--fg)}
-    .tag-duo{position:relative;height:1.7em;overflow:hidden}
-    .tag-swap{
-      position:absolute;inset:0;
-      opacity:0;
-      animation:swap 7s infinite;
-      display:flex;align-items:center;gap:8px;
-      white-space:nowrap;
-    }
-    .tag-swap:nth-child(1){animation-delay:0s}
-    .tag-swap:nth-child(2){animation-delay:3.5s}
-    @keyframes swap{
-      0%{opacity:0;transform:translateY(10px)}
-      8%{opacity:1;transform:translateY(0)}
-      40%{opacity:1}
-      48%{opacity:0;transform:translateY(-10px)}
-      100%{opacity:0;transform:translateY(-10px)}
-    }
+  .hr-y{border-top:1px solid var(--line);}
 
-    .fav-toggle{
-      border:none;
-      background:none;
-      color:var(--muted);
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      padding:0 2px;
-      cursor:pointer;
-    }
-    .fav-toggle i{font-size:18px;}
-    .fav-toggle.is-favorite{color:#facc15;}
+  .schoolrow{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:6px var(--containerPad);
+  }
+  .ham-logo{
+    height:var(--crestH);
+    width:auto;
+    object-fit:contain;
+    display:block;
+    flex-shrink:0;
+  }
+  .schooltext{line-height:1}
+  .schooltext .small{
+    font:300 var(--hamSmall)/1 Oswald;
+    letter-spacing:.12em;
+    color:var(--muted);
+  }
+  .schooltext .big1{
+    font:400 var(--hamBig)/1 "Bebas Neue",sans-serif;
+    letter-spacing:.09em;
+  }
+  .schooltext .big2{
+    font:400 var(--hamBigger)/1 "Bebas Neue",sans-serif;
+    letter-spacing:.09em;
+    margin-top:-2px;
+  }
 
-    .superfan-cta{
-      padding:4px 10px;
-      border-radius:999px;
-      border:1px solid var(--fg);
-      background:transparent;
-      color:var(--fg);
-      font:700 11px "Bebas Neue",sans-serif;
-      letter-spacing:.18em;
-      text-transform:uppercase;
-      cursor:pointer;
-      white-space:nowrap;
-    }
-    .superfan-cta.small{font-size:10px;padding:3px 10px;}
+  /* HERO ROW (breadcrumbs + CTA + search) */
+  .hero{
+    padding:4px 0 6px;
+    background:var(--header-bg);
+  }
+  .hero-grid{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+  }
+  .hero-left{
+    display:flex;
+    flex-direction:column;
+    gap:2px;
+  }
+  .crumbs{
+    font:300 calc(var(--hamSmall)*.7)/1 Oswald;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    color:var(--muted);
+  }
+  .cta-line{
+    font-family:Oswald,sans-serif;
+    font-size:12px;
+    letter-spacing:.18em;
+    text-transform:uppercase;
+    white-space:nowrap;
+  }
+  .cta-line span.bold{
+    font-family:Indigo,"Bebas Neue",sans-serif;
+    letter-spacing:.12em;
+  }
+  .hero-right{
+    display:flex;
+    gap:10px;
+    align-items:center;
+  }
 
-    .hero-right{display:flex;gap:10px;align-items:center;}
-    .hero-icon i{font-size:20px;}
+  /* MAIN LAYOUT */
+  main{
+    padding:12px 0 calc(var(--footerH) + 12px);
+  }
+  .profile-shell{
+    max-width:1200px;
+    margin:0 auto;
+    padding:0 var(--containerPad);
+  }
+  .profile-card{
+    background:var(--card-bg);
+    border-radius:22px;
+    box-shadow:0 8px 24px rgba(0,0,0,.4);
+    padding:18px 18px 24px;
+  }
 
-    @media (max-width:768px){
-      .hero-grid{flex-direction:row;align-items:center;}
-      .hero-left{flex:1}
-      .crumbs{font-size:10px;letter-spacing:.16em;}
-    }
+  .player-header{
+    display:flex;
+    gap:18px;
+    align-items:flex-start;
+    margin-bottom:18px;
+    transition:padding .25s, box-shadow .25s, border-radius .25s;
+  }
+  .player-photo-wrap{
+    flex-shrink:0;
+    border-radius:18px;
+    overflow:hidden;
+    box-shadow:0 4px 12px rgba(0,0,0,.5);
+  }
+  .player-photo{
+    display:block;
+    width:min(260px,72vw);
+    height:auto;
+  }
 
-    /* DRAWER */
-    body.drawer-open{overflow:hidden}
-    .drawer-mask{
-      position:fixed;inset:0;
-      background:rgba(0,0,0,.35);
-      opacity:0;
-      pointer-events:none;
-      transition:opacity .2s;
-      z-index:60;
-    }
-    .drawer{
-      position:fixed;top:0;bottom:0;left:0;
-      width:min(340px,80vw);
-      background:var(--drawer-bg);
-      color:#fff;
-      transform:translateX(-110%);
-      transition:transform .25s;
-      z-index:70;
-      display:flex;
+  .player-meta{
+    flex:1;
+  }
+  .player-team{
+    font:400 13px/1.3 Oswald,sans-serif;
+    letter-spacing:.18em;
+    text-transform:uppercase;
+    color:var(--muted);
+    margin-bottom:4px;
+  }
+  .player-name{
+    font:400 clamp(26px,4.2vw,34px) "Bebas Neue",sans-serif;
+    letter-spacing:.12em;
+  }
+  .player-line2{
+    margin-top:4px;
+    font:300 13px/1.4 Oswald;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    color:var(--muted);
+  }
+  .player-line2 span{white-space:nowrap;}
+
+  .bio-lines{
+    margin-top:10px;
+    font-size:13px;
+    line-height:1.5;
+  }
+  .bio-lines strong{font-weight:500;}
+
+  /* FUNZONE TABS */
+  .funzone-shell{
+    margin-top:18px;
+  }
+  .funzone-tabs{
+    display:flex;
+    flex-wrap:wrap;
+    border-bottom:1px solid var(--line);
+    position:sticky;
+    top:134px; /* just under global header on mobile */
+    z-index:30;
+    background:var(--card-bg);
+  }
+  @media (min-width:900px){
+    .funzone-tabs{top:140px;}
+  }
+  .fun-tab{
+    flex:1 1 50%;
+    text-align:center;
+    padding:10px 6px;
+    border:none;
+    background:none;
+    cursor:pointer;
+    font:700 11px "Bebas Neue",sans-serif;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    color:var(--muted);
+    border-bottom:2px solid transparent;
+  }
+  .fun-tab.active{
+    color:var(--fg);
+    border-bottom-color:var(--fg);
+  }
+  .funzone-panel{
+    display:none;
+    padding:14px 4px 4px;
+  }
+  .funzone-panel.active{display:block;}
+
+  /* STATS GRID */
+  .stats-section-title{
+    background:var(--line);
+    padding:6px 10px;
+    border-radius:10px;
+    font:700 12px "Bebas Neue",sans-serif;
+    letter-spacing:.18em;
+    text-align:center;
+    text-transform:uppercase;
+    margin:6px 0 10px;
+  }
+  .stats-grid{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:8px;
+    margin-bottom:14px;
+  }
+  .stat-item{
+    text-align:center;
+    background:var(--line);
+    border-radius:10px;
+    padding:8px 5px;
+  }
+  .stat-label{
+    font-size:10px;
+    text-transform:uppercase;
+    opacity:.7;
+  }
+  .stat-value{
+    margin-top:4px;
+    font-size:16px;
+    font-weight:600;
+  }
+  @media (max-width:640px){
+    .stats-grid{grid-template-columns:repeat(3,1fr);}
+  }
+
+  /* NEWS CARDS */
+  .news-card{
+    display:flex;
+    gap:10px;
+    padding:10px;
+    margin-bottom:10px;
+    border-radius:12px;
+    border:1px solid var(--line);
+    background:rgba(0,0,0,.1);
+  }
+  body.light-theme .news-card{
+    background:rgba(255,255,255,.7);
+  }
+  .news-thumb{
+    flex-shrink:0;
+    width:84px;
+    height:64px;
+    border-radius:8px;
+    background-size:cover;
+    background-position:center;
+  }
+  .news-title{
+    font-weight:600;
+    margin-bottom:4px;
+    line-height:1.2;
+  }
+  .news-meta{
+    font-size:11px;
+    opacity:.7;
+    margin-bottom:4px;
+  }
+  .news-recap{
+    font-size:12px;
+    line-height:1.4;
+  }
+
+  /* SOCIAL LIST */
+  .social-list{
+    list-style:none;
+  }
+  .social-list li{
+    margin-bottom:10px;
+  }
+  .social-list a{
+    text-decoration:underline;
+    text-underline-offset:2px;
+  }
+
+  /* MENTORSHIP */
+  .mm-box{
+    border-radius:12px;
+    border:1px solid var(--line);
+    padding:12px;
+    margin-bottom:16px;
+  }
+  .mm-box h4{
+    font:700 14px "Bebas Neue",sans-serif;
+    letter-spacing:.14em;
+    margin-bottom:4px;
+  }
+  .mm-box p{font-size:13px;line-height:1.4;}
+
+  .mm-cta-btn{
+    margin-top:10px;
+    width:100%;
+    padding:11px;
+    border-radius:999px;
+    border:none;
+    cursor:pointer;
+    font:700 12px "Bebas Neue",sans-serif;
+    letter-spacing:.18em;
+    text-transform:uppercase;
+    background:var(--fg);
+    color:var(--bg);
+  }
+
+  /* GALLERY */
+  .gallery-strip{
+    display:flex;
+    gap:10px;
+    overflow-x:auto;
+    padding-bottom:6px;
+  }
+  .gallery-strip img{
+    height:120px;
+    border-radius:10px;
+    flex-shrink:0;
+    object-fit:cover;
+  }
+
+  /* COMPACT HEADER (on scroll, all tabs) */
+  .profile-shell.compact .profile-card{
+    border-radius:0 0 22px 22px;
+  }
+  .profile-shell.compact .player-header{
+    position:sticky;
+    top:96px; /* just under main header on mobile */
+    z-index:32;
+    padding-bottom:8px;
+    background:var(--card-bg);
+  }
+  @media (min-width:900px){
+    .profile-shell.compact .player-header{top:100px;}
+  }
+  .profile-shell.compact .player-header{
+    align-items:center;
+    gap:10px;
+  }
+  .profile-shell.compact .player-photo{
+    width:90px;
+  }
+  .profile-shell.compact .player-photo-wrap{
+    border-radius:12px;
+    box-shadow:0 3px 8px rgba(0,0,0,.5);
+  }
+  .profile-shell.compact .player-name{
+    font-size:22px;
+  }
+  .profile-shell.compact .bio-lines{
+    display:none;
+  }
+
+  /* MOBILE TWEAKS */
+  @media (max-width:768px){
+    .player-header{
       flex-direction:column;
-    }
-    body.drawer-open .drawer-mask{opacity:1;pointer-events:auto}
-    body.drawer-open .drawer{transform:translateX(0)}
-    .drawer-header{
-      display:flex;justify-content:space-between;align-items:center;
-      padding:16px;
-      border-bottom:1px solid rgba(255,255,255,.12);
-    }
-    .drawer-title{
-      font:400 20px "Bebas Neue",sans-serif;
-      letter-spacing:.12em;
-      text-transform:uppercase;
-    }
-    .drawer-content{flex:1;overflow-y:auto;padding:0 16px 16px;}
-    .drawer-subhead{
-      font:400 16px "Bebas Neue",sans-serif;
-      letter-spacing:.12em;
-      margin:18px 0 8px;
-      text-transform:uppercase;
-    }
-    #playerSearch{
-      width:100%;
-      padding:10px 12px;
-      border-radius:999px;
-      border:none;
-      outline:none;
-      background:rgba(255,255,255,.12);
-      color:#fff;
-      font-size:14px;
-    }
-    #liveResults{margin-top:10px;}
-    .live-hit{
-      display:flex;gap:10px;align-items:center;
-      padding:8px 6px;
-      border-radius:10px;
-      cursor:pointer;
-    }
-    .live-hit:hover{background:rgba(255,255,255,.08);}
-    .live-hit img{
-      width:42px;height:42px;border-radius:6px;object-fit:cover;flex-shrink:0;
-    }
-    .live-hit-main{font-size:14px;font-weight:600;}
-    .live-hit-sub{font-size:12px;opacity:.75;}
-
-    .drawer-nav-item{
-      display:block;
-      margin-bottom:10px;
-    }
-
-    /* PROFILE LAYOUT */
-    main{padding:12px 0 80px;}
-    .profile-shell{max-width:1200px;margin:0 auto;padding:0 var(--containerPad);}
-    .profile-card{
-      background:#fff;
-      border-radius:18px;
-      box-shadow:0 10px 30px rgba(0,0,0,.08);
-      padding:18px 18px 24px;
-    }
-    body.light-theme .profile-card{
-      background:#111;
-      box-shadow:0 10px 30px rgba(0,0,0,.55);
-    }
-
-    .profile-main{
-      display:grid;
-      grid-template-columns:minmax(0,280px) minmax(0,1fr);
-      gap:18px;
       align-items:flex-start;
     }
-    @media (max-width:768px){
-      .profile-main{
-        grid-template-columns:minmax(0,1fr);
-      }
+    .profile-shell.compact .player-header{
+      flex-direction:row;
     }
+    .player-photo{
+      width:min(220px,80vw);
+    }
+  }
 
-    .profile-photo-wrap{
-      position:relative;
-      border-radius:18px;
-      overflow:hidden;
-      box-shadow:0 14px 30px rgba(0,0,0,.18);
-      background:#000;
-    }
-    .profile-photo-wrap img{
-      display:block;
-      width:100%;
-      height:100%;
-      object-fit:cover;
-    }
+  /* FOOTER */
+  .site-footer{
+    position:fixed;
+    left:0;right:0;bottom:0;
+    height:var(--footerH);
+    border-top:1px solid var(--line);
+    background:var(--bg);
+    z-index:20;
+  }
+  .site-footer img{
+    height:100%;
+    width:100%;
+    object-fit:contain;
+  }
 
-    .profile-info{
-      display:flex;
-      flex-direction:column;
-      gap:8px;
-    }
-    .profile-teamline{
-      font-size:14px;
-      text-transform:uppercase;
-      letter-spacing:.12em;
-      color:var(--muted);
-    }
-    .profile-name{
-      font:400 32px "Bebas Neue",sans-serif;
-      letter-spacing:.12em;
-      text-transform:uppercase;
-    }
-    .profile-meta{
-      font-size:13px;
-      line-height:1.4;
-    }
-    .profile-meta strong{font-weight:700;}
-
-    .profile-line{margin-top:4px;}
-
-    /* STICKY MINI BAR (mobile) */
-    .profile-sticky-bar{
-      position:sticky;
-      top:var(--stickyBarTop);
-      z-index:40;
-      background:var(--header-bg);
-      border-bottom:1px solid var(--line);
-      display:none;
-      padding:6px var(--containerPad);
-    }
-    .profile-sticky-bar-inner{
-      display:flex;
-      align-items:center;
-      gap:8px;
-    }
-    .profile-sticky-thumb{
-      width:40px;height:40px;border-radius:10px;overflow:hidden;flex-shrink:0;
-      box-shadow:0 6px 16px rgba(0,0,0,.25);
-    }
-    .profile-sticky-thumb img{
-      width:100%;height:100%;object-fit:cover;
-    }
-    .profile-sticky-text{
-      flex:1;
-      min-width:0;
-    }
-    .profile-sticky-name{
-      font:400 18px "Bebas Neue",sans-serif;
-      letter-spacing:.15em;
-      text-transform:uppercase;
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
-    }
-    .profile-sticky-sub{
-      font-size:11px;
-      letter-spacing:.08em;
-      text-transform:uppercase;
-      color:var(--muted);
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
-    }
-    .profile-sticky-bar.is-visible{display:block;}
-
-    /* FUN ZONE TABS */
-    .tabs-wrapper{
-      margin-top:18px;
-      position:sticky;
-      top:var(--stickyTabsTop);
-      z-index:30;
-      background:var(--bg);
-      padding:0 var(--containerPad) 6px;
-    }
-    .tabs-row{
-      display:flex;
-      border-bottom:2px solid var(--line);
-      overflow-x:auto;
-      scrollbar-width:none;
-    }
-    .tabs-row::-webkit-scrollbar{display:none;}
-    .tab-btn{
-      flex:1;
-      min-width:130px;
-      padding:8px 6px 10px;
-      border:none;
-      background:none;
-      cursor:pointer;
-      font:400 11px "Bebas Neue",sans-serif;
-      letter-spacing:.12em;
-      text-transform:uppercase;
-      color:var(--muted);
-      border-bottom:3px solid transparent;
-      white-space:nowrap;
-    }
-    .tab-btn.active{
-      color:var(--fg);
-      border-bottom-color:var(--fg);
-    }
-
-    .tab-panels{
-      padding:10px var(--containerPad) 0;
-    }
-    .tab-panel{display:none;}
-    .tab-panel.active{display:block;}
-
-    /* STATS GRID */
-    .stats-block{
-      margin-bottom:18px;
-      background:#fff;
-      border-radius:14px;
-      box-shadow:0 8px 18px rgba(0,0,0,.06);
-      padding:14px 14px 12px;
-    }
-    body.light-theme .stats-block{
-      background:#111;
-      box-shadow:0 8px 18px rgba(0,0,0,.55);
-    }
-    .stats-heading{
-      font:400 14px "Bebas Neue",sans-serif;
-      letter-spacing:.14em;
-      text-transform:uppercase;
-      text-align:center;
-      margin-bottom:10px;
-    }
-    .stats-grid{
-      display:grid;
-      grid-template-columns:repeat(4,1fr);
-      gap:8px;
-    }
-    @media (max-width:600px){
-      .stats-grid{
-        grid-template-columns:repeat(3,1fr);
-      }
-    }
-    .stat-tile{
-      border-radius:10px;
-      background:var(--line);
-      padding:6px 4px;
-      text-align:center;
-    }
-    .stat-label{
-      font-size:11px;
-      text-transform:uppercase;
-      opacity:.7;
-    }
-    .stat-value{
-      font-size:18px;
-      font-weight:700;
-      margin-top:2px;
-    }
-
-    /* NEWS */
-    .news-card{
-      background:#fff;
-      border-radius:14px;
-      box-shadow:0 8px 18px rgba(0,0,0,.06);
-      padding:10px;
-      display:flex;
-      gap:10px;
-      margin-bottom:10px;
-    }
-    body.light-theme .news-card{
-      background:#111;
-      box-shadow:0 8px 18px rgba(0,0,0,.55);
-    }
-    .news-thumb{
-      width:84px;height:64px;border-radius:10px;overflow:hidden;flex-shrink:0;background:#000;
-    }
-    .news-thumb img{width:100%;height:100%;object-fit:cover;}
-    .news-main{flex:1;min-width:0;}
-    .news-title{
-      font-weight:700;
-      font-size:14px;
-      margin-bottom:4px;
-    }
-    .news-meta{
-      font-size:11px;
-      opacity:.75;
-      margin-bottom:6px;
-    }
-    .news-recap{
-      font-size:13px;
-      line-height:1.4;
-    }
-
-    /* SOCIAL */
-    .social-section{
-      display:flex;
-      flex-direction:column;
-      gap:12px;
-    }
-    .social-pill-row{
-      display:flex;
-      flex-wrap:wrap;
-      gap:8px;
-    }
-    .social-pill{
-      padding:8px 12px;
-      border-radius:999px;
-      border:1px solid var(--line);
-      font-size:13px;
-      display:inline-flex;
-      align-items:center;
-      gap:6px;
-    }
-    .social-pill i{font-size:16px;}
-    .social-note{font-size:13px;opacity:.8;}
-
-    /* MENTORSHIP */
-    .mm-card{
-      background:#fff;
-      border-radius:14px;
-      box-shadow:0 8px 18px rgba(0,0,0,.06);
-      padding:14px 14px 18px;
-    }
-    body.light-theme .mm-card{
-      background:#111;
-      box-shadow:0 8px 18px rgba(0,0,0,.55);
-    }
-    .mm-title{
-      font:400 16px "Bebas Neue",sans-serif;
-      letter-spacing:.14em;
-      text-transform:uppercase;
-      margin-bottom:6px;
-    }
-    .mm-body{font-size:14px;line-height:1.5;margin-bottom:10px;}
-    .mm-options{margin-bottom:10px;font-size:13px;}
-    .mm-cta-btn{
-      padding:10px 16px;
-      border-radius:999px;
-      border:none;
-      background:var(--fg);
-      color:var(--bg);
-      font:400 14px "Bebas Neue",sans-serif;
-      letter-spacing:.16em;
-      text-transform:uppercase;
-      cursor:pointer;
-    }
-
-    /* GALLERY */
-    .gallery-shell{
-      background:#fff;
-      border-radius:14px;
-      box-shadow:0 8px 18px rgba(0,0,0,.06);
-      padding:12px;
-    }
-    body.light-theme .gallery-shell{
-      background:#111;
-      box-shadow:0 8px 18px rgba(0,0,0,.55);
-    }
-    .carousel{
-      position:relative;
-      overflow:hidden;
-      border-radius:14px;
-    }
-    .carousel-track{
-      display:flex;
-      transition:transform .35s ease;
-    }
-    .carousel-slide{
-      min-width:100%;
-      max-height:300px;
-    }
-    .carousel-slide img{
-      width:100%;height:100%;object-fit:cover;display:block;
-    }
-    .carousel-arrow{
-      position:absolute;
-      top:50%;
-      transform:translateY(-50%);
-      width:34px;height:34px;
-      border-radius:50%;
-      border:none;
-      background:rgba(0,0,0,.55);
-      color:#fff;
-      display:flex;align-items:center;justify-content:center;
-      cursor:pointer;
-    }
-    .carousel-arrow.left{left:8px;}
-    .carousel-arrow.right{right:8px;}
-    .gallery-caption{
-      font-size:12px;
-      margin-top:8px;
-      opacity:.85;
-    }
-    .gallery-upload-note{
-      margin-top:10px;
-      font-size:13px;
-    }
-    .upload-link{
-      text-decoration:underline;
-      cursor:pointer;
-    }
-
-    /* MODAL FOR SUPERFAN CTA */
-    .modal-mask{
-      position:fixed;inset:0;
-      background:rgba(0,0,0,.5);
-      display:none;
-      align-items:center;
-      justify-content:center;
-      z-index:90;
-    }
-    .modal-mask.is-open{display:flex;}
-    .modal-dialog{
-      max-width:380px;width:90%;
-      background:#fff;
-      border-radius:16px;
-      padding:18px 18px 16px;
-      box-shadow:0 18px 40px rgba(0,0,0,.4);
-    }
-    body.light-theme .modal-dialog{
-      background:#111;
-    }
-    .modal-title{
-      font:400 18px "Bebas Neue",sans-serif;
-      letter-spacing:.14em;
-      text-transform:uppercase;
-      margin-bottom:8px;
-    }
-    .modal-body{font-size:14px;line-height:1.5;margin-bottom:12px;}
-    .modal-price{font-weight:700;margin-bottom:10px;}
-    .modal-actions{
-      display:flex;
-      gap:8px;
-      justify-content:flex-end;
-      flex-wrap:wrap;
-    }
-    .btn-outline{
-      padding:8px 12px;
-      border-radius:999px;
-      border:1px solid var(--fg);
-      background:none;
-      font:400 13px "Bebas Neue",sans-serif;
-      letter-spacing:.12em;
-      text-transform:uppercase;
-      cursor:pointer;
-    }
-    .btn-solid{
-      padding:8px 12px;
-      border-radius:999px;
-      border:none;
-      background:var(--fg);
-      color:var(--bg);
-      font:400 13px "Bebas Neue",sans-serif;
-      letter-spacing:.12em;
-      text-transform:uppercase;
-      cursor:pointer;
-    }
-
-    /* FOOTER SPONSOR (match other pages) */
-    .site-footer{
-      position:fixed;
-      left:0;right:0;bottom:0;
-      height:60px;
-      background:var(--bg);
-      border-top:1px solid var(--line);
-      z-index:20;
-    }
-    .site-footer img{
-      width:100%;height:100%;object-fit:contain;
-    }
+  /* ACCESSIBILITY */
+  .icon-btn:focus,button:focus{outline:2px solid var(--fg);outline-offset:2px;}
   </style>
 </head>
-
 <body>
-  <!-- LEFT DRAWER -->
-  <div class="drawer-mask"></div>
-  <aside class="drawer" id="drawerLeft" aria-label="Navigation & search">
-    <div class="drawer-header">
-      <div class="drawer-title">PLAYER PROFILE SEARCH</div>
-      <button class="icon-btn" id="drawerClose"><i class="ri-close-line"></i></button>
-    </div>
-    <div class="drawer-content">
-      <input id="playerSearch" placeholder="Type to search…" />
-      <div id="liveResults"></div>
-
-      <div class="drawer-subhead">Navigation</div>
-      <nav>
-        <a href="index.html" class="drawer-nav-item nav-pair">
-          <span class="thin">WHERE THEY</span><span class="bold">YAT?</span>
-        </a>
-        <a href="alumni-news.html" class="drawer-nav-item nav-pair">
-          <span class="thin">ACTIVE ALUMNI</span><span class="bold">NEWS</span>
-        </a>
-        <a href="current-team.html" class="drawer-nav-item nav-pair">
-          <span class="thin">THE</span><span class="bold">CURRENT TEAM</span>
-        </a>
-        <a href="marketplace.html" class="drawer-nav-item nav-pair">
-          <span class="thin">MENTORSHIP</span><span class="bold">MARKETPLACE</span>
-        </a>
-        <a href="all-time-list.html" class="drawer-nav-item nav-pair">
-          <span class="thin">NEXT-LEVEL</span><span class="bold">ALL-TIME LIST</span>
-        </a>
-        <a href="partner-program.html" class="drawer-nav-item nav-pair">
-          <span class="thin">PCD ACTION</span><span class="bold">PARTNER PROGRAM</span>
-        </a>
-        <a href="faq.html" class="drawer-nav-item nav-pair">
-          <span class="bold">FAQ’S</span>
-        </a>
-      </nav>
-    </div>
-  </aside>
-
-  <!-- HEADER -->
-  <header class="header">
-    <div class="container topbar">
-      <div class="left-icons">
-        <button class="icon-btn" id="btnMenu" aria-label="Menu"><i class="ri-menu-line"></i></button>
-        <button class="icon-btn" id="btnAccount" aria-label="Account"><i class="ri-user-3-line"></i></button>
-        <button class="icon-btn" id="theme-toggle" aria-label="Toggle Theme"><i class="ri-sun-line"></i></button>
-      </div>
-
-      <nav class="topnav" aria-label="Top Navigation">
-        <a href="index.html" class="nav-pair"><span class="thin">WHERE THEY</span><span class="bold">YAT?</span></a>
-        <a href="alumni-news.html" class="nav-pair"><span class="thin">ACTIVE ALUMNI</span><span class="bold">NEWS</span></a>
-        <a href="current-team.html" class="nav-pair"><span class="thin">THE</span><span class="bold">CURRENT TEAM</span></a>
-        <a href="marketplace.html" class="nav-pair"><span class="thin">MENTORSHIP</span><span class="bold">MARKETPLACE</span></a>
-        <a href="all-time-list.html" class="nav-pair"><span class="thin">NEXT-LEVEL</span><span class="bold">ALL-TIME LIST</span></a>
-        <a href="partner-program.html" class="nav-pair"><span class="thin">PCD ACTION</span><span class="bold">PARTNER PROGRAM</span></a>
-        <a href="faq.html" class="nav-pair"><span class="bold">FAQ’S</span></a>
-      </nav>
-
-      <div class="wordmark-wrap">
-        <img src="assets/img/yatstats-logo.png" alt="YAT?STATS" class="wordmark-img">
-      </div>
-    </div>
-
-    <div class="hr-y"></div>
-
-    <!-- SCHOOL BANNER -->
-    <div class="container schoolrow">
-      <img src="assets/img/schools/hamilton.az.png" alt="Hamilton H" class="ham-logo"
-           onerror="this.onerror=null;this.src='assets/img/placeholder.png';">
-      <div class="schooltext">
-        <div class="small">CHANDLER, AZ</div>
-        <div class="big1">HAMILTON HIGH SCHOOL</div>
-        <div class="big2">ACTIVE BASEBALL ALUMNI</div>
-      </div>
-    </div>
-
-    <div class="hr-y"></div>
-
-    <!-- HERO / BREADCRUMBS + CTA ROTATOR -->
-    <section class="hero">
-      <div class="container hero-grid">
-        <div class="hero-left">
-          <div class="tag-duo">
-            <!-- state 1: breadcrumbs + star -->
-            <div class="tag-swap">
-              <div class="crumbs">
-                HAMILTON ▸ <span class="crumb-name" id="crumbPlayerName">PLAYER</span>
-              </div>
-              <button class="fav-toggle" id="favToggle" aria-label="Mark as favorite player">
-                <i class="ri-star-line"></i>
-              </button>
-            </div>
-            <!-- state 2: SuperFan CTA -->
-            <div class="tag-swap">
-              <button class="superfan-cta small js-superfan-cta">ADD TO MY SUPERFAN DASHBOARD</button>
-            </div>
-          </div>
-        </div>
-        <div class="hero-right">
-          <button id="openSearch" class="hero-icon icon-btn" aria-label="Search players"><i class="ri-search-line"></i></button>
-          <!-- Filters / reset not super relevant on profile, but left here for consistency / future -->
-        </div>
-      </div>
-    </section>
-  </header>
-
-  <!-- STICKY MINI BAR (shows after scroll on mobile) -->
-  <div class="profile-sticky-bar" id="profileStickyBar">
-    <div class="profile-sticky-bar-inner">
-      <div class="profile-sticky-thumb"><img src="" alt="" id="stickyThumb"></div>
-      <div class="profile-sticky-text">
-        <div class="profile-sticky-name" id="stickyName">PLAYER NAME</div>
-        <div class="profile-sticky-sub" id="stickySub">TEAM • LEVEL • STATUS</div>
-      </div>
-      <button class="fav-toggle" id="favToggleSticky" aria-label="Mark as favorite player">
-        <i class="ri-star-line"></i>
+<header class="header">
+  <div class="container topbar">
+    <div class="left-icons">
+      <button class="icon-btn" id="btnMenu" aria-label="Menu">
+        <i class="ri-menu-line"></i>
       </button>
+      <button class="icon-btn" id="btnAccount" aria-label="Account">
+        <i class="ri-user-3-line"></i>
+      </button>
+      <button class="icon-btn" id="theme-toggle" aria-label="Toggle Theme">
+        <i class="ri-sun-line"></i>
+      </button>
+    </div>
+
+    <nav class="topnav" aria-label="Top Navigation">
+      <a href="index.html" class="nav-pair"><span class="thin">WHERE THEY</span><span class="bold">YAT?</span></a>
+      <a href="alumni-news.html" class="nav-pair"><span class="thin">ACTIVE ALUMNI</span><span class="bold">NEWS</span></a>
+      <a href="current-team.html" class="nav-pair"><span class="thin">THE</span><span class="bold">CURRENT TEAM</span></a>
+      <a href="marketplace.html" class="nav-pair"><span class="thin">MENTORSHIP</span><span class="bold">MARKETPLACE</span></a>
+      <a href="all-time-list.html" class="nav-pair"><span class="thin">NEXT-LEVEL</span><span class="bold">ALL-TIME LIST</span></a>
+      <a href="partner-program.html" class="nav-pair"><span class="thin">PCD ACTION</span><span class="bold">PARTNER PROGRAM</span></a>
+      <a href="faq.html" class="nav-pair"><span class="bold">FAQ’S</span></a>
+    </nav>
+
+    <div class="wordmark-wrap">
+      <img src="assets/img/yatstats-logo.png" class="wordmark-img" alt="YAT?STATS">
     </div>
   </div>
 
-  <!-- MAIN PROFILE CONTENT -->
-  <main>
-    <div class="profile-shell">
-      <section class="profile-card" id="profileMain">
-        <div class="profile-main" id="profileHeroBlock">
-          <div class="profile-photo-wrap">
-            <img src="" alt="Player photo" id="playerPhoto">
+  <div class="hr-y"></div>
+
+  <div class="container schoolrow">
+    <img class="ham-logo" src="assets/img/schools/hamilton.az.png" alt="Hamilton H">
+    <div class="schooltext">
+      <div class="small">CHANDLER, AZ</div>
+      <div class="big1">HAMILTON HIGH SCHOOL</div>
+      <div class="big2">ACTIVE BASEBALL ALUMNI</div>
+    </div>
+  </div>
+
+  <div class="hr-y"></div>
+
+  <section class="hero">
+    <div class="container hero-grid">
+      <div class="hero-left">
+        <div class="crumbs" id="crumbs">HAMILTON ▸ PLAYER</div>
+        <div class="cta-line" id="superfanCta">
+          ADD <span class="bold" id="ctaName">PLAYER NAME</span> TO MY SUPERFAN DASHBOARD
+        </div>
+      </div>
+      <div class="hero-right">
+        <!-- Favorite star next to breadcrumbs/CTA instead of on card -->
+        <button class="icon-btn" id="favoriteBtn" aria-label="Favorite player">
+          <i class="ri-star-line" id="favoriteIcon"></i>
+        </button>
+        <button class="icon-btn" id="profileSearchBtn" aria-label="Search players">
+          <i class="ri-search-line"></i>
+        </button>
+      </div>
+    </div>
+  </section>
+</header>
+
+<main>
+  <div class="profile-shell" id="profileShell">
+    <div class="profile-card" id="profileCard">
+      <!-- PLAYER HEADER (image + bio) -->
+      <section class="player-header" id="playerHeader">
+        <div class="player-photo-wrap">
+          <img src="" alt="" class="player-photo" id="playerPhoto">
+        </div>
+        <div class="player-meta">
+          <div class="player-team" id="playerTeam">TEAM • LEVEL</div>
+          <div class="player-name" id="playerName">PLAYER NAME</div>
+          <div class="player-line2" id="playerLine2">
+            <span id="playerStatus">TRIPLE-A • ACTIVE 2025</span>
           </div>
-          <div class="profile-info">
-            <div class="profile-teamline" id="teamLine">Team • League</div>
-            <div class="profile-name" id="playerNameHeading">PLAYER NAME</div>
-            <div class="profile-meta" id="playerMetaPrimary">
-              <!-- filled by JS -->
-            </div>
-            <div class="profile-meta" id="playerMetaSecondary">
-              <!-- filled by JS -->
-            </div>
+          <div class="bio-lines" id="bioLines">
+            <div><strong>Draft:</strong> <span id="draftInfo">N/A</span></div>
+            <div><strong>Colleges:</strong> <span id="colleges">N/A</span></div>
+            <div><strong>Profile:</strong> <span id="bodyLine">SS | H: 6-0 | W: 180 | B/T: R/R</span></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- FUNZONE -->
+      <section class="funzone-shell">
+        <div class="funzone-tabs" id="funTabs">
+          <button class="fun-tab active" data-panel="statsPanel">Season & Career Statistics</button>
+          <button class="fun-tab" data-panel="newsPanel">News & Video Clips</button>
+          <button class="fun-tab" data-panel="socialPanel">Social Media</button>
+          <button class="fun-tab" data-panel="mentorPanel">Mentorship Marketplace</button>
+          <button class="fun-tab" data-panel="galleryPanel">Timeline Gallery</button>
+        </div>
+
+        <!-- STATS -->
+        <div class="funzone-panel active" id="statsPanel">
+          <div id="statsContent">
+            <div class="stats-section-title">CAREER STATS</div>
+            <div class="stats-grid" id="careerStatsGrid"></div>
+
+            <div class="stats-section-title">2025 SEASON STATS</div>
+            <div class="stats-grid" id="season2025Grid"></div>
+
+            <div class="stats-section-title">2024 SEASON STATS</div>
+            <div class="stats-grid" id="season2024Grid"></div>
+
+            <div class="stats-section-title">2023 SEASON STATS</div>
+            <div class="stats-grid" id="season2023Grid"></div>
+          </div>
+        </div>
+
+        <!-- NEWS -->
+        <div class="funzone-panel" id="newsPanel">
+          <div class="stats-section-title">LATEST HEADLINES</div>
+          <div id="newsList">
+            <!-- Sample card; real ones can replace via script -->
+            <article class="news-card">
+              <div class="news-thumb" style="background-image:url('assets/img/hs_players/drew_swift.jpg');"></div>
+              <div>
+                <div class="news-title">Drew Swift multi-hit night for Aviators</div>
+                <div class="news-meta">MiLB • 8/25/2025 • Via milb.com</div>
+                <div class="news-recap">
+                  Swifty was piling up multi-hit games back in his Hamilton Huskies days, and he’s still at it in Triple-A for the Aviators. YAT-A-BOY, Drew — Huskies nation sees you!
+                </div>
+              </div>
+            </article>
+          </div>
+        </div>
+
+        <!-- SOCIAL -->
+        <div class="funzone-panel" id="socialPanel">
+          <div class="stats-section-title">LATEST SOCIAL POSTS</div>
+          <ul class="social-list" id="socialList">
+            <li id="socialXRow">X / Twitter: <a href="#" target="_blank" rel="noopener" id="xLink">@player</a></li>
+            <li id="socialIGRow">Instagram: <a href="#" target="_blank" rel="noopener" id="igLink">@player</a></li>
+          </ul>
+          <p style="font-size:12px;opacity:.7;margin-top:8px;">
+            Share your favorite highlights with <strong>#YAT-A-BOY</strong> and tag <strong>@yat_stats</strong> to help boost your guy’s NIL value.
+          </p>
+        </div>
+
+        <!-- MENTORSHIP -->
+        <div class="funzone-panel" id="mentorPanel">
+          <div class="stats-section-title">MENTORSHIP MARKETPLACE</div>
+          <div class="mm-box">
+            <h4>PERSONALIZED VIDEO BREAKDOWN</h4>
+            <p>
+              Upload a clip of your swing, throwing mechanics, or fielding and get a personalized breakdown from this player.
+              You’ll get timestamped feedback, drills to work on, and a YAT-A-BOY shout-out you can keep forever.
+            </p>
+            <button class="mm-cta-btn">START A MENTORSHIP REQUEST</button>
+          </div>
+          <p style="font-size:12px;opacity:.7;">
+            The purchase flow (Add to Cart / Buy Now) will live in the Mentorship Marketplace funnel and your SuperFan dashboard.
+            This tab gives each player their own storefront window into that experience.
+          </p>
+        </div>
+
+        <!-- GALLERY -->
+        <div class="funzone-panel" id="galleryPanel">
+          <div class="stats-section-title">TIMELINE GALLERY</div>
+          <p style="font-size:13px;margin-bottom:8px;">
+            We’ll be inviting family, friends, teammates, and fans to submit photos from Little League to today.
+            Once approved, they’ll appear here in order so you can swipe through this player’s journey.
+          </p>
+          <div class="gallery-strip" id="galleryStrip">
+            <img src="assets/img/hs_players/drew_swift.jpg" alt="High school days">
+            <img src="assets/img/now_players/drew_swift.jpg" alt="Pro ball">
+            <img src="assets/img/hs_players/drew_swift.jpg" alt="Throwback">
           </div>
         </div>
       </section>
     </div>
-
-    <!-- TABS STICKY WRAPPER -->
-    <div class="tabs-wrapper">
-      <div class="tabs-row" role="tablist">
-        <button class="tab-btn active" data-tab="stats">SEASON & CAREER STATISTICS</button>
-        <button class="tab-btn" data-tab="news">NEWS & VIDEO CLIPS</button>
-        <button class="tab-btn" data-tab="social">SOCIAL MEDIA</button>
-        <button class="tab-btn" data-tab="mentor">MENTORSHIP MARKETPLACE</button>
-        <button class="tab-btn" data-tab="gallery">TIMELINE GALLERY</button>
-      </div>
-    </div>
-
-    <!-- TAB PANELS -->
-    <div class="tab-panels">
-      <section class="tab-panel active" id="panel-stats"></section>
-      <section class="tab-panel" id="panel-news"></section>
-      <section class="tab-panel" id="panel-social"></section>
-      <section class="tab-panel" id="panel-mentor"></section>
-      <section class="tab-panel" id="panel-gallery"></section>
-    </div>
-  </main>
-
-  <!-- SUPERFAN MODAL -->
-  <div class="modal-mask" id="superfanModal">
-    <div class="modal-dialog">
-      <div class="modal-title">SUPERFAN SUBSCRIPTION</div>
-      <div class="modal-body" id="superfanModalBody">
-        Congratulations! Once your SuperFan transaction is completed the players you follow will be loaded onto your dashboard.
-      </div>
-      <div class="modal-price">
-        SuperFan Access: <span id="superfanPrice">$9.99 / month</span>
-      </div>
-      <div class="modal-actions">
-        <button class="btn-outline" id="superfanLaterBtn">Maybe Later</button>
-        <button class="btn-solid" id="superfanCheckoutBtn">ADD TO CART</button>
-      </div>
-    </div>
   </div>
+</main>
 
-  <!-- FOOTER SPONSOR -->
-  <footer class="site-footer">
-    <a href="https://www.flowpage.com/petedeluca" target="_blank" rel="noopener noreferrer">
-      <img src="assets/img/partners/american_banner.png" alt="American Solutions for Business">
-    </a>
-  </footer>
+<footer class="site-footer">
+  <a href="https://www.flowpage.com/petedeluca" target="_blank" rel="noopener noreferrer">
+    <img src="assets/img/partners/american_banner.png" alt="American Solutions for Business">
+  </a>
+</footer>
 
-  <script type="module">
-    const $ = s => document.querySelector(s);
-    const $$ = s => Array.from(document.querySelectorAll(s));
-    const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQcWJM6Q6hTdFnES_G5LUy4teCS-sJ5HdAc9F5HSY8DGE9egdGy8yUAe2ShT3tFm-CwUuCYeAYy_YiW/pub?gid=2028135390&output=csv";
+<script>
+/* ========= SMALL HELPER UTILS ========= */
+const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQcWJM6Q6hTdFnES_G5LUy4teCS-sJ5HdAc9F5HSY8DGE9egdGy8yUAe2ShT3tFm-CwUuCYeAYy_YiW/pub?gid=2028135390&output=csv";
 
-    /* ---------- THEME ---------- */
-    function applyThemeFromStorage(){
-      const saved = localStorage.getItem('theme');
-      const body = document.body;
-      const icon = $('#theme-toggle i');
-      if(saved === 'light'){
-        body.classList.add('light-theme');
-        icon?.classList.replace('ri-sun-line','ri-moon-line');
-      }else{
-        body.classList.remove('light-theme');
-        icon?.classList.replace('ri-moon-line','ri-sun-line');
-      }
+const $ = s => document.querySelector(s);
+const params = new URLSearchParams(location.search);
+const requestedSlug = params.get('player') || '';
+
+function slugOf(player){
+  if (!player) return '';
+  const s = (player.slug || '').trim();
+  if (s) return s;
+  return (player.display_name || '')
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g,'-');
+}
+function imageNameOf(p){
+  const first = (p.first||'').toLowerCase().replace(/\s+/g,'_');
+  const last  = (p.last||'').toLowerCase().replace(/\s+/g,'_');
+  if (first || last) return [first,last].filter(Boolean).join('_');
+  return (p.slug || p.display_name || '').toLowerCase().replace(/\s+/g,'_').replace(/[^a-z0-9_]/g,'');
+}
+function formatDecimalStat(key, val){
+  if (!val || val === '--') return '--';
+  const decimals = ['AVG','OBP','SLG','OPS'];
+  if (!decimals.includes(key)) return val;
+  const num = parseFloat(val);
+  if (Number.isNaN(num)) return val;
+  const s = num.toFixed(3);
+  return (num < 1 && num > -1) ? s.substring(1) : s;
+}
+
+/* ========= THEME SYNC ========= */
+(function setupTheme(){
+  const toggle = $('#theme-toggle');
+  const icon   = toggle.querySelector('i');
+  const saved = localStorage.getItem('theme');
+  if (saved === 'light') {
+    document.body.classList.add('light-theme');
+    icon.classList.remove('ri-sun-line');
+    icon.classList.add('ri-moon-line');
+  }
+  toggle.addEventListener('click', () => {
+    document.body.classList.toggle('light-theme');
+    const isLight = document.body.classList.contains('light-theme');
+    localStorage.setItem('theme', isLight ? 'light' : 'dark');
+    if (isLight){
+      icon.classList.remove('ri-sun-line');
+      icon.classList.add('ri-moon-line');
+    }else{
+      icon.classList.remove('ri-moon-line');
+      icon.classList.add('ri-sun-line');
     }
-    $('#theme-toggle')?.addEventListener('click', ()=>{
-      document.body.classList.toggle('light-theme');
-      localStorage.setItem('theme', document.body.classList.contains('light-theme') ? 'light' : 'dark');
-      applyThemeFromStorage();
+  });
+})();
+
+/* ========= FUNZONE TABS (all share same sticky behavior) ========= */
+(function setupTabs(){
+  const tabs = document.querySelectorAll('.fun-tab');
+  const panels = document.querySelectorAll('.funzone-panel');
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      const id = tab.dataset.panel;
+      tabs.forEach(t => t.classList.remove('active'));
+      panels.forEach(p => p.classList.remove('active'));
+      tab.classList.add('active');
+      document.getElementById(id).classList.add('active');
+      // scrolling behavior: make sure sticky header works regardless of tab
+      // (no special-casing the stats tab)
     });
-    applyThemeFromStorage();
+  });
+})();
 
-    /* ---------- DRAWER ---------- */
-    function openDrawer(){
-      document.body.classList.add('drawer-open');
+/* ========= COMPACT HEADER ON SCROLL (applies to ALL tabs) ========= */
+(function setupCompactHeader(){
+  const shell = $('#profileShell');
+  const triggerY = 220; // px down before we compact
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > triggerY){
+      shell.classList.add('compact');
+    }else{
+      shell.classList.remove('compact');
     }
-    function closeDrawer(){
-      document.body.classList.remove('drawer-open');
-    }
-    $('#btnMenu')?.addEventListener('click', openDrawer);
-    $('#openSearch')?.addEventListener('click', openDrawer);
-    $('#drawerClose')?.addEventListener('click', closeDrawer);
-    $('.drawer-mask')?.addEventListener('click', closeDrawer);
+  });
+})();
 
-    /* ---------- SLUG / CSV HELPERS ---------- */
-    function slugOf(p){
-      if(!p) return '';
-      const s=(p.slug||'').trim();
-      if(s) return s;
-      return (p.display_name||'').trim().toLowerCase().replace(/[^a-z0-9]+/g,'-');
-    }
-    function imageNameOf(p){
-      const statusUpper=(p.status||'').toUpperCase();
-      const isSponsor = statusUpper === 'SPONSOR' || statusUpper === 'RETIRED-SPONSOR';
-      if(isSponsor && p.slug){
-        return p.slug.trim().toLowerCase().replace(/\s+/g,'_').replace(/[^a-z0-9_]/g,'');
-      }
-      const first=(p.first||'').toLowerCase().replace(/\s+/g,'_');
-      const last=(p.last||'').toLowerCase().replace(/\s+/g,'_');
-      if(first || last) return [first,last].filter(Boolean).join('_');
-      return (p.slug||p.display_name||'').toLowerCase().replace(/\s+/g,'_').replace(/[^a-z0-9_]/g,'');
-    }
+/* ========= FAVORITE STAR + CTA CLICK ========= */
+(function setupFavoriteAndCTA(){
+  const icon = $('#favoriteIcon');
+  const btn  = $('#favoriteBtn');
+  const cta  = $('#superfanCta');
 
-    async function loadCSV(url){
-      const res = await fetch(url);
-      if(!res.ok) throw new Error('CSV load failed: '+res.status);
-      const text = await res.text();
-      const rows = text.trim().split(/\r?\n/).map(
-        line => line.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/).map(c => c.replace(/^"|"$/g,''))
-      );
-      const header = rows.shift().map(h => h.trim());
-      const idx = name => header.indexOf(name);
-      const statKeys = ['avg','obp','slg','ops','ab','h','r','rbi','2b','3b','hr','sb','bb','era','k/9','k/bb','whip','ip','er','ko','gp','w-l','saves','fip'];
-
-      return rows.map(r=>{
-        const player = {
-          slug:r[idx('slug')],
-          display_name:r[idx('display_name')],
-          first:r[idx('first')],
-          last:r[idx('last')],
-          grad_class:r[idx('grad_class')],
-          letter_years:r[idx('letter_years')],
-          status:r[idx('status')],
-          level:r[idx('level')],
-          team:r[idx('team')],
-          org:r[idx('org')],
-          position:r[idx('position')],
-          height:r[idx('height')],
-          weight:r[idx('weight')],
-          bats:r[idx('bats')],
-          throws:r[idx('throws')],
-          draft_info:r[idx('Draft_Info')] ?? r[idx('draft_info')],
-          colleges:r[idx('Colleges')] ?? r[idx('colleges')],
-          next_game_date:r[idx('next_game_date')],
-          next_game_time:r[idx('next_game_time')],
-          next_game_opponent:r[idx('next_game_opponent')],
-          next_game_datetime:r[idx('next_game_datetime')],
-          last_game_1:r[idx('last_game_1')],
-          last_game_2:r[idx('last_game_2')],
-          last_game_3:r[idx('last_game_3')],
-          x_handle:r[idx('x_handle')],
-          ig_handle:r[idx('ig_handle')],
-          video_url:r[idx('video_url')],
-          nil_score:r[idx('nil_score')],
-          stats:{}
-        };
-        for(const key of statKeys){
-          const sIdx = idx(key);
-          if(sIdx > -1 && r[sIdx]) player.stats[key.toUpperCase()] = r[sIdx];
-        }
-        return player;
-      });
+  function toggleStar(){
+    const filled = icon.classList.contains('ri-star-fill');
+    if (filled){
+      icon.classList.remove('ri-star-fill');
+      icon.classList.add('ri-star-line');
+    }else{
+      icon.classList.add('ri-star-fill');
+      icon.classList.remove('ri-star-line');
     }
+  }
 
-    function formatStatValue(key,value){
-      if(!value || value === '--') return '--';
-      const decimalStats=['AVG','OBP','SLG','OPS'];
-      if(decimalStats.includes(key.toUpperCase())){
-        const num=parseFloat(value);
-        if(isNaN(num)) return value;
-        const str=num.toFixed(3);
-        return (num<1 && num>-1) ? str.substring(1) : str;
-      }
-      return value;
+  btn.addEventListener('click', toggleStar);
+  cta.addEventListener('click', () => {
+    // placeholder purchase pop-up
+    alert("This will be your SuperFan subscription pop-up: price, Add to Cart, or Buy Now.");
+  });
+})();
+
+/* ========= CSV LOAD + PAGE BINDING ========= */
+async function loadCSV(url){
+  const res = await fetch(url);
+  const text = await res.text();
+  const rows = text.trim().split(/\r?\n/).map(line =>
+    line.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/).map(c=>c.replace(/^"|"$/g,""))
+  );
+  const header = rows.shift().map(h => h.trim());
+  const idx = name => header.indexOf(name);
+
+  const statKeys = [
+    'avg','obp','slg','ops',
+    'ab','h','r','rbi','2b','3b','hr','sb',
+    'bb','era','k/9','k/bb','whip','ip','er','ko','gp','w-l','saves','fip'
+  ];
+
+  return rows.map(r=>{
+    const p = {
+      slug:r[idx('slug')],
+      display_name:r[idx('display_name')],
+      first:r[idx('first')],
+      last:r[idx('last')],
+      grad_class:r[idx('grad_class')],
+      letter_years:r[idx('letter_years')],
+      status:r[idx('status')],
+      level:r[idx('level')],
+      team:r[idx('team')],
+      org:r[idx('org')],
+      position:r[idx('position')],
+      height:r[idx('height')],
+      weight:r[idx('weight')],
+      bats:r[idx('bats')],
+      throws:r[idx('throws')],
+      draft_info:r[idx('Draft_Info')] ?? r[idx('draft_info')],
+      colleges:r[idx('Colleges')] ?? r[idx('colleges')],
+      x_handle:r[idx('x_handle')],
+      ig_handle:r[idx('ig_handle')],
+      stats:{}
+    };
+    statKeys.forEach(key=>{
+      const i = idx(key);
+      if (i>-1 && r[i]) p.stats[key.toUpperCase()] = r[i];
+    });
+    return p;
+  });
+}
+
+function buildStatsGrid(player, targetId){
+  const holder = document.getElementById(targetId);
+  if (!holder) return;
+  holder.innerHTML = '';
+  const isPitcher = player.stats['ERA'] !== undefined;
+  const batterStats = ['AVG','OBP','SLG','OPS','H','R','HR','RBI','AB','2B','3B','SB'];
+  const pitcherStats = ['ERA','K/9','K/BB','WHIP','IP','ER','KO','BB','GP','W-L','SAVES','FIP'];
+  const keys = isPitcher ? pitcherStats : batterStats;
+  keys.forEach(k=>{
+    const v = formatDecimalStat(k, player.stats[k] || '--');
+    const div = document.createElement('div');
+    div.className = 'stat-item';
+    div.innerHTML = `<div class="stat-label">${k}</div><div class="stat-value">${v}</div>`;
+    holder.appendChild(div);
+  });
+}
+
+(async function initProfile(){
+  try{
+    const players = await loadCSV(CSV_URL);
+    let player = players.find(p => slugOf(p) === requestedSlug);
+    if (!player){
+      // fallback: use display_name match
+      player = players.find(p => (p.display_name||'').toLowerCase() === requestedSlug.replace(/-/g,' '));
     }
-
-    /* ---------- PLAYER SEARCH IN DRAWER ---------- */
-    function makeHit(p){
-      const el=document.createElement('div');
-      el.className='live-hit';
-      const imageName=imageNameOf(p);
-      const hsImgJpg=`assets/img/hs_players/${imageName}.jpg`;
-      const hsImgPng=`assets/img/hs_players/${imageName}.png`;
-      el.innerHTML=`
-        <img src="${hsImgJpg}" onerror="this.onerror=null;this.src='${hsImgPng}'">
-        <div>
-          <div class="live-hit-main">${p.display_name}</div>
-          <div class="live-hit-sub">${p.level||''} • Class of ${p.grad_class||''}</div>
-        </div>`;
-      el.onclick=()=>{
-        window.location.href = 'profile.html?player='+encodeURIComponent(slugOf(p));
-      };
-      return el;
-    }
-    function setupSearch(players){
-      const searchInput = $('#playerSearch');
-      const liveResults = $('#liveResults');
-      if(!searchInput || !liveResults) return;
-
-      searchInput.addEventListener('input', ()=>{
-        const q = searchInput.value.trim().toLowerCase();
-        liveResults.innerHTML='';
-        if(!q) return;
-        const hits = players.filter(p => (p.display_name || '').toLowerCase().includes(q)).slice(0,25);
-        hits.forEach(p => liveResults.appendChild(makeHit(p)));
-      });
+    if (!player){
+      $('#playerName').textContent = 'Player not found';
+      return;
     }
 
-    /* ---------- FAVORITES (LOCALSTORAGE ONLY) ---------- */
-    function getFavSet(){
-      try{
-        const raw = localStorage.getItem('YAT_FAV_PLAYERS') || '[]';
-        return new Set(JSON.parse(raw));
-      }catch{ return new Set(); }
+    // Fill header + hero
+    const name = player.display_name || `${player.first||''} ${player.last||''}`.trim();
+    $('#playerName').textContent = name;
+    $('#ctaName').textContent = name.toUpperCase();
+    $('#crumbs').textContent = `HAMILTON ▸ ${name}`;
+    $('#playerTeam').textContent = `${player.team || ''} • ${player.org || player.level || ''}`;
+    $('#playerStatus').textContent = `${player.level || ''} • ${player.status || ''}`;
+    $('#draftInfo').textContent = player.draft_info || 'N/A';
+    $('#colleges').textContent = player.colleges || 'N/A';
+    $('#bodyLine').textContent =
+      `${player.position || '--'} | H: ${player.height||'--'} | W: ${player.weight||'--'} | B/T: ${player.bats||'--'}/${player.throws||'--'}`;
+
+    // Image
+    const imgName = imageNameOf(player);
+    const nowJpg = `assets/img/now_players/${imgName}.jpg`;
+    const nowPng = `assets/img/now_players/${imgName}.png`;
+    const photo = $('#playerPhoto');
+    photo.src = nowJpg;
+    photo.alt = name;
+    photo.onerror = () => {
+      if (photo.src.endsWith('.jpg')) photo.src = nowPng;
+    };
+
+    // Social
+    if (player.x_handle){
+      $('#xLink').href = `https://x.com/${player.x_handle}`;
+      $('#xLink').textContent = '@' + player.x_handle;
+    }else{
+      $('#socialXRow').style.display = 'none';
     }
-    function saveFavSet(set){
-      localStorage.setItem('YAT_FAV_PLAYERS', JSON.stringify(Array.from(set)));
-    }
-    function wireFavToggles(slug){
-      const favSet = getFavSet();
-      const mainBtn = $('#favToggle');
-      const stickyBtn = $('#favToggleSticky');
-
-      const updateUI = ()=>{
-        const isFav = favSet.has(slug);
-        [mainBtn,stickyBtn].forEach(btn=>{
-          if(!btn) return;
-          btn.classList.toggle('is-favorite', isFav);
-          const icon = btn.querySelector('i');
-          if(icon){
-            icon.className = isFav ? 'ri-star-fill' : 'ri-star-line';
-          }
-        });
-      };
-      updateUI();
-
-      const toggle = ()=>{
-        if(favSet.has(slug)) favSet.delete(slug); else favSet.add(slug);
-        saveFavSet(favSet);
-        updateUI();
-      };
-      [mainBtn,stickyBtn].forEach(btn=>{
-        btn?.addEventListener('click', toggle);
-      });
-    }
-
-    /* ---------- SUPERFAN CTA MODAL ---------- */
-    function setupSuperfanModal(player){
-      const modal = $('#superfanModal');
-      const laterBtn = $('#superfanLaterBtn');
-      const checkoutBtn = $('#superfanCheckoutBtn');
-      const openers = $$('.js-superfan-cta');
-
-      const open = ()=>{
-        modal.classList.add('is-open');
-      };
-      const close = ()=>{
-        modal.classList.remove('is-open');
-      };
-
-      openers.forEach(btn=>btn.addEventListener('click', open));
-      laterBtn?.addEventListener('click', close);
-      modal?.addEventListener('click', e=>{
-        if(e.target === modal) close();
-      });
-
-      checkoutBtn?.addEventListener('click', ()=>{
-        // Placeholder: this is where Stripe / GHL checkout will be triggered.
-        alert('In the live site this will take the fan to a checkout screen (Stripe / GHL) and then unlock their SuperFan dashboard.');
-        close();
-      });
+    if (player.ig_handle){
+      $('#igLink').href = `https://instagram.com/${player.ig_handle}`;
+      $('#igLink').textContent = '@' + player.ig_handle;
+    }else{
+      $('#socialIGRow').style.display = 'none';
     }
 
-    /* ---------- STICKY BAR / TABS ---------- */
-    function updateStickyOffsets(){
-      const header = document.querySelector('.header');
-      const headerH = header ? header.offsetHeight : 96;
-      document.documentElement.style.setProperty('--stickyBarTop', headerH + 'px');
-      document.documentElement.style.setProperty('--stickyTabsTop', (headerH + 52) + 'px');
-    }
-    window.addEventListener('resize', updateStickyOffsets);
-
-    function wireScrollSticky(){
-      const heroBlock = $('#profileHeroBlock');
-      const bar = $('#profileStickyBar');
-      if(!heroBlock || !bar) return;
-
-      const threshold = heroBlock.offsetTop + heroBlock.offsetHeight - 40;
-
-      const onScroll = ()=>{
-        if(window.scrollY > threshold){
-          bar.classList.add('is-visible');
-        }else{
-          bar.classList.remove('is-visible');
-        }
-      };
-      window.addEventListener('scroll', onScroll);
-      onScroll();
-    }
-
-    function wireTabs(){
-      const buttons = $$('.tab-btn');
-      const panels = {
-        stats: $('#panel-stats'),
-        news: $('#panel-news'),
-        social: $('#panel-social'),
-        mentor: $('#panel-mentor'),
-        gallery: $('#panel-gallery')
-      };
-      buttons.forEach(btn=>{
-        btn.addEventListener('click', ()=>{
-          const tab = btn.dataset.tab;
-          buttons.forEach(b=>b.classList.toggle('active', b===btn));
-          Object.entries(panels).forEach(([key,p])=>{
-            if(p) p.classList.toggle('active', key===tab);
-          });
-        });
-      });
-    }
-
-    /* ---------- RENDER PROFILE ---------- */
-    function renderProfile(player){
-      // Hero image
-      const imgName = imageNameOf(player);
-      const nowJpg = `assets/img/now_players/${imgName}.jpg`;
-      const nowPng = `assets/img/now_players/${imgName}.png`;
-      const photoEl = $('#playerPhoto');
-      photoEl.src = nowJpg;
-      photoEl.onerror = function(){
-        this.onerror=null;
-        this.src = nowPng;
-      };
-
-      // Basic text
-      const name = player.display_name || `${player.first||''} ${player.last||''}`.trim();
-      $('#playerNameHeading').textContent = name;
-      $('#crumbPlayerName').textContent = name;
-      $('#teamLine').textContent = `${player.team||''} • ${player.org||''}`.replace(/ ?• ?$/,'');
-      $('#playerMetaPrimary').innerHTML =
-        `<div class="profile-line"><strong>${player.level||''}</strong> • ${player.status||''}</div>` +
-        `<div class="profile-line">${player.position||''} | H: ${player.height||'--'} | W: ${player.weight||'--'} | B/T: ${player.bats||'--'}/${player.throws||'--'}</div>`;
-      $('#playerMetaSecondary').innerHTML =
-        `<div class="profile-line"><strong>Draft:</strong> ${player.draft_info || 'N/A'}</div>`+
-        `<div class="profile-line"><strong>Colleges:</strong> ${player.colleges || 'N/A'}</div>`;
-
-      // Sticky bar content
-      $('#stickyThumb').src = nowJpg;
-      $('#stickyThumb').onerror = function(){
-        this.onerror=null; this.src = nowPng;
-      };
-      $('#stickyName').textContent = name;
-      $('#stickySub').textContent = `${player.team||''} • ${player.level||''} • ${player.status||''}`.replace(/ ?• ?$/,'');
-
-      // STATS PANEL
-      renderStatsPanel(player);
-
-      // NEWS PANEL
-      renderNewsPanel(player);
-
-      // SOCIAL PANEL
-      renderSocialPanel(player);
-
-      // MENTOR PANEL
-      renderMentorPanel(player);
-
-      // GALLERY PANEL
-      renderGalleryPanel(player);
-
-      // SuperFan modal copy mentions no name (per spec).
-      setupSuperfanModal(player);
-
-      // Favorites controls
-      wireFavToggles(slugOf(player));
-
-      // Sticky layout helpers
-      updateStickyOffsets();
-      wireScrollSticky();
-      wireTabs();
-    }
-
-    function renderStatsPanel(player){
-      const panel = $('#panel-stats');
-      if(!panel) return;
-      const batterStats=['AVG','OBP','SLG','OPS','H','R','HR','RBI','AB','2B','3B','SB'];
-      const pitcherStats=['ERA','K/9','K/BB','WHIP','IP','ER','KO','BB','GP','W-L','SAVES','FIP'];
-      const isPitcher = player.stats['ERA'] !== undefined;
-      const statsToShow = isPitcher ? pitcherStats : batterStats;
-
-      function makeGrid(label){
-        const tiles = statsToShow.map(stat=>{
-          const v = formatStatValue(stat, player.stats[stat]);
-          return `<div class="stat-tile">
-                    <div class="stat-label">${stat}</div>
-                    <div class="stat-value">${v ?? '--'}</div>
-                  </div>`;
-        }).join('');
-        return `<div class="stats-block">
-                  <div class="stats-heading">${label}</div>
-                  <div class="stats-grid">${tiles}</div>
-                </div>`;
-      }
-
-      // Career stats (using same row for now)
-      let html = makeGrid('CAREER STATS');
-
-      // Dummy season splits (for visual) – all using same values for now
-      const currentYear = new Date().getFullYear();
-      for(let i=0;i<3;i++){
-        const year = currentYear - i;
-        html += makeGrid(`${year} SEASON STATS`);
-      }
-      panel.innerHTML = html;
-    }
-
-    function renderNewsPanel(player){
-      const panel = $('#panel-news');
-      if(!panel) return;
-
-      const cacheRaw = localStorage.getItem('YAT_NEWS_CACHE_V1');
-      let items = [];
-      try{
-        const cache = cacheRaw ? JSON.parse(cacheRaw) : {};
-        if(Array.isArray(cache.items)) items = cache.items;
-      }catch{ items=[]; }
-
-      const nameLc = (player.display_name || '').toLowerCase();
-      const mine = items
-        .filter(n => String(n.player_display_name||'').toLowerCase() === nameLc)
-        .sort((a,b)=> new Date(b.publishedAt||0) - new Date(a.publishedAt||0))
-        .slice(0,5);
-
-      if(!mine.length){
-        panel.innerHTML = `
-          <div class="stats-block">
-            <div class="stats-heading">LATEST HEADLINES</div>
-            <p style="font-size:14px;text-align:center;opacity:.8;">
-              No recent headlines found for ${player.display_name || 'this player'} yet. Check back soon!
-            </p>
-          </div>`;
-        return;
-      }
-
-      const cards = mine.map(n=>{
-        const img = n.image || ('https://picsum.photos/seed/'+encodeURIComponent(n.id||n.title||'news')+'/600/400');
-        const when = n.publishedAt ? new Date(n.publishedAt).toLocaleString() : '';
-        const src = n.source || 'News';
-        const base = String(n.url || '#');
-        const url = base + (base.includes('?') ? '&' : '?') + 'utm_source=yatstats&utm_medium=player_profile';
-        // Simple fun recap placeholder – can be replaced with AI service later
-        const recap = `${player.first || player.display_name} keeps making noise at the next level. Full details in the article below – but Husky fans know this is the same energy we saw back in Chandler. YAT-A-BOY!`;
-        return `
-          <article class="news-card">
-            <a href="${url}" target="_blank" rel="noopener" class="news-thumb">
-              <img src="${img}" alt="">
-            </a>
-            <div class="news-main">
-              <div class="news-title"><a href="${url}" target="_blank" rel="noopener">${n.title || 'Read more'}</a></div>
-              <div class="news-meta">${src} • ${when}</div>
-              <div class="news-recap">${recap}</div>
-            </div>
-          </article>`;
-      }).join('');
-
-      panel.innerHTML = `
-        <div class="stats-block">
-          <div class="stats-heading">LATEST HEADLINES</div>
-          ${cards}
-        </div>
-      `;
-    }
-
-    function renderSocialPanel(player){
-      const panel = $('#panel-social');
-      if(!panel) return;
-
-      const xHandle = (player.x_handle || '').replace(/^@/,'');
-      const igHandle = (player.ig_handle || '').replace(/^@/,'');
-
-      const lines = [];
-      if(xHandle){
-        lines.push(`
-          <a class="social-pill" href="https://x.com/${xHandle}" target="_blank" rel="noopener">
-            <i class="ri-twitter-x-line"></i><span>@${xHandle}</span>
-          </a>`);
-      }
-      if(igHandle){
-        lines.push(`
-          <a class="social-pill" href="https://instagram.com/${igHandle}" target="_blank" rel="noopener">
-            <i class="ri-instagram-line"></i><span>@${igHandle}</span>
-          </a>`);
-      }
-
-      const video = player.video_url
-        ? `<div style="margin-top:10px;">
-             <div class="social-note" style="margin-bottom:4px;">Featured highlight clip</div>
-             <iframe width="100%" height="220" src="${player.video_url}" title="Video highlight"
-                     frameborder="0" allowfullscreen
-                     style="border-radius:12px;"></iframe>
-           </div>`
-        : '';
-
-      panel.innerHTML = `
-        <div class="stats-block">
-          <div class="stats-heading">SOCIAL MEDIA</div>
-          <div class="social-section">
-            <div class="social-pill-row">
-              ${lines.length ? lines.join('') : '<div class="social-note">No social handles on file yet for this player.</div>'}
-            </div>
-            <div class="social-note">
-              Tap a handle to view their latest posts. When you share, show them love with
-              <strong>#YATABOY</strong> and tag <strong>@yat_stats</strong>.
-            </div>
-            ${video}
-          </div>
-        </div>`;
-    }
-
-    function renderMentorPanel(player){
-      const panel = $('#panel-mentor');
-      if(!panel) return;
-
-      const name = player.first || player.display_name || 'this player';
-      panel.innerHTML = `
-        <div class="mm-card">
-          <div class="mm-title">MENTORSHIP MARKETPLACE</div>
-          <div class="mm-body">
-            Upload your baseball video (hitting, throwing, fielding, etc.) and get personalized feedback,
-            coaching, and encouragement from ${name}. We’ll route your request through the YAT?STATS
-            Mentorship Marketplace so ${name.split(' ')[0] || 'your mentor'} can reply with a custom video message.
-          </div>
-          <div class="mm-options">
-            Example options (final pricing TBD):
-            <ul style="margin:6px 0 0 18px;padding:0;font-size:13px;">
-              <li>Quick “YAT-A-BOY!” shout-out</li>
-              <li>Video breakdown of your swing or delivery</li>
-              <li>Mentor message for your youth team</li>
-            </ul>
-          </div>
-          <button class="mm-cta-btn">
-            START A MENTORSHIP REQUEST
-          </button>
-          <div class="social-note" style="margin-top:8px;">
-            For the MVP, this button can send fans to a dedicated Mentorship Marketplace page
-            or a GHL-powered checkout flow. Later we can wire this directly to Stripe / ARMS
-            and your SuperFan dashboards.
-          </div>
-        </div>
-      `;
-    }
-
-    function renderGalleryPanel(player){
-      const panel = $('#panel-gallery');
-      if(!panel) return;
-
-      const imgName = imageNameOf(player);
-      const slides = [
-        `assets/img/gallery/${imgName}_1.jpg`,
-        `assets/img/gallery/${imgName}_2.jpg`,
-        `assets/img/gallery/${imgName}_3.jpg`
-      ];
-
-      const slidesHtml = slides.map((src,i)=>`
-        <div class="carousel-slide">
-          <img src="${src}" alt="Timeline photo ${i+1} for ${player.display_name || 'player'}"
-               onerror="this.onerror=null;this.src='assets/img/placeholder.png';">
-        </div>
-      `).join('');
-
-      panel.innerHTML = `
-        <div class="gallery-shell">
-          <div class="carousel" id="timelineCarousel">
-            <div class="carousel-track">
-              ${slidesHtml}
-            </div>
-            <button class="carousel-arrow left" aria-label="Previous photo"><i class="ri-arrow-left-s-line"></i></button>
-            <button class="carousel-arrow right" aria-label="Next photo"><i class="ri-arrow-right-s-line"></i></button>
-          </div>
-          <div class="gallery-caption">
-            Swipe or tap the arrows to follow ${player.display_name || 'this player'} from youth days
-            to the pros.
-          </div>
-          <div class="gallery-upload-note">
-            Have a great photo with ${player.display_name || 'this player'}?
-            <span class="upload-link" id="uploadLink">Tap here</span> to email it in with the year and a short memory.
-            Captains will review and add the best pics to this timeline.
-          </div>
-        </div>
-      `;
-
-      // Simple carousel logic
-      const carousel = $('#timelineCarousel');
-      if(!carousel) return;
-      const track = carousel.querySelector('.carousel-track');
-      const slidesEls = Array.from(carousel.querySelectorAll('.carousel-slide'));
-      const prevBtn = carousel.querySelector('.carousel-arrow.left');
-      const nextBtn = carousel.querySelector('.carousel-arrow.right');
-      let index = 0;
-      const goTo = (i)=>{
-        if(!slidesEls.length) return;
-        index = (i + slidesEls.length) % slidesEls.length;
-        track.style.transform = `translateX(-${index*100}%)`;
-      };
-      prevBtn?.addEventListener('click', ()=>goTo(index-1));
-      nextBtn?.addEventListener('click', ()=>goTo(index+1));
-
-      $('#uploadLink')?.addEventListener('click', ()=>{
-        const subject = encodeURIComponent(`Fan photo for ${player.display_name || 'Hamilton alum'}`);
-        const body = encodeURIComponent(
-          `Hi YAT?STATS,\n\nI have a photo for the ${player.display_name || 'player'} timeline gallery.\n\nApprox year:\nStory / memory:\n\n(Attach the photo before sending.)\n\nThanks!`
-        );
-        window.location.href = `mailto:fanpics@yatstats.com?subject=${subject}&body=${body}`;
-      });
-    }
-
-    /* ---------- AUTH UI (minimal, same pattern as index) ---------- */
-    (function setupAuth(){
-      if(!window.firebaseAuth || !window.auth) return;
-      const { signOut } = window.firebaseAuth;
-      const accountBtn = $('#btnAccount');
-
-      accountBtn?.addEventListener('click', ()=>{
-        alert('Account / SuperFan dashboard will live here in the full app. For now this is a visual placeholder.');
-      });
-
-      document.addEventListener('authStateChanged', ({detail})=>{
-        // hook later if we want different icons for signed-in users
-        console.log('Auth state (profile page):', detail.user?.uid ? 'signed in' : 'anon');
-      });
-
-      // Example sign-out hook you can wire to a menu item later:
-      window.yatSignOut = async ()=>{
-        try{ await signOut(window.auth); }
-        catch(err){ console.error(err); }
-      };
-    })();
-
-    /* ---------- BOOT ---------- */
-    (async function init(){
-      try{
-        const params = new URLSearchParams(location.search);
-        const slugParam = params.get('player');
-        const players = await loadCSV(CSV_URL);
-        window.__PLAYERS = players;
-        setupSearch(players);
-
-        const player = players.find(p => slugOf(p) === slugParam) || players[0];
-        if(!player){
-          $('#profileMain').innerHTML =
-            '<p style="padding:18px;font-size:14px;">Player not found.</p>';
-          return;
-        }
-
-        renderProfile(player);
-      }catch(err){
-        console.error(err);
-        $('#profileMain').innerHTML =
-          '<p style="padding:18px;font-size:14px;">Error loading player profile.</p>';
-      }
-    })();
-  </script>
+    // Stats grids – reuse same numbers for now for demo
+    buildStatsGrid(player, 'careerStatsGrid');
+    buildStatsGrid(player, 'season2025Grid');
+    buildStatsGrid(player, 'season2024Grid');
+    buildStatsGrid(player, 'season2023Grid');
+  }catch(err){
+    console.error(err);
+  }
+})();
+</script>
 </body>
 </html>
