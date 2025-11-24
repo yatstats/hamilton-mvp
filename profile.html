@@ -1,377 +1,560 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Player Profile – Hamilton Active Baseball Alumni</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Player Profile • Hamilton Active Baseball Alumni</title>
 
-<link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400&family=Bebas+Neue&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400&family=Bebas+Neue&display=swap" rel="stylesheet">
 
-<!-- Firebase init (same as index) -->
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-  import {
-    getAuth,
-    createUserWithEmailAndPassword,
-    signInWithEmailAndPassword,
-    signOut,
-    onAuthStateChanged,
-    signInWithCustomToken,
-    signInAnonymously
-  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+  <!-- Firebase init (same pattern as index) -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import {
+      getAuth,
+      createUserWithEmailAndPassword,
+      signInWithEmailAndPassword,
+      signOut,
+      onAuthStateChanged,
+      signInWithCustomToken,
+      signInAnonymously
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-  window.firebaseAuth = {
-    getAuth,
-    createUserWithEmailAndPassword,
-    signInWithEmailAndPassword,
-    signOut,
-    onAuthStateChanged,
-    signInWithCustomToken,
-    signInAnonymously
-  };
+    window.firebaseAuth = {
+      getAuth,
+      createUserWithEmailAndPassword,
+      signInWithEmailAndPassword,
+      signOut,
+      onAuthStateChanged,
+      signInWithCustomToken,
+      signInAnonymously
+    };
 
-  try {
-    const firebaseConfig = JSON.parse(window.__firebase_config || '{}');
-    const app = initializeApp(firebaseConfig);
-    window.auth = getAuth(app);
+    try {
+      const firebaseConfig = JSON.parse(window.__firebase_config || '{}');
+      const app = initializeApp(firebaseConfig);
+      window.auth = getAuth(app);
 
-    onAuthStateChanged(window.auth, user => {
-      document.dispatchEvent(new CustomEvent('authStateChanged', { detail: { user } }));
-    });
+      onAuthStateChanged(window.auth, user => {
+        document.dispatchEvent(new CustomEvent('authStateChanged', { detail: { user } }));
+      });
 
-    if (window.__initial_auth_token) {
-      await signInWithCustomToken(window.auth, window.__initial_auth_token);
-    } else {
-      await signInAnonymously(window.auth);
+      if (window.__initial_auth_token) {
+        await signInWithCustomToken(window.auth, window.__initial_auth_token);
+      } else {
+        await signInAnonymously(window.auth);
+      }
+    } catch (e) {
+      console.error("Firebase initialization error:", e);
     }
-  } catch (e) {
-    console.error("Firebase initialization error:", e);
-  }
-</script>
+  </script>
 
-<style>
-:root{
-  --bg:#0c0c0c; --fg:#f2f2f2; --muted:#c4c4c4; --ink:#e8e8e8; --line:rgba(255,255,255,.08);
-  --card-bg:#171717; --header-bg:#000; --drawer-bg:rgba(10,10,10,.65);
-  --shade-end:rgba(0,0,0,.95);
-  --hamSmall:13px; --hamBig:20px; --hamBigger:24px; --tagGrey:#cfd2d6;
-  --crestH:clamp(42px,6.3vw,74px);
-  --containerPad:16px; --footerH:clamp(56px,8vh,77px);
-}
-body.light-theme{
-  --bg:#f4f4f4; --fg:#121212; --muted:#555; --ink:#222; --line:rgba(0,0,0,.1);
-  --card-bg:#fff; --header-bg:#fff; --drawer-bg:rgba(255,255,255,.65);
-}
-@font-face{font-family:'Indigo';src:url('assets/fonts/Indigo.otf') format('opentype');font-weight:400;font-style:normal;font-display:swap;}
-*{box-sizing:border-box}
-html,body{margin:0}
-body{
-  background:var(--bg);
-  color:var(--fg);
-  font-family:Oswald,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
-  transition:background-color .3s,color .3s;
-}
-body.drawer-open{overflow:hidden}
-a{color:inherit;text-decoration:none}
-.container{max-width:1400px;margin:0 auto;padding:0 var(--containerPad)}
+  <style>
+    :root{
+      --bg:#0c0c0c; --fg:#f2f2f2; --muted:#c4c4c4; --ink:#e8e8e8; --line:rgba(255,255,255,.08);
+      --card-bg:#171717; --header-bg:#000; --drawer-bg:rgba(10,10,10,.65);
+      --shade-end:rgba(0,0,0,.95);
+      --hamSmall:13px; --hamBig:20px; --hamBigger:24px; --tagGrey:#cfd2d6;
+      --crestH:clamp(42px,6.3vw,74px);
+      --containerPad:16px; --footerH:clamp(56px,8vh,77px);
+      --sticky-offset:72px; /* approx header height on mobile */
+    }
+    body.light-theme{
+      --bg:#f4f4f4; --fg:#121212; --muted:#555; --ink:#222; --line:rgba(0,0,0,.1);
+      --card-bg:#fff; --header-bg:#fff; --drawer-bg:rgba(255,255,255,.65);
+    }
+    @font-face{font-family:'Indigo';src:url('assets/fonts/Indigo.otf') format('opentype');font-weight:400;font-style:normal;font-display:swap;}
+    *{box-sizing:border-box}
+    html,body{margin:0}
+    body{
+      background:var(--bg);
+      color:var(--fg);
+      font-family:Oswald,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+      transition:background-color .3s,color .3s;
+    }
+    body.drawer-open{overflow:hidden}
+    a{color:inherit;text-decoration:none}
+    .container{max-width:1400px;margin:0 auto;padding:0 var(--containerPad)}
 
-/* HEADER */
-.header{position:sticky;top:0;z-index:50;background:var(--header-bg);transition:background-color .3s;}
-.topbar{display:flex;align-items:center;justify-content:space-between;padding:8px 0}
-.left-icons{
-  display:flex;
-  align-items:center;
-  gap:8px;
-  /* move hamburger group slightly right */
-  margin-left:8px;
-}
-.icon-btn{background:none;border:none;color:var(--fg);opacity:.92;display:inline-flex;align-items:center;justify-content:center;padding:0;margin:0 2px;cursor:pointer}
-.icon-btn i{font-size:20px}
-.topnav{display:flex;gap:18px;align-items:center}
-.nav-pair{white-space:nowrap}
-.nav-pair .thin{font:300 var(--hamSmall) Oswald,sans-serif;letter-spacing:.02em;color:#cfd2d6;margin-right:2px}
-body.light-theme .nav-pair .thin{color:var(--muted)}
-.nav-pair .bold{font:400 var(--hamSmall) Indigo,"Bebas Neue",sans-serif}
-.wordmark-wrap{display:flex;align-items:center;justify-content:flex-end;min-width:120px}
-.wordmark-img{height:clamp(18px,3.2vw,28px);width:auto;display:block}
-body.light-theme .wordmark-img{filter:invert(1)}
-@media (max-width:1200px){.topnav{display:none !important}}
+    /* HEADER (copied from index) */
+    .header{position:sticky;top:0;z-index:50;background:var(--header-bg);transition:background-color .3s;}
+    .topbar{display:flex;align-items:center;justify-content:space-between;padding:8px 0}
+    .left-icons{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      margin-left:4px; /* nudge right */
+    }
+    .icon-btn{background:none;border:none;color:var(--fg);opacity:.92;display:inline-flex;align-items:center;justify-content:center;padding:0;margin:0 2px;cursor:pointer}
+    .icon-btn i{font-size:20px}
+    .topnav{display:flex;gap:18px;align-items:center}
+    .nav-pair{white-space:nowrap}
+    .nav-pair .thin{font:300 var(--hamSmall) Oswald,sans-serif;letter-spacing:.02em;color:#cfd2d6;margin-right:2px}
+    body.light-theme .nav-pair .thin{color:var(--muted)}
+    .nav-pair .bold{font:400 var(--hamSmall) Indigo,"Bebas Neue",sans-serif}
+    .wordmark-wrap{display:flex;align-items:center;justify-content:flex-end;min-width:120px}
+    .wordmark-img{height:clamp(18px,3.2vw,28px);width:auto;display:block}
+    body.light-theme .wordmark-img{filter:invert(1)}
+    @media (max-width:1200px){.topnav{display:none !important}}
+    .hr-y{border-top:1px solid var(--line)}
 
-.hr-y{border-top:1px solid var(--line)}
+    .schoolrow{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      padding:6px var(--containerPad);
+    }
+    .ham-logo{
+      height:var(--crestH);
+      width:auto;
+      object-fit:contain;
+      display:block;
+      flex-shrink:0;
+    }
+    .schooltext{line-height:1}
+    .schooltext .small{font:300 var(--hamSmall)/1 Oswald;letter-spacing:.12em;color:var(--muted)}
+    .schooltext .big1{font:400 var(--hamBig)/1 "Bebas Neue",sans-serif;letter-spacing:.04em}
+    .schooltext .big2{font:400 var(--hamBigger)/1 "Bebas Neue",sans-serif;letter-spacing:.04em;margin-top:-2px}
+    .crumbs{font:300 calc(var(--hamSmall)*.5)/1 Oswald;letter-spacing:.02em;color:var(--muted);text-transform:uppercase}
 
-.schoolrow{
-  display:flex;
-  align-items:center;
-  gap:12px;
-  padding:6px var(--containerPad);
-}
-.ham-logo{
-  height:var(--crestH);
-  width:auto;
-  object-fit:contain;
-  display:block;
-  flex-shrink:0;
-}
-.schooltext{line-height:1}
-.schooltext .small{font:300 var(--hamSmall)/1 Oswald;letter-spacing:.12em;color:var(--muted)}
-.schooltext .big1{font:400 var(--hamBig)/1 "Bebas Neue",sans-serif;letter-spacing:.04em}
-.schooltext .big2{font:400 var(--hamBigger)/1 "Bebas Neue",sans-serif;letter-spacing:.04em;margin-top:-2px}
-.crumbs{font:300 calc(var(--hamSmall)*.5)/1 Oswald;letter-spacing:.02em;color:var(--muted);text-transform:uppercase}
+    /* HERO for PROFILE */
+    .hero{padding:2px 0}
+    .hero-grid{display:flex;align-items:center;justify-content:space-between;gap:16px}
+    .hero-left{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+    .hero-breadcrumb{font:300 11px Oswald,sans-serif;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+    .hero-star{font-size:18px;cursor:pointer;margin-left:6px}
+    .hero-star.is-favorite{color:#fbbf24}
+    .hero-right{display:flex;align-items:center;gap:10px;justify-content:flex-end;flex-wrap:wrap}
+    .superfan-cta{
+      font:400 12px "Bebas Neue",sans-serif;
+      letter-spacing:.18em;
+      text-transform:uppercase;
+      padding:6px 14px;
+      border-radius:999px;
+      border:1px solid var(--line);
+      background:transparent;
+      cursor:pointer;
+      white-space:nowrap;
+    }
+    .hero-small-icons{display:flex;gap:8px;align-items:center}
+    .hero-icon i{font-size:20px}
 
-/* HERO – profile version */
-.hero{padding:2px 0}
-.hero-grid{display:flex;align-items:center;justify-content:space-between;gap:16px}
-.hero-left{display:flex;flex-direction:column;gap:4px}
-.hero-crumbs{margin:0;text-align:left;white-space:nowrap}
-.hero-superfan{margin-top:2px}
-.hero-superfan .thin{font-size:11px;letter-spacing:.15em;text-transform:uppercase}
-.hero-superfan .bold{font-size:12px;letter-spacing:.12em;text-transform:uppercase}
-@media (max-width:768px){
-  .hero-grid{flex-direction:column;align-items:flex-start;padding-bottom:4px}
-}
-.hero-right{display:flex;gap:10px}
-.hero-icon i{font-size:20px}
+    @media (max-width:768px){
+      .hero-grid{flex-direction:column;align-items:flex-start}
+      .hero-right{width:100%;justify-content:space-between}
+      .superfan-cta{flex:1;text-align:center}
+    }
 
-/* DRAWERS */
-.drawer-mask{position:fixed;inset:0;background:rgba(0,0,0,.35);opacity:0;pointer-events:none;transition:opacity .2s;z-index:60}
-.drawer{position:fixed;top:0;bottom:0;width:min(360px,82vw);background:var(--drawer-bg);backdrop-filter:blur(4px);color:var(--ink);transform:translateX(-110%);transition:transform .25s,background-color .3s;z-index:70}
-.drawer-right{right:0;left:auto;transform:translateX(110%);display:flex;flex-direction:column;height:100%}
-.drawer h3{margin:18px 16px 8px;padding-right:30px}
-.drawer .pad{padding:10px 16px}
-.drawer .close-btn{position:absolute;top:12px;right:12px}
-.drawer a{color:var(--ink)}
-.drawer a:hover{color:var(--fg)}
-body.drawer-left-open .drawer-mask,
-body.drawer-right-open .drawer-mask{opacity:1;pointer-events:auto}
-body.drawer-left-open #drawerLeft{transform:translateX(0)}
-body.drawer-right-open .drawer-right{transform:translateX(0)}
-.drawer-content{flex-grow:1;overflow-y:auto;padding:10px 16px}
-.drawer-footer{flex-shrink:0;padding:12px 16px;border-top:1px solid var(--line);background:rgba(10,10,10,.8);display:flex;gap:10px;align-items:center}
-body.light-theme .drawer-footer{background:rgba(255,255,255,.8)}
+    /* DRAWERS (copied) */
+    .drawer-mask{position:fixed;inset:0;background:rgba(0,0,0,.35);opacity:0;pointer-events:none;transition:opacity .2s;z-index:60}
+    .drawer{position:fixed;top:0;bottom:0;width:min(360px,82vw);background:var(--drawer-bg);backdrop-filter:blur(4px);color:var(--ink);transform:translateX(-110%);transition:transform .25s,background-color .3s;z-index:70}
+    .drawer-right{right:0;left:auto;transform:translateX(110%);display:flex;flex-direction:column;height:100%}
+    .drawer h3{margin:18px 16px 8px;padding-right:30px}
+    .drawer .pad{padding:10px 16px}
+    .drawer .close-btn{position:absolute;top:12px;right:12px}
+    .drawer a{color:var(--ink)}
+    .drawer a:hover{color:var(--fg)}
+    body.drawer-left-open .drawer-mask,
+    body.drawer-right-open .drawer-mask{opacity:1;pointer-events:auto}
+    body.drawer-left-open #drawerLeft{transform:translateX(0)}
+    body.drawer-right-open .drawer-right{transform:translateX(0)}
+    .drawer-content{flex-grow:1;overflow-y:auto;padding:10px 16px}
+    .drawer-footer{flex-shrink:0;padding:12px 16px;border-top:1px solid var(--line);background:rgba(10,10,10,.8);display:flex;gap:10px;align-items:center}
+    body.light-theme .drawer-footer{background:rgba(255,255,255,.8)}
 
-/* SEARCH DRAWER CONTENT */
-#liveResults{margin:10px 4px 18px;max-height:55vh;overflow:auto}
-.live-hit{padding:10px 12px;display:flex;align-items:center;gap:10px;border-radius:10px;cursor:pointer}
-.live-hit:hover{background:var(--line)}
-.live-hit img{width:36px;height:36px;border-radius:6px;object-fit:cover}
+    /* FILTERS, AUTH – same as index */
+    .filter-group{border-bottom:1px solid var(--line)}
+    .filter-group:last-of-type{border-bottom:none}
+    .filter-title{padding:14px 0;cursor:pointer;font-weight:700;font-family:"Bebas Neue",sans-serif;letter-spacing:.05em;list-style:none;display:flex;justify-content:space-between;align-items:center}
+    .filter-title::-webkit-details-marker{display:none}
+    .filter-title::after{content:'▸';font-size:1.2em;transition:transform .2s}
+    details[open]>.filter-title::after{transform:rotate(90deg)}
+    .filter-options{padding:4px 0 16px 0}
+    .filter-options label{display:block;margin-bottom:8px;padding-left:4px}
+    .filter-options input[type=checkbox]{margin-right:8px;transform:scale(1.1)}
+    .select-all-label{font-weight:700;border-bottom:1px solid var(--line);padding-bottom:8px !important;margin-bottom:12px !important}
+    #liveResults{margin:10px 4px 18px;max-height:55vh;overflow:auto}
+    .live-hit{padding:10px 12px;display:flex;align-items:center;gap:10px;border-radius:10px;cursor:pointer}
+    .live-hit:hover{background:var(--line)}
+    .live-hit img{width:36px;height:36px;border-radius:6px;object-fit:cover}
+    .auth-tabs{display:flex;border-bottom:1px solid var(--line)}
+    .auth-tab{flex:1;text-align:center;padding:10px;cursor:pointer;background:transparent;border:none;color:var(--muted);font-family:"Bebas Neue",sans-serif;font-size:16px;letter-spacing:.05em}
+    .auth-tab.active{color:var(--fg);border-bottom:2px solid var(--fg)}
+    .auth-form{display:none}
+    .auth-form.active{display:block}
+    .form-field{margin-bottom:15px}
+    .form-field label{display:block;margin-bottom:5px;font-size:12px}
+    .form-field input{width:100%;padding:10px;border-radius:8px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--ink)}
+    body.light-theme .form-field input{background:rgba(0,0,0,.06)}
+    .auth-btn{width:100%;padding:12px;background:var(--fg);color:var(--bg);border:none;border-radius:8px;font-family:"Bebas Neue",sans-serif;font-size:16px;letter-spacing:.08em;cursor:pointer}
+    #authMessage{margin-top:15px;text-align:center;font-size:13px}
+    .error{color:#fca5a5}
+    .success{color:#86efac}
 
-/* AUTH */
-.auth-tabs{display:flex;border-bottom:1px solid var(--line)}
-.auth-tab{flex:1;text-align:center;padding:10px;cursor:pointer;background:transparent;border:none;color:var(--muted);font-family:"Bebas Neue",sans-serif;font-size:16px;letter-spacing:.05em}
-.auth-tab.active{color:var(--fg);border-bottom:2px solid var(--fg)}
-.auth-form{display:none}
-.auth-form.active{display:block}
-.form-field{margin-bottom:15px}
-.form-field label{display:block;margin-bottom:5px;font-size:12px}
-.form-field input{width:100%;padding:10px;border-radius:8px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--ink)}
-body.light-theme .form-field input{background:rgba(0,0,0,.06)}
-.auth-btn{width:100%;padding:12px;background:var(--fg);color:var(--bg);border:none;border-radius:8px;font-family:"Bebas Neue",sans-serif;font-size:16px;letter-spacing:.08em;cursor:pointer}
-#authMessage{margin-top:15px;text-align:center;font-size:13px}
-.error{color:#fca5a5}
-.success{color:#86efac}
+    /* MAIN PROFILE LAYOUT */
+    .main{
+      padding:8px 0 calc(var(--footerH) + 12px);
+    }
 
-/* FOOTER */
-.site-footer{position:fixed;left:0;right:0;bottom:0;height:var(--footerH);background:var(--bg);border-top:1px solid var(--line);z-index:40}
-.site-footer a{display:block;height:100%;width:100%}
-.site-footer img{height:100%;width:100%;object-fit:contain}
+    .profile-container{
+      max-width:1100px;
+      margin:0 auto;
+      padding:12px 0 40px;
+    }
 
-/* ACCESSIBILITY */
-.icon-btn:focus,button:focus,input:focus,details summary:focus{outline:2px solid var(--fg);outline-offset:2px}
+    /* Player header (big) */
+    .profile-header{
+      display:flex;
+      gap:18px;
+      background:var(--card-bg);
+      border-radius:18px;
+      padding:18px;
+      box-shadow:0 10px 25px rgba(0,0,0,.45);
+      margin-bottom:16px;
+    }
+    .profile-photo-wrap{
+      flex:0 0 260px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+    .profile-photo{
+      width:100%;
+      max-width:260px;
+      border-radius:18px;
+      object-fit:cover;
+      display:block;
+    }
+    .profile-info{
+      flex:1;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      gap:6px;
+    }
+    .profile-team-line{
+      font-size:13px;
+      text-transform:uppercase;
+      letter-spacing:.16em;
+      color:var(--muted);
+    }
+    .profile-name{
+      font:700 32px "Bebas Neue",sans-serif;
+      letter-spacing:.15em;
+      text-transform:uppercase;
+    }
+    .profile-meta-line{
+      font-size:13px;
+      text-transform:uppercase;
+      letter-spacing:.12em;
+    }
+    .profile-bio-line{
+      font-size:13px;
+      line-height:1.5;
+    }
 
-/* SPLASH */
-#splashScreen{position:fixed;top:0;left:0;width:100%;height:100vh;background:#000;z-index:1000;opacity:1;transition:opacity .8s ease-out;pointer-events:auto;overflow:hidden}
-#splashScreen.is-hidden{opacity:0;pointer-events:none}
-.splash-top{position:absolute;width:100%;top:33%;left:50%;transform:translate(-50%,-50%);text-align:center}
-.splash-bottom{position:absolute;width:100%;bottom:33%;left:50%;transform:translate(-50%,50%);display:flex;align-items:center;justify-content:center;gap:clamp(12px,4vw,20px)}
-.splash-top .logo-container{position:relative;display:inline-block;overflow:hidden}
-.splash-top .splash-logo-main{width:clamp(280px,70vw,450px);height:auto;filter:drop-shadow(0 0 15px rgba(255,255,255,.2));animation:pulse-glow 2.5s infinite ease-in-out}
-.shimmer::after{content:'';position:absolute;top:0;left:-150%;width:70%;height:100%;background:linear-gradient(90deg,rgba(255,255,255,0) 0%,rgba(255,255,255,.2) 50%,rgba(255,255,255,0) 100%);transform:skewX(-25deg);animation:shimmer-effect 4s infinite;animation-delay:1.5s}
-.splash-bottom .splash-logo-h{height:clamp(45px,15vw,65px);width:auto;animation:fadeInDelayed 1s ease-in-out forwards;animation-delay:1.2s;opacity:0}
-.splash-bottom .splash-logo-ne{height:clamp(35px,12vw,50px);width:auto;animation:fadeInDelayed 1s ease-in-out forwards;animation-delay:1.2s;opacity:0}
-@keyframes fadeInDelayed{to{opacity:1}}
-@keyframes pulse-glow{0%{filter:drop-shadow(0 0 15px rgba(255,255,255,.2))}50%{filter:drop-shadow(0 0 25px rgba(255,255,255,.4))}100%{filter:drop-shadow(0 0 15px rgba(255,255,255,.2))}}
-@keyframes shimmer-effect{100%{left:150%}}
+    @media (max-width:900px){
+      .profile-header{
+        flex-direction:column;
+        align-items:center;
+      }
+      .profile-photo-wrap{
+        flex:0 0 auto;
+        width:100%;
+        max-width:420px;
+      }
+      .profile-info{
+        width:100%;
+      }
+      .profile-name{
+        font-size:28px;
+      }
+    }
 
-/* MAIN / PROFILE */
-.main{padding:8px 0 calc(var(--footerH) + 12px);}
-.profile-shell{max-width:1100px;margin:0 auto;padding:8px var(--containerPad) 32px;}
-.profile-card{
-  background:var(--card-bg);
-  border-radius:18px;
-  box-shadow:0 8px 18px rgba(0,0,0,.35);
-  padding:18px 16px 20px;
-}
-.profile-top{
-  display:flex;
-  gap:18px;
-  align-items:flex-start;
-}
-.profile-photo{
-  flex:0 0 40%;
-  max-width:280px;
-}
-.profile-photo img{
-  width:100%;
-  border-radius:14px;
-  display:block;
-}
-.profile-meta{
-  flex:1;
-  display:flex;
-  flex-direction:column;
-  gap:6px;
-}
-.profile-teamline{
-  font:300 13px/1 Oswald,sans-serif;
-  letter-spacing:.18em;
-  text-transform:uppercase;
-  color:var(--muted);
-}
-.profile-name{
-  font:400 32px/1 "Bebas Neue",sans-serif;
-  letter-spacing:.12em;
-  margin:4px 0 2px;
-}
-.profile-sub,
-.profile-details,
-.profile-draft,
-.profile-colleges{
-  font-size:14px;
-  line-height:1.4;
-}
-.profile-sub{
-  font-weight:700;
-  text-transform:uppercase;
-}
-.profile-draft strong,
-.profile-colleges strong{font-weight:700}
+    /* Sticky shell for compact bar + tabs */
+    .funzone-shell{
+      position:sticky;
+      top:var(--sticky-offset);
+      z-index:30;
+      background:var(--bg);
+      padding-bottom:6px;
+    }
 
-/* FUNZONE TABS */
-.funzone-tabs{
-  display:flex;
-  flex-wrap:wrap;
-  border-top:1px solid var(--line);
-  border-bottom:1px solid var(--line);
-  margin-top:16px;
-  background:var(--header-bg);
-  position:sticky;
-  top:var(--profileTabsTop, 0px);
-  z-index:30;
-}
-.funzone-tab{
-  flex:1 0 50%;
-  padding:10px 8px;
-  border:none;
-  background:none;
-  color:var(--muted);
-  font:700 11px "Bebas Neue",sans-serif;
-  letter-spacing:.06em;
-  text-transform:uppercase;
-  cursor:pointer;
-  white-space:nowrap;
-  text-align:center;
-}
-.funzone-tab.active{
-  color:var(--fg);
-  border-bottom:2px solid var(--fg);
-}
-.funzone-content{
-  background:var(--card-bg);
-  padding:16px 12px 24px;
-}
+    /* Compact bar (mobile) */
+    .profile-header-compact{
+      display:none;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      padding:8px 10px;
+      border-radius:999px;
+      background:var(--card-bg);
+      box-shadow:0 6px 18px rgba(0,0,0,.4);
+      margin-bottom:8px;
+    }
+    .compact-left{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      min-width:0;
+    }
+    .compact-photo{
+      width:38px;
+      height:38px;
+      border-radius:50%;
+      object-fit:cover;
+      flex-shrink:0;
+    }
+    .compact-text{
+      display:flex;
+      flex-direction:column;
+      font-size:11px;
+      text-transform:uppercase;
+      letter-spacing:.12em;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+    .compact-name{
+      font-family:"Bebas Neue",sans-serif;
+      letter-spacing:.14em;
+      font-size:14px;
+    }
+    .compact-level{color:var(--muted)}
 
-/* Stats grid reused from card back */
-.stats-header-bar{background:var(--line);color:var(--fg);text-align:center;padding:6px;font:700 12px "Bebas Neue",sans-serif;margin:0 0 12px;border-radius:6px}
-.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;text-align:center}
-.stat-item{background:var(--line);border-radius:8px;padding:8px 5px;display:flex;flex-direction:column;justify-content:center}
-.stat-label{font-size:11px;text-transform:uppercase;opacity:.7}
-.stat-value{font-size:18px;font-weight:700;line-height:1;margin-top:4px}
+    .funzone-shell.is-compact .profile-header-compact{
+      display:flex;
+    }
 
-/* NEWS CARDS */
-.news-card{
-  display:flex;
-  gap:10px;
-  margin:10px 0;
-  padding:8px;
-  border-radius:10px;
-  border:1px solid var(--line);
-  text-decoration:none;
-  align-items:center;
-}
-.news-thumb{
-  width:84px;
-  height:64px;
-  flex:0 0 84px;
-  background:#000;
-  border-radius:8px;
-  background-size:cover;
-  background-position:center;
-}
-.news-meta-title{font-weight:700;line-height:1.2;}
-.news-meta-sub{font-size:12px;opacity:.75;margin-top:4px}
+    @media (min-width:901px){
+      .funzone-shell{
+        top:calc(var(--sticky-offset) - 16px);
+      }
+    }
 
-/* MOBILE / COMPACT */
-@media(max-width:768px){
-  .profile-card{
-    padding:12px 10px 16px;
-    border-radius:0;
-    box-shadow:none;
-  }
-  .profile-top{
-    flex-direction:column;
-    align-items:center;
-  }
-  .profile-photo{
-    max-width:220px;
-  }
-}
-/* compact sticky bar on scroll */
-.profile-card.compact .profile-top{
-  position:sticky;
-  top:0;
-  z-index:35;
-  background:var(--header-bg);
-  padding:6px 4px 6px;
-  gap:8px;
-  align-items:center;
-  border-bottom:1px solid var(--line);
-}
-.profile-card.compact .profile-photo{
-  flex:0 0 56px;
-  max-width:56px;
-}
-.profile-card.compact .profile-photo img{
-  border-radius:8px;
-}
-.profile-card.compact .profile-name{font-size:20px;margin:0}
-.profile-card.compact .profile-meta{gap:2px}
-.profile-card.compact .profile-teamline{font-size:11px;letter-spacing:.12em}
-.profile-card.compact .profile-sub,
-.profile-card.compact .profile-details,
-.profile-card.compact .profile-draft,
-.profile-card.compact .profile-colleges{font-size:11px}
+    @media (max-width:900px){
+      /* only show compact version on mobile */
+      .funzone-shell.is-compact + .profile-header{
+        /* optional: could hide big header, but we'll leave visible for now */
+      }
+    }
 
-/* SUPERFAN HERO CTA */
-.hero-superfan{display:flex;align-items:baseline;gap:4px}
-.hero-superfan .thin{margin-right:2px}
-</style>
+    /* TABS */
+    .funzone-tabs{
+      display:flex;
+      overflow-x:auto;
+      gap:4px;
+      padding:4px 2px 0;
+      border-bottom:1px solid var(--line);
+    }
+    .funzone-tab{
+      flex:0 0 auto;
+      padding:8px 10px;
+      border:none;
+      background:transparent;
+      color:var(--muted);
+      font:700 11px "Bebas Neue",sans-serif;
+      letter-spacing:.13em;
+      text-transform:uppercase;
+      cursor:pointer;
+      border-bottom:2px solid transparent;
+      white-space:nowrap;
+    }
+    .funzone-tab.active{
+      color:var(--fg);
+      border-bottom-color:var(--fg);
+    }
+
+    /* PANELS */
+    .funzone-panels{
+      margin-top:12px;
+    }
+    .funzone-panel{
+      display:none;
+      background:var(--card-bg);
+      border-radius:16px;
+      padding:16px 14px 20px;
+      box-shadow:0 10px 24px rgba(0,0,0,.4);
+    }
+    .funzone-panel.active{
+      display:block;
+    }
+
+    /* STATS GRID */
+    .stats-section-title{
+      font:700 13px "Bebas Neue",sans-serif;
+      letter-spacing:.16em;
+      text-transform:uppercase;
+      text-align:center;
+      padding:8px 0;
+      background:var(--line);
+      border-radius:10px;
+      margin-bottom:12px;
+    }
+    .stats-grid{
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      gap:10px;
+    }
+    .stat-item{
+      background:rgba(0,0,0,.35);
+      border-radius:10px;
+      padding:10px 6px;
+      text-align:center;
+    }
+    .stat-label{
+      font-size:11px;
+      text-transform:uppercase;
+      opacity:.7;
+    }
+    .stat-value{
+      font-size:20px;
+      font-weight:700;
+      margin-top:4px;
+    }
+    .season-block{
+      margin-top:18px;
+    }
+
+    @media (max-width:700px){
+      .stats-grid{
+        grid-template-columns:repeat(2,1fr);
+      }
+    }
+
+    /* NEWS */
+    .news-list{
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+    }
+    .news-item{
+      display:flex;
+      gap:10px;
+      padding:10px;
+      border-radius:12px;
+      border:1px solid var(--line);
+    }
+    .news-thumb{
+      flex:0 0 92px;
+      height:70px;
+      border-radius:10px;
+      background:#000 center/cover no-repeat;
+    }
+    .news-body{
+      flex:1;
+      min-width:0;
+    }
+    .news-title{
+      font-weight:700;
+      line-height:1.2;
+      margin-bottom:3px;
+    }
+    .news-meta{
+      font-size:11px;
+      opacity:.75;
+      margin-bottom:6px;
+    }
+    .news-recap{
+      font-size:12px;
+      line-height:1.4;
+      opacity:.95;
+    }
+
+    /* SOCIAL */
+    .social-block{
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      font-size:13px;
+    }
+    .pill-btn{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding:8px 14px;
+      border-radius:999px;
+      border:1px solid var(--line);
+      background:transparent;
+      font:400 12px "Bebas Neue",sans-serif;
+      letter-spacing:.14em;
+      text-transform:uppercase;
+      cursor:pointer;
+    }
+
+    /* MENTORSHIP */
+    .mm-grid{
+      display:grid;
+      gap:14px;
+      grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+      margin-top:14px;
+    }
+    .mm-card{
+      background:rgba(0,0,0,.35);
+      border-radius:14px;
+      padding:12px 12px 14px;
+    }
+    .mm-title{
+      font:700 15px "Bebas Neue",sans-serif;
+      letter-spacing:.14em;
+      text-transform:uppercase;
+      margin-bottom:4px;
+    }
+    .mm-desc{font-size:13px;line-height:1.4;margin-bottom:8px;}
+
+    /* GALLERY */
+    .gallery-wrapper{
+      position:relative;
+    }
+    .gallery-viewport{
+      overflow:hidden;
+      border-radius:16px;
+    }
+    .gallery-track{
+      display:flex;
+      transition:transform .4s ease;
+    }
+    .gallery-slide{
+      min-width:100%;
+      max-height:360px;
+    }
+    .gallery-slide img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:block;
+    }
+    .gallery-nav{
+      margin-top:8px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:8px;
+    }
+    .gallery-dots{
+      display:flex;
+      gap:4px;
+    }
+    .gallery-dot{
+      width:7px;
+      height:7px;
+      border-radius:50%;
+      background:var(--line);
+    }
+    .gallery-dot.active{background:var(--fg);}
+
+    /* FOOTER */
+    .site-footer{position:fixed;left:0;right:0;bottom:0;height:var(--footerH);background:var(--bg);border-top:1px solid var(--line);z-index:40}
+    .site-footer a{display:block;height:100%;width:100%}
+    .site-footer img{height:100%;width:100%;object-fit:contain}
+
+    /* ACCESSIBILITY */
+    .icon-btn:focus,button:focus,input:focus{outline:2px solid var(--fg);outline-offset:2px}
+  </style>
 </head>
 
 <body>
-<!-- SPLASH (same behavior as index) -->
-<div id="splashScreen">
-  <div class="splash-top">
-    <div class="logo-container shimmer">
-      <img src="assets/img/yatstats-logo.png" alt="YAT?STATS Logo" class="splash-logo-main">
-    </div>
-  </div>
-  <div class="splash-bottom">
-    <img src="assets/img/schools/hamilton.az.png" alt="Hamilton Huskies Logo" class="splash-logo-h">
-    <img src="assets/img/partners/american_logo.png" alt="American Logo" class="splash-logo-ne">
-  </div>
-</div>
-
 <header class="header">
   <div class="container topbar">
     <div class="left-icons">
@@ -401,7 +584,8 @@ body.light-theme .form-field input{background:rgba(0,0,0,.06)}
   <div class="hr-y"></div>
 
   <div class="container schoolrow">
-    <img id="hamLogo" class="ham-logo" src="assets/img/schools/hamilton.az.png" alt="Hamilton H" onerror="this.src='assets/img/placeholder.png';">
+    <img class="ham-logo" src="assets/img/schools/hamilton.az.png" alt="Hamilton H"
+         onerror="this.src='assets/img/placeholder.png';">
     <div class="schooltext">
       <div class="small">CHANDLER, AZ</div>
       <div class="big1">HAMILTON HIGH SCHOOL</div>
@@ -413,15 +597,21 @@ body.light-theme .form-field input{background:rgba(0,0,0,.06)}
 
   <section class="hero">
     <div class="container hero-grid">
-      <div class="hero-left" aria-live="polite">
-        <div class="crumbs hero-crumbs" id="heroBreadcrumbs">HAMILTON ▸ PLAYER</div>
-        <div id="superfanCta" class="nav-pair hero-superfan">
-          <span class="thin">ADD</span>
-          <span class="bold" id="superfanCtaText">PLAYER TO MY SUPERFAN DASHBOARD</span>
-        </div>
+      <div class="hero-left">
+        <div class="hero-breadcrumb" id="breadcrumbText">HAMILTON ▸ PLAYER</div>
+        <button class="icon-btn hero-star" id="favoriteStar" aria-label="Toggle favorite">
+          <i class="ri-star-line"></i>
+        </button>
       </div>
       <div class="hero-right">
-        <button id="openSearch" class="hero-icon icon-btn" aria-label="Open search"><i class="ri-search-line"></i></button>
+        <button id="superfanCta" class="superfan-cta">
+          ADD PLAYER TO MY SUPERFAN DASHBOARD
+        </button>
+        <div class="hero-small-icons">
+          <button id="openSearch" class="hero-icon icon-btn" aria-label="Open search"><i class="ri-search-line"></i></button>
+          <button id="openFilters" class="hero-icon icon-btn" aria-label="Open filters"><i class="ri-filter-3-line"></i></button>
+          <button id="filtersReset2" class="hero-icon icon-btn" aria-label="Reset filters"><i class="ri-restart-line"></i></button>
+        </div>
       </div>
     </div>
   </section>
@@ -429,7 +619,7 @@ body.light-theme .form-field input{background:rgba(0,0,0,.06)}
 
 <div class="drawer-mask"></div>
 
-<!-- LEFT DRAWER – search + nav -->
+<!-- LEFT DRAWER -->
 <aside class="drawer" id="drawerLeft" aria-label="Left drawer">
   <button class="icon-btn close-btn"><i class="ri-close-line"></i></button>
   <div class="drawer-content">
@@ -448,6 +638,26 @@ body.light-theme .form-field input{background:rgba(0,0,0,.06)}
       <a href="partner-program.html" class="nav-pair"><span class="thin">PCD ACTION</span><span class="bold">PARTNER PROGRAM</span></a>
       <a href="faq.html" class="nav-pair"><span class="bold">FAQ’S</span></a>
     </div>
+  </div>
+</aside>
+
+<!-- FILTER DRAWER -->
+<aside class="drawer drawer-right" id="drawerFilters" style="display:flex;">
+  <button class="icon-btn close-btn"><i class="ri-close-line"></i></button>
+  <h3>FILTERS</h3>
+  <div class="drawer-content" id="filters">
+    <!-- simple name filter for profile search reuse -->
+    <details class="filter-group" open>
+      <summary class="filter-title">By Name</summary>
+      <div class="filter-options">
+        <input id="filterName" placeholder="Type a name…" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--ink)"/>
+      </div>
+    </details>
+  </div>
+  <div class="drawer-footer">
+    <button id="filtersReset" class="icon-btn" style="padding:10px 14px;border:1px solid var(--line);border-radius:12px">
+      <i class="ri-restart-line"></i>&nbsp;Reset
+    </button>
   </div>
 </aside>
 
@@ -477,9 +687,75 @@ body.light-theme .form-field input{background:rgba(0,0,0,.06)}
 </aside>
 
 <main class="main">
-  <section id="profileShell" class="profile-shell" aria-live="polite">
-    <p style="color:var(--muted);">Loading player profile…</p>
-  </section>
+  <div class="container profile-container">
+    <!-- Sticky shell holds compact header + tabs -->
+    <div id="funzoneShell" class="funzone-shell">
+      <div class="profile-header-compact" id="compactHeader">
+        <div class="compact-left">
+          <img id="compactPhoto" class="compact-photo" src="assets/img/placeholder.png" alt="">
+          <div class="compact-text">
+            <span id="compactName" class="compact-name">PLAYER NAME</span>
+            <span id="compactLevel" class="compact-level">LEVEL • STATUS</span>
+          </div>
+        </div>
+        <button id="compactStarBtn" class="icon-btn hero-star" aria-label="Toggle favorite (compact)">
+          <i class="ri-star-line"></i>
+        </button>
+      </div>
+
+      <nav class="funzone-tabs" id="funzoneTabs">
+        <button class="funzone-tab active" data-tab="stats">SEASON &amp; CAREER STATISTICS</button>
+        <button class="funzone-tab" data-tab="news">NEWS &amp; VIDEO CLIPS</button>
+        <button class="funzone-tab" data-tab="social">SOCIAL MEDIA</button>
+        <button class="funzone-tab" data-tab="mentor">MENTORSHIP MARKETPLACE</button>
+        <button class="funzone-tab" data-tab="gallery">TIMELINE GALLERY</button>
+      </nav>
+    </div>
+
+    <!-- Big player header -->
+    <section class="profile-header" id="profileHeader">
+      <div class="profile-photo-wrap">
+        <img id="profilePhoto" class="profile-photo" src="assets/img/placeholder.png" alt="Player photo">
+      </div>
+      <div class="profile-info">
+        <div id="profileTeamLine" class="profile-team-line">TEAM • ORG</div>
+        <div id="profileName" class="profile-name">PLAYER NAME</div>
+        <div id="profileLevelStatus" class="profile-meta-line">LEVEL • STATUS</div>
+        <div id="profileBio" class="profile-bio-line">
+          Pitcher | H: -- | W: -- | B/T: --/--
+        </div>
+        <div id="profileDraft" class="profile-bio-line"><strong>Draft:</strong> --</div>
+        <div id="profileColleges" class="profile-bio-line"><strong>Colleges:</strong> --</div>
+      </div>
+    </section>
+
+    <!-- FUNZONE PANELS -->
+    <section class="funzone-panels">
+      <div class="funzone-panel active" id="panel-stats">
+        <div id="statsContent">Loading stats…</div>
+      </div>
+
+      <div class="funzone-panel" id="panel-news">
+        <div class="stats-section-title">LATEST HEADLINES</div>
+        <div id="newsContent">Loading news…</div>
+      </div>
+
+      <div class="funzone-panel" id="panel-social">
+        <div class="stats-section-title">SOCIAL &amp; SHARES</div>
+        <div id="socialContent" class="social-block"></div>
+      </div>
+
+      <div class="funzone-panel" id="panel-mentor">
+        <div class="stats-section-title">MENTORSHIP MARKETPLACE</div>
+        <div id="mentorContent"></div>
+      </div>
+
+      <div class="funzone-panel" id="panel-gallery">
+        <div class="stats-section-title">FAN TIMELINE GALLERY</div>
+        <div id="galleryContent"></div>
+      </div>
+    </section>
+  </div>
 </main>
 
 <footer class="site-footer">
@@ -488,478 +764,594 @@ body.light-theme .form-field input{background:rgba(0,0,0,.06)}
   </a>
 </footer>
 
+<!-- SUPERFAN MODAL -->
+<div id="superfanModal" style="position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center;z-index:80;">
+  <div style="background:var(--card-bg);border-radius:18px;padding:18px 18px 16px;max-width:360px;width:90%;box-shadow:0 18px 40px rgba(0,0,0,.6);">
+    <h2 id="superfanTitle" style="font:700 20px 'Bebas Neue',sans-serif;letter-spacing:.16em;text-transform:uppercase;margin:0 0 6px;">ADD TO SUPERFAN DASHBOARD</h2>
+    <p id="superfanBody" style="font-size:13px;line-height:1.5;margin:0 0 12px;">
+      Support this alum and unlock their personalized content, shout-outs, and more.
+    </p>
+    <p style="font-size:13px;margin:0 0 12px;"><strong>Demo only:</strong> This button will eventually connect to your GHL/ARMS checkout flow.</p>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:4px;">
+      <button id="superfanCancel" class="pill-btn" type="button">NOT NOW</button>
+      <button id="superfanCheckout" class="pill-btn" type="button">GO TO CHECKOUT</button>
+    </div>
+  </div>
+</div>
+
 <script type="module">
-const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQcWJM6Q6hTdFnES_G5LUy4teCS-sJ5HdAc9F5HSY8DGE9egdGy8yUAe2ShT3tFm-CwUuCYeAYy_YiW/pub?gid=2028135390&output=csv";
+  /* ---------- Shared helpers (adapted from index) ---------- */
+  const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQcWJM6Q6hTdFnES_G5LUy4teCS-sJ5HdAc9F5HSY8DGE9egdGy8yUAe2ShT3tFm-CwUuCYeAYy_YiW/pub?gid=2028135390&output=csv";
 
-const $ = s => document.querySelector(s);
-const $$ = s => Array.from(document.querySelectorAll(s));
+  const $  = s => document.querySelector(s);
+  const $$ = s => Array.from(document.querySelectorAll(s));
 
-/* CSV loader (same logic as index) */
-async function loadCSV(url){
-  const res = await fetch(url);
-  if(!res.ok) throw new Error(`HTTP ${res.status}`);
-  const text = await res.text();
-  if(!text.trim()) throw new Error('Empty CSV');
+  function slugOf(p){
+    if (!p) return '';
+    const s=(p.slug||'').trim();
+    if(s) return s;
+    return (p.display_name||'').trim().toLowerCase().replace(/[^a-z0-9]+/g,'-');
+  }
 
-  const rows = text.trim()
-    .split(/\r?\n/)
-    .map(line => line.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/).map(c=>c.replace(/^"|"$/g,'')));
+  function imageNameOf(p){
+    const statusUpper = (p.status || '').toUpperCase();
+    if ((statusUpper === 'SPONSOR' || statusUpper === 'RETIRED-SPONSOR') && p.slug) {
+      return p.slug.trim().toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g,'');
+    }
+    const first = (p.first || '').toLowerCase().replace(/\s+/g,'_');
+    const last  = (p.last  || '').toLowerCase().replace(/\s+/g,'_');
+    if (first || last) return [first,last].filter(Boolean).join('_');
+    return (p.slug || p.display_name || '')
+      .toLowerCase()
+      .replace(/\s+/g,'_')
+      .replace(/[^a-z0-9_]/g,'');
+  }
 
-  const header = rows.shift().map(h => h.trim());
-  const idx = name => header.indexOf(name);
+  function formatStatValue(key, value){
+    if (!value || value === '--') return '--';
+    const decimalStats=['AVG','OBP','SLG','OPS'];
+    if (decimalStats.includes(key.toUpperCase())){
+      const num=parseFloat(value);
+      if (isNaN(num)) return value;
+      const str=num.toFixed(3);
+      return (num < 1 && num > -1) ? str.substring(1) : str;
+    }
+    return value;
+  }
 
-  const statKeys = ['avg','obp','slg','ops','ab','h','r','rbi','2b','3b','hr','sb','bb','era','k/9','k/bb','whip','ip','er','ko','gp','w-l','saves','fip'];
+  async function loadCSV(url){
+    const res = await fetch(url);
+    if(!res.ok) throw new Error(`HTTP ${res.status}`);
+    const text = await res.text();
+    if(!text.trim()) throw new Error('Empty CSV');
 
-  return rows.map(r=>{
-    const player = {
-      slug:r[idx('slug')],
-      display_name:r[idx('display_name')],
-      first:r[idx('first')],
-      last:r[idx('last')],
-      grad_class:r[idx('grad_class')],
-      letter_years:r[idx('letter_years')],
-      status:r[idx('status')],
-      level:r[idx('level')],
-      team:r[idx('team')],
-      org:r[idx('org')],
-      position:r[idx('position')],
-      height:r[idx('height')],
-      weight:r[idx('weight')],
-      bats:r[idx('bats')],
-      throws:r[idx('throws')],
-      draft_info:r[idx('Draft_Info')] ?? r[idx('draft_info')],
-      colleges:r[idx('Colleges')] ?? r[idx('colleges')],
-      next_game_date: r[idx('next_game_date')],
-      next_game_time: r[idx('next_game_time')],
-      next_game_opponent: r[idx('next_game_opponent')],
-      next_game_datetime: r[idx('next_game_datetime')],
-      last_game_1:r[idx('last_game_1')],
-      last_game_2:r[idx('last_game_2')],
-      last_game_3:r[idx('last_game_3')],
-      x_handle:r[idx('x_handle')],
-      ig_handle:r[idx('ig_handle')],
-      video_url:r[idx('video_url')],
-      nil_score:r[idx('nil_score')],
-      stats:{}
+    const rows = text.trim()
+      .split(/\r?\n/)
+      .map(line => line.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/).map(c=>c.replace(/^"|"$/g,'')));
+
+    const header = rows.shift().map(h => h.trim());
+    const idx = name => header.indexOf(name);
+
+    const statKeys = ['avg','obp','slg','ops','ab','h','r','rbi','2b','3b','hr','sb','bb','era','k/9','k/bb','whip','ip','er','ko','gp','w-l','saves','fip'];
+
+    return rows.map(r=>{
+      const player = {
+        slug:r[idx('slug')],
+        display_name:r[idx('display_name')],
+        first:r[idx('first')],
+        last:r[idx('last')],
+        grad_class:r[idx('grad_class')],
+        letter_years:r[idx('letter_years')],
+        status:r[idx('status')],
+        level:r[idx('level')],
+        team:r[idx('team')],
+        org:r[idx('org')],
+        position:r[idx('position')],
+        height:r[idx('height')],
+        weight:r[idx('weight')],
+        bats:r[idx('bats')],
+        throws:r[idx('throws')],
+        draft_info:r[idx('Draft_Info')] ?? r[idx('draft_info')],
+        colleges:r[idx('Colleges')] ?? r[idx('colleges')],
+        x_handle:r[idx('x_handle')],
+        ig_handle:r[idx('ig_handle')],
+        video_url:r[idx('video_url')],
+        nil_score:r[idx('nil_score')],
+        stats:{}
+      };
+      for(const key of statKeys){
+        const sIdx = idx(key);
+        if (sIdx > -1 && r[sIdx]) player.stats[key.toUpperCase()] = r[sIdx];
+      }
+      return player;
+    });
+  }
+
+  function getQuerySlug(){
+    const params = new URLSearchParams(location.search);
+    return (params.get('player') || '').trim().toLowerCase();
+  }
+
+  /* ---------- Theme (same logic as index) ---------- */
+  function setupTheme(){
+    const themeToggle=$('#theme-toggle'); if(!themeToggle) return;
+    const body=document.body, icon=themeToggle.querySelector('i');
+    const applyTheme=()=>{
+      const saved=localStorage.getItem('theme');
+      if (saved==='light'){
+        body.classList.add('light-theme');
+        icon?.classList.replace('ri-sun-line','ri-moon-line');
+      } else {
+        body.classList.remove('light-theme');
+        icon?.classList.replace('ri-moon-line','ri-sun-line');
+      }
+    };
+    themeToggle.addEventListener('click', ()=>{
+      body.classList.toggle('light-theme');
+      localStorage.setItem('theme', body.classList.contains('light-theme') ? 'light' : 'dark');
+      applyTheme();
+    });
+    applyTheme();
+  }
+
+  /* ---------- Drawers / auth (copied / simplified) ---------- */
+  function closeDrawers(){ document.body.classList.remove('drawer-left-open','drawer-right-open','drawer-open'); }
+  function setupEventListeners(){
+    $('#btnMenu')?.addEventListener('click',()=>{ document.body.classList.add('drawer-left-open','drawer-open'); });
+    $('#openSearch')?.addEventListener('click',()=>{ document.body.classList.add('drawer-left-open','drawer-open'); });
+    $('#openFilters')?.addEventListener('click',()=>{
+      $('#drawerFilters').style.display='flex';
+      $('#drawerAccount').style.display='none';
+      document.body.classList.add('drawer-right-open','drawer-open');
+    });
+    $('#btnAccount')?.addEventListener('click',()=>{
+      $('#drawerAccount').style.display='flex';
+      $('#drawerFilters').style.display='none';
+      document.body.classList.add('drawer-right-open','drawer-open');
+    });
+
+    $$('.close-btn').forEach(b=>b.addEventListener('click',closeDrawers));
+    $('.drawer-mask')?.addEventListener('click',closeDrawers);
+
+    $('#filtersReset')?.addEventListener('click',()=>$('#filterName').value='');
+    $('#filtersReset2')?.addEventListener('click',()=>$('#filterName').value='');
+
+    $('#playerSearch')?.addEventListener('input',()=>{
+      const q=($('#playerSearch')?.value||'').trim().toLowerCase();
+      const box=$('#liveResults'); if(!box) return;
+      if(!q){ box.innerHTML=''; return; }
+      const hits=(window.PLAYERS||[]).filter(p=>(p.display_name||'').toLowerCase().includes(q)).slice(0,25);
+      box.innerHTML='';
+      hits.forEach(p=>{
+        const el=document.createElement('div'); el.className='live-hit';
+        const imageName=imageNameOf(p);
+        const hsImgJpg=`assets/img/hs_players/${imageName}.jpg`;
+        const hsImgPng=`assets/img/hs_players/${imageName}.png`;
+        el.innerHTML=`<img src="${hsImgJpg}" onerror="this.onerror=null;this.src='${hsImgPng}';">
+                      <div><div style="font-weight:700">${p.display_name}</div>
+                      <div style="opacity:.7;font-size:.92em">${p.level||''} • Class of ${p.grad_class||''}</div></div>`;
+        el.onclick=()=>window.location.href=`profile.html?player=${encodeURIComponent(slugOf(p))}`;
+        box.appendChild(el);
+      });
+    });
+  }
+
+  function setupAuth(){
+    if (!window.firebaseAuth){ console.warn("Firebase auth script not ready yet, skipping auth setup."); return; }
+    const { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } = window.firebaseAuth;
+    const auth = window.auth;
+    const signInForm=$('#signInForm'), registerForm=$('#registerForm'),
+          signOutBtn=$('#btnSignOut'), authMessage=$('#authMessage');
+
+    signInForm?.addEventListener('submit', async e=>{
+      e.preventDefault();
+      try{
+        await signInWithEmailAndPassword(auth, $('#signInEmail').value, $('#signInPassword').value);
+        authMessage.textContent='Sign in successful!'; authMessage.className='success';
+        setTimeout(()=>{ closeDrawers(); authMessage.textContent=''; },1500);
+      }catch(err){ authMessage.textContent=err.message; authMessage.className='error'; }
+    });
+
+    registerForm?.addEventListener('submit', async e=>{
+      e.preventDefault();
+      try{
+        await createUserWithEmailAndPassword(auth, $('#registerEmail').value, $('#registerPassword').value);
+        authMessage.textContent='Registration successful!'; authMessage.className='success';
+        setTimeout(()=>{ closeDrawers(); authMessage.textContent=''; },1500);
+      }catch(err){ authMessage.textContent=err.message; authMessage.className='error'; }
+    });
+
+    signOutBtn?.addEventListener('click', async ()=>{ await signOut(auth); });
+
+    document.addEventListener('authStateChanged', ({detail})=>{
+      const { user } = detail;
+      const accountBtn=$('#btnAccount'), soBtn=$('#btnSignOut');
+      if (user && !user.isAnonymous){ accountBtn.style.display='none'; soBtn.style.display='inline-flex'; }
+      else { accountBtn.style.display='inline-flex'; soBtn.style.display='none'; }
+    });
+
+    $$('.auth-tab').forEach(tab=>{
+      tab.addEventListener('click', ()=>{
+        const target=tab.dataset.tab;
+        $$('.auth-tab').forEach(t=>t.classList.remove('active'));
+        tab.classList.add('active');
+        $$('.auth-form').forEach(form=>{
+          form.classList.toggle('active', form.id === `${target}Form`);
+        });
+        authMessage.textContent='';
+      });
+    });
+  }
+
+  /* ---------- Favorites ---------- */
+  function getFavs(){
+    try{
+      const raw=localStorage.getItem('YAT_FAVORITES_V1');
+      return raw?JSON.parse(raw):[];
+    }catch{ return []; }
+  }
+  function toggleFav(slug){
+    const favs=getFavs();
+    const idx=favs.indexOf(slug);
+    if(idx>-1) favs.splice(idx,1); else favs.push(slug);
+    localStorage.setItem('YAT_FAVORITES_V1',JSON.stringify(favs));
+    return favs.includes(slug);
+  }
+  function isFav(slug){ return getFavs().includes(slug); }
+
+  function applyFavState(slug){
+    const star=$('#favoriteStar');
+    const compactStar=$('#compactStarBtn');
+    const fav=isFav(slug);
+    if(star){
+      star.classList.toggle('is-favorite',fav);
+      const icon=star.querySelector('i');
+      if(icon) icon.className=fav?'ri-star-fill':'ri-star-line';
+    }
+    if(compactStar){
+      compactStar.classList.toggle('is-favorite',fav);
+      const icon=compactStar.querySelector('i');
+      if(icon) icon.className=fav?'ri-star-fill':'ri-star-line';
+    }
+  }
+
+  /* ---------- Stats rendering ---------- */
+  function buildStatsHTML(player){
+    const isPitcher = player.stats['ERA'] !== undefined;
+    const batterStats = ['AVG','OBP','SLG','OPS','H','R','HR','RBI','AB','2B','3B','SB'];
+    const pitcherStats = ['ERA','K/9','K/BB','WHIP','IP','ER','KO','BB','GP','W-L','SAVES','FIP'];
+    const statsToShow = isPitcher ? pitcherStats : batterStats;
+
+    const makeGrid = (label) => {
+      return `
+        <div class="stats-section-title">${label}</div>
+        <div class="stats-grid">
+          ${statsToShow.map(stat=>{
+            const v = formatStatValue(stat, player.stats[stat]);
+            return `<div class="stat-item">
+                      <div class="stat-label">${stat}</div>
+                      <div class="stat-value">${v ?? '--'}</div>
+                    </div>`;
+          }).join('')}
+        </div>`;
     };
 
-    for(const key of statKeys){
-      const sIdx = idx(key);
-      if (sIdx > -1 && r[sIdx]) player.stats[key.toUpperCase()] = r[sIdx];
+    let html = makeGrid('CAREER STATS');
+    html += '<div class="season-block">' + makeGrid('2025 SEASON STATS') + '</div>';
+    html += '<div class="season-block">' + makeGrid('2024 SEASON STATS') + '</div>';
+    html += '<div class="season-block">' + makeGrid('2023 SEASON STATS') + '</div>';
+    return html;
+  }
+
+  /* ---------- News (demo) ---------- */
+  function buildNewsHTML(player){
+    // For now: demo items using player's name
+    const items = [
+      {
+        title:`${player.display_name} multi-hit night in Triple-A`,
+        source:'MiLB (Demo)',
+        date:'8/25/2025 · 8:00 PM',
+        img:`assets/img/now_players/${imageNameOf(player)}.jpg`,
+        recap:`Swifty-style: ${player.display_name} is still doing what he did back at Hamilton – stacking hits and making it look easy. Huskies fans remember those big nights under the lights, and now he’s putting on a show for his pro club. YAT-A-BOY – we see you!`,
+        url:'#'
+      },
+      {
+        title:`Coach praises ${player.last || player.display_name} for leadership and grit`,
+        source:'Local Beat (Demo)',
+        date:'7/12/2025 · 3:30 PM',
+        img:`assets/img/hs_players/${imageNameOf(player)}.jpg`,
+        recap:`If you watched him roam the field at Hamilton, this won’t surprise you. Coaches still talk about how ${player.display_name} set the tone in the dugout and in the weight room. That same edge is showing up now at the next level.`,
+        url:'#'
+      }
+    ];
+
+    return `
+      <div class="news-list">
+        ${items.map(n => `
+          <article class="news-item">
+            <div class="news-thumb" style="background-image:url('${n.img}')"></div>
+            <div class="news-body">
+              <div class="news-title">${n.title}</div>
+              <div class="news-meta">${n.source} • ${n.date}</div>
+              <div class="news-recap">${n.recap}</div>
+            </div>
+          </article>
+        `).join('')}
+      </div>
+      <p style="font-size:11px;opacity:.7;margin-top:10px;">
+        * Demo content – real headlines + AI recaps will be wired later.
+      </p>`;
+  }
+
+  /* ---------- Social ---------- */
+  function buildSocialHTML(player){
+    const chunks = [];
+    if(player.x_handle){
+      chunks.push(`
+        <button class="pill-btn" onclick="window.open('https://x.com/${player.x_handle}','_blank')">
+          <i class="ri-twitter-x-line"></i> VIEW ON X
+        </button>
+      `);
     }
-    return player;
-  });
-}
-
-function slugOf(p){
-  if (!p) return '';
-  const s=(p.slug||'').trim();
-  if(s) return s;
-  return (p.display_name||'').trim().toLowerCase().replace(/[^a-z0-9]+/g,'-');
-}
-function imageNameOf(p){
-  const statusUpper = (p.status || '').toUpperCase();
-  if ((statusUpper === 'SPONSOR' || statusUpper === 'RETIRED-SPONSOR') && p.slug) {
-    return p.slug.trim().toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g,'');
-  }
-  const first = (p.first || '').toLowerCase().replace(/\s+/g,'_');
-  const last = (p.last || '').toLowerCase().replace(/\s+/g,'_');
-  if (first || last) return [first,last].filter(Boolean).join('_');
-  return (p.slug || p.display_name || '')
-    .toLowerCase()
-    .replace(/\s+/g,'_')
-    .replace(/[^a-z0-9_]/g,'');
-}
-
-function formatStatValue(key, value){
-  if (!value || value === '--') return '--';
-  const decimalStats=['AVG','OBP','SLG','OPS'];
-  if (decimalStats.includes(key.toUpperCase())){
-    const num=parseFloat(value);
-    if (isNaN(num)) return value;
-    const str=num.toFixed(3);
-    return (num < 1 && num > -1) ? str.substring(1) : str;
-  }
-  return value;
-}
-
-function generateStatsGridHTML(player){
-  const isPitcher = player.stats['ERA'] !== undefined;
-  const batterStats = ['AVG','OBP','SLG','OPS','H','R','HR','RBI','AB','2B','3B','SB'];
-  const pitcherStats = ['ERA','K/9','K/BB','WHIP','IP','ER','KO','BB','GP','W-L','SAVES','FIP'];
-  const statsToShow = isPitcher ? pitcherStats : batterStats;
-  let grid = `<div class="stats-header-bar">${
-    (player.status||'').includes('ACTIVE') ? '2025 SEASON STATS' : 'CAREER STATS'
-  }</div>`;
-  grid += '<div class="stats-grid">';
-  grid += statsToShow.map(stat=>{
-    const v = formatStatValue(stat, player.stats[stat]);
-    return `<div class="stat-item"><div class="stat-label">${stat}</div><div class="stat-value">${v ?? '--'}</div></div>`;
-  }).join('');
-  grid += '</div>';
-  return grid;
-}
-
-/* THEME */
-function setupTheme(){
-  const themeToggle=$('#theme-toggle'); if(!themeToggle) return;
-  const body=document.body, icon=themeToggle.querySelector('i');
-  const applyTheme=()=>{
-    const saved=localStorage.getItem('theme');
-    if (saved==='light'){
-      body.classList.add('light-theme');
-      icon?.classList.replace('ri-sun-line','ri-moon-line');
-    } else {
-      body.classList.remove('light-theme');
-      icon?.classList.replace('ri-moon-line','ri-sun-line');
+    if(player.ig_handle){
+      chunks.push(`
+        <button class="pill-btn" onclick="window.open('https://instagram.com/${player.ig_handle}','_blank')">
+          <i class="ri-instagram-line"></i> VIEW ON INSTAGRAM
+        </button>
+      `);
     }
-  };
-  themeToggle.addEventListener('click', ()=>{
-    body.classList.toggle('light-theme');
-    localStorage.setItem('theme', body.classList.contains('light-theme') ? 'light' : 'dark');
-    applyTheme();
-  });
-  applyTheme();
-}
 
-/* AUTH */
-function setupAuth(){
-  if (!window.firebaseAuth){ console.warn("Firebase auth script not ready."); return; }
-  const { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } = window.firebaseAuth;
-  const auth = window.auth;
-  const signInForm=$('#signInForm'), registerForm=$('#registerForm'),
-        signOutBtn=$('#btnSignOut'), authMessage=$('#authMessage');
+    const shareText = encodeURIComponent(`YAT-A-BOY ${player.display_name}! Check out his YAT?STATS profile. #YATSTATS #YATABOY`);
+    const shareUrl  = encodeURIComponent(location.href);
+    chunks.push(`
+      <button class="pill-btn" onclick="window.open('https://x.com/intent/tweet?text=${shareText}&url=${shareUrl}','_blank')">
+        <i class="ri-share-forward-line"></i> SHARE THIS PLAYER
+      </button>
+    `);
 
-  signInForm?.addEventListener('submit', async e=>{
-    e.preventDefault();
-    try{
-      await signInWithEmailAndPassword(auth, $('#signInEmail').value, $('#signInPassword').value);
-      authMessage.textContent='Sign in successful!'; authMessage.className='success';
-      setTimeout(()=>{ closeDrawers(); authMessage.textContent=''; },1500);
-    }catch(err){ authMessage.textContent=err.message; authMessage.className='error'; }
-  });
+    if (!chunks.length){
+      chunks.push(`<p>No social handles on file yet for ${player.display_name}.</p>`);
+    }
 
-  registerForm?.addEventListener('submit', async e=>{
-    e.preventDefault();
-    try{
-      await createUserWithEmailAndPassword(auth, $('#registerEmail').value, $('#registerPassword').value);
-      authMessage.textContent='Registration successful!'; authMessage.className='success';
-      setTimeout(()=>{ closeDrawers(); authMessage.textContent=''; },1500);
-    }catch(err){ authMessage.textContent=err.message; authMessage.className='error'; }
-  });
-
-  signOutBtn?.addEventListener('click', async ()=>{ await signOut(auth); });
-
-  document.addEventListener('authStateChanged', ({detail})=>{
-    const { user } = detail;
-    const accountBtn=$('#btnAccount'), soBtn=$('#btnSignOut');
-    if (user && !user.isAnonymous){ accountBtn.style.display='none'; soBtn.style.display='inline-flex'; }
-    else { accountBtn.style.display='inline-flex'; soBtn.style.display='none'; }
-  });
-
-  $$('.auth-tab').forEach(tab=>{
-    tab.addEventListener('click', ()=>{
-      const target=tab.dataset.tab;
-      $$('.auth-tab').forEach(t=>t.classList.remove('active'));
-      tab.classList.add('active');
-      $$('.auth-form').forEach(form=>form.style.display = (form.id===`${target}Form`) ? 'block' : 'none');
-      authMessage.textContent='';
-    });
-  });
-}
-
-/* DRAWERS */
-function closeDrawers(){ document.body.classList.remove('drawer-left-open','drawer-right-open','drawer-open'); }
-function setupDrawers(){
-  $('#btnMenu')?.addEventListener('click',()=>{
-    document.body.classList.add('drawer-left-open','drawer-open');
-  });
-  $('#openSearch')?.addEventListener('click',()=>{
-    document.body.classList.add('drawer-left-open','drawer-open');
-  });
-  $('#btnAccount')?.addEventListener('click',()=>{
-    $('#drawerAccount').style.display='flex';
-    document.body.classList.add('drawer-right-open','drawer-open');
-  });
-
-  $$('.close-btn').forEach(b=>b.addEventListener('click',closeDrawers));
-  $('.drawer-mask')?.addEventListener('click',closeDrawers);
-}
-
-/* LIVE SEARCH */
-function makeHit(p){
-  const el=document.createElement('div'); el.className='live-hit';
-  const imageName=imageNameOf(p);
-  const hsImgJpg=`assets/img/hs_players/${imageName}.jpg`;
-  const hsImgPng=`assets/img/hs_players/${imageName}.png`;
-  el.innerHTML=`<img src="${hsImgJpg}" onerror="this.onerror=null;this.src='${hsImgPng}';">
-                <div><div style="font-weight:700">${p.display_name}</div>
-                <div style="opacity:.7;font-size:.92em">${p.level||''} • Class of ${p.grad_class||''}</div></div>`;
-  el.onclick=()=>{ window.location.href = './profile.html?player=' + encodeURIComponent(slugOf(p)); };
-  return el;
-}
-function liveSearch(){
-  const q=($('#playerSearch')?.value||'').trim().toLowerCase();
-  const box=$('#liveResults'); if(!box) return;
-  if(!q){ box.innerHTML=''; return; }
-  const hits=(window.PLAYERS||[]).filter(p=>(p.display_name||'').toLowerCase().includes(q)).slice(0,25);
-  box.innerHTML=''; hits.forEach(p=>box.appendChild(makeHit(p)));
-}
-
-/* FUNZONE CONTENT SWITCHER */
-function renderStatsTab(player, container){
-  container.innerHTML = generateStatsGridHTML(player);
-}
-function renderNewsTab(player, container){
-  const cacheRaw = localStorage.getItem('YAT_NEWS_CACHE_V1');
-  let items = [];
-  try{
-    const cache = cacheRaw ? JSON.parse(cacheRaw) : {};
-    items = Array.isArray(cache.items) ? cache.items : [];
-  }catch{ items = []; }
-
-  const nameLc = (player.display_name||'').toLowerCase();
-  const mine = items
-    .filter(n => (String(n.player_display_name||'').toLowerCase() === nameLc))
-    .sort((a,b)=> new Date(b.publishedAt||0) - new Date(a.publishedAt||0))
-    .slice(0,3);
-
-  if (!mine.length){
-    container.innerHTML = `<div class="stats-header-bar">LATEST HEADLINES</div>
-      <div style="padding:12px;text-align:center;opacity:.8;">No recent headlines yet for ${player.display_name}. Check back soon!</div>`;
-    return;
+    return chunks.join('');
   }
 
-  const cards = mine.map(n=>{
-    const img = n.image || ('https://picsum.photos/seed/' + encodeURIComponent(n.id || n.title || 'news') + '/600/400');
-    const when = n.publishedAt ? new Date(n.publishedAt).toLocaleString() : '';
-    const base = String(n.url || '#');
-    const read = base + (base.includes('?') ? '&' : '?') + 'utm_source=yatstats&utm_medium=funzone';
-    const src = n.source || 'News';
-    const ttl = n.title || 'Read more';
-    return `<a href="${read}" target="_blank" rel="noopener noreferrer" class="news-card">
-              <div class="news-thumb" style="background-image:url('${img}')"></div>
-              <div style="flex:1;min-width:0;">
-                <div class="news-meta-title">${ttl}</div>
-                <div class="news-meta-sub">${src} • ${when}</div>
-              </div>
-            </a>`;
-  }).join('');
-
-  container.innerHTML = `<div class="stats-header-bar">LATEST HEADLINES</div><div style="padding:8px 4px;">${cards}</div>`;
-}
-function renderSocialTab(player, container){
-  let html = '<div style="padding:12px;">';
-  if (player.x_handle){
-    html += `<a href="https://x.com/${player.x_handle}" target="_blank" rel="noopener" style="display:block;margin-bottom:8px;">Latest posts on X / Twitter</a>`;
-  }
-  if (player.ig_handle){
-    html += `<a href="https://instagram.com/${player.ig_handle}" target="_blank" rel="noopener" style="display:block;margin-bottom:8px;">Latest posts on Instagram</a>`;
-  }
-  html += `<p style="margin-top:12px;font-size:13px;opacity:.8;">
-      When you share, tag <strong>#YAT-A-BOY</strong> and <strong>@yat_stats</strong> so we can boost your post.</p>`;
-  if (!player.x_handle && !player.ig_handle){
-    html = '<p style="padding:12px;text-align:center;">No social media handles on file yet.</p>';
-  }
-  container.innerHTML = html;
-}
-function renderMentorTab(player, container){
-  container.innerHTML = `
-    <div class="stats-header-bar">MENTORSHIP MARKETPLACE</div>
-    <p style="padding:12px 8px 8px;line-height:1.5;">
-      Upload a video of your swing, pitching mechanics, or defensive work and get a personal shout-out and breakdown from
-      <strong>${player.display_name}</strong>. Once you complete a purchase, we’ll add you to your own SuperFan dashboard where all of your
-      message history lives.
-    </p>
-    <p style="padding:0 8px 12px;font-size:13px;opacity:.8;">
-      Transactions will be processed securely through our Mentorship Marketplace flow.
-    </p>
-    <button style="width:100%;padding:12px;background:var(--fg);color:var(--bg);border:none;border-radius:8px;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:.08em;cursor:pointer;">
-      START A MENTORSHIP REQUEST
-    </button>
-  `;
-}
-function renderPicsTab(player, container){
-  container.innerHTML = `
-    <div class="stats-header-bar">FAN PICS & TIMELINE GALLERY</div>
-    <p style="padding:12px 8px 8px;line-height:1.5;">
-      Soon you’ll be able to upload childhood photos, high school memories, and pro-ball moments with
-      <strong>${player.display_name}</strong>. We’ll stitch them into a swipeable timeline so fans can watch the whole journey.
-    </p>
-    <p style="padding:0 8px 12px;font-size:13px;opacity:.8;">
-      For now, email photos to <strong>pics@yatstats.com</strong> with the player’s name and approximate year in the subject line.
-    </p>
-  `;
-}
-
-/* RENDER PROFILE */
-function renderProfile(player){
-  const shell = $('#profileShell');
-  if (!shell) return;
-
-  const imageName = imageNameOf(player);
-  const statusUpper = (player.status || '').toUpperCase();
-  const isSponsorImage = (statusUpper === 'SPONSOR' || statusUpper === 'RETIRED-SPONSOR');
-
-  const nowFolder = isSponsorImage ? 'partners' : 'now_players';
-  const nowExt = isSponsorImage ? 'png' : 'jpg';
-  const nowFallbackExt = isSponsorImage ? 'jpg' : 'png';
-
-  const nowSrc = `assets/img/${nowFolder}/${imageName}.${nowExt}`;
-  const nowFallback = `assets/img/${nowFolder}/${imageName}.${nowFallbackExt}`;
-
-  const org = player.org ? player.org : (player.conference || '');
-  const statusLevel = [player.level, player.status].filter(Boolean).join(' • ');
-
-  shell.innerHTML = `
-    <article class="profile-card" id="profileCard">
-      <div class="profile-top">
-        <div class="profile-photo">
-          <img src="${nowSrc}" alt="${player.display_name}"
-               onerror="this.onerror=null;this.src='${nowFallback}'">
-        </div>
-        <div class="profile-meta">
-          <div class="profile-teamline">${player.team || ''}${org ? ' • ' + org : ''}</div>
-          <h1 class="profile-name">${player.display_name || ''}</h1>
-          <div class="profile-sub">${statusLevel}</div>
-          <div class="profile-details">
-            ${player.position || ''} | H: ${player.height || '--'} | W: ${player.weight || '--'} | B/T: ${player.bats || '--'}/${player.throws || '--'}
+  /* ---------- Mentorship ---------- */
+  function buildMentorHTML(player){
+    return `
+      <p style="font-size:13px;line-height:1.5;">
+        Imagine getting a personal video from ${player.display_name} – breaking down your swing, shouting out your Little League team, or dropping some real talk about chasing the next level.
+        That’s what the <strong>Mentorship Marketplace</strong> is all about.
+      </p>
+      <div class="mm-grid">
+        <div class="mm-card">
+          <div class="mm-title">60-SECOND SHOUTOUT</div>
+          <div class="mm-desc">
+            A custom hype video for you, your team, or someone you want to surprise.
           </div>
-          <div class="profile-draft"><strong>Draft:</strong> ${player.draft_info || 'N/A'}</div>
-          <div class="profile-colleges"><strong>Colleges:</strong> ${player.colleges || 'N/A'}</div>
+          <button class="pill-btn" onclick="window.location.href='marketplace.html?player=${encodeURIComponent(slugOf(player))}&type=shoutout'">
+            PREVIEW &amp; BOOK
+          </button>
+        </div>
+        <div class="mm-card">
+          <div class="mm-title">VIDEO SKILL BREAKDOWN</div>
+          <div class="mm-desc">
+            Upload a clip of your swing, fielding, or pitching – get feedback from ${player.display_name} right in your inbox.
+          </div>
+          <button class="pill-btn" onclick="window.location.href='marketplace.html?player=${encodeURIComponent(slugOf(player))}&type=breakdown'">
+            PREVIEW &amp; BOOK
+          </button>
+        </div>
+        <div class="mm-card">
+          <div class="mm-title">LOCKER ROOM Q&amp;A</div>
+          <div class="mm-desc">
+            A more in-depth video answering your questions about recruiting, mental game, and life at the next level.
+          </div>
+          <button class="pill-btn" onclick="window.location.href='marketplace.html?player=${encodeURIComponent(slugOf(player))}&type=qa'">
+            PREVIEW &amp; BOOK
+          </button>
         </div>
       </div>
+      <p style="font-size:11px;opacity:.75;margin-top:10px;">
+        Checkout and payment will eventually route through your ARMS/GHL flow – this tab is the front door.
+      </p>`;
+  }
 
-      <nav class="funzone-tabs" id="funzoneTabs">
-        <button class="funzone-tab active" data-tab="stats">SEASON & CAREER STATISTICS</button>
-        <button class="funzone-tab" data-tab="news">NEWS & VIDEO CLIPS</button>
-        <button class="funzone-tab" data-tab="social">SOCIAL MEDIA</button>
-        <button class="funzone-tab" data-tab="mentor">MENTORSHIP MARKETPLACE</button>
-        <button class="funzone-tab" data-tab="pics">TIMELINE GALLERY</button>
-      </nav>
+  /* ---------- Gallery (demo carousel) ---------- */
+  function buildGalleryHTML(player){
+    const base = imageNameOf(player) || 'placeholder';
+    const slides = [
+      `assets/img/hs_players/${base}.jpg`,
+      `assets/img/now_players/${base}.jpg`,
+      `assets/img/hs_players/${base}.png`
+    ];
+    const validSlides = slides; // we’ll just trust paths for now
 
-      <section class="funzone-content" id="funzoneContent"></section>
-    </article>
-  `;
+    const dots = validSlides.map((_,i)=>`<div class="gallery-dot${i===0?' active':''}" data-idx="${i}"></div>`).join('');
 
-  // Hero crumbs + SuperFan CTA
-  $('#heroBreadcrumbs').textContent = `HAMILTON ▸ ${player.display_name || ''}`;
-  $('#superfanCtaText').textContent = `${(player.display_name || '').toUpperCase()} TO MY SUPERFAN DASHBOARD`;
+    return `
+      <div class="gallery-wrapper">
+        <div class="gallery-viewport">
+          <div class="gallery-track" id="galleryTrack">
+            ${validSlides.map(src=>`
+              <div class="gallery-slide"><img src="${src}" alt="Timeline photo for ${player.display_name}"></div>
+            `).join('')}
+          </div>
+        </div>
+        <div class="gallery-nav">
+          <button class="pill-btn" id="galleryPrev"><i class="ri-arrow-left-s-line"></i> PREV</button>
+          <div class="gallery-dots" id="galleryDots">${dots}</div>
+          <button class="pill-btn" id="galleryNext">NEXT <i class="ri-arrow-right-s-line"></i></button>
+        </div>
+      </div>
+      <p style="font-size:12px;line-height:1.4;margin-top:10px;">
+        Have a photo with ${player.display_name}? Help us build the timeline!<br>
+        <a href="mailto:photos@yatstats.com?subject=Fan photo for ${encodeURIComponent(player.display_name)}"
+           style="text-decoration:underline;">Email it to us</a> with the approximate year and a short caption.
+      </p>`;
+  }
 
-  const content = $('#funzoneContent');
-  renderStatsTab(player, content);
+  function setupGallery(){
+    const track = $('#galleryTrack');
+    const dotsContainer = $('#galleryDots');
+    if(!track || !dotsContainer) return;
+    const slides = $$('.gallery-slide');
+    const dots = $$('.gallery-dot');
+    let idx=0;
 
-  $$('#funzoneTabs .funzone-tab').forEach(btn=>{
-    btn.addEventListener('click',()=>{
-      $$('#funzoneTabs .funzone-tab').forEach(b=>b.classList.remove('active'));
-      btn.classList.add('active');
-      const tab = btn.dataset.tab;
-      if (tab === 'stats') renderStatsTab(player, content);
-      else if (tab === 'news') renderNewsTab(player, content);
-      else if (tab === 'social') renderSocialTab(player, content);
-      else if (tab === 'mentor') renderMentorTab(player, content);
-      else if (tab === 'pics') renderPicsTab(player, content);
+    function update(){
+      track.style.transform=`translateX(-${idx*100}%)`;
+      dots.forEach((d,i)=>d.classList.toggle('active',i===idx));
+    }
+    $('#galleryPrev')?.addEventListener('click',()=>{
+      idx=(idx-1+slides.length)%slides.length; update();
     });
+    $('#galleryNext')?.addEventListener('click',()=>{
+      idx=(idx+1)%slides.length; update();
+    });
+    dots.forEach(d=>{
+      d.addEventListener('click',()=>{
+        idx=parseInt(d.dataset.idx,10)||0; update();
+      });
+    });
+  }
+
+  /* ---------- Tab switching + sticky compact header ---------- */
+  function setupTabs(playerSlug){
+    const tabs=$$('#funzoneTabs .funzone-tab');
+    const panels={
+      stats:$('#panel-stats'),
+      news:$('#panel-news'),
+      social:$('#panel-social'),
+      mentor:$('#panel-mentor'),
+      gallery:$('#panel-gallery')
+    };
+    tabs.forEach(tab=>{
+      tab.addEventListener('click',()=>{
+        const tabId=tab.dataset.tab;
+        tabs.forEach(t=>t.classList.remove('active'));
+        tab.classList.add('active');
+        Object.entries(panels).forEach(([id,el])=>{
+          el.classList.toggle('active',id===tabId);
+        });
+        if(tabId==='gallery') setupGallery();
+      });
+    });
+
+    const shell = $('#funzoneShell');
+    const profileHeader = $('#profileHeader');
+
+    function onScroll(){
+      if(!shell || !profileHeader) return;
+      const rect = profileHeader.getBoundingClientRect();
+      const trigger = rect.bottom - (parseInt(getComputedStyle(document.documentElement).getPropertyValue('--sticky-offset')) || 72);
+      shell.classList.toggle('is-compact', trigger <= 0);
+    }
+    window.addEventListener('scroll', onScroll, {passive:true});
+    onScroll();
+
+    // Favorite star clicks
+    $('#favoriteStar')?.addEventListener('click',()=>{
+      const fav=toggleFav(playerSlug);
+      applyFavState(playerSlug);
+    });
+    $('#compactStarBtn')?.addEventListener('click',()=>{
+      const fav=toggleFav(playerSlug);
+      applyFavState(playerSlug);
+    });
+  }
+
+  /* ---------- SuperFan modal ---------- */
+  function setupSuperfan(player){
+    const modal = $('#superfanModal');
+    const openBtn = $('#superfanCta');
+    const cancel = $('#superfanCancel');
+    const checkout = $('#superfanCheckout');
+
+    if(openBtn){
+      openBtn.textContent = `ADD ${player.display_name.toUpperCase()} TO MY SUPERFAN DASHBOARD`;
+      openBtn.addEventListener('click',()=>{ modal.style.display='flex'; });
+    }
+    cancel?.addEventListener('click',()=>{ modal.style.display='none'; });
+    modal?.addEventListener('click',e=>{
+      if(e.target===modal) modal.style.display='none';
+    });
+    checkout?.addEventListener('click',()=>{
+      // later: send to real checkout
+      alert('Demo only: this will go to your Mentorship / SuperFan checkout funnel.');
+      modal.style.display='none';
+    });
+  }
+
+  /* ---------- Render player into profile ---------- */
+  function renderPlayer(player){
+    const slug = slugOf(player);
+    const name = player.display_name || `${player.first||''} ${player.last||''}`.trim();
+    const org = player.org || '';
+    const teamLine = [player.team, org].filter(Boolean).join(' • ');
+
+    $('#breadcrumbText').textContent = `HAMILTON ▸ ${name.toUpperCase()}`;
+
+    $('#profileTeamLine').textContent = teamLine || 'HAMILTON HUSKIES ALUM';
+    $('#profileName').textContent = name;
+    $('#profileLevelStatus').textContent = `${player.level || ''} • ${player.status || ''}`.trim();
+    $('#profileBio').innerHTML = `${player.position||''} | H: ${player.height||'--'} | W: ${player.weight||'--'} | B/T: ${player.bats||'--'}/${player.throws||'--'}`;
+    $('#profileDraft').innerHTML = `<strong>Draft:</strong> ${player.draft_info || 'N/A'}`;
+    $('#profileColleges').innerHTML = `<strong>Colleges:</strong> ${player.colleges || 'N/A'}`;
+
+    const imgName = imageNameOf(player);
+    const nowJpg = `assets/img/now_players/${imgName}.jpg`;
+    const nowPng = `assets/img/now_players/${imgName}.png`;
+    const photo = $('#profilePhoto');
+    if(photo){
+      photo.src = nowJpg;
+      photo.onerror = ()=>{ photo.onerror=null; photo.src=nowPng; };
+      photo.alt = name;
+    }
+
+    const compact = $('#compactPhoto');
+    if(compact){
+      compact.src = nowJpg;
+      compact.onerror = ()=>{ compact.onerror=null; compact.src=nowPng; };
+      compact.alt = name;
+    }
+    $('#compactName').textContent = name;
+    $('#compactLevel').textContent = `${player.level || ''} • ${player.status || ''}`.trim();
+
+    $('#statsContent').innerHTML = buildStatsHTML(player);
+    $('#newsContent').innerHTML  = buildNewsHTML(player);
+    $('#socialContent').innerHTML = buildSocialHTML(player);
+    $('#mentorContent').innerHTML = buildMentorHTML(player);
+    $('#galleryContent').innerHTML = buildGalleryHTML(player);
+
+    applyFavState(slug);
+    setupTabs(slug);
+    setupSuperfan(player);
+  }
+
+  /* ---------- Boot ---------- */
+  document.addEventListener('DOMContentLoaded', async ()=>{
+    try{
+      setupTheme();
+      setupEventListeners();
+      setupAuth();
+
+      const slug = getQuerySlug();
+      const data = await loadCSV(CSV_URL);
+      window.PLAYERS = data;
+
+      const player = data.find(p => slugOf(p) === slug) || data[0];
+      if(!player){
+        $('.profile-container').innerHTML = '<p>Player not found.</p>';
+        return;
+      }
+      renderPlayer(player);
+    }catch(err){
+      console.error(err);
+      $('.profile-container').innerHTML =
+        `<p style="color:red;"><strong>Error:</strong> Could not load player. ${err.message}</p>`;
+    }
   });
-
-  setupProfileScroll();
-}
-
-/* SCROLL BEHAVIOR: compact bar + sticky tabs offset */
-function setupProfileScroll(){
-  const card = $('#profileCard');
-  const tabs = $('#funzoneTabs');
-  if (!card || !tabs) return;
-
-  // Set custom property so tabs stick just under header
-  const header = document.querySelector('.header');
-  if (header){
-    const top = header.getBoundingClientRect().bottom + window.scrollY;
-    document.documentElement.style.setProperty('--profileTabsTop', top + 'px');
-  }
-
-  const trigger = card.offsetTop + 220;
-  const onScroll = ()=>{
-    if (window.scrollY > trigger) card.classList.add('compact');
-    else card.classList.remove('compact');
-  };
-  window.addEventListener('scroll', onScroll, { passive:true });
-  onScroll();
-}
-
-/* SPLASH */
-function setupSplash(){
-  const splash = $('#splashScreen');
-  if (!splash) return;
-  const alreadyShown = sessionStorage.getItem('splashShown') === 'true';
-  if (alreadyShown){
-    splash.classList.add('is-hidden');
-    splash.style.display='none';
-    return;
-  }
-  setTimeout(()=>{
-    splash.classList.add('is-hidden');
-    splash.addEventListener('transitionend', (e)=>{
-      if(e.target===splash) splash.style.display='none';
-    }, {once:true});
-  }, 3000);
-  setTimeout(() => {
-    if (splash.style.display !== 'none') splash.style.display = 'none';
-  }, 6000);
-  sessionStorage.setItem('splashShown','true');
-}
-
-/* GEMINI STUB (kept in case we hook AI recaps here later) */
-window.gemini = {
-  async generateGeminiText(prompt) {
-    const apiUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=' + (window.__gemini_api_key || '');
-    const payload = { contents: [{ parts: [{ text: prompt }] }] };
-    try {
-      const resp = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-      if (!resp.ok) return `Error: The AI service failed to respond.`;
-      const result = await resp.json();
-      return result.candidates?.[0]?.content?.parts?.[0]?.text || "No response from AI.";
-    } catch (err) {
-      console.error('Gemini API call failed:', err);
-      return 'AI service is currently unavailable.';
-    }
-  }
-};
-
-document.addEventListener('DOMContentLoaded', async ()=>{
-  setupTheme();
-  setupDrawers();
-  setupAuth();
-  setupSplash();
-
-  $('#playerSearch')?.addEventListener('input', ()=>liveSearch());
-
-  try{
-    const players = await loadCSV(CSV_URL);
-    window.PLAYERS = players;
-
-    const params = new URLSearchParams(window.location.search);
-    const slugParam = (params.get('player') || '').toLowerCase();
-
-    let player = players.find(p => slugOf(p).toLowerCase() === slugParam);
-    if (!player){
-      // fallback: try matching display name
-      player = players.find(p => (p.display_name || '').toLowerCase().replace(/[^a-z0-9]+/g,'-') === slugParam);
-    }
-
-    if (!player){
-      $('#profileShell').innerHTML =
-        `<p style="color:red;"><strong>Player not found.</strong> Try using the menu search to find another alumni.</p>`;
-      return;
-    }
-
-    renderProfile(player);
-  }catch(err){
-    console.error(err);
-    $('#profileShell').innerHTML =
-      `<p style="color:red;"><strong>Error:</strong> Could not load player profile. ${err.message}</p>`;
-  }
-});
 </script>
 </body>
 </html>
