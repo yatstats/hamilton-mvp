@@ -183,6 +183,23 @@ body.light-theme .form-field input{background:rgba(0,0,0,.06)}
 
 /* MAIN GRID */
 .main{padding:8px 0 calc(var(--footerH) + 12px)}
+
+/* NEW: outer gallery frame so cards don't bleed on mobile */
+.grid-shell{
+  margin-top:8px;
+  border-radius:16px;
+  padding:14px;
+  background:var(--bg);
+  border:1px solid var(--line);
+  box-shadow:0 10px 22px rgba(0,0,0,.45);
+  overflow:hidden; /* keeps single-column card edges inside the frame */
+}
+body.light-theme .grid-shell{
+  background:#ffffff;
+  box-shadow:0 8px 18px rgba(0,0,0,.08);
+}
+
+/* existing grid */
 .grid{display:grid;gap:14px;grid-template-columns:repeat(5,1fr)}
 @media (max-width:1400px){.grid{grid-template-columns:repeat(4,1fr)}}
 @media (max-width:1100px){.grid{grid-template-columns:repeat(3,1fr)}}
@@ -460,8 +477,10 @@ body.light-theme .card{box-shadow:0 4px 12px rgba(0,0,0,.1)}
 </aside>
 
 <main class="main container">
-  <div id="cardGrid" class="grid" aria-live="polite">
-    <p style="color:var(--muted);grid-column:1 / -1;">Loading YATSTATS players...</p>
+  <div class="grid-shell">
+    <div id="cardGrid" class="grid" aria-live="polite">
+      <p style="color:var(--muted);grid-column:1 / -1;">Loading YATSTATS players...</p>
+    </div>
   </div>
 </main>
 
@@ -812,12 +831,7 @@ function selectAllInGroup(containerSelector){
   if (selectAll) selectAll.checked = true;
 }
 
-/* READ FILTERS
-   Rule: for each category:
-   - 0 selected  => ignore
-   - ALL selected => ignore (doesn't restrict anything)
-   - some selected => filter on those values
-*/
+/* READ FILTERS */
 function readFilters(){
   const name = ($('#filterName')?.value || '').trim().toLowerCase();
 
@@ -844,7 +858,7 @@ function readFilters(){
   };
 }
 
-/* APPLY FILTERS – pure AND logic across ACTIVE groups */
+/* APPLY FILTERS */
 function applyFilters(){
   if(!window.PLAYERS) return;
   const F = readFilters();
@@ -870,18 +884,14 @@ function applyFilters(){
   renderCards(sorted);
 }
 
-/* RESET FILTERS – back to the "default active" view */
+/* RESET FILTERS */
 function resetFilters(){
-  // Clear all checkboxes and text inputs
   $$('#filters input').forEach(i=>{
     if(i.type==='checkbox') i.checked=false;
     if(i.type==='text') i.value='';
   });
 
-  // Status: ONLY default 4 (ACTIVE 2025, ACTIVE 2024, INJURED, FREE AGENT)
   setDefaultStatusFilter();
-
-  // Other groups: "no restriction" by selecting all
   selectAllInGroup('#filterLevels');
   selectAllInGroup('#filterGradClass');
   selectAllInGroup('#filterRosterYear');
