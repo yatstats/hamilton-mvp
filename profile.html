@@ -1,834 +1,1023 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Player Profile – Hamilton Active Baseball Alumni</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Player Profile – Hamilton Active Baseball Alumni</title>
 
-  <!-- Icons + Fonts -->
-  <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400&family=Bebas+Neue&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400&family=Bebas+Neue&display=swap" rel="stylesheet">
 
-  <!-- Firebase init (same pattern as index.html) -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import {
-      getAuth,
-      createUserWithEmailAndPassword,
-      signInWithEmailAndPassword,
-      signOut,
-      onAuthStateChanged,
-      signInWithCustomToken,
-      signInAnonymously
-    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+<!-- Firebase init (same pattern as index.html) -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import {
+    getAuth,
+    createUserWithEmailAndPassword,
+    signInWithEmailAndPassword,
+    signOut,
+    onAuthStateChanged,
+    signInWithCustomToken,
+    signInAnonymously
+  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-    window.firebaseAuth = {
-      getAuth,
-      createUserWithEmailAndPassword,
-      signInWithEmailAndPassword,
-      signOut,
-      onAuthStateChanged,
-      signInWithCustomToken,
-      signInAnonymously
-    };
+  window.firebaseAuth = {
+    getAuth,
+    createUserWithEmailAndPassword,
+    signInWithEmailAndPassword,
+    signOut,
+    onAuthStateChanged,
+    signInWithCustomToken,
+    signInAnonymously
+  };
 
-    try {
-      const firebaseConfig = JSON.parse(window.__firebase_config || '{}');
-      const app = initializeApp(firebaseConfig);
-      window.auth = getAuth(app);
+  try {
+    const firebaseConfig = JSON.parse(window.__firebase_config || '{}');
+    const app = initializeApp(firebaseConfig);
+    window.auth = getAuth(app);
 
-      onAuthStateChanged(window.auth, user => {
-        document.dispatchEvent(new CustomEvent('authStateChanged', { detail: { user } }));
-      });
+    onAuthStateChanged(window.auth, user => {
+      document.dispatchEvent(new CustomEvent('authStateChanged', { detail: { user } }));
+    });
 
-      if (window.__initial_auth_token) {
-        await signInWithCustomToken(window.auth, window.__initial_auth_token);
-      } else {
-        await signInAnonymously(window.auth);
-      }
-    } catch (e) {
-      console.error("Firebase initialization error:", e);
+    if (window.__initial_auth_token) {
+      await signInWithCustomToken(window.auth, window.__initial_auth_token);
+    } else {
+      await signInAnonymously(window.auth);
     }
-  </script>
+  } catch (e) {
+    console.error("Firebase initialization error:", e);
+  }
+</script>
 
-  <style>
-    :root{
-      --bg:#0c0c0c;
-      --fg:#f5f5f5;
-      --muted:#b3b3b3;
-      --ink:#f5f5f5;
-      --line:rgba(255,255,255,.1);
-      --header-bg:#000;
-      --drawer-bg:rgba(10,10,10,.85);
-      --hamSmall:13px;
-      --hamBig:20px;
-      --hamBigger:24px;
-      --crestH:clamp(42px,6.3vw,74px);
-      --containerPad:16px;
-      --tabsTop:170px;
-    }
-    body.light-theme{
-      --bg:#f4f4f4;
-      --fg:#121212;
-      --muted:#666;
-      --ink:#222;
-      --line:rgba(0,0,0,.08);
-      --header-bg:#fff;
-      --drawer-bg:rgba(0,0,0,.75);
-    }
-    *{box-sizing:border-box}
-    html,body{margin:0;padding:0}
-    body{
-      background:var(--bg);
-      color:var(--fg);
-      font-family:Oswald,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
-      transition:background-color .3s,color .3s;
-    }
-    a{color:inherit;text-decoration:none}
-    .container{max-width:1200px;margin:0 auto;padding:0 var(--containerPad)}
+<style>
+:root{
+  --bg:#0c0c0c; --fg:#f2f2f2; --muted:#c4c4c4; --ink:#e8e8e8; --line:rgba(255,255,255,.08);
+  --card-bg:#171717; --header-bg:#000; --drawer-bg:rgba(10,10,10,.65);
+  --hamSmall:13px; --hamBig:20px; --hamBigger:24px; --tagGrey:#cfd2d6;
+  --crestH:clamp(42px,6.3vw,74px);
+  --containerPad:16px; --footerH:clamp(56px,8vh,77px);
+}
+body.light-theme{
+  --bg:#f4f4f4; --fg:#121212; --muted:#555; --ink:#222; --line:rgba(0,0,0,.1);
+  --card-bg:#fff; --header-bg:#fff; --drawer-bg:rgba(255,255,255,.65);
+}
+@font-face{font-family:'Indigo';src:url('assets/fonts/Indigo.otf') format('opentype');font-weight:400;font-style:normal;font-display:swap;}
 
-    /* HEADER / TOPBAR */
-    .header{position:sticky;top:0;z-index:50;background:var(--header-bg);box-shadow:0 1px 0 var(--line);}
-    .topbar{display:flex;align-items:center;justify-content:space-between;padding:8px 0}
-    .left-icons{display:flex;align-items:center;gap:10px}
-    .icon-btn{
-      background:none;border:none;color:var(--fg);opacity:.92;
-      display:inline-flex;align-items:center;justify-content:center;
-      padding:0;margin:0;cursor:pointer;
-    }
-    .icon-btn i{font-size:22px}
-    .topnav{display:flex;gap:18px;align-items:center}
-    .nav-pair{white-space:nowrap}
-    .nav-pair .thin{
-      font:300 var(--hamSmall) Oswald,sans-serif;
-      letter-spacing:.02em;
-      color:#cfd2d6;
-      margin-right:2px;
-    }
-    body.light-theme .nav-pair .thin{color:var(--muted)}
-    .nav-pair .bold{
-      font:400 var(--hamSmall) "Bebas Neue",sans-serif;
-      letter-spacing:.09em;
-    }
-    .wordmark-wrap{
-      display:flex;align-items:center;justify-content:flex-end;min-width:120px;
-    }
-    .wordmark-img{
-      height:clamp(18px,3.2vw,28px);width:auto;display:block;
-    }
-    body.light-theme .wordmark-img{filter:invert(1)}
-    @media (max-width:1100px){.topnav{display:none}}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  background:var(--bg);
+  color:var(--fg);
+  font-family:Oswald,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+  transition:background-color .3s,color .3s;
+}
+a{color:inherit;text-decoration:none}
+body.drawer-open{overflow:hidden}
+.container{max-width:1400px;margin:0 auto;padding:0 var(--containerPad)}
 
-    .hr-y{border-top:1px solid var(--line);}
+/* HEADER (copied from index) */
+.header{position:sticky;top:0;z-index:50;background:var(--header-bg);transition:background-color .3s;}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:8px 0}
+.left-icons{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  margin-left:4px; /* slight inset */
+}
+.icon-btn{
+  background:none;border:none;color:var(--fg);opacity:.92;
+  display:inline-flex;align-items:center;justify-content:center;
+  padding:0;margin:0 2px;cursor:pointer
+}
+.icon-btn i{font-size:20px}
+.topnav{display:flex;gap:18px;align-items:center}
+.nav-pair{white-space:nowrap}
+.nav-pair .thin{
+  font:300 var(--hamSmall) Oswald,sans-serif;
+  letter-spacing:.02em;
+  color:#cfd2d6;
+  margin-right:2px
+}
+body.light-theme .nav-pair .thin{color:var(--muted)}
+.nav-pair .bold{font:400 var(--hamSmall) Indigo,"Bebas Neue",sans-serif}
+.wordmark-wrap{display:flex;align-items:center;justify-content:flex-end;min-width:120px}
+.wordmark-img{height:clamp(18px,3.2vw,28px);width:auto;display:block}
+body.light-theme .wordmark-img{filter:invert(1)}
+@media (max-width:1200px){.topnav{display:none !important}}
 
-    /* SCHOOL BANNER (shared) */
-    .schoolrow{
-      display:flex;align-items:center;gap:12px;
-      padding:6px var(--containerPad);
-      background:var(--bg);
-    }
-    .ham-logo{
-      height:var(--crestH);width:auto;object-fit:contain;display:block;flex-shrink:0;
-    }
-    .schooltext{line-height:1}
-    .schooltext .small{
-      font:300 var(--hamSmall)/1 Oswald;
-      letter-spacing:.18em;
-      text-transform:uppercase;
-      color:var(--muted);
-    }
-    .schooltext .big1,
-    .schooltext .big2{
-      font:400 var(--hamBigger)/1 "Bebas Neue",sans-serif;
-      letter-spacing:.12em;
-      text-transform:uppercase;
-    }
-    .schooltext .big1{margin-top:2px;}
-    .schooltext .big2{margin-top:-2px;}
+.hr-y{border-top:1px solid var(--line);}
 
-    /* “FLIP FOR STATS!” row */
-    .flip-row{
-      padding:8px var(--containerPad);
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:12px;
-      font:300 13px Oswald,sans-serif;
-      letter-spacing:.18em;
-      text-transform:uppercase;
-    }
-    .flip-row span.thin{
-      color:var(--muted);
-      margin-right:4px;
-    }
-    .flip-row span.bold{
-      font-weight:400;
-    }
-    .flip-row-actions{
-      display:flex;
-      align-items:center;
-      gap:14px;
-    }
-    .flip-row-actions i{font-size:21px;}
+/* SCHOOL BANNER */
+.schoolrow{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding:6px var(--containerPad);
+}
+.ham-logo{
+  height:var(--crestH);
+  width:auto;
+  object-fit:contain;
+  display:block;
+  flex-shrink:0;
+}
+.schooltext{line-height:1}
+.schooltext .small{
+  font:300 var(--hamSmall)/1 Oswald;
+  letter-spacing:.12em;
+  color:var(--muted);
+}
+/* tightened like your preferred header */
+.schooltext .big1{
+  font:400 var(--hamBig)/1 "Bebas Neue",sans-serif;
+  letter-spacing:.04em;
+}
+.schooltext .big2{
+  font:400 var(--hamBigger)/1 "Bebas Neue",sans-serif;
+  letter-spacing:.04em;
+  margin-top:-2px;
+}
 
-    /* PLAYER HERO (matches flip-card back) */
-    .hero-shell{
-      background:var(--bg);
-      padding:0 var(--containerPad) 6px;
-    }
-    .player-hero{
-      max-width:1200px;
-      margin:0 auto;
-      background:body.light-theme ? #fff : #111;
-      border-radius:18px 18px 0 0;
-    }
-    .player-hero-inner{
-      display:flex;
-      justify-content:space-between;
-      gap:16px;
-      padding:18px 18px 14px;
-      background:#f4f4f4;
-    }
-    body:not(.light-theme) .player-hero-inner{
-      background:#111;
-    }
-    .player-text{
-      flex:1;
-      min-width:0;
-    }
-    .player-name{
-      font:400 24px "Bebas Neue",sans-serif;
-      letter-spacing:.16em;
-      text-transform:uppercase;
-      margin-bottom:6px;
-    }
-    .player-line{
-      font:300 12px Oswald,sans-serif;
-      letter-spacing:.14em;
-      text-transform:uppercase;
-      color:var(--muted);
-      margin-bottom:4px;
-    }
-    .player-bio{
-      font-size:13px;
-      line-height:1.5;
-    }
-    .player-photo{
-      width:140px;
-      aspect-ratio:5 / 7;
-      border-radius:18px;
-      overflow:hidden;
-      box-shadow:0 10px 24px rgba(0,0,0,.4);
-      flex-shrink:0;
-      background:#000;
-    }
-    .player-photo img{
-      width:100%;height:100%;object-fit:cover;
-    }
+/* HERO ROW (same structure as index) */
+.hero{padding:2px 0}
+.hero-grid{display:flex;align-items:center;justify-content:space-between;gap:16px}
+.hero-left{display:flex;flex-direction:column;gap:4px}
+.tag-duo{position:relative;height:1.8em}
+.tag-swap{position:absolute;left:0;top:0;right:0;opacity:0;animation:swap 6s infinite;white-space:nowrap}
+.tag-swap:nth-child(1){animation-delay:0s}
+.tag-swap:nth-child(2){animation-delay:3s}
+.tag-grey{font:300 1em Oswald,sans-serif;letter-spacing:.02em;color:var(--tagGrey)}
+body.light-theme .tag-grey{color:var(--muted)}
+.tag-bold{font:400 1em Indigo,"Bebas Neue",sans-serif}
+@keyframes swap{0%{opacity:0}5%{opacity:1}45%{opacity:1}50%{opacity:0}100%{opacity:0}}
 
-    /* STAR LEGEND UNDER HERO */
-    .star-legend{
-      display:flex;
-      flex-direction:column;
-      gap:4px;
-      padding:10px 18px 10px;
-      font:300 11px Oswald,sans-serif;
-      letter-spacing:.14em;
-      text-transform:uppercase;
-      background:var(--bg);
-    }
-    .star-row{
-      display:flex;
-      align-items:center;
-      gap:8px;
-    }
-    .star-row span.icon{
-      font-size:18px;
-    }
+.crumbs{
+  font:300 calc(var(--hamSmall)*.5)/1 Oswald;
+  letter-spacing:.02em;
+  color:var(--muted);
+  text-transform:uppercase;
+}
+.hero-crumbs{margin:0;text-align:left;white-space:nowrap}
+.hero-right{display:flex;gap:10px}
+.hero-icon i{font-size:20px}
+@media (max-width:768px){.hero-crumbs{font-size:10px}}
 
-    /* FUN ZONE TABS */
-    .tabs-wrapper{
-      position:sticky;
-      top:var(--tabsTop);
-      z-index:30;
-      background:var(--bg);
-      padding:4px 0 6px;
-      border-bottom:1px solid var(--line);
-    }
-    .tabs-inner{
-      max-width:1200px;
-      margin:0 auto;
-      padding:0 var(--containerPad);
-    }
-    .tabs-row{
-      display:flex;
-      justify-content:space-between;
-      gap:4px;
-    }
-    .tab-btn{
-      flex:1;
-      padding:6px 2px 8px;
-      border:none;
-      background:none;
-      cursor:pointer;
-      font:400 11px "Bebas Neue",sans-serif;
-      letter-spacing:.10em;
-      text-transform:uppercase;
-      color:var(--muted);
-      border-bottom:3px solid transparent;
-      text-align:center;
-      line-height:1.2;
-      white-space:normal;
-    }
-    .tab-btn.active{
-      color:var(--fg);
-      border-bottom-color:var(--fg);
-    }
+/* DRAWERS (same behavior as index) */
+.drawer-mask{
+  position:fixed;inset:0;
+  background:rgba(0,0,0,.35);
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .2s;
+  z-index:60;
+}
+.drawer{
+  position:fixed;top:0;bottom:0;
+  width:min(360px,82vw);
+  background:var(--drawer-bg);
+  backdrop-filter:blur(4px);
+  color:var(--ink);
+  transform:translateX(-110%);
+  transition:transform .25s,background-color .3s;
+  z-index:70;
+}
+.drawer-right{right:0;left:auto;transform:translateX(110%);display:flex;flex-direction:column;height:100%}
+.drawer h3{margin:18px 16px 8px;padding-right:30px}
+.drawer .pad{padding:10px 16px}
+.drawer .close-btn{position:absolute;top:12px;right:12px}
+.drawer a{color:var(--ink)}
+.drawer a:hover{color:var(--fg)}
+body.drawer-left-open .drawer-mask,
+body.drawer-right-open .drawer-mask{opacity:1;pointer-events:auto}
+body.drawer-left-open #drawerLeft{transform:translateX(0)}
+body.drawer-right-open .drawer-right{transform:translateX(0)}
+.drawer-content{flex-grow:1;overflow-y:auto;padding:10px 16px}
+.drawer-footer{flex-shrink:0;padding:12px 16px;border-top:1px solid var(--line);background:rgba(10,10,10,.8);display:flex;gap:10px;align-items:center}
+body.light-theme .drawer-footer{background:rgba(255,255,255,.8)}
 
-    /* TAB PANELS */
-    .tab-panels{
-      max-width:1200px;
-      margin:0 auto;
-      padding:10px var(--containerPad) 80px;
-    }
-    .tab-panel{display:none;}
-    .tab-panel.active{display:block;}
+/* filter + search bits */
+#liveResults{margin:10px 4px 18px;max-height:55vh;overflow:auto}
+.live-hit{padding:10px 12px;display:flex;align-items:center;gap:10px;border-radius:10px;cursor:pointer}
+.live-hit:hover{background:var(--line)}
+.live-hit img{width:36px;height:36px;border-radius:6px;object-fit:cover}
 
-    /* STATS GRID */
-    .stats-block{
-      margin-bottom:18px;
-      background:#fff;
-      border-radius:14px;
-      box-shadow:0 8px 18px rgba(0,0,0,.06);
-      padding:14px 14px 12px;
-    }
-    body:not(.light-theme) .stats-block{
-      background:#111;
-      box-shadow:0 8px 18px rgba(0,0,0,.55);
-    }
-    .stats-heading-row{
-      display:flex;
-      justify-content:space-between;
-      align-items:baseline;
-      margin-bottom:10px;
-    }
-    .stats-heading{
-      font:400 14px "Bebas Neue",sans-serif;
-      letter-spacing:.14em;
-      text-transform:uppercase;
-    }
-    .stats-subline{
-      font:300 11px Oswald,sans-serif;
-      letter-spacing:.12em;
-      text-transform:uppercase;
-      color:var(--muted);
-    }
-    .stats-grid{
-      display:grid;
-      grid-template-columns:repeat(4,1fr);
-      gap:8px;
-    }
-    @media (max-width:600px){
-      .stats-grid{
-        grid-template-columns:repeat(3,1fr);
-      }
-    }
-    .stat-tile{
-      border-radius:10px;
-      background:var(--line);
-      padding:6px 4px;
-      text-align:center;
-    }
-    .stat-label{
-      font-size:11px;
-      text-transform:uppercase;
-      opacity:.7;
-    }
-    .stat-value{
-      font-size:18px;
-      font-weight:700;
-      margin-top:2px;
-    }
+/* auth bits */
+.auth-tabs{display:flex;border-bottom:1px solid var(--line)}
+.auth-tab{flex:1;text-align:center;padding:10px;cursor:pointer;background:transparent;border:none;color:var(--muted);font-family:"Bebas Neue",sans-serif;font-size:16px;letter-spacing:.05em}
+.auth-tab.active{color:var(--fg);border-bottom:2px solid var(--fg)}
+.auth-form{display:none}
+.auth-form.active{display:block}
+.form-field{margin-bottom:15px}
+.form-field label{display:block;margin-bottom:5px;font-size:12px}
+.form-field input{width:100%;padding:10px;border-radius:8px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--ink)}
+body.light-theme .form-field input{background:rgba(0,0,0,.06)}
+.auth-btn{width:100%;padding:12px;background:var(--fg);color:var(--bg);border:none;border-radius:8px;font-family:"Bebas Neue",sans-serif;font-size:16px;letter-spacing:.08em;cursor:pointer}
+#authMessage{margin-top:15px;text-align:center;font-size:13px}
+.error{color:#fca5a5}
+.success{color:#86efac}
 
-    /* NEWS */
-    .news-card{
-      background:#fff;
-      border-radius:14px;
-      box-shadow:0 8px 18px rgba(0,0,0,.06);
-      padding:10px;
-      display:flex;
-      gap:10px;
-      margin-bottom:10px;
-    }
-    body:not(.light-theme) .news-card{
-      background:#111;
-      box-shadow:0 8px 18px rgba(0,0,0,.55);
-    }
-    .news-thumb{
-      width:84px;height:64px;border-radius:10px;overflow:hidden;flex-shrink:0;background:#000;
-    }
-    .news-thumb img{width:100%;height:100%;object-fit:cover;}
-    .news-main{flex:1;min-width:0;}
-    .news-title{
-      font-weight:700;
-      font-size:14px;
-      margin-bottom:4px;
-    }
-    .news-meta{
-      font-size:11px;
-      opacity:.75;
-      margin-bottom:6px;
-    }
-    .news-recap{
-      font-size:13px;
-      line-height:1.4;
-    }
+/* PROFILE LAYOUT – this is the "card back" look */
+.profile-main{
+  max-width:900px;
+  margin:12px auto calc(var(--footerH) + 20px);
+  padding:0 var(--containerPad);
+}
 
-    /* SOCIAL */
-    .social-section{
-      display:flex;
-      flex-direction:column;
-      gap:12px;
-    }
-    .social-pill-row{
-      display:flex;
-      flex-wrap:wrap;
-      gap:8px;
-    }
-    .social-pill{
-      padding:8px 12px;
-      border-radius:999px;
-      border:1px solid var(--line);
-      font-size:13px;
-      display:inline-flex;
-      align-items:center;
-      gap:6px;
-    }
-    .social-pill i{font-size:16px;}
-    .social-note{font-size:13px;opacity:.8;}
+/* Top info block – directly from card back */
+.back-top-section{
+  display:flex;
+  padding:12px;
+  gap:12px;
+  border-radius:16px 16px 0 0;
+  background:var(--card-bg);
+  border:1px solid var(--line);
+  border-bottom:none;
+}
+.back-info-left{flex-grow:1}
+.back-player-name{
+  font:700 24px "Bebas Neue",sans-serif;
+  letter-spacing:.04em;
+  margin-bottom:4px;
+}
+.back-player-details{
+  font-size:12px;
+  opacity:.85;
+  line-height:1.4;
+}
+.back-player-details strong{font-weight:700}
+.back-photo-right{flex-shrink:0;display:flex;align-items:flex-start}
+.back-player-photo{
+  width:100px;
+  height:140px;          /* ≈5x7 ratio */
+  object-fit:cover;
+  border-radius:8px;
+  border:4px solid var(--bg);
+  box-shadow:0 2px 5px rgba(0,0,0,.3);
+}
 
-    /* MENTORSHIP */
-    .mm-card{
-      background:#fff;
-      border-radius:14px;
-      box-shadow:0 8px 18px rgba(0,0,0,.06);
-      padding:14px 14px 18px;
-    }
-    body:not(.light-theme) .mm-card{
-      background:#111;
-      box-shadow:0 8px 18px rgba(0,0,0,.55);
-    }
-    .mm-title{
-      font:400 16px "Bebas Neue",sans-serif;
-      letter-spacing:.14em;
-      text-transform:uppercase;
-      margin-bottom:6px;
-    }
-    .mm-body{font-size:14px;line-height:1.5;margin-bottom:10px;}
-    .mm-options{margin-bottom:10px;font-size:13px;}
-    .mm-cta-btn{
-      padding:10px 16px;
-      border-radius:999px;
-      border:none;
-      background:var(--fg);
-      color:var(--bg);
-      font:400 14px "Bebas Neue",sans-serif;
-      letter-spacing:.16em;
-      text-transform:uppercase;
-      cursor:pointer;
-    }
+/* tabs */
+.tabs-wrapper{
+  position:sticky;
+  top:138px; /* sits just under global header stack */
+  z-index:30;
+  background:var(--bg);
+}
+.back-nav{
+  display:flex;
+  justify-content:space-around;
+  border:1px solid var(--line);
+  border-top:none;
+  border-radius:0 0 16px 16px;
+  overflow:hidden;
+}
+.back-nav-link{
+  flex:1;
+  background:none;
+  border:none;
+  color:var(--muted);
+  font:700 11px "Bebas Neue",sans-serif;
+  letter-spacing:.05em;
+  cursor:pointer;
+  padding:8px 4px;
+  border-bottom:2px solid transparent;
+}
+.back-nav-link.active{
+  color:var(--fg);
+  border-bottom-color:var(--fg);
+}
 
-    /* GALLERY */
-    .gallery-shell{
-      background:#fff;
-      border-radius:14px;
-      box-shadow:0 8px 18px rgba(0,0,0,.06);
-      padding:12px;
-    }
-    body:not(.light-theme) .gallery-shell{
-      background:#111;
-      box-shadow:0 8px 18px rgba(0,0,0,.55);
-    }
-    .carousel{
-      position:relative;
-      overflow:hidden;
-      border-radius:14px;
-    }
-    .carousel-track{
-      display:flex;
-      transition:transform .35s ease;
-    }
-    .carousel-slide{
-      min-width:100%;
-      max-height:300px;
-    }
-    .carousel-slide img{
-      width:100%;height:100%;object-fit:cover;display:block;
-    }
-    .carousel-arrow{
-      position:absolute;
-      top:50%;
-      transform:translateY(-50%);
-      width:34px;height:34px;
-      border-radius:50%;
-      border:none;
-      background:rgba(0,0,0,.55);
-      color:#fff;
-      display:flex;align-items:center;justify-content:center;
-      cursor:pointer;
-    }
-    .carousel-arrow.left{left:8px;}
-    .carousel-arrow.right{right:8px;}
-    .gallery-caption{
-      font-size:12px;
-      margin-top:8px;
-      opacity:.85;
-    }
-    .gallery-upload-note{
-      margin-top:10px;
-      font-size:13px;
-    }
-    .upload-link{
-      text-decoration:underline;
-      cursor:pointer;
-    }
+/* tab content panels */
+.profile-panels{
+  margin-top:12px;
+}
+.tab-panel{display:none;}
+.tab-panel.active{display:block;}
 
-    /* FOOTER SPONSOR */
-    .site-footer{
-      position:fixed;
-      left:0;right:0;bottom:0;
-      height:60px;
-      background:var(--bg);
-      border-top:1px solid var(--line);
-      z-index:20;
-    }
-    .site-footer img{
-      width:100%;height:100%;object-fit:contain;
-    }
-  </style>
+/* stats block looks like card fun-zone */
+.stats-card{
+  background:var(--card-bg);
+  border-radius:16px;
+  padding:14px 14px 18px;
+  box-shadow:0 8px 18px rgba(0,0,0,.35);
+}
+body.light-theme .stats-card{box-shadow:0 8px 18px rgba(0,0,0,.12);}
+.stats-header-bar{
+  background:var(--line);
+  color:var(--fg);
+  text-align:center;
+  padding:6px;
+  font:700 12px "Bebas Neue",sans-serif;
+  margin:0 0 12px;
+  border-radius:8px;
+}
+.stats-grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:8px;
+  text-align:center;
+}
+@media (max-width:600px){
+  .stats-grid{grid-template-columns:repeat(3,1fr);}
+}
+.stat-item{
+  background:var(--line);
+  border-radius:8px;
+  padding:8px 5px;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+}
+.stat-label{
+  font-size:11px;
+  text-transform:uppercase;
+  opacity:.7;
+}
+.stat-value{
+  font-size:18px;
+  font-weight:700;
+  line-height:1;
+  margin-top:4px;
+}
+
+/* NEWS / SOCIAL / MENTORSHIP / GALLERY simple blocks */
+.card-block{
+  background:var(--card-bg);
+  border-radius:16px;
+  padding:14px;
+  box-shadow:0 8px 18px rgba(0,0,0,.35);
+}
+body.light-theme .card-block{box-shadow:0 8px 18px rgba(0,0,0,.12);}
+.card-title{
+  font:400 16px "Bebas Neue",sans-serif;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  margin-bottom:8px;
+}
+.card-text{font-size:14px;line-height:1.5}
+
+/* simple news cards */
+.news-item{
+  display:flex;
+  gap:10px;
+  margin:8px 0;
+  padding:8px;
+  border-radius:10px;
+  border:1px solid var(--line);
+  text-decoration:none;
+}
+.news-thumb{
+  width:84px;height:64px;border-radius:8px;flex-shrink:0;
+  background:#000 center/cover no-repeat;
+}
+.news-main{flex:1;min-width:0;}
+.news-title{font-weight:700;font-size:14px;line-height:1.2}
+.news-meta{font-size:11px;opacity:.75;margin-top:4px}
+
+/* social pills */
+.social-pills{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.social-pill{
+  padding:8px 12px;
+  border-radius:999px;
+  border:1px solid var(--line);
+  font-size:13px;
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+}
+.social-pill i{font-size:16px}
+
+/* gallery placeholder */
+.gallery-note{font-size:14px;line-height:1.5;margin-top:6px}
+
+/* FOOTER sponsor */
+.site-footer{
+  position:fixed;
+  left:0;right:0;bottom:0;
+  height:var(--footerH);
+  background:var(--bg);
+  border-top:1px solid var(--line);
+  z-index:40;
+}
+.site-footer a{display:block;height:100%;width:100%}
+.site-footer img{height:100%;width:100%;object-fit:contain}
+
+/* focus */
+.icon-btn:focus,button:focus,input:focus{outline:2px solid var(--fg);outline-offset:2px}
+</style>
 </head>
 
 <body>
-  <!-- LEFT DRAWER -->
-  <div class="drawer-mask"></div>
-  <aside class="drawer" id="drawerLeft" aria-label="Navigation & search">
-    <div class="drawer-header">
-      <div class="drawer-title">PLAYER PROFILE SEARCH</div>
-      <button class="icon-btn" id="drawerClose"><i class="ri-close-line"></i></button>
-    </div>
-    <div class="drawer-content">
-      <input id="playerSearch" placeholder="Type to search…" />
+<!-- LEFT SEARCH DRAWER -->
+<div class="drawer-mask"></div>
+<aside class="drawer" id="drawerLeft">
+  <button class="icon-btn close-btn"><i class="ri-close-line"></i></button>
+  <div class="drawer-content">
+    <h3>PLAYER PROFILE SEARCH</h3>
+    <div class="pad">
+      <input id="playerSearch" placeholder="Type to search…"
+             style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--ink)">
       <div id="liveResults"></div>
-
-      <div class="drawer-subhead">Navigation</div>
-      <nav>
-        <a href="index.html" class="drawer-nav-item nav-pair">
-          <span class="thin">WHERE THEY</span><span class="bold">YAT?</span>
-        </a>
-        <a href="alumni-news.html" class="drawer-nav-item nav-pair">
-          <span class="thin">ACTIVE ALUMNI</span><span class="bold">NEWS</span>
-        </a>
-        <a href="current-team.html" class="drawer-nav-item nav-pair">
-          <span class="thin">THE</span><span class="bold">CURRENT TEAM</span>
-        </a>
-        <a href="marketplace.html" class="drawer-nav-item nav-pair">
-          <span class="thin">MENTORSHIP</span><span class="bold">MARKETPLACE</span>
-        </a>
-        <a href="all-time-list.html" class="drawer-nav-item nav-pair">
-          <span class="thin">NEXT-LEVEL</span><span class="bold">ALL-TIME LIST</span>
-        </a>
-        <a href="partner-program.html" class="drawer-nav-item nav-pair">
-          <span class="thin">PCD ACTION</span><span class="bold">PARTNER PROGRAM</span>
-        </a>
-        <a href="faq.html" class="drawer-nav-item nav-pair">
-          <span class="bold">FAQ’S</span>
-        </a>
-      </nav>
-    </div>
-  </aside>
-
-  <!-- HEADER -->
-  <header class="header">
-    <div class="container topbar">
-      <div class="left-icons">
-        <button class="icon-btn" id="btnMenu" aria-label="Menu">
-          <i class="ri-menu-line"></i>
-        </button>
-        <button class="icon-btn" id="btnAccount" aria-label="Account">
-          <i class="ri-user-3-line"></i>
-        </button>
-        <button class="icon-btn" id="theme-toggle" aria-label="Toggle Theme">
-          <i class="ri-sun-line"></i>
-        </button>
-      </div>
-
-      <nav class="topnav" aria-label="Top Navigation">
-        <a href="index.html" class="nav-pair">
-          <span class="thin">WHERE THEY</span><span class="bold">YAT?</span>
-        </a>
-        <a href="alumni-news.html" class="nav-pair">
-          <span class="thin">ACTIVE ALUMNI</span><span class="bold">NEWS</span>
-        </a>
-        <a href="current-team.html" class="nav-pair">
-          <span class="thin">THE</span><span class="bold">CURRENT TEAM</span>
-        </a>
-        <a href="marketplace.html" class="nav-pair">
-          <span class="thin">MENTORSHIP</span><span class="bold">MARKETPLACE</span>
-        </a>
-        <a href="all-time-list.html" class="nav-pair">
-          <span class="thin">NEXT-LEVEL</span><span class="bold">ALL-TIME LIST</span>
-        </a>
-        <a href="partner-program.html" class="nav-pair">
-          <span class="thin">PCD ACTION</span><span class="bold">PARTNER PROGRAM</span>
-        </a>
-        <a href="faq.html" class="nav-pair">
-          <span class="bold">FAQ’S</span>
-        </a>
-      </nav>
-
-      <div class="wordmark-wrap">
-        <img src="assets/img/yatstats-logo.png" alt="YAT?STATS" class="wordmark-img">
-      </div>
     </div>
 
-    <div class="hr-y"></div>
+    <h3>NAVIGATION</h3>
+    <div class="pad" style="display:flex;flex-direction:column;gap:12px">
+      <a href="index.html" class="nav-pair"><span class="thin">WHERE THEY</span><span class="bold">YAT?</span></a>
+      <a href="alumni-news.html" class="nav-pair"><span class="thin">ACTIVE ALUMNI</span><span class="bold">NEWS</span></a>
+      <a href="current-team.html" class="nav-pair"><span class="thin">THE</span><span class="bold">CURRENT TEAM</span></a>
+      <a href="marketplace.html" class="nav-pair"><span class="thin">MENTORSHIP</span><span class="bold">MARKETPLACE</span></a>
+      <a href="all-time-list.html" class="nav-pair"><span class="thin">NEXT-LEVEL</span><span class="bold">ALL-TIME LIST</span></a>
+      <a href="partner-program.html" class="nav-pair"><span class="thin">PCD ACTION</span><span class="bold">PARTNER PROGRAM</span></a>
+      <a href="faq.html" class="nav-pair"><span class="bold">FAQ’S</span></a>
+    </div>
+  </div>
+</aside>
 
-    <!-- SCHOOL BANNER -->
-    <div class="schoolrow">
-      <img src="assets/img/hamilton-huskies-logo.png" alt="Hamilton Huskies" class="ham-logo">
-      <div class="schooltext">
-        <div class="small">CHANDLER, AZ</div>
-        <div class="big1">HAMILTON HIGH SCHOOL</div>
-        <div class="big2">ACTIVE BASEBALL ALUMNI</div>
+<!-- RIGHT DRAWERS -->
+<aside class="drawer drawer-right" id="drawerFilters" style="display:none;">
+  <button class="icon-btn close-btn"><i class="ri-close-line"></i></button>
+  <div class="drawer-content">
+    <h3>FILTERS</h3>
+    <p class="pad" style="font-size:14px;opacity:.8;">Filters are only used on the main WHERE THEY YAT? grid.</p>
+  </div>
+</aside>
+
+<aside class="drawer drawer-right" id="drawerAccount" style="display:none;">
+  <button class="icon-btn close-btn"><i class="ri-close-line"></i></button>
+  <h3>ACCOUNT</h3>
+  <div class="drawer-content">
+    <div class="auth-tabs">
+      <button class="auth-tab active" data-tab="signIn">Sign In</button>
+      <button class="auth-tab" data-tab="register">Register</button>
+    </div>
+    <div id="auth-forms-container" class="pad">
+      <form id="signInForm" class="auth-form active">
+        <div class="form-field"><label for="signInEmail">Email</label><input type="email" id="signInEmail" required></div>
+        <div class="form-field"><label for="signInPassword">Password</label><input type="password" id="signInPassword" required></div>
+        <button type="submit" class="auth-btn">Sign In</button>
+      </form>
+      <form id="registerForm" class="auth-form">
+        <div class="form-field"><label for="registerEmail">Email</label><input type="email" id="registerEmail" required></div>
+        <div class="form-field"><label for="registerPassword">Password</label><input type="password" id="registerPassword" required></div>
+        <button type="submit" class="auth-btn">Create Account</button>
+      </form>
+      <p id="authMessage"></p>
+    </div>
+  </div>
+</aside>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="container topbar">
+    <div class="left-icons">
+      <button class="icon-btn" id="btnMenu" aria-label="Menu"><i class="ri-menu-line"></i></button>
+      <div id="auth-container">
+        <button class="icon-btn" id="btnAccount" aria-label="Account"><i class="ri-user-3-line"></i></button>
+        <button class="icon-btn" id="btnSignOut" style="display:none;"><i class="ri-logout-box-line"></i></button>
       </div>
+      <button class="icon-btn" id="theme-toggle" aria-label="Toggle Theme"><i class="ri-sun-line"></i></button>
     </div>
 
-    <!-- FLIP FOR STATS -->
-    <div class="flip-row">
-      <div><span class="thin">FLIP FOR</span><span class="bold">STATS!</span></div>
-      <div class="flip-row-actions">
-        <i class="ri-search-line"></i>
-        <i class="ri-equalizer-line"></i>
-        <i class="ri-refresh-line"></i>
-      </div>
-    </div>
-  </header>
+    <nav class="topnav" aria-label="Top Navigation">
+      <a href="index.html" class="nav-pair"><span class="thin">WHERE THEY</span><span class="bold">YAT?</span></a>
+      <a href="alumni-news.html" class="nav-pair"><span class="thin">ACTIVE ALUMNI</span><span class="bold">NEWS</span></a>
+      <a href="current-team.html" class="nav-pair"><span class="thin">THE</span><span class="bold">CURRENT TEAM</span></a>
+      <a href="marketplace.html" class="nav-pair"><span class="thin">MENTORSHIP</span><span class="bold">MARKETPLACE</span></a>
+      <a href="all-time-list.html" class="nav-pair"><span class="thin">NEXT-LEVEL</span><span class="bold">ALL-TIME LIST</span></a>
+      <a href="partner-program.html" class="nav-pair"><span class="thin">PCD ACTION</span><span class="bold">PARTNER PROGRAM</span></a>
+      <a href="faq.html" class="nav-pair"><span class="bold">FAQ’S</span></a>
+    </nav>
 
-  <!-- PLAYER HERO (card back style) -->
-  <section class="hero-shell">
-    <div class="player-hero">
-      <div class="player-hero-inner">
-        <div class="player-text">
-          <div class="player-name" id="playerNameDisplay">CODY BELLINGER</div>
-          <div class="player-line" id="playerLineDisplay">NEW YORK YANKEES • MLB • ACTIVE 2025</div>
-          <div class="player-bio" id="playerBioDisplay">
-            CF-1B | H: 6-4 | W: 203 | B/T: L/L<br>
-            Draft: 2013 · 4 · 124-LAN<br>
-            Colleges: N/A
-          </div>
-        </div>
-        <div class="player-photo">
-          <img id="playerPhoto" src="assets/img/sample-player.jpg" alt="Player photo">
-        </div>
-      </div>
-
-      <div class="star-legend">
-        <div class="star-row">
-          <span class="icon">⭐️</span>
-          <span>HAMILTON FAN FAVORITE</span>
-        </div>
-        <div class="star-row">
-          <span class="icon">🌟</span>
-          <span>GLOBAL SUPERFAN DASHBOARD</span>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- FUN ZONE TABS -->
-  <div class="tabs-wrapper">
-    <div class="tabs-inner">
-      <div class="tabs-row">
-        <button class="tab-btn active" data-tab="stats">SEASON &amp;<br>CAREER STATISTICS</button>
-        <button class="tab-btn" data-tab="news">NEWS &amp;<br>VIDEO CLIPS</button>
-        <button class="tab-btn" data-tab="social">SOCIAL<br>MEDIA FEEDS</button>
-        <button class="tab-btn" data-tab="mm">YAT?STATS<br>MENTORSHIP MARKETPLACE</button>
-        <button class="tab-btn" data-tab="gallery">TIMELINE<br>PHOTO GALLERY</button>
-      </div>
+    <div class="wordmark-wrap">
+      <img src="assets/img/yatstats-logo.png" alt="YAT?STATS" class="wordmark-img">
     </div>
   </div>
 
-  <!-- TAB PANELS -->
-  <main class="tab-panels">
-    <!-- STATS -->
-    <section class="tab-panel active" id="tab-stats">
-      <div class="stats-block">
-        <div class="stats-heading-row">
-          <div class="stats-heading">CAREER STATS</div>
+  <div class="hr-y"></div>
+
+  <div class="container schoolrow">
+    <img id="hamLogo" class="ham-logo" src="assets/img/schools/hamilton.az.png" alt="Hamilton H"
+         onerror="this.src='assets/img/placeholder.png';">
+    <div class="schooltext">
+      <div class="small">CHANDLER, AZ</div>
+      <div class="big1">HAMILTON HIGH SCHOOL</div>
+      <div class="big2">ACTIVE BASEBALL ALUMNI</div>
+    </div>
+  </div>
+
+  <div class="hr-y"></div>
+
+  <section class="hero">
+    <div class="container hero-grid">
+      <div class="hero-left" aria-live="polite">
+        <div class="tag-duo">
+          <div class="tag-swap"><span class="tag-grey">FLIP FOR</span> <span class="tag-bold">STATS!</span></div>
+          <div class="tag-swap"><span class="tag-grey">WHERE THEY</span> <span class="tag-bold">YAT?</span></div>
         </div>
-        <div class="stats-grid" id="careerStatsGrid">
-          <!-- tiles injected -->
-        </div>
+        <div class="crumbs hero-crumbs" id="profileCrumbs">HAMILTON ▸ PLAYER PROFILE</div>
       </div>
-
-      <div class="stats-block">
-        <div class="stats-heading-row">
-          <div class="stats-heading">2025 SEASON STATS</div>
-          <div class="stats-subline" id="stats2025Team">NEW YORK YANKEES • MLB</div>
-        </div>
-        <div class="stats-grid" id="stats2025Grid"></div>
+      <div class="hero-right">
+        <button id="openSearch" class="hero-icon icon-btn" aria-label="Open search"><i class="ri-search-line"></i></button>
+        <button id="openFilters" class="hero-icon icon-btn" aria-label="Open filters"><i class="ri-filter-3-line"></i></button>
+        <button id="refreshProfile" class="hero-icon icon-btn" aria-label="Refresh profile"><i class="ri-restart-line"></i></button>
       </div>
+    </div>
+  </section>
+</header>
 
-      <div class="stats-block">
-        <div class="stats-heading-row">
-          <div class="stats-heading">2024 SEASON STATS</div>
-          <div class="stats-subline" id="stats2024Team">NEW YORK YANKEES • MLB</div>
-        </div>
-        <div class="stats-grid" id="stats2024Grid"></div>
-      </div>
-    </section>
+<!-- PROFILE CONTENT -->
+<main class="profile-main">
+  <div id="profileShell">
+    <p style="color:var(--muted);">Loading player profile…</p>
+  </div>
+</main>
 
-    <!-- NEWS -->
-    <section class="tab-panel" id="tab-news">
-      <article class="news-card">
-        <div class="news-thumb">
-          <img src="assets/img/sample-player.jpg" alt="">
-        </div>
-        <div class="news-main">
-          <div class="news-title" id="headlineTitle">Cody Bellinger latest highlights &amp; updates</div>
-          <div class="news-meta" id="headlineMeta">MLB.com • 9/5/2025, 6:00 AM</div>
-          <div class="news-recap" id="headlineRecap">
-            Cody keeps making noise at the next level. Full details in the article below – but Husky fans
-            know this is the same energy we saw back in Chandler. YAT-A-BOY!
-          </div>
-        </div>
-      </article>
-    </section>
+<footer class="site-footer">
+  <a href="https://www.flowpage.com/petedeluca" target="_blank" rel="noopener noreferrer">
+    <img src="assets/img/partners/american_banner.png" alt="Sponsor Banner">
+  </a>
+</footer>
 
-    <!-- SOCIAL -->
-    <section class="tab-panel" id="tab-social">
-      <div class="social-section">
-        <div class="social-pill-row">
-          <a class="social-pill" href="#" id="xHandle">
-            <i class="ri-twitter-x-line"></i><span>@x.com/</span>
-          </a>
-          <a class="social-pill" href="#" id="igHandle">
-            <i class="ri-instagram-line"></i><span>@instagram.com/</span>
-          </a>
-        </div>
-        <div class="social-note">
-          Tap a handle to view their latest posts. When you share, show them love with <strong>#YATABOY</strong>
-          and tag <strong>@yat_stats</strong>.
-        </div>
-      </div>
-    </section>
+<script type="module">
+/* ---- shared helpers from index ---- */
+const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQcWJM6Q6hTdFnES_G5LUy4teCS-sJ5HdAc9F5HSY8DGE9egdGy8yUAe2ShT3tFm-CwUuCYeAYy_YiW/pub?gid=2028135390&output=csv";
 
-    <!-- MENTORSHIP -->
-    <section class="tab-panel" id="tab-mm">
-      <div class="mm-card">
-        <div class="mm-title">MENTORSHIP MARKETPLACE</div>
-        <div class="mm-body">
-          Upload your baseball video (hitting, throwing, fielding, etc.) and get personalized feedback,
-          coaching, and encouragement from this player. We’ll route your request through the
-          YAT?STATS Mentorship Marketplace so they can reply with a custom video message.
-        </div>
-        <div class="mm-options">
-          Example options (final pricing TBD):
-          <ul>
-            <li>Quick “YAT-A-BOY!” shout-out</li>
-            <li>Video breakdown of your swing or delivery</li>
-            <li>Mentor message for your youth team</li>
-          </ul>
-        </div>
-        <button class="mm-cta-btn">START A MENTORSHIP REQUEST</button>
-      </div>
-    </section>
+const $ = s => document.querySelector(s);
+const $$ = s => Array.from(document.querySelectorAll(s));
 
-    <!-- GALLERY -->
-    <section class="tab-panel" id="tab-gallery">
-      <div class="gallery-shell">
-        <div class="carousel">
-          <div class="carousel-track" id="galleryTrack">
-            <div class="carousel-slide">
-              <img src="assets/img/sample-player.jpg" alt="">
-            </div>
-          </div>
-          <button class="carousel-arrow left" id="galleryPrev"><i class="ri-arrow-left-s-line"></i></button>
-          <button class="carousel-arrow right" id="galleryNext"><i class="ri-arrow-right-s-line"></i></button>
-        </div>
-        <div class="gallery-caption" id="galleryCaption">
-          Timeline photo 1 for this player.
-        </div>
-        <div class="gallery-upload-note">
-          Have a great photo with this player? <span class="upload-link">Tap here</span> to email it in
-          with the year and a short memory. Captains will review and add the best pics to this timeline.
-        </div>
-      </div>
-    </section>
-  </main>
+const levelOrder = {
+  'MLB':13,'INTERNATIONAL':12,'TRIPLE-A':11,'AAA':11,'DOUBLE-A':10,'AA':10,
+  'HIGH-A':9,'A+':9,'LOW-A':8,'A':8,'ROOKIE':7,'ROK':7,'INDY':6,
+  'NCAA-D1':5,'NCAA-D2':4,'NCAA-D3':3,'NAIA':2,'JUCO':1
+};
 
-  <!-- SPONSOR FOOTER -->
-  <footer class="site-footer">
-    <img src="assets/img/footer-sponsor-strip.png" alt="Sponsor strip">
-  </footer>
+async function loadCSV(url){
+  const res = await fetch(url);
+  if(!res.ok) throw new Error(`HTTP ${res.status}`);
+  const text = await res.text();
+  const rows = text.trim()
+    .split(/\r?\n/)
+    .map(line => line.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/).map(c=>c.replace(/^"|"$/g,'')));
 
-  <script>
-    // THEME PERSISTENCE
-    (function initTheme(){
-      const saved = localStorage.getItem('theme');
-      if(saved === 'light'){
-        document.body.classList.add('light-theme');
-      }
-      const icon = document.querySelector('#theme-toggle i');
-      if(document.body.classList.contains('light-theme')){
-        icon.classList.remove('ri-sun-line');
-        icon.classList.add('ri-moon-line');
-      } else {
-        icon.classList.remove('ri-moon-line');
-        icon.classList.add('ri-sun-line');
-      }
-    })();
+  const header = rows.shift().map(h => h.trim());
+  const idx = name => header.indexOf(name);
 
-    document.getElementById('theme-toggle').addEventListener('click', () => {
-      const body = document.body;
-      const icon = document.querySelector('#theme-toggle i');
-      body.classList.toggle('light-theme');
-      const isLight = body.classList.contains('light-theme');
-      localStorage.setItem('theme', isLight ? 'light' : 'dark');
-      if(isLight){
-        icon.classList.remove('ri-sun-line');
-        icon.classList.add('ri-moon-line');
-      }else{
-        icon.classList.remove('ri-moon-line');
-        icon.classList.add('ri-sun-line');
-      }
-    });
+  const statKeys = ['avg','obp','slg','ops','ab','h','r','rbi','2b','3b','hr','sb','bb','era','k/9','k/bb','whip','ip','er','ko','gp','w-l','saves','fip'];
 
-    // DRAWER
-    const drawerMask = document.querySelector('.drawer-mask');
-    const drawer = document.getElementById('drawerLeft');
-    function openDrawer(){
-      document.body.classList.add('drawer-open');
+  return rows.map(r=>{
+    const player = {
+      slug:r[idx('slug')],
+      display_name:r[idx('display_name')],
+      first:r[idx('first')],
+      last:r[idx('last')],
+      grad_class:r[idx('grad_class')],
+      letter_years:r[idx('letter_years')],
+      status:r[idx('status')],
+      level:r[idx('level')],
+      team:r[idx('team')],
+      org:r[idx('org')],
+      position:r[idx('position')],
+      height:r[idx('height')],
+      weight:r[idx('weight')],
+      bats:r[idx('bats')],
+      throws:r[idx('throws')],
+      draft_info:r[idx('Draft_Info')] ?? r[idx('draft_info')],
+      colleges:r[idx('Colleges')] ?? r[idx('colleges')],
+      next_game_date: r[idx('next_game_date')],
+      next_game_time: r[idx('next_game_time')],
+      next_game_opponent: r[idx('next_game_opponent')],
+      next_game_datetime: r[idx('next_game_datetime')],
+      last_game_1:r[idx('last_game_1')],
+      last_game_2:r[idx('last_game_2')],
+      last_game_3:r[idx('last_game_3')],
+      x_handle:r[idx('x_handle')],
+      ig_handle:r[idx('ig_handle')],
+      video_url:r[idx('video_url')],
+      nil_score:r[idx('nil_score')],
+      stats:{}
+    };
+
+    for(const key of statKeys){
+      const sIdx = idx(key);
+      if (sIdx > -1 && r[sIdx]) player.stats[key.toUpperCase()] = r[sIdx];
     }
-    function closeDrawer(){
-      document.body.classList.remove('drawer-open');
-    }
-    document.getElementById('btnMenu').addEventListener('click', openDrawer);
-    document.getElementById('drawerClose').addEventListener('click', closeDrawer);
-    drawerMask.addEventListener('click', closeDrawer);
+    return player;
+  });
+}
 
-    // SIMPLE TABS
-    document.querySelectorAll('.tab-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const target = btn.getAttribute('data-tab');
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-        btn.classList.add('active');
-        document.getElementById('tab-'+target).classList.add('active');
+function slugOf(p){
+  if (!p) return '';
+  const s=(p.slug||'').trim();
+  if(s) return s;
+  return (p.display_name||'').trim().toLowerCase().replace(/[^a-z0-9]+/g,'-');
+}
+function imageNameOf(p){
+  const statusUpper = (p.status || '').toUpperCase();
+  if ((statusUpper === 'SPONSOR' || statusUpper === 'RETIRED-SPONSOR') && p.slug) {
+    return p.slug.trim().toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g,'');
+  }
+  const first = (p.first || '').toLowerCase().replace(/\s+/g,'_');
+  const last = (p.last || '').toLowerCase().replace(/\s+/g,'_');
+  if (first || last) return [first,last].filter(Boolean).join('_');
+  return (p.slug || p.display_name || '')
+    .toLowerCase()
+    .replace(/\s+/g,'_')
+    .replace(/[^a-z0-9_]/g,'');
+}
+function profileURL(p){ return `./profile.html?player=${slugOf(p)}`; }
+
+function formatStatValue(key, value){
+  if (!value || value === '--') return '--';
+  const decimalStats=['AVG','OBP','SLG','OPS'];
+  if (decimalStats.includes(key.toUpperCase())){
+    const num=parseFloat(value);
+    if (isNaN(num)) return value;
+    const str=num.toFixed(3);
+    return (num < 1 && num > -1) ? str.substring(1) : str;
+  }
+  return value;
+}
+
+/* stats grid similar to card back */
+function generateStatsGridHTML(player){
+  const isPitcher = player.stats['ERA'] !== undefined;
+  const batterStats = ['AVG','OBP','SLG','OPS','H','R','HR','RBI','AB','2B','3B','SB'];
+  const pitcherStats = ['ERA','K/9','K/BB','WHIP','IP','ER','KO','BB','GP','W-L','SAVES','FIP'];
+  const statsToShow = isPitcher ? pitcherStats : batterStats;
+  const heading = (player.status||'').includes('ACTIVE') ? '2025 SEASON STATS' : 'CAREER STATS';
+  let grid = `<div class="stats-header-bar">${heading}</div><div class="stats-grid">`;
+  grid += statsToShow.map(stat=>{
+    const v = formatStatValue(stat, player.stats[stat]);
+    return `<div class="stat-item"><div class="stat-label">${stat}</div><div class="stat-value">${v ?? '--'}</div></div>`;
+  }).join('');
+  grid += '</div>';
+  return `<div class="stats-card">${grid}</div>`;
+}
+
+/* THEME */
+function setupTheme(){
+  const themeToggle=$('#theme-toggle'); if(!themeToggle) return;
+  const body=document.body, icon=themeToggle.querySelector('i');
+  const applyTheme=()=>{
+    const saved=localStorage.getItem('theme');
+    if (saved==='light'){
+      body.classList.add('light-theme');
+      icon?.classList.replace('ri-sun-line','ri-moon-line');
+    } else {
+      body.classList.remove('light-theme');
+      icon?.classList.replace('ri-moon-line','ri-sun-line');
+    }
+  };
+  themeToggle.addEventListener('click', ()=>{
+    body.classList.toggle('light-theme');
+    localStorage.setItem('theme', body.classList.contains('light-theme') ? 'light' : 'dark');
+    applyTheme();
+  });
+  applyTheme();
+}
+
+/* DRAWERS + AUTH */
+function closeDrawers(){ document.body.classList.remove('drawer-left-open','drawer-right-open','drawer-open'); }
+
+function setupEventListeners(){
+  $('#btnMenu')?.addEventListener('click',()=>{ document.body.classList.add('drawer-left-open','drawer-open'); });
+  $('#openSearch')?.addEventListener('click',()=>{ document.body.classList.add('drawer-left-open','drawer-open'); });
+
+  $('#openFilters')?.addEventListener('click',()=>{
+    $('#drawerFilters').style.display='flex';
+    $('#drawerAccount').style.display='none';
+    document.body.classList.add('drawer-right-open','drawer-open');
+  });
+  $('#btnAccount')?.addEventListener('click',()=>{
+    $('#drawerAccount').style.display='flex';
+    $('#drawerFilters').style.display='none';
+    document.body.classList.add('drawer-right-open','drawer-open');
+  });
+
+  $$('.close-btn').forEach(b=>b.addEventListener('click',closeDrawers));
+  $('.drawer-mask')?.addEventListener('click',closeDrawers);
+
+  $('#refreshProfile')?.addEventListener('click',()=>window.location.reload());
+}
+
+function setupAuth(){
+  if (!window.firebaseAuth){ console.warn("Firebase auth not ready"); return; }
+  const { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } = window.firebaseAuth;
+  const auth = window.auth;
+  const signInForm=$('#signInForm'), registerForm=$('#registerForm'),
+        signOutBtn=$('#btnSignOut'), authMessage=$('#authMessage');
+
+  signInForm?.addEventListener('submit', async e=>{
+    e.preventDefault();
+    try{
+      await signInWithEmailAndPassword(auth, $('#signInEmail').value, $('#signInPassword').value);
+      authMessage.textContent='Sign in successful!'; authMessage.className='success';
+      setTimeout(()=>{ closeDrawers(); authMessage.textContent=''; },1500);
+    }catch(err){ authMessage.textContent=err.message; authMessage.className='error'; }
+  });
+
+  registerForm?.addEventListener('submit', async e=>{
+    e.preventDefault();
+    try{
+      await createUserWithEmailAndPassword(auth, $('#registerEmail').value, $('#registerPassword').value);
+      authMessage.textContent='Registration successful!'; authMessage.className='success';
+      setTimeout(()=>{ closeDrawers(); authMessage.textContent=''; },1500);
+    }catch(err){ authMessage.textContent=err.message; authMessage.className='error'; }
+  });
+
+  signOutBtn?.addEventListener('click', async ()=>{ await signOut(auth); });
+
+  document.addEventListener('authStateChanged', ({detail})=>{
+    const { user } = detail;
+    const accountBtn=$('#btnAccount'), soBtn=$('#btnSignOut');
+    if (user && !user.isAnonymous){ accountBtn.style.display='none'; soBtn.style.display='inline-flex'; }
+    else { accountBtn.style.display='inline-flex'; soBtn.style.display='none'; }
+  });
+
+  $$('.auth-tab').forEach(tab=>{
+    tab.addEventListener('click', ()=>{
+      const target=tab.dataset.tab;
+      $$('.auth-tab').forEach(t=>t.classList.remove('active'));
+      tab.classList.add('active');
+      $$('.auth-form').forEach(form=>{
+        form.classList.toggle('active', form.id===`${target}Form`);
       });
+      authMessage.textContent='';
     });
+  });
+}
 
-    // TODO: hook this up to real player data the same way as before
-  </script>
+/* LIVE SEARCH DRAWER */
+function makeHit(p){
+  const el=document.createElement('div'); el.className='live-hit';
+  const imageName=imageNameOf(p);
+  const hsImgJpg=`assets/img/hs_players/${imageName}.jpg`;
+  const hsImgPng=`assets/img/hs_players/${imageName}.png`;
+  el.innerHTML=`<img src="${hsImgJpg}" onerror="this.onerror=null;this.src='${hsImgPng}';">
+                <div><div style="font-weight:700">${p.display_name}</div>
+                <div style="opacity:.7;font-size:.92em">${p.level||''} • Class of ${p.grad_class||''}</div></div>`;
+  el.onclick=()=>window.location.href=profileURL(p);
+  return el;
+}
+function liveSearch(){
+  const q=($('#playerSearch')?.value||'').trim().toLowerCase();
+  const box=$('#liveResults'); if(!box) return;
+  if(!q){ box.innerHTML=''; return; }
+  const hits=(window.PLAYERS||[]).filter(p=>(p.display_name||'').toLowerCase().includes(q)).slice(0,25);
+  box.innerHTML=''; hits.forEach(p=>box.appendChild(makeHit(p)));
+}
+
+/* TABS CONTENT PER PLAYER */
+function populateTabs(player){
+  const shell = $('#profileShell');
+  if (!player){
+    shell.innerHTML = `<p style="color:red;">Player not found.</p>`;
+    return;
+  }
+
+  const name = player.display_name || `${player.first||''} ${player.last||''}`.trim();
+  $('#profileCrumbs').textContent = `HAMILTON ▸ ${name.toUpperCase()}`;
+
+  const imageName = imageNameOf(player);
+  const hsImgJpg=`assets/img/hs_players/${imageName}.jpg`;
+  const hsImgPng=`assets/img/hs_players/${imageName}.png`;
+  const org = player.org ? player.org : (player.conference || '');
+  const klass = player.grad_class || '';
+  const letters = (player.letter_years || '').split(',').map(y=>y.trim()).filter(Boolean).join(' • ');
+
+  shell.innerHTML = `
+    <section class="back-top-section">
+      <div class="back-info-left">
+        <div class="back-player-name">${name}</div>
+        <div class="back-player-details">
+          <strong>${player.team || ''}</strong>${org ? ' - ' + org : ''}<br>
+          ${player.level || ''}${player.status ? ' • ' + player.status : ''}<br>
+          ${klass ? 'Class of ' + klass + (letters ? ' • ' + letters : '') : (letters || '')}
+        </div>
+        <div class="back-player-details" style="margin-top:8px;">
+          <strong>Position:</strong> ${player.position || 'N/A'}<br>
+          <strong>Vitals:</strong> H: ${player.height || '--'} | W: ${player.weight || '--'} | B/T: ${player.bats || '--'}/${player.throws || '--'}<br>
+          <strong>Draft:</strong> ${player.draft_info || 'N/A'}<br>
+          <strong>Colleges:</strong> ${player.colleges || 'N/A'}
+        </div>
+      </div>
+      <div class="back-photo-right">
+        <img src="${hsImgJpg}" class="back-player-photo" alt="${name}"
+             onerror="this.onerror=null;this.src='${hsImgPng}';">
+      </div>
+    </section>
+
+    <div class="tabs-wrapper">
+      <nav class="back-nav">
+        <button class="back-nav-link active" data-tab="stats">SEASON & CAREER STATISTICS</button>
+        <button class="back-nav-link" data-tab="news">NEWS & VIDEO CLIPS</button>
+        <button class="back-nav-link" data-tab="social">SOCIAL MEDIA FEEDS</button>
+        <button class="back-nav-link" data-tab="mentor">YAT?STATS MENTORSHIP MARKETPLACE</button>
+        <button class="back-nav-link" data-tab="pics">TIMELINE PHOTO GALLERY</button>
+      </nav>
+    </div>
+
+    <section class="profile-panels">
+      <div class="tab-panel active" data-tab="stats" id="tabStats">
+        ${generateStatsGridHTML(player)}
+      </div>
+      <div class="tab-panel" data-tab="news" id="tabNews"></div>
+      <div class="tab-panel" data-tab="social" id="tabSocial"></div>
+      <div class="tab-panel" data-tab="mentor" id="tabMentor"></div>
+      <div class="tab-panel" data-tab="pics" id="tabPics"></div>
+    </section>
+  `;
+
+  // TAB CLICK HANDLERS
+  const links = $$('#profileShell .back-nav-link');
+  const panels = $$('#profileShell .tab-panel');
+
+  function showTab(id){
+    links.forEach(l=>l.classList.toggle('active', l.dataset.tab===id));
+    panels.forEach(p=>p.classList.toggle('active', p.dataset.tab===id));
+    if (id === 'stats'){
+      $('#tabStats').innerHTML = generateStatsGridHTML(player);
+    } else if (id === 'news'){
+      renderNewsTab(player);
+    } else if (id === 'social'){
+      renderSocialTab(player);
+    } else if (id === 'mentor'){
+      renderMentorTab(player);
+    } else if (id === 'pics'){
+      renderPicsTab(player);
+    }
+  }
+
+  links.forEach(link=>{
+    link.addEventListener('click', ()=>showTab(link.dataset.tab));
+  });
+
+  // initial non-stats panels will lazy-render on first click
+}
+
+function renderNewsTab(player){
+  const panel = $('#tabNews');
+  if (!panel) return;
+  const cacheRaw = localStorage.getItem('YAT_NEWS_CACHE_V1');
+  let items = [];
+  try{
+    const cache = cacheRaw ? JSON.parse(cacheRaw) : {};
+    items = Array.isArray(cache.items) ? cache.items : [];
+  }catch{ items = []; }
+
+  const nameLc = (player.display_name||'').toLowerCase();
+  const mine = items
+    .filter(n => (String(n.player_display_name||'').toLowerCase() === nameLc))
+    .sort((a,b)=> new Date(b.publishedAt||0) - new Date(a.publishedAt||0))
+    .slice(0,5);
+
+  if (!mine.length){
+    panel.innerHTML = `
+      <div class="card-block">
+        <div class="card-title">LATEST HEADLINES</div>
+        <p class="card-text" style="opacity:.85;">No recent headlines yet for ${player.display_name}. Check back soon!</p>
+      </div>`;
+    return;
+  }
+
+  const cards = mine.map(n=>{
+    const img = n.image || ('https://picsum.photos/seed/' + encodeURIComponent(n.id || n.title || 'news') + '/600/400');
+    const when = n.publishedAt ? new Date(n.publishedAt).toLocaleString() : '';
+    const base = String(n.url || '#');
+    const read = base + (base.includes('?') ? '&' : '?') + 'utm_source=yatstats&utm_medium=profile';
+    const src = n.source || 'News';
+    const ttl = n.title || 'Read more';
+    return `
+      <a href="${read}" target="_blank" rel="noopener noreferrer" class="news-item">
+        <div class="news-thumb" style="background-image:url('${img}')"></div>
+        <div class="news-main">
+          <div class="news-title">${ttl}</div>
+          <div class="news-meta">${src} • ${when}</div>
+        </div>
+      </a>`;
+  }).join('');
+
+  panel.innerHTML = `
+    <div class="card-block">
+      <div class="card-title">LATEST HEADLINES</div>
+      ${cards}
+    </div>`;
+}
+
+function renderSocialTab(player){
+  const panel = $('#tabSocial');
+  if (!panel) return;
+
+  let html = `
+    <div class="card-block">
+      <div class="card-title">SOCIAL MEDIA</div>
+      <div class="card-text">
+        Tap a handle to view their latest posts. When you share, show them love with
+        <strong>#YATABOY</strong> and tag <strong>@yat_stats</strong>.
+      </div>
+      <div class="social-pills">`;
+
+  if (player.x_handle){
+    html += `<a class="social-pill" href="https://x.com/${player.x_handle}" target="_blank" rel="noopener">
+              <i class="ri-twitter-x-line"></i><span>@${player.x_handle}</span>
+            </a>`;
+  }
+  if (player.ig_handle){
+    html += `<a class="social-pill" href="https://instagram.com/${player.ig_handle}" target="_blank" rel="noopener">
+              <i class="ri-instagram-line"></i><span>@${player.ig_handle}</span>
+            </a>`;
+  }
+  if (!player.x_handle && !player.ig_handle){
+    html += `<span class="card-text" style="opacity:.8;">No social media handles on file yet.</span>`;
+  }
+  html += `</div></div>`;
+  panel.innerHTML = html;
+}
+
+function renderMentorTab(player){
+  const panel = $('#tabMentor');
+  if (!panel) return;
+
+  const name = player.display_name || `${player.first||''} ${player.last||''}`.trim();
+
+  panel.innerHTML = `
+    <div class="card-block">
+      <div class="card-title">MENTORSHIP MARKETPLACE</div>
+      <div class="card-text">
+        Upload your baseball video (hitting, throwing, fielding, etc.) and get personalized feedback,
+        coaching, and encouragement from <strong>${name.toUpperCase()}</strong>. We’ll route your
+        request through the YAT?STATS Mentorship Marketplace so ${player.first || 'your mentor'}
+        can reply with a custom video message.
+      </div>
+      <div class="card-text" style="margin-top:8px;font-size:13px;">
+        Example options (final pricing TBD):
+        <ul style="margin-top:4px;padding-left:20px;">
+          <li>Quick “YAT-A-BOY!” shout-out</li>
+          <li>Video breakdown of your swing or delivery</li>
+          <li>Mentor message for your youth team</li>
+        </ul>
+      </div>
+      <button style="margin-top:10px;width:100%;padding:12px;border-radius:999px;border:none;background:var(--fg);color:var(--bg);font:400 14px 'Bebas Neue',sans-serif;letter-spacing:.16em;text-transform:uppercase;cursor:pointer;">
+        START A MENTORSHIP REQUEST
+      </button>
+      <p class="card-text" style="margin-top:8px;font-size:13px;opacity:.8;">
+        For the MVP, this button can send fans to a dedicated Mentorship Marketplace page or
+        a GHL-powered checkout flow.
+      </p>
+    </div>`;
+}
+
+function renderPicsTab(player){
+  const panel = $('#tabPics');
+  if (!panel) return;
+
+  const name = player.display_name || `${player.first||''} ${player.last||''}`.trim();
+
+  panel.innerHTML = `
+    <div class="card-block">
+      <div class="card-title">TIMELINE PHOTO GALLERY</div>
+      <div class="card-text">
+        Swipe or tap the arrows to follow ${name.toUpperCase()} from youth days to the pros.
+      </div>
+      <p class="gallery-note">
+        Have a great photo with ${name.toUpperCase()}? <a href="mailto:info@yatstats.com?subject=Timeline photo for ${encodeURIComponent(name)}">Tap here</a>
+        to email it in with the year and a short memory. Captains will review and add the best pics
+        to this timeline.
+      </p>
+    </div>`;
+}
+
+/* BOOTSTRAP */
+document.addEventListener('DOMContentLoaded', async ()=>{
+  try{
+    setupTheme();
+    setupEventListeners();
+    setupAuth();
+
+    const data = await loadCSV(CSV_URL);
+    window.PLAYERS = data;
+
+    // hook live search
+    $('#playerSearch')?.addEventListener('input', ()=>liveSearch());
+
+    const params = new URLSearchParams(window.location.search);
+    const targetSlug = (params.get('player') || '').toLowerCase();
+
+    let player = data.find(p => slugOf(p) === targetSlug);
+    if (!player){
+      // fallback: try match on last name
+      player = data.find(p => (p.last||'').toLowerCase() === targetSlug);
+    }
+    if (!player){
+      player = data[0];
+    }
+
+    populateTabs(player);
+  }catch(err){
+    console.error(err);
+    $('#profileShell').innerHTML = `<p style="color:red;">Error loading profile: ${err.message}</p>`;
+  }
+});
+</script>
 </body>
 </html>
