@@ -89,7 +89,8 @@ body.drawer-open{overflow:hidden}
 .icon-btn{
   background:none;border:none;color:var(--fg);opacity:.92;
   display:inline-flex;align-items:center;justify-content:center;
-  padding:0;margin:0 2px;cursor:pointer
+  padding:8px; min-width:36px; min-height:36px;
+  margin:0 2px;cursor:pointer
 }
 .icon-btn i{font-size:20px}
 .topnav{display:flex;gap:18px;align-items:center}
@@ -218,83 +219,6 @@ body.light-theme .form-field input{background:rgba(0,0,0,.06)}
 .error{color:#fca5a5}
 .success{color:#86efac}
 
-/* PROFILE LAYOUT – this is the "card back" look */
-.profile-main{
-  max-width:900px;
-  margin:12px auto calc(var(--footerH) + 20px);
-  padding:0 var(--containerPad);
-}
-
-/* Top info block – directly from card back */
-.back-top-section{
-  display:flex;
-  padding:12px;
-  gap:12px;
-  border-radius:16px 16px 0 0;
-  background:var(--card-bg);
-  border:1px solid var(--line);
-  border-bottom:none;
-}
-.back-info-left{flex-grow:1}
-.back-player-name{
-  font:700 24px "Bebas Neue",sans-serif;
-  letter-spacing:.04em;
-  margin-bottom:4px;
-}
-.back-player-details{
-  font-size:12px;
-  opacity:.85;
-  line-height:1.4;
-}
-.back-player-details strong{font-weight:700}
-.back-photo-right{flex-shrink:0;display:flex;align-items:flex-start}
-.back-player-photo{
-  width:100px;
-  height:140px;          /* ≈5x7 ratio */
-  object-fit:cover;
-  border-radius:8px;
-  border:4px solid var(--bg);
-  box-shadow:0 2px 5px rgba(0,0,0,.3);
-}
-
-/* tabs */
-.tabs-wrapper{
-  position:sticky;
-  top:138px; /* sits just under global header stack */
-  z-index:30;
-  background:var(--bg);
-}
-.back-nav{
-  display:flex;
-  justify-content:space-around;
-  border:1px solid var(--line);
-  border-top:none;
-  border-radius:0 0 16px 16px;
-  overflow:hidden;
-}
-.back-nav-link{
-  flex:1;
-  background:none;
-  border:none;
-  color:var(--muted);
-  font:700 11px "Bebas Neue",sans-serif;
-  letter-spacing:.05em;
-  cursor:pointer;
-  padding:8px 4px;
-  border-bottom:2px solid transparent;
-}
-.back-nav-link.active{
-  color:var(--fg);
-  border-bottom-color:var(--fg);
-}
-
-/* tab content panels */
-.profile-panels{
-  margin-top:12px;
-}
-.tab-panel{display:none;}
-.tab-panel.active{display:block;}
-
 /* stats block looks like card fun-zone */
 .stats-card{
   background:var(--card-bg);
@@ -317,9 +241,6 @@ body.light-theme .stats-card{box-shadow:0 8px 18px rgba(0,0,0,.12);}
   grid-template-columns:repeat(4,1fr);
   gap:8px;
   text-align:center;
-}
-@media (max-width:600px){
-  .stats-grid{grid-template-columns:repeat(3,1fr);}
 }
 .stat-item{
   background:var(--line);
@@ -551,6 +472,70 @@ body.light-theme .card-block{box-shadow:0 8px 18px rgba(0,0,0,.12);}
   position:sticky;
   top:132px; /* adjust to sit under your site header */
   z-index:30;
+}
+
+/* Mobile optimizations */
+@media (max-width: 600px) {
+  .stats-grid {
+    grid-template-columns: repeat(3,1fr);
+  }
+}
+
+@media (max-width: 500px) {
+  .player-header-open {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  .player-photo-wrap {
+    margin-bottom: 8px;
+  }
+  .player-photo-wrap img {
+    width: 90px;
+    height: 126px;
+  }
+  .schoolrow {
+    gap: 8px;
+    padding: 4px var(--containerPad);
+  }
+  .hero-grid {
+    flex-direction: column;
+    gap: 8px;
+  }
+  .hero-left {
+    align-items: center;
+    text-align: center;
+  }
+  .hero-right {
+    justify-content: center;
+  }
+  .player-name {
+    font-size: 20px;
+  }
+  .player-line,
+  .player-extra {
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 400px) {
+  .stats-grid {
+    grid-template-columns: repeat(2,1fr);
+  }
+  .player-photo-wrap img {
+    width: 80px;
+    height: 112px;
+  }
+  .player-tab {
+    padding: 10px 4px;
+    font-size: 10px;
+  }
+  .icon-btn {
+    padding: 6px;
+    min-width: 32px;
+    min-height: 32px;
+  }
+  --containerPad: 8px;
 }
 </style>
 </head>
@@ -1155,6 +1140,7 @@ document.addEventListener('DOMContentLoaded', async ()=>{
       player = data[0];
     }
 
+    window.currentPlayer = player;
     populateTabs(player);
   }catch(err){
     console.error(err);
@@ -1197,7 +1183,7 @@ document.addEventListener('DOMContentLoaded', async ()=>{
 
       // Lazy render non-stats tabs
       if (id === 'news' && $('#tabNews').innerHTML === '') {
-        renderNewsTab(window.currentPlayer); // Assume player is stored globally or pass it
+        renderNewsTab(window.currentPlayer);
       } else if (id === 'social' && $('#tabSocial').innerHTML === '') {
         renderSocialTab(window.currentPlayer);
       } else if (id === 'mentor' && $('#tabMentor').innerHTML === '') {
@@ -1208,9 +1194,7 @@ document.addEventListener('DOMContentLoaded', async ()=>{
     });
   });
 })();
-
-// Store player globally for lazy renders (adjust as needed)
-window.currentPlayer = null; // Set in populateTabs: window.currentPlayer = player;
 </script>
 </body>
 </html>
+```
