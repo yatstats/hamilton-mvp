@@ -2,10 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
-  />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>YAT?STATS • Microsite</title>
 
   <!-- Remix Icon for icons -->
@@ -15,22 +12,15 @@
   />
 
   <!-- Google Fonts -->
-  <link
-    rel="preconnect"
-    href="https://fonts.googleapis.com"
-  />
-  <link
-    rel="preconnect"
-    href="https://fonts.gstatic.com"
-    crossorigin
-  />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
     href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400&family=Bebas+Neue&display=swap"
     rel="stylesheet"
   />
 
-  <!-- Global microsite styles (your existing root styles) -->
-  <link rel="stylesheet" href="/styles.css" />
+  <!-- Global microsite styles (shared CSS) -->
+  <link rel="stylesheet" href="styles.css" />
 </head>
 
 <body>
@@ -44,7 +34,6 @@
         <i class="ri-close-line"></i>
       </button>
       <h3>Site Menu</h3>
-
       <nav>
         <a href="../index.html">WHERE THEY YAT?</a><br />
         <a href="../alumni-news.html">Alumni News</a><br />
@@ -68,7 +57,14 @@
         id="liveSearchInput"
         type="search"
         placeholder="Type a player name…"
-        style="width:100%;padding:8px 10px;border-radius:6px;border:1px solid rgba(255,255,255,0.18);background:#111;color:#f2f2f2;"
+        style="
+          width: 100%;
+          padding: 8px 10px;
+          border-radius: 6px;
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          background: #111;
+          color: #fff;
+        "
       />
       <div id="liveResults"></div>
     </div>
@@ -79,26 +75,14 @@
     <div class="container">
       <!-- TOP BAR -->
       <div class="topbar">
-        <!-- left: hamburger + left nav -->
+        <!-- left: hamburger -->
         <div class="left-icons">
           <button class="icon-btn" id="btnMenu" aria-label="Open main menu">
             <i class="ri-menu-line"></i>
           </button>
-
-          <!-- tiny top-left text nav -->
-          <div class="topnav hide-sm">
-            <div class="nav-pair">
-              <span class="thin" id="navSchoolThin"></span>
-              <span class="bold" id="navProgramBold"></span>
-            </div>
-            <div class="nav-pair">
-              <span class="thin">POWERED BY</span>
-              <span class="bold">YAT?STATS</span>
-            </div>
-          </div>
         </div>
 
-        <!-- right: wordmark + right-side icons -->
+        <!-- right: brand + search -->
         <div class="tagline">
           <div class="tag-duo hide-sm">
             <div class="tag-swap">
@@ -109,9 +93,7 @@
             </div>
           </div>
 
-          <div class="wordmark">
-            YAT?STATS
-          </div>
+          <div class="wordmark">YAT?STATS</div>
 
           <button class="icon-btn" id="btnSearch" aria-label="Open search">
             <i class="ri-search-line"></i>
@@ -132,21 +114,20 @@
           <img
             id="schoolLogo"
             class="school-logo"
-            src="assets/img/placeholder.png"
+            src="../assets/img/schools/default.png"
             alt="School logo"
-            onerror="this.src='assets/img/placeholder.png';"
           />
 
           <div class="schooltext">
             <div id="schoolLocation" class="small"></div>
             <div id="schoolNameLine1" class="big1"></div>
-            <div id="schoolNameLine2" class="big2"></div>
+            <div class="big2">ACTIVE BASEBALL ALUMNI</div>
           </div>
         </div>
 
-        <!-- breadcrumbs / etc (optional) -->
+        <!-- breadcrumbs / etc -->
         <div class="crumbs">
-          <span id="crumbsText">Microsite • Baseball Alumni</span>
+          <span id="crumbsText"></span>
         </div>
       </div>
     </section>
@@ -155,12 +136,12 @@
     <section>
       <div class="container">
         <div class="grid">
-          <!-- Example card – you’ll later bind real player data here -->
+          <!-- CARD 1 -->
           <article class="card">
             <div class="card-inner">
               <div
                 class="bg"
-                style="background-image:url('assets/img/placeholder-player.jpg');"
+                style="background-image:url('../assets/img/placeholder-player.jpg');"
               ></div>
               <div class="shade"></div>
               <div class="cap">
@@ -168,27 +149,32 @@
                 <div class="chips">
                   <span class="chip">SS</span>
                   <span class="chip">D1</span>
-                  <span class="chip">’24</span>
+                  <span class="chip">'24</span>
                 </div>
               </div>
             </div>
           </article>
 
-          <!-- Duplicate card as layout filler -->
+          <!-- CARD 2 -->
           <article class="card">
             <div class="card-inner">
-              <div class="bg"></div>
+              <div
+                class="bg"
+                style="background-image:url('../assets/img/placeholder-player.jpg');"
+              ></div>
               <div class="shade"></div>
               <div class="cap">
                 <div class="name">Another Player</div>
                 <div class="chips">
                   <span class="chip">RHP</span>
                   <span class="chip">JUCO</span>
-                  <span class="chip">’23</span>
+                  <span class="chip">'23</span>
                 </div>
               </div>
             </div>
           </article>
+
+          <!-- you can clone more cards here later -->
         </div>
       </div>
     </section>
@@ -209,54 +195,62 @@
     </div>
   </footer>
 
-  <!-- BASIC JS: "DB" INIT + DRAWERS -->
+  <!-- BASIC JS: SCHOOL INIT + DRAWERS -->
   <script>
     (function () {
-      // 🔥 THIS OBJECT IS OUR "FAKE DB ROW" FOR HAMILTON.
-      // When the real DB is live, replace this with a fetch
-      // that returns the same shape.
+      // NOTE:
+      // Right now this is just a local object.
+      // Later we can replace this with a real API call
+      // that returns the same shape (hsid, hsname, hslocation, logo_url).
       const schoolData = {
-        id: "5004",
-        slug: "hamilton",
-        location: "CHANDLER, AZ",
-        nameLine1: "HAMILTON HIGH SCHOOL",
-        nameLine2: "ACTIVE BASEBALL ALUMNI",
-        navThin: "HAMILTON",
-        navBold: "BASEBALL ALUMNI",
-        tagline1: "WHERE THEY YAT?",
-        tagline2: "ACTIVE ALUMNI \u2022 REAL FANS",
-        logoUrl: "assets/img/hamilton-h.png",
-        logoAlt: "Hamilton H"
+        hsid: 5004,
+        hsname: "Hamilton High School",
+        hslocation: "CHANDLER, AZ",
+        logo_url: null, // let the auto-logo rule handle it
       };
 
       initSchool(schoolData);
       initDrawers();
 
-      // ----- SCHOOL INIT (DB-SHAPED) -----
+      // ----- SCHOOL INIT -----
       function initSchool(school) {
-        setText("schoolLocation", school.location);
-        setText("schoolNameLine1", school.nameLine1);
-        setText("schoolNameLine2", school.nameLine2);
-        setText("navSchoolThin", school.navThin);
-        setText("navProgramBold", school.navBold);
-        setText("taglineLine1", school.tagline1);
-        setText("taglineLine2", school.tagline2);
+        const locEl = document.getElementById("schoolLocation");
+        const nameEl1 = document.getElementById("schoolNameLine1");
+        const logoEl = document.getElementById("schoolLogo");
+        const crumbsEl = document.getElementById("crumbsText");
 
-        const logo = document.getElementById("schoolLogo");
-        if (logo) {
-          if (school.logoUrl) logo.src = school.logoUrl;
-          logo.alt = school.logoAlt || "School logo";
+        if (locEl) {
+          locEl.textContent = (school.hslocation || "").toUpperCase();
         }
 
-        // Page title uses school name
-        if (school.nameLine1) {
-          document.title = "YAT?STATS \u2022 " + school.nameLine1;
+        if (nameEl1) {
+          nameEl1.textContent = (school.hsname || "").toUpperCase();
         }
-      }
 
-      function setText(id, value) {
-        const el = document.getElementById(id);
-        if (el && value != null) el.textContent = value;
+        // crumbs: "HAMILTON BASEBALL ALUMNI"
+        if (crumbsEl && school.hsname) {
+          const shortName = school.hsname.replace(/High School/i, "").trim();
+          const baseName = shortName || school.hsname;
+          crumbsEl.textContent = baseName.toUpperCase() + " BASEBALL ALUMNI";
+        }
+
+        // logo: use DB url if present, else auto path, else default
+        if (logoEl) {
+          const autoLogo = "../assets/img/schools/" + school.hsid + ".png";
+          logoEl.src = school.logo_url || autoLogo;
+          logoEl.alt = school.hsname || "School logo";
+
+          logoEl.onerror = function () {
+            this.onerror = null;
+            this.src = "../assets/img/schools/default.png";
+          };
+        }
+
+        // static global taglines
+        const t1 = document.getElementById("taglineLine1");
+        const t2 = document.getElementById("taglineLine2");
+        if (t1) t1.textContent = "WHERE THEY YAT?";
+        if (t2) t2.textContent = "FLIP FOR STATS!";
       }
 
       // ----- DRAWERS (LEFT NAV + RIGHT SEARCH) -----
@@ -270,21 +264,26 @@
         const btnCloseLeft = document.getElementById("btnCloseLeft");
         const btnCloseRight = document.getElementById("btnCloseRight");
 
-        function openLeft() {
-          body.classList.add("drawer-left-open");
-        }
-        function openRight() {
-          body.classList.add("drawer-right-open");
-        }
         function closeAll() {
           body.classList.remove("drawer-left-open", "drawer-right-open");
         }
 
-        if (btnMenu) btnMenu.addEventListener("click", openLeft);
-        if (btnSearch) btnSearch.addEventListener("click", openRight);
-        if (btnCloseLeft) btnCloseLeft.addEventListener("click", closeAll);
-        if (btnCloseRight) btnCloseRight.addEventListener("click", closeAll);
-        if (mask) mask.addEventListener("click", closeAll);
+        if (btnMenu) {
+          btnMenu.addEventListener("click", function () {
+            body.classList.add("drawer-left-open");
+          });
+        }
+
+        if (btnSearch) {
+          btnSearch.addEventListener("click", function () {
+            body.classList.add("drawer-right-open");
+          });
+        }
+
+        [mask, btnCloseLeft, btnCloseRight].forEach(function (el) {
+          if (!el) return;
+          el.addEventListener("click", closeAll);
+        });
       }
     })();
   </script>
