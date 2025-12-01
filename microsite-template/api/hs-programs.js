@@ -52,7 +52,7 @@ export default async function handler(req, res) {
         drafted_total            AS "Drafted",
 
         microsite_subdomain      AS "Microsite Sub-Domain"
-      FROM hs_baseball_programs
+      FROM microsite_schools
       ${whereClause}
       ORDER BY hsname ASC
       LIMIT 20000;
