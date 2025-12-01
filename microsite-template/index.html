@@ -492,7 +492,9 @@
   <!-- MAIN APP SCRIPT -->
   <script type="module">
     /* ---- YATSTATS • Hamilton • index – build 5.1.x ---- */
-    const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQcWJM6Q6hTdFnES_G5LUy4teCS-sJ5HdAc9F5HSY8DGE9egdGy8yUAe2ShT3tFm-CwUuCYeAYy_YiW/pub?gid=2028135390&output=csv";
+
+    // 🔧 BACKEND CONFIG – CHANGE THIS TO YOUR REAL API BASE (Vercel, etc.)
+    const API_BASE = 'https://api.yatstats.com';
 
     const $ = s => document.querySelector(s);
     const $$ = s => Array.from(document.querySelectorAll(s));
@@ -519,60 +521,58 @@
       if (selectAll) selectAll.checked = false;
     }
 
-    async function loadCSV(url){
-      const res = await fetch(url);
-      if(!res.ok) throw new Error(`HTTP ${res.status}`);
-      const text = await res.text();
-      if(!text.trim()) throw new Error('Empty CSV');
+    // -----------------------------
+    // HSID FROM SUBDOMAIN: 5004.yatstats.com → "5004"
+    // -----------------------------
+    function getHsidFromSubdomain() {
+      const host = window.location.hostname; // e.g. "5004.yatstats.com"
+      const parts = host.split('.');
+      const maybeSub = parts[0];
+      const isNumeric = /^\d+$/.test(maybeSub);
+      const hsid = isNumeric ? maybeSub : null;
 
-      const rows = text.trim()
-        .split(/\r?\n/)
-        .map(line => line.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/).map(c=>c.replace(/^"|"$/g,'')));
+      if (!hsid) {
+        console.error('HSID not found in subdomain. Host =', host);
+      }
 
-      const header = rows.shift().map(h => h.trim());
-      const idx = name => header.indexOf(name);
+      return hsid;
+    }
 
-      const statKeys = ['avg','obp','slg','ops','ab','h','r','rbi','2b','3b','hr','sb','bb','era','k/9','k/bb','whip','ip','er','ko','gp','w-l','saves','fip'];
-
-      return rows.map(r=>{
-        const player = {
-          slug:r[idx('slug')],
-          display_name:r[idx('display_name')],
-          first:r[idx('first')],
-          last:r[idx('last')],
-          grad_class:r[idx('grad_class')],
-          letter_years:r[idx('letter_years')],
-          status:r[idx('status')],
-          level:r[idx('level')],
-          team:r[idx('team')],
-          org:r[idx('org')],
-          position:r[idx('position')],
-          height:r[idx('height')],
-          weight:r[idx('weight')],
-          bats:r[idx('bats')],
-          throws:r[idx('throws')],
-          draft_info:r[idx('Draft_Info')] ?? r[idx('draft_info')],
-          colleges:r[idx('Colleges')] ?? r[idx('colleges')],
-          next_game_date: r[idx('next_game_date')],
-          next_game_time: r[idx('next_game_time')],
-          next_game_opponent: r[idx('next_game_opponent')],
-          next_game_datetime: r[idx('next_game_datetime')],
-          last_game_1:r[idx('last_game_1')],
-          last_game_2:r[idx('last_game_2')],
-          last_game_3:r[idx('last_game_3')],
-          x_handle:r[idx('x_handle')],
-          ig_handle:r[idx('ig_handle')],
-          video_url:r[idx('video_url')],
-          nil_score:r[idx('nil_score')],
-          stats:{}
-        };
-
-        for(const key of statKeys){
-          const sIdx = idx(key);
-          if (sIdx > -1 && r[sIdx]) player.stats[key.toUpperCase()] = r[sIdx];
-        }
-        return player;
+    // -----------------------------
+    // GENERIC JSON FETCH HELPER
+    // -----------------------------
+    async function fetchJSON(url) {
+      const res = await fetch(url, {
+        headers: { 'Accept': 'application/json' }
       });
+      if (!res.ok) {
+        throw new Error(`HTTP ${res.status} ${res.statusText} for ${url}`);
+      }
+      return res.json();
+    }
+
+    // -----------------------------
+    // LOAD PLAYERS FROM API (Neon-backed)
+    // Expected server response:
+    //   Either [ { ...playerFields } ]  OR  { players: [ ... ] }
+    // with the same field names used below (display_name, first, last, etc.)
+    // -----------------------------
+    async function loadPlayers(hsid) {
+      if (!hsid) {
+        throw new Error('Cannot load players without HSID');
+      }
+
+      const url = `${API_BASE}/api/microsites/${hsid}/players`;
+      const data = await fetchJSON(url);
+
+      if (Array.isArray(data)) {
+        return data;
+      }
+      if (data && Array.isArray(data.players)) {
+        return data.players;
+      }
+
+      throw new Error('Invalid players payload from API (expected array or { players: [] })');
     }
 
     function slugOf(p){
@@ -1155,7 +1155,12 @@
           setupEventListeners();
           setupAuth();
 
-          const data = await loadCSV(CSV_URL);
+          const hsid = getHsidFromSubdomain();
+          if (!hsid) {
+            throw new Error('HSID missing from subdomain (expected something like 5004.yatstats.com)');
+          }
+
+          const data = await loadPlayers(hsid);
           window.PLAYERS = data;
 
           populateFilters(data);
