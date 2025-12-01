@@ -193,20 +193,22 @@
         loadingEl.classList.remove("hidden");
         resultsWrap.classList.remove("hidden");
 
-        const res = await fetch(SHEET_URL, { cache: "no-store" });
+        // NEW: hit our Vercel API instead of Google Sheets
+        const res = await fetch("/api/hs-programs", { cache: "no-store" });
         if (!res.ok) throw new Error("HTTP " + res.status);
         rows = await res.json();
 
         if (rows.length) {
           const headers = Object.keys(rows[0]);
-          URL_HEADER_KEY = URL_HEADER_CANDIDATES.find(h => headers.includes(h)) || null;
+          URL_HEADER_KEY =
+            URL_HEADER_CANDIDATES.find(h => headers.includes(h)) || null;
           console.log("CTA header:", URL_HEADER_KEY);
         }
         feedbackEl.classList.add("hidden");
       } catch (e) {
         console.error(e);
         feedbackEl.textContent =
-          "Couldn’t load the HS directory. Check the OpenSheet URL or tab name.";
+          "Couldn’t load the HS directory. Check the /api/hs-programs endpoint.";
         feedbackEl.classList.remove("hidden");
       } finally {
         loadingEl.classList.add("hidden");
