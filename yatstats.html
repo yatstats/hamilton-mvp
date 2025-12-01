@@ -147,16 +147,20 @@
     }
 
     function getLogoPath(row) {
-      const st = deriveStateAbbr(row).toLowerCase();
-      let slug = slugify(row["hsname"]);
-      // clean extra words at the end
-      slug = slug
-        .replace(/-high-school$/,"")
-        .replace(/-highschool$/,"")
-        .replace(/[_\.\-\s]+$/,"");
-      if (!st || !slug) return LOGO_FALLBACK;
-      return `${LOGO_BASE}/${slug}.${st}.png`;   // e.g. hamilton.az.png
-    }
+  // Try common field names for the HS ID
+  const rawId =
+    row["hsid"] ||
+    row["HSID"] ||
+    row["hs_id"];
+
+  const hsid = (rawId || "").toString().trim();
+
+  // If we don't have an ID, fall back to the default logo
+  if (!hsid) return LOGO_FALLBACK;
+
+  // New naming convention: <hsid>.png  (e.g. 5004.png)
+  return `${LOGO_BASE}/${hsid}.png`;
+}
 
     // read CTA text + clickable URL (if any) from the sheet
     function getCtaData(row) {
