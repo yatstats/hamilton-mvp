@@ -1,49 +1,74 @@
 // api/hs-programs.js
-// HS search API using your Neon/Postgres data
+// Uses Neon serverless client (no "pg" dependency needed)
 
-import { Pool } from "pg";
+import { Pool } from "@neondatabase/serverless";
 
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL, // same as players API
+  connectionString: process.env.NEON_DATABASE_URL,
 });
 
+/**
+ * Return HS baseball programs in the exact shape
+ * the front-end expects.
+ *
+ * Data source: public.tbc_schools_raw
+ */
 export default async function handler(req, res) {
   try {
-    const client = await pool.connect();
+    const { q, state } = req.query || {};
 
-    try {
-      // For now: pull basic school info from tbc_schools_raw.
-      // We alias columns so the JSON keys match what your
-      // front-end code already expects.
-      const { rows } = await client.query(`
-        SELECT
-          hsid,
-          hsname,
-          hslocation AS city,      -- e.g. "Chandler, AZ"
-          state_name AS regionname,
+    const values = [];
+    const where = [];
 
-          -- TEMPORARY placeholders until hs_programs_stats is populated
-          0 AS "YAT?STATS NATIONAL RANK",
-          0 AS "YAT?STATS STATE RANK",
-          0 AS "Current Active Alumni",
-          0 AS "MLB Players Produced",
-          0 AS "All-Time Next Level Alumni",
-          0 AS "Drafted out of High School",
-          0 AS "Drafted",
-
-          -- TEMPORARY CTA target: your main funnel / homepage
-          'https://yatstats.com' AS "Microsite Sub-Domain"
-        FROM tbc_schools_raw
-        LIMIT 20000;
-      `);
-
-      res.setHeader("Access-Control-Allow-Origin", "*");
-      res.status(200).json(rows);
-    } finally {
-      client.release();
+    // Text search on hsname or cityname
+    if (q) {
+      values.push(`%${q.toLowerCase()}%`);
+      where.push(
+        `(LOWER(hsname) LIKE $${values.length} OR LOWER(cityname) LIKE $${values.length})`
+      );
     }
+
+    // Optional state filter (2-letter abbreviation)
+    if (state) {
+      values.push(state.toUpperCase());
+      where.push(`state_abbrev = $${values.length}`);
+    }
+
+    const whereClause = where.length ? `WHERE ${where.join(" AND ")}` : "";
+
+    const sql = `
+      SELECT
+        -- real columns from tbc_schools_raw
+        hsid,
+        hsname,
+        cityname            AS city,
+        state_name          AS regionname,
+        state_abbrev        AS state_abbr,
+
+        -- placeholder stats until hs_programs_stats is populated
+        0::int              AS "YAT?STATS NATIONAL RANK",
+        0::int              AS "YAT?STATS STATE RANK",
+        0::int              AS "Current Active Alumni",
+        0::int              AS "MLB Players Produced",
+        0::int              AS "All-Time Next Level Alumni",
+        0::int              AS "Drafted out of High School",
+        0::int              AS "Drafted",
+
+        -- button text / URL column used by the search UI
+        ('https://' || hsid || '.yatstats.com')
+                            AS "Microsite Sub-Domain"
+      FROM tbc_schools_raw
+      ${whereClause}
+      ORDER BY hsname ASC
+      LIMIT 20000;
+    `;
+
+    const result = await pool.query(sql, values);
+
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.status(200).json(result.rows);
   } catch (err) {
-    console.error("hs-programs API error:", err);
+    console.error("Error in /api/hs-programs:", err);
     res.status(500).json({ error: "Failed to load HS programs." });
   }
 }
