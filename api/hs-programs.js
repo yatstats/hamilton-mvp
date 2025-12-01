@@ -1,71 +1,74 @@
 // microsite-template/api/hs-programs.js
-// HS search API – uses tbc_schools_raw + hs_programs_stats
+// Uses real data from tbc_schools_raw and hs_programs_stats in Neon.
+// No hard-coded fake stats; missing stats stay NULL.
 
 import { Pool } from "@neondatabase/serverless";
 
 const pool = new Pool({
-  connectionString: process.env.NEON_DATABASE_URL,
+  connectionString: process.env.NEON_DATABASE_URL, // set in Vercel env vars
 });
 
 export default async function handler(req, res) {
   try {
     const { q, state } = req.query || {};
-    const values = [];
-    const whereParts = [];
 
-    // Text search across hsname, cityname, state_name
+    const values = [];
+    const where = [];
+
+    // Text search on hsname or cityname
     if (q) {
       values.push(`%${q.toLowerCase()}%`);
-      const idx = values.length;
-      whereParts.push(
-        `(LOWER(s.hsname) LIKE $${idx} OR LOWER(s.cityname) LIKE $${idx} OR LOWER(s.state_name) LIKE $${idx})`
+      where.push(
+        `(LOWER(s.hsname) LIKE $${values.length} OR LOWER(s.cityname) LIKE $${values.length})`
       );
     }
 
-    // State filter (two-letter abbrev coming from the dropdown)
+    // Optional state filter (expects e.g. "AZ", "CA")
     if (state) {
       values.push(state.toUpperCase());
-      const idx = values.length;
-      whereParts.push(`s.state_abbrev = $${idx}`);
+      where.push(`s.state_abbrev = $${values.length}`);
     }
 
-    const whereClause = whereParts.length
-      ? `WHERE ${whereParts.join(" AND ")}`
-      : "";
+    const whereClause = where.length ? `WHERE ${where.join(" AND ")}` : "";
 
     const sql = `
       SELECT
+        -- real columns from tbc_schools_raw
         s.hsid,
         s.hsname,
-        s.hslocation       AS city,        -- e.g. "CHANDLER, AZ"
-        s.state_name       AS regionname,  -- full state name
+        s.cityname,
+        s.state_abbrev,
+        s.state_name,
 
-        -- Stats (can be NULL for now; we COALESCE to 0 where it makes sense)
-        COALESCE(st.overall_rank, NULL)         AS "YAT?STATS NATIONAL RANK",
-        NULL::integer                           AS "YAT?STATS STATE RANK",  -- placeholder for future
+        -- shape them into what the front-end expects
+        CONCAT(s.cityname, ', ', s.state_abbrev) AS city,
+        s.state_name AS regionname,
 
-        COALESCE(st.active_players_2024_25, 0)  AS "Current Active Alumni",
-        COALESCE(st.major_leaguers, 0)         AS "MLB Players Produced",
-        COALESCE(st.alumni_listed, 0)          AS "All-Time Next Level Alumni",
-        COALESCE(st.drafted_from_school, 0)    AS "Drafted out of High School",
-        COALESCE(st.total_draft_picks, 0)      AS "Drafted",
+        -- real stats from hs_programs_stats (when present)
+        p.overall_rank              AS "YAT?STATS NATIONAL RANK",
+        NULL::int                   AS "YAT?STATS STATE RANK", -- we don't have this yet
+        p.active_players_2024_25    AS "Current Active Alumni",
+        p.major_leaguers            AS "MLB Players Produced",
+        p.alumni_listed             AS "All-Time Next Level Alumni",
+        p.drafted_from_school       AS "Drafted out of High School",
+        p.total_draft_picks         AS "Drafted",
 
-        -- For now, just use hsid-based microsite subdomain
-        (s.hsid::text || '.yatstats.com')      AS "Microsite Sub-Domain"
+        -- microsite URL / CTA column (hooked up later)
+        NULL::text                  AS "Microsite Sub-Domain"
       FROM tbc_schools_raw s
-      LEFT JOIN hs_programs_stats st
-        ON st.hsid = s.hsid
+      LEFT JOIN hs_programs_stats p
+        ON p.hsid = s.hsid
       ${whereClause}
       ORDER BY s.hsname ASC
-      LIMIT 20000;
+      LIMIT 500;
     `;
 
-    const result = await pool.query(sql, values);
+    const { rows } = await pool.query(sql, values);
 
     res.setHeader("Access-Control-Allow-Origin", "*");
-    res.status(200).json(result.rows);
+    res.status(200).json(rows);
   } catch (err) {
-    console.error("Error querying Neon (hs-programs):", err);
+    console.error("hs-programs API error:", err);
     res.status(500).json({ error: "Failed to load HS programs." });
   }
 }
