@@ -1,22 +1,33 @@
 // api/hs-programs.js
-// HS directory API backed by Neon (Postgres) using the `tbc_schools_raw` table.
+// HS directory API backed by Neon (Postgres) using tbc_schools_raw.
 
 import { Pool } from "@neondatabase/serverless";
 
-const pool = new Pool({
-  connectionString: process.env.NEON_DATABASE_URL, // set in Vercel → Settings → Environment Variables
-});
+let pool; // lazily initialized so we can handle missing env vars cleanly
 
-/**
- * Return HS baseball programs in the shape your front-end expects.
- *
- * We’re using:
- *   - tbc_schools_raw as the base (17k+ rows)
- *   - Placeholder 0’s for the “success stats” until hs_programs_stats is wired in
- */
 export default async function handler(req, res) {
   try {
-    // Allow CORS from anywhere for now
+    // ---- DB CONNECTION STRING ----
+    const connectionString =
+      process.env.NEON_DATABASE_URL ||
+      process.env.DATABASE_URL ||
+      process.env.POSTGRES_URL;
+
+    if (!connectionString) {
+      console.error(
+        "🛑 No DB connection string. Set NEON_DATABASE_URL (or DATABASE_URL / POSTGRES_URL) in Vercel."
+      );
+      res
+        .status(500)
+        .json({ error: "DB connection string missing on server." });
+      return;
+    }
+
+    if (!pool) {
+      pool = new Pool({ connectionString });
+    }
+
+    // CORS – OK to be open for now
     res.setHeader("Access-Control-Allow-Origin", "*");
 
     const { q, state } = req.query || {};
@@ -24,7 +35,7 @@ export default async function handler(req, res) {
     const values = [];
     const where = [];
 
-    // Text search across school name + city
+    // Text search on school name + city
     if (q) {
       values.push(`%${q.toLowerCase()}%`);
       where.push(
@@ -32,7 +43,7 @@ export default async function handler(req, res) {
       );
     }
 
-    // State filter (2-letter abbreviation)
+    // 2-letter state filter
     if (state) {
       values.push(state.toUpperCase());
       where.push(`s.state_abbrev = $${values.length}`);
@@ -42,13 +53,13 @@ export default async function handler(req, res) {
 
     const sql = `
       SELECT
-        s.hsid,                         -- numeric/string ID
-        s.hsname,                       -- school name
-        s.cityname      AS city,        -- city
-        s.state_name    AS regionname,  -- use state name as "region"
+        s.hsid,                        -- HS ID
+        s.hsname,                      -- school name
+        s.cityname      AS city,       -- city
+        s.state_name    AS regionname, -- state name
         s.state_abbrev  AS state_abbr,
 
-        -- temporary placeholder stats until hs_programs_stats is wired
+        -- TEMP placeholder stats until hs_programs_stats is wired:
         0 AS "YAT?STATS NATIONAL RANK",
         0 AS "YAT?STATS STATE RANK",
         0 AS "Current Active Alumni",
@@ -68,9 +79,10 @@ export default async function handler(req, res) {
 
     res.status(200).json(result.rows);
   } catch (err) {
-    console.error("Error querying Neon in hs-programs:", err);
-    res
-      .status(500)
-      .json({ error: "Failed to load HS programs from database." });
+    console.error("🔥 Error in /api/hs-programs handler:", err);
+    res.status(500).json({
+      error: "Server error while loading HS programs.",
+      message: err.message,
+    });
   }
 }
