@@ -1,74 +1,76 @@
 // api/hs-programs.js
-// Uses Neon serverless client (no "pg" dependency needed)
+// HS directory API backed by Neon (Postgres) using the `tbc_schools_raw` table.
 
 import { Pool } from "@neondatabase/serverless";
 
 const pool = new Pool({
-  connectionString: process.env.NEON_DATABASE_URL,
+  connectionString: process.env.NEON_DATABASE_URL, // set in Vercel → Settings → Environment Variables
 });
 
 /**
- * Return HS baseball programs in the exact shape
- * the front-end expects.
+ * Return HS baseball programs in the shape your front-end expects.
  *
- * Data source: public.tbc_schools_raw
+ * We’re using:
+ *   - tbc_schools_raw as the base (17k+ rows)
+ *   - Placeholder 0’s for the “success stats” until hs_programs_stats is wired in
  */
 export default async function handler(req, res) {
   try {
+    // Allow CORS from anywhere for now
+    res.setHeader("Access-Control-Allow-Origin", "*");
+
     const { q, state } = req.query || {};
 
     const values = [];
     const where = [];
 
-    // Text search on hsname or cityname
+    // Text search across school name + city
     if (q) {
       values.push(`%${q.toLowerCase()}%`);
       where.push(
-        `(LOWER(hsname) LIKE $${values.length} OR LOWER(cityname) LIKE $${values.length})`
+        `(LOWER(s.hsname) LIKE $${values.length} OR LOWER(s.cityname) LIKE $${values.length})`
       );
     }
 
-    // Optional state filter (2-letter abbreviation)
+    // State filter (2-letter abbreviation)
     if (state) {
       values.push(state.toUpperCase());
-      where.push(`state_abbrev = $${values.length}`);
+      where.push(`s.state_abbrev = $${values.length}`);
     }
 
     const whereClause = where.length ? `WHERE ${where.join(" AND ")}` : "";
 
     const sql = `
       SELECT
-        -- real columns from tbc_schools_raw
-        hsid,
-        hsname,
-        cityname            AS city,
-        state_name          AS regionname,
-        state_abbrev        AS state_abbr,
+        s.hsid,                         -- numeric/string ID
+        s.hsname,                       -- school name
+        s.cityname      AS city,        -- city
+        s.state_name    AS regionname,  -- use state name as "region"
+        s.state_abbrev  AS state_abbr,
 
-        -- placeholder stats until hs_programs_stats is populated
-        0::int              AS "YAT?STATS NATIONAL RANK",
-        0::int              AS "YAT?STATS STATE RANK",
-        0::int              AS "Current Active Alumni",
-        0::int              AS "MLB Players Produced",
-        0::int              AS "All-Time Next Level Alumni",
-        0::int              AS "Drafted out of High School",
-        0::int              AS "Drafted",
+        -- temporary placeholder stats until hs_programs_stats is wired
+        0 AS "YAT?STATS NATIONAL RANK",
+        0 AS "YAT?STATS STATE RANK",
+        0 AS "Current Active Alumni",
+        0 AS "MLB Players Produced",
+        0 AS "All-Time Next Level Alumni",
+        0 AS "Drafted out of High School",
+        0 AS "Drafted",
 
-        -- button text / URL column used by the search UI
-        ('https://' || hsid || '.yatstats.com')
-                            AS "Microsite Sub-Domain"
-      FROM tbc_schools_raw
+        NULL AS "Microsite Sub-Domain"
+      FROM tbc_schools_raw s
       ${whereClause}
-      ORDER BY hsname ASC
+      ORDER BY s.hsname ASC
       LIMIT 20000;
     `;
 
     const result = await pool.query(sql, values);
 
-    res.setHeader("Access-Control-Allow-Origin", "*");
     res.status(200).json(result.rows);
   } catch (err) {
-    console.error("Error in /api/hs-programs:", err);
-    res.status(500).json({ error: "Failed to load HS programs." });
+    console.error("Error querying Neon in hs-programs:", err);
+    res
+      .status(500)
+      .json({ error: "Failed to load HS programs from database." });
   }
 }
