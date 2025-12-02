@@ -1,9 +1,9 @@
-// api/hs-programs.js
+/// api/hs-programs.js
 // HS directory API backed by Neon (Postgres) using tbc_schools_raw.
 
 import { Pool } from "@neondatabase/serverless";
 
-let pool; // lazily initialized so we can handle missing env vars cleanly
+let pool; // lazily initialized
 
 export default async function handler(req, res) {
   try {
@@ -14,12 +14,10 @@ export default async function handler(req, res) {
       process.env.POSTGRES_URL;
 
     if (!connectionString) {
-      console.error(
-        "🛑 No DB connection string. Set NEON_DATABASE_URL (or DATABASE_URL / POSTGRES_URL) in Vercel."
-      );
-      res
-        .status(500)
-        .json({ error: "DB connection string missing on server." });
+      console.error("❌ No Postgres connection string found in env vars.");
+      res.status(500).json({
+        error: "Missing database connection string.",
+      });
       return;
     }
 
@@ -27,56 +25,46 @@ export default async function handler(req, res) {
       pool = new Pool({ connectionString });
     }
 
-    // CORS – OK to be open for now
-    res.setHeader("Access-Control-Allow-Origin", "*");
-
-    const { q, state } = req.query || {};
-
-    const values = [];
-    const where = [];
-
-    // Text search on school name + city
-    if (q) {
-      values.push(`%${q.toLowerCase()}%`);
-      where.push(
-        `(LOWER(s.hsname) LIKE $${values.length} OR LOWER(s.cityname) LIKE $${values.length})`
-      );
-    }
-
-    // 2-letter state filter
-    if (state) {
-      values.push(state.toUpperCase());
-      where.push(`s.state_abbrev = $${values.length}`);
-    }
-
-    const whereClause = where.length ? `WHERE ${where.join(" AND ")}` : "";
+    // For now, we keep it VERY simple:
+    //  - One table: tbc_schools_raw
+    //  - Only columns we KNOW exist there
+    //  - Fake the stat fields as NULL so the UI shows "-"
+    //
+    // You told me tbc_schools_raw has (or will have) columns like:
+    //   hsid, hsname, cityname, regionname, nickname, color1, color2, color3
+    //
+    // We alias things so your front-end can keep using its existing keys.
 
     const sql = `
       SELECT
-        s.hsid,                        -- HS ID
-        s.hsname,                      -- school name
-        s.cityname      AS city,       -- city
-        s.state_name    AS regionname, -- state name
-        s.state_abbrev  AS state_abbr,
+        s.hsid,
+        s.hsname,
+        s.cityname       AS city,
+        s.regionname     AS regionname,
+        s.nickname       AS nickname,
+        s.color1,
+        s.color2,
+        s.color3,
 
-        -- TEMP placeholder stats until hs_programs_stats is wired:
-        0 AS "YAT?STATS NATIONAL RANK",
-        0 AS "YAT?STATS STATE RANK",
-        0 AS "Current Active Alumni",
-        0 AS "MLB Players Produced",
-        0 AS "All-Time Next Level Alumni",
-        0 AS "Drafted out of High School",
-        0 AS "Drafted",
+        -- placeholder stats so the UI doesn't explode
+        NULL::integer    AS "YAT?STATS NATIONAL RANK",
+        NULL::integer    AS "YAT?STATS STATE RANK",
+        NULL::integer    AS "Current Active Alumni",
+        NULL::integer    AS "MLB Players Produced",
+        NULL::integer    AS "All-Time Next Level Alumni",
+        NULL::integer    AS "Drafted out of High School",
+        NULL::integer    AS "Drafted",
 
-        NULL AS "Microsite Sub-Domain"
+        NULL::text       AS "Microsite Sub-Domain"
       FROM tbc_schools_raw s
-      ${whereClause}
       ORDER BY s.hsname ASC
       LIMIT 20000;
     `;
 
-    const result = await pool.query(sql, values);
+    const result = await pool.query(sql);
 
+    // Allow the front-end to fetch this from your page
+    res.setHeader("Access-Control-Allow-Origin", "*");
     res.status(200).json(result.rows);
   } catch (err) {
     console.error("🔥 Error in /api/hs-programs handler:", err);
