@@ -16,15 +16,15 @@
   <style>
     * {
       font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto,
-        "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+      "Helvetica Neue", Arial, "Noto Sans", sans-serif;
     }
 
     /* small header lines (city/state + ACTIVE BASEBALL ALUMNI) */
     .banner-small {
       font-family: Inter, system-ui, sans-serif;
-      letter-spacing: 0.18em;         /* a little tight so it fits one line */
+      letter-spacing: 0.18em;
       text-transform: uppercase;
-      white-space: nowrap;            /* no wrapping to 2nd/3rd line */
+      white-space: nowrap;
     }
 
     /* big school name */
@@ -44,230 +44,152 @@
 </head>
 <body class="bg-black text-white">
 
-  <!-- Search Section -->
-  <section id="search-section" class="py-14">
-    <div class="max-w-5xl mx-auto px-6 text-center">
-      <h2 class="text-3xl md:text-4xl font-extrabold mb-3">
-        SEARCH 17,000+<br>HS BASEBALL PROGRAMS
-      </h2>
+<!-- Search Section -->
+<section id="search-section" class="py-14">
+  <div class="max-w-5xl mx-auto px-6 text-center">
+    <h2 class="text-3xl md:text-4xl font-extrabold mb-3">
+      SEARCH 17,000+<br>HS BASEBALL PROGRAMS
+    </h2>
 
-      <!-- Controls -->
-      <div class="max-w-3xl mx-auto grid sm:grid-cols-3 gap-3 mt-6">
-        <input id="school-search-input"
-               class="w-full bg-neutral-900 border border-neutral-700 text-white placeholder-neutral-500 text-base md:text-lg rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-neutral-300"
-               placeholder="E.g., YOUR LOCAL SCHOOL" />
-        <select id="state-filter"
-                class="w-full bg-neutral-900 border border-neutral-700 text-white text-base md:text-lg rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-neutral-300">
-          <option value="">All States</option>
-        </select>
-        <button id="search-button"
-                class="bg-neutral-100 text-black font-semibold py-3 px-6 rounded-md text-base md:text-lg hover:bg-white transition">
-          Search
-        </button>
-      </div>
-
-      <!-- Results -->
-      <div id="results-container" class="mt-8 max-w-5xl mx-auto text-left hidden">
-        <div id="loading" class="py-10 text-center hidden">
-          <div class="animate-spin inline-block h-8 w-8 border-4 border-neutral-600 border-t-transparent rounded-full"></div>
-          <p class="text-gray-400 mt-4">Loading…</p>
-        </div>
-
-        <div id="results-content"></div>
-        <div id="pagination" class="flex flex-wrap justify-center gap-2 mt-8"></div>
-      </div>
-
-      <p id="feedback" class="text-gray-400 mt-6 hidden"></p>
+    <!-- Controls -->
+    <div class="max-w-3xl mx-auto grid sm:grid-cols-3 gap-3 mt-6">
+      <input id="school-search-input"
+             class="w-full bg-neutral-900 border border-neutral-700 text-white placeholder-neutral-500 text-base md:text-lg rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-neutral-300"
+             placeholder="E.g., YOUR LOCAL SCHOOL" />
+      <select id="state-filter"
+              class="w-full bg-neutral-900 border border-neutral-700 text-white text-base md:text-lg rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-neutral-300">
+        <option value="">All States</option>
+      </select>
+      <button id="search-button"
+              class="bg-neutral-100 text-black font-semibold py-3 px-6 rounded-md text-base md:text-lg hover:bg-white transition">
+        Search
+      </button>
     </div>
-  </section>
 
-  <script>
+    <!-- Results -->
+    <div id="results-container" class="mt-8 max-w-5xl mx-auto text-left hidden">
+      <div id="loading" class="py-10 text-center hidden">
+        <div class="animate-spin inline-block h-8 w-8 border-4 border-neutral-600 border-t-transparent rounded-full"></div>
+        <p class="text-gray-400 mt-4">Loading…</p>
+      </div>
 
-    /* Where logos live on GitHub Pages */
-    const LOGO_BASE =
-      "https://yatstats.github.io/hamilton-mvp/assets/img/schools";
-    const LOGO_FALLBACK = LOGO_BASE + "/default.png";
+      <div id="results-content"></div>
 
-    /* state maps */
-    const STATE_ABBR_TO_NAME = {
-      AL:"Alabama", AK:"Alaska", AZ:"Arizona", AR:"Arkansas", CA:"California", CO:"Colorado",
-      CT:"Connecticut", DE:"Delaware", FL:"Florida", GA:"Georgia", HI:"Hawaii", ID:"Idaho",
-      IL:"Illinois", IN:"Indiana", IA:"Iowa", KS:"Kansas", KY:"Kentucky", LA:"Louisiana",
-      ME:"Maine", MD:"Maryland", MA:"Massachusetts", MI:"Michigan", MN:"Minnesota",
-      MS:"Mississippi", MO:"Missouri", MT:"Montana", NE:"Nebraska", NV:"Nevada",
-      NH:"New Hampshire", NJ:"New Jersey", NM:"New Mexico", NY:"New York",
-      NC:"North Carolina", ND:"North Dakota", OH:"Ohio", OK:"Oklahoma", OR:"Oregon",
-      PA:"Pennsylvania", RI:"Rhode Island", SC:"South Carolina", SD:"South Dakota",
-      TN:"Tennessee", TX:"Texas", UT:"Utah", VT:"Vermont", VA:"Virginia",
-      WA:"Washington", WV:"West Virginia", WI:"Wisconsin", WY:"Wyoming", DC:"District of Columbia"
-    };
-    const STATE_NAME_TO_ABBR = Object.fromEntries(
-      Object.entries(STATE_ABBR_TO_NAME).map(([abbr, name]) => [name.toLowerCase(), abbr])
-    );
+      <div id="pagination" class="flex items-center justify-center gap-4 mt-8 text-sm"></div>
+    </div>
 
-    /* headers we care about */
-    const KEY_NATIONAL_RANK = "YAT?STATS NATIONAL RANK";
-    const KEY_STATE_RANK    = "YAT?STATS STATE RANK";
-    const URL_HEADER_CANDIDATES = ["Microsite Sub-Domain", "Full URL", "website URL", "Website URL", "URL"];
-    let URL_HEADER_KEY = null;
+    <p id="feedback" class="text-gray-400 mt-6 hidden"></p>
+  </div>
+</section>
 
-    /* state */
-    let rows = [];
-    let filtered = [];
-    let currentPage = 1;
-    const RESULTS_PER_PAGE = 6;
+<script>
+  /* Where logos live */
+  const LOGO_BASE =
+    "https://yatstats.github.io/hamilton-mvp/assets/img/schools";
+  const LOGO_FALLBACK = LOGO_BASE + "/default.png";
 
-    /* utils */
-    const norm    = (s) => (s || "").toString().trim().toLowerCase();
-    const slugify = (s) => norm(s).replace(/[^a-z0-9]/g, "-");
+  /* State list for dropdown */
+  const STATE_ABBR_TO_NAME = {
+    AL:"Alabama", AK:"Alaska", AZ:"Arizona", AR:"Arkansas", CA:"California", CO:"Colorado",
+    CT:"Connecticut", DE:"Delaware", FL:"Florida", GA:"Georgia", HI:"Hawaii", ID:"Idaho",
+    IL:"Illinois", IN:"Indiana", IA:"Iowa", KS:"Kansas", KY:"Kentucky", LA:"Louisiana",
+    ME:"Maine", MD:"Maryland", MA:"Massachusetts", MI:"Michigan", MN:"Minnesota",
+    MS:"Mississippi", MO:"Missouri", MT:"Montana", NE:"Nebraska", NV:"Nevada",
+    NH:"New Hampshire", NJ:"New Jersey", NM:"New Mexico", NY:"New York",
+    NC:"North Carolina", ND:"North Dakota", OH:"Ohio", OK:"Oklahoma", OR:"Oregon",
+    PA:"Pennsylvania", RI:"Rhode Island", SC:"South Carolina", SD:"South Dakota",
+    TN:"Tennessee", TX:"Texas", UT:"Utah", VT:"Vermont", VA:"Virginia",
+    WA:"Washington", WV:"West Virginia", WI:"Wisconsin", WY:"Wyoming", DC:"District of Columbia"
+  };
 
-    function parseCityState(val) {
-      const txt = (val || "").toString();
-      if (!txt.includes(",")) return { city: txt.trim(), st: "" };
-      const [c, st] = txt.split(",");
-      return { city: c.trim(), st: st.trim().toUpperCase() };
+  function fillStateDropdown() {
+    const stateEl = document.getElementById("state-filter");
+    const frag = document.createDocumentFragment();
+    Object.keys(STATE_ABBR_TO_NAME).sort().forEach(abbr => {
+      const opt = document.createElement("option");
+      opt.value = abbr;                // send 2-letter code to API
+      opt.textContent = STATE_ABBR_TO_NAME[abbr];
+      frag.appendChild(opt);
+    });
+    stateEl.appendChild(frag);
+  }
+
+  /* Global search state */
+  let lastQuery = "";
+  let lastState = "";
+  let currentPage = 1;
+  let totalPages = 1;
+
+  const loadingEl   = document.getElementById("loading");
+  const feedbackEl  = document.getElementById("feedback");
+  const resultsWrap = document.getElementById("results-container");
+  const resultsEl   = document.getElementById("results-content");
+  const paginationEl= document.getElementById("pagination");
+
+  function scrollToResultsTop() {
+    resultsWrap.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  function getLogoPath(program) {
+    const id = program.hsid || program.logoHsid;
+    if (!id) return LOGO_FALLBACK;
+    return `${LOGO_BASE}/${id}.png`;
+  }
+
+  function buildCta(program) {
+    // result is one object from programs[]
+    const url = program.micrositeUrl || program.stagingUrl || null;
+    const ctaText = url
+      ? `CLICK TO ENTER THE YAT?STATS GLOBAL NETWORK THROUGH > ${url}`
+      : "MICROSITE COMING SOON – STATS PREVIEW ONLY";
+
+    if (url) {
+      return `
+        <a href="${url}" target="_blank" rel="noopener"
+           class="w-full py-3 rounded-md font-semibold border border-neutral-600 bg-neutral-100 text-black hover:bg-white block text-[0.7rem] sm:text-xs md:text-sm break-words text-center">
+          ${ctaText}
+        </a>
+      `;
+    } else {
+      return `
+        <button
+           class="w-full py-3 rounded-md font-semibold border border-neutral-600 bg-neutral-800 text-neutral-300 text-[0.7rem] sm:text-xs md:text-sm break-words cursor-default">
+          ${ctaText}
+        </button>
+      `;
+    }
+  }
+
+  function renderResults(programs) {
+    resultsEl.innerHTML = "";
+
+    if (!programs.length) {
+      resultsEl.innerHTML =
+        `<p class="text-gray-400 text-center py-8">No matches found.</p>`;
+      return;
     }
 
-    function deriveStateAbbr(row) {
-      const regionRaw = (row["regionname"] || "").toString().trim();
-      if (regionRaw) {
-        const lc = regionRaw.toLowerCase();
-        if (STATE_NAME_TO_ABBR[lc]) return STATE_NAME_TO_ABBR[lc];
-        if (regionRaw.length === 2) return regionRaw.toUpperCase();
-      }
-      const fromCity = parseCityState(row["city"]);
-      if (fromCity.st) return fromCity.st;
-      return "";
-    }
+    programs.forEach(program => {
+      const logo = getLogoPath(program);
 
-    function getCityOnly(row) {
-      const raw = (row["city"] || "").toString();
-      if (!raw.includes(",")) return raw.trim();
-      return parseCityState(raw).city;
-    }
+      const city    = (program.city || "").toString();
+      const state   = (program.state || "").toString().toUpperCase();
+      const cityLine = [city, state].filter(Boolean).join(", ").toUpperCase();
 
-    function getLogoPath(row) {
-  const id = row["hsid"];
-  if (!id) return LOGO_FALLBACK;
-  return `${LOGO_BASE}/${id}.png`;
-}
+      // Try both camelCase + snake_case / legacy names so we don't break if backend differs a bit
+      const natRank   = program.nationalRank || program.yatstats_national_rank || "-";
+      const stateRank = program.stateRank    || program.yatstats_state_rank    || "-";
 
-    // read CTA text + clickable URL (if any) from the sheet
-    function getCtaData(row) {
-      if (!URL_HEADER_KEY) return { text: "", href: null };
-      const raw = (row[URL_HEADER_KEY] || "").toString().trim();
-      if (!raw) return { text: "", href: null };
+      const active    = program.currentActiveAlumni      || program.current_active_alumni      || 0;
+      const majors    = program.mlbPlayersProduced       || program.mlb_players_produced       || 0;
+      const alumni    = program.allTimeNextLevelAlumni   || program.all_time_next_level_alumni || 0;
+      const draftedHS = program.draftedOutOfHighSchool   || program.drafted_out_of_high_school || 0;
+      const draftedTot= program.draftedTotal             || program.drafted                    || 0;
 
-      // pull out first URL if present
-      const match = raw.match(/https?:\/\/\S+/i);
-      const href = match ? match[0] : null;
-      return { text: raw, href };
-    }
+      const ctaHTML = buildCta(program);
 
-    function fillStateDropdown() {
-      const stateEl = document.getElementById("state-filter");
-      const frag = document.createDocumentFragment();
-      Object.keys(STATE_ABBR_TO_NAME).sort().forEach(abbr => {
-        const opt = document.createElement("option");
-        opt.value = abbr.toLowerCase();
-        opt.textContent = STATE_ABBR_TO_NAME[abbr];
-        frag.appendChild(opt);
-      });
-      stateEl.appendChild(frag);
-    }
-
-    async function loadData() {
-      const loadingEl  = document.getElementById("loading");
-      const feedbackEl = document.getElementById("feedback");
-      const resultsWrap= document.getElementById("results-container");
-
-      try {
-        loadingEl.classList.remove("hidden");
-        resultsWrap.classList.remove("hidden");
-
-        // NEW: hit our Vercel API instead of Google Sheets
-        const res = await fetch("/api/hs-programs", { cache: "no-store" });
-        if (!res.ok) throw new Error("HTTP " + res.status);
-        rows = await res.json();
-
-        if (rows.length) {
-          const headers = Object.keys(rows[0]);
-          URL_HEADER_KEY =
-            URL_HEADER_CANDIDATES.find(h => headers.includes(h)) || null;
-          console.log("CTA header:", URL_HEADER_KEY);
-        }
-        feedbackEl.classList.add("hidden");
-      } catch (e) {
-        console.error(e);
-        feedbackEl.textContent =
-          "Couldn’t load the HS directory. Check the /api/hs-programs endpoint.";
-        feedbackEl.classList.remove("hidden");
-      } finally {
-        loadingEl.classList.add("hidden");
-      }
-    }
-
-    function matchRow(row, q, stFilter) {
-      const hs     = norm(row["hsname"]);
-      const city   = norm(getCityOnly(row));
-      const region = norm(row["regionname"]);
-      const stAbbr = deriveStateAbbr(row).toLowerCase();
-      if (stFilter && stFilter !== stAbbr) return false;
-      if (!q) return true;
-      return (
-        hs.includes(q) ||
-        city.includes(q) ||
-        region.includes(q) ||
-        stAbbr.includes(q)
-      );
-    }
-
-    function search() {
-      const q        = norm(document.getElementById("school-search-input").value);
-      const stFilter = norm(document.getElementById("state-filter").value);
-      filtered       = rows.filter(r => matchRow(r, q, stFilter));
-      currentPage    = 1;
-      render();
-    }
-
-    function scrollToResultsTop() {
-      const container = document.getElementById("results-container");
-      if (!container) return;
-      container.scrollIntoView({ behavior: "smooth", block: "start" });
-    }
-
-    function render() {
-      const resultsEl    = document.getElementById("results-content");
-      const paginationEl = document.getElementById("pagination");
-      resultsEl.innerHTML = "";
-      paginationEl.innerHTML = "";
-
-      if (!filtered.length) {
-        resultsEl.innerHTML =
-          `<p class="text-gray-400 text-center py-8">No matches found.</p>`;
-        return;
-      }
-
-      const totalPages = Math.ceil(filtered.length / RESULTS_PER_PAGE);
-      const start      = (currentPage - 1) * RESULTS_PER_PAGE;
-      const pageItems  = filtered.slice(start, start + RESULTS_PER_PAGE);
-
-      pageItems.forEach(row => {
-        const natRank      = row[KEY_NATIONAL_RANK] || "-";
-        const stateRank    = row[KEY_STATE_RANK]    || "-";
-        const active       = row["Current Active Alumni"]      || 0;
-        const majors       = row["MLB Players Produced"]       || 0;
-        const alumniListed = row["All-Time Next Level Alumni"] || 0;
-        const draftedHS    = row["Drafted out of High School"] || 0;
-        const draftedTotal = row["Drafted"]                    || 0;
-
-        const stAbbr = deriveStateAbbr(row);
-        const city   = getCityOnly(row);
-        const logo   = getLogoPath(row);
-        const { text: ctaText, href: ctaHref } = getCtaData(row);
-        const cityLine = [city, stAbbr].filter(Boolean).join(", ").toUpperCase();
-
-        const headerHTML = `
+      const cardHTML = `
+        <div class="mb-10 p-6 md:p-8 bg-[#050505] border border-neutral-800 rounded-xl shadow-lg">
           <div class="flex items-center gap-4 mb-6">
             <img src="${logo}"
                  class="h-20 w-20 object-contain bg-neutral-900 rounded"
@@ -278,17 +200,14 @@
                 ${cityLine}
               </p>
               <p class="banner-school text-2xl md:text-3xl">
-                ${(row["hsname"] || "").toUpperCase()}
+                ${(program.hsname || "").toUpperCase()}
               </p>
               <p class="banner-small text-[0.6rem] md:text-xs text-neutral-300">
                 ACTIVE ALUMNI
               </p>
             </div>
           </div>
-        `;
 
-        /* stat order: Active, MLB, National, State, All-Time, Drafted HS/Total */
-        const statsHTML = `
           <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-6">
             <div class="bg-neutral-900 rounded p-4 text-center">
               <p class="text-2xl font-bold">${active}</p>
@@ -307,87 +226,114 @@
               <p class="text-xs text-neutral-400">State Rank</p>
             </div>
             <div class="bg-neutral-900 rounded p-4 text-center">
-              <p class="text-2xl font-bold">${alumniListed}</p>
+              <p class="text-2xl font-bold">${alumni}</p>
               <p class="text-xs text-neutral-400">All-Time Next Level Alumni</p>
             </div>
             <div class="bg-neutral-900 rounded p-4 text-center">
-              <p class="text-2xl font-bold">${draftedHS}/${draftedTotal}</p>
+              <p class="text-2xl font-bold">${draftedHS}/${draftedTot}</p>
               <p class="text-xs text-neutral-400">Drafted HS / Total</p>
             </div>
           </div>
-        `;
 
-        let buttonHTML = "";
-        if (ctaText) {
-          if (ctaHref) {
-            // clickable link (microsite or future funnel)
-            buttonHTML = `
-              <a href="${ctaHref}" target="_blank" rel="noopener"
-                 class="w-full py-3 rounded-md font-semibold border border-neutral-600 bg-neutral-100 text-black hover:bg-white block text-[0.7rem] sm:text-xs md:text-sm break-words text-center">
-                 ${ctaText}
-              </a>`;
-          } else {
-            // plain message button (SORRY text, etc.)
-            buttonHTML = `
-              <button
-                 class="w-full py-3 rounded-md font-semibold border border-neutral-600 bg-neutral-100 text-black text-[0.7rem] sm:text-xs md:text-sm break-words">
-                 ${ctaText}
-              </button>`;
-          }
-        }
-
-        resultsEl.insertAdjacentHTML("beforeend", `
-          <div class="mb-10 p-6 md:p-8 bg-[#050505] border border-neutral-800 rounded-xl shadow-lg">
-            ${headerHTML}
-            ${statsHTML}
-            <div class="mt-2">
-              ${buttonHTML}
-            </div>
+          <div class="mt-2">
+            ${ctaHTML}
           </div>
-        `);
+        </div>
+      `;
+
+      resultsEl.insertAdjacentHTML("beforeend", cardHTML);
+    });
+  }
+
+  function renderPagination() {
+    paginationEl.innerHTML = "";
+
+    if (totalPages <= 1) return;
+
+    const info = document.createElement("span");
+    info.textContent = `Page ${currentPage} of ${totalPages}`;
+    info.className = "text-neutral-400";
+
+    const makeBtn = (label, onClick, disabled) => {
+      const base = "px-3 py-2 rounded border border-neutral-700";
+      const cls = disabled
+        ? `${base} text-neutral-500 cursor-not-allowed`
+        : `${base} bg-neutral-900 text-neutral-200 hover:bg-neutral-800`;
+      const btn = document.createElement("button");
+      btn.textContent = label;
+      btn.className = cls;
+      if (!disabled) btn.addEventListener("click", () => {
+        onClick();
+        scrollToResultsTop();
+      });
+      return btn;
+    };
+
+    const prevBtn = makeBtn("Prev", () => search(currentPage - 1), currentPage === 1);
+    const nextBtn = makeBtn("Next", () => search(currentPage + 1), currentPage === totalPages);
+
+    paginationEl.appendChild(prevBtn);
+    paginationEl.appendChild(info);
+    paginationEl.appendChild(nextBtn);
+  }
+
+  async function search(page = 1) {
+    const qInput = document.getElementById("school-search-input");
+    const stateSel = document.getElementById("state-filter");
+
+    lastQuery = (qInput.value || "").trim();
+    lastState = (stateSel.value || "").trim();
+
+    try {
+      loadingEl.classList.remove("hidden");
+      resultsWrap.classList.remove("hidden");
+      feedbackEl.classList.add("hidden");
+
+      const params = new URLSearchParams();
+      if (lastQuery) params.set("q", lastQuery);
+      if (lastState) params.set("state", lastState);
+      params.set("page", page.toString());
+
+      const res = await fetch(`/api/hs-programs?${params.toString()}`, {
+        cache: "no-store"
       });
 
-      const makeBtn = (label, on, disabled=false, active=false) => {
-        const base = "px-3 py-2 rounded border border-neutral-700 text-sm";
-        const cls = disabled
-          ? base + " text-neutral-500 cursor-not-allowed"
-          : active
-            ? base + " bg-neutral-100 text-black font-semibold"
-            : base + " bg-neutral-900 text-neutral-200 hover:bg-neutral-800";
-        const el = document.createElement("button");
-        el.textContent = label;
-        el.className = cls;
-        if (!disabled) el.addEventListener("click", () => { on(); scrollToResultsTop(); });
-        return el;
-      };
+      if (!res.ok) throw new Error("HTTP " + res.status);
 
-      const totalPages2 = Math.ceil(filtered.length / RESULTS_PER_PAGE);
-      paginationEl.appendChild(
-        makeBtn("Prev", () => { currentPage = Math.max(1, currentPage - 1); render(); },
-          currentPage === 1)
-      );
-      for (let i = 1; i <= totalPages2; i++) {
-        paginationEl.appendChild(
-          makeBtn(String(i), () => { currentPage = i; render(); }, false, i === currentPage)
-        );
-      }
-      paginationEl.appendChild(
-        makeBtn("Next", () => { currentPage = Math.min(totalPages2, currentPage + 1); render(); },
-          currentPage === totalPages2)
-      );
+      const data = await res.json();
+      const programs   = data.programs || data.results || [];
+      currentPage      = data.page || 1;
+      totalPages       = data.totalPages || 1;
+
+      renderResults(programs);
+      renderPagination();
+    } catch (err) {
+      console.error(err);
+      feedbackEl.textContent =
+        "Couldn’t load the HS directory. Check the /api/hs-programs endpoint.";
+      feedbackEl.classList.remove("hidden");
+    } finally {
+      loadingEl.classList.add("hidden");
     }
+  }
 
-    /* wire up */
-    document.getElementById("search-button")
-      .addEventListener("click", search);
-    document.getElementById("school-search-input")
-      .addEventListener("keydown", (e) => { if (e.key === "Enter") search(); });
-    document.getElementById("state-filter")
-      .addEventListener("change", search);
+  /* Wire up events */
+  document.getElementById("search-button")
+    .addEventListener("click", () => search(1));
 
-    fillStateDropdown();
-    loadData();
-  </script>
+  document.getElementById("school-search-input")
+    .addEventListener("keydown", (e) => {
+      if (e.key === "Enter") search(1);
+    });
+
+  document.getElementById("state-filter")
+    .addEventListener("change", () => search(1));
+
+  fillStateDropdown();
+
+  // Initial load: show first page of "everything"
+  search(1);
+</script>
 
 </body>
 </html>
