@@ -608,6 +608,7 @@ async function loadCSV(url){
 
   return rows.map(r=>{
     const player = {
+      playerid: r[idx('playerid')],             // ← NEW: keep playerid
       slug:r[idx('slug')],
       display_name:r[idx('display_name')],
       first:r[idx('first')],
@@ -666,7 +667,12 @@ function imageNameOf(p){
     .replace(/\s+/g,'_')
     .replace(/[^a-z0-9_]/g,'');
 }
-function profileURL(p){ return `./profile.html?player=${slugOf(p)}`; }
+
+/* profile links now use playerid, not slug */
+function profileURL(p){
+  const id = p.playerid || '';
+  return `./profile.html?playerid=${encodeURIComponent(id)}`;
+}
 
 function formatStatValue(key, value){
   if (!value || value === '--') return '--';
@@ -1006,7 +1012,7 @@ function renderSocialTab(player){
       <div class="card-title">SOCIAL MEDIA</div>
       <div class="card-text">
         Tap a handle to view their latest posts. When you share, show them love with
-        <strong>#YATABOY</strong> and tag <strong>@yat_stats</strong>.
+        <strong>#YATATABOY</strong> and tag <strong>@yat_stats</strong>.
       </div>
       <div class="social-pills">`;
 
@@ -1093,14 +1099,25 @@ document.addEventListener('DOMContentLoaded', async ()=>{
     $('#playerSearch')?.addEventListener('input', ()=>liveSearch());
 
     const params = new URLSearchParams(window.location.search);
-    const targetSlug = (params.get('player') || '').toLowerCase();
 
-    let player = data.find(p => slugOf(p) === targetSlug);
-    if (!player){
-      player = data.find(p => (p.last||'').toLowerCase() === targetSlug);
+    // Prefer playerid, but support old ?player=slug links as a fallback
+    const rawId   = (params.get('playerid') || '').trim();
+    const rawSlug = (params.get('player') || '').trim().toLowerCase();
+
+    let player = null;
+
+    if (rawId) {
+      player = data.find(p => String(p.playerid) === rawId);
     }
-    if (!player){
-      player = data[0];
+
+    if (!player && rawSlug) {
+      player = data.find(p => slugOf(p).toLowerCase() === rawSlug);
+    }
+
+    if (!player) {
+      $('#profileShell').innerHTML =
+        `<p style="color:red;">Player not found for <strong>${rawId || rawSlug || 'this URL'}</strong>.</p>`;
+      return;
     }
 
     populateTabs(player);
