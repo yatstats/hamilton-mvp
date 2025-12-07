@@ -3,9 +3,12 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Active Alumni News • Hamilton YAT?STATS</title>
+<title>Active Alumni News • {{SCHOOL_NAME}} YAT?STATS</title>
 <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400&family=Bebas+Neue&display=swap" rel="stylesheet">
+<link href="assets/css/globals.css" rel="stylesheet">
+<script src="assets/js/school-config.js"></script>
+<script src="assets/js/layout.js"></script>
 <style>
 /* -------------------- CORE THEME -------------------- */
 :root{
@@ -234,7 +237,7 @@ body.light-theme .drawer-footer{background:rgba(255,255,255,.8)}
 </style>
 
 </head>
-<body>
+<body data-tokenize>
 <!-- HEADER -->
 <header class="header">
   <div class="container topbar">
@@ -243,16 +246,7 @@ body.light-theme .drawer-footer{background:rgba(255,255,255,.8)}
       <button class="icon-btn" id="btnAccount" aria-label="Account"><i class="ri-user-3-line"></i></button>
       <button class="icon-btn" id="theme-toggle" aria-label="Toggle Theme"><i class="ri-sun-line"></i></button>
     </div>
-    <nav class="topnav" aria-label="Top Navigation">
-      <a href="index.html" class="nav-pair"><span class="thin">WHERE THEY</span><span class="bold">YAT?</span></a>
-      <a href="alumni-news.html" class="nav-pair"><span class="thin">ACTIVE ALUMNI</span><span class="bold">NEWS</span></a>
-      <!-- NAV ORDER UPDATED TO MATCH INDEX: CURRENT TEAM BEFORE MENTORSHIP MARKETPLACE -->
-      <a href="current-team.html" class="nav-pair"><span class="thin">THE</span><span class="bold">CURRENT TEAM</span></a>
-      <a href="marketplace.html" class="nav-pair"><span class="thin">MENTORSHIP</span><span class="bold">MARKETPLACE</span></a>
-      <a href="all-time-list.html" class="nav-pair"><span class="thin">NEXT-LEVEL</span><span class="bold">ALL-TIME LIST</span></a>
-      <a href="partner-program.html" class="nav-pair"><span class="thin">PCD ACTION</span><span class="bold">PARTNER PROGRAM</span></a>
-      <a href="faq.html" class="nav-pair"><span class="bold">FAQ’S</span></a>
-    </nav>
+      <nav class="topnav" aria-label="Top Navigation"></nav>
     <div class="wordmark-wrap">
       <img class="wordmark-img" src="assets/img/yatstats-logo.png" alt="YAT?STATS">
     </div>
@@ -261,22 +255,22 @@ body.light-theme .drawer-footer{background:rgba(255,255,255,.8)}
 
   <!-- SCHOOL ROW MATCHES INDEX (id + onerror too) -->
   <div class="container schoolrow">
-    <img id="hamLogo" class="ham-logo"
-         src="assets/img/schools/hamilton.az.png"
-         alt="Hamilton H"
-         onerror="this.src='assets/img/placeholder.png';">
-    <div class="schooltext">
-      <div class="small">CHANDLER, AZ</div>
-      <div class="big1">HAMILTON HIGH SCHOOL</div>
-      <div class="big2">ACTIVE BASEBALL ALUMNI</div>
-    </div>
+      <img id="hamLogo" class="ham-logo" data-school-crest
+           src="assets/img/schools/hamilton.az.png"
+           alt="School crest"
+           onerror="this.src='assets/img/placeholder.png';">
+      <div class="schooltext">
+        <div class="small" data-school-city>{{CITY_STATE}}</div>
+        <div class="big1" data-school-name>{{SCHOOL_NAME_UPPER}} HIGH SCHOOL</div>
+        <div class="big2" data-school-tagline>{{TAGLINE}}</div>
+      </div>
   </div>
 
   <div class="hr-y"></div>
   <section class="hero">
     <div class="container hero-grid">
       <div class="hero-left" aria-live="polite">
-        <div class="crumbs">HAMILTON ▸ ACTIVE ALUMNI NEWS</div>
+        <div class="crumbs" data-tokenize>{{SCHOOL_NAME_UPPER}} ▸ ACTIVE ALUMNI NEWS</div>
       </div>
       <div class="hero-right">
         <button id="openSearch" class="hero-icon icon-btn" aria-label="Open search"><i class="ri-search-line"></i></button>
@@ -298,16 +292,7 @@ body.light-theme .drawer-footer{background:rgba(255,255,255,.8)}
       <div id="liveResults"></div>
     </div>
     <h3>NAVIGATION</h3>
-    <div class="pad" style="display:flex;flex-direction:column;gap:12px">
-      <a href="index.html" class="nav-pair"><span class="thin">WHERE THEY</span><span class="bold">YAT?</span></a>
-      <a href="alumni-news.html" class="nav-pair"><span class="thin">ACTIVE ALUMNI</span><span class="bold">NEWS</span></a>
-      <!-- LEFT DRAWER NAV ORDER MATCHES INDEX -->
-      <a href="current-team.html" class="nav-pair"><span class="thin">THE</span><span class="bold">CURRENT TEAM</span></a>
-      <a href="marketplace.html" class="nav-pair"><span class="thin">MENTORSHIP</span><span class="bold">MARKETPLACE</span></a>
-      <a href="all-time-list.html" class="nav-pair"><span class="thin">NEXT-LEVEL</span><span class="bold">ALL-TIME LIST</span></a>
-      <a href="partner-program.html" class="nav-pair"><span class="thin">PCD ACTION</span><span class="bold">PARTNER PROGRAM</span></a>
-      <a href="faq.html" class="nav-pair"><span class="bold">FAQ’S</span></a>
-    </div>
+      <div class="pad drawer-nav" style="display:flex;flex-direction:column;gap:12px"></div>
   </div>
 </aside>
 
@@ -682,7 +667,8 @@ function newsCardHTML(n){
   const shareText = encodeURIComponent(`We See Where YAT, ${first}! #YATABOY${first}`);
   const shareUrl = encodeURIComponent(n.url || location.href);
   const xHref = `https://twitter.com/intent/tweet?text=${shareText}&url=${shareUrl}`;
-  const mailHref = `mailto:?subject=${encodeURIComponent(n.title||'Hamilton Alumni News')}&body=${shareText}%0A${shareUrl}`;
+  const schoolName = (window.SCHOOL_CONFIG?.name)||'School';
+  const mailHref = `mailto:?subject=${encodeURIComponent(n.title||`${schoolName} Alumni News`)}&body=${shareText}%0A${shareUrl}`;
   return `
   <article class="news-card">
     <a class="news-thumb" href="${n.url||'#'}" target="_blank" rel="noopener" style="background-image:url('${img}')" aria-label="Open story"></a>
