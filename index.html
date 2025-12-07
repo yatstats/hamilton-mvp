@@ -4,7 +4,8 @@
 <head>  
 <meta charset="utf-8" />  
 <meta name="viewport" content="width=device-width,initial-scale=1" />  
-<title>WHERE THEY YAT? – Hamilton Active Baseball Alumni</title>  <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">  
+<title>WHERE THEY YAT? – ACTIVE BASEBALL ALUMNI</title>  <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+<script src="school-config.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400&family=Bebas+Neue&display=swap" rel="stylesheet">  <!-- Firebase init (separate script) -->  <script type="module">  
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";  
   import {  
@@ -309,10 +310,10 @@ body.light-theme .card{box-shadow:0 4px 12px rgba(0,0,0,.1)}
       <img src="assets/img/yatstats-logo.png" alt="YAT?STATS Logo" class="splash-logo-main">  
     </div>  
   </div>  
-  <div class="splash-bottom">  
-    <img src="assets/img/schools/5004.png" alt="Hamilton Huskies Logo" class="splash-logo-h">  
-    <img src="assets/img/partners/american_logo.png" alt="American Logo" class="splash-logo-ne">  
-  </div>  
+  <div class="splash-bottom">
+    <img id="splashCrest" src="assets/img/placeholder.png" alt="School Crest" class="splash-logo-h">
+    <img src="assets/img/partners/american_logo.png" alt="American Logo" class="splash-logo-ne">
+  </div>
 </div>  <header class="header">  
   <div class="container topbar">  
     <div class="left-icons">  
@@ -336,22 +337,22 @@ body.light-theme .card{box-shadow:0 4px 12px rgba(0,0,0,.1)}
   <img class="wordmark-img" src="assets/img/yatstats-logo.png" alt="YAT?STATS">  
 </div>
 
-  </div>    <div class="hr-y"></div>    <div class="container schoolrow">  
-    <img id="hamLogo" class="ham-logo" src="assets/img/schools/5004.png" alt="Hamilton H" onerror="this.src='assets/img/placeholder.png';">  
-    <div class="schooltext">  
-      <div class="small">CHANDLER, AZ</div>  
-      <div class="big1">HAMILTON HIGH SCHOOL</div>  
-      <div class="big2">ACTIVE BASEBALL ALUMNI</div>  
-    </div>  
-  </div>    <div class="hr-y"></div>    <section class="hero">  
-    <div class="container hero-grid">  
-      <div class="hero-left" aria-live="polite">  
-        <div class="tag-duo">  
-          <div class="tag-swap"><span class="tag-grey">FLIP FOR</span> <span class="tag-bold">STATS!</span></div>  
-          <div class="tag-swap"><span class="tag-grey">WHERE THEY</span> <span class="tag-bold">YAT?</span></div>  
-        </div>  
-        <div class="crumbs hero-crumbs">HAMILTON ▸ WHERE THEY YAT?</div>  
-      </div>  
+  </div>    <div class="hr-y"></div>    <div class="container schoolrow">
+    <img id="schoolCrest" class="ham-logo" src="assets/img/placeholder.png" alt="School Crest" onerror="this.src='assets/img/placeholder.png';">
+    <div class="schooltext">
+      <div class="small" id="schoolCityState"></div>
+      <div class="big1" id="schoolName"></div>
+      <div class="big2" id="schoolTagline"></div>
+    </div>
+  </div>    <div class="hr-y"></div>    <section class="hero">
+    <div class="container hero-grid">
+      <div class="hero-left" aria-live="polite">
+        <div class="tag-duo">
+          <div class="tag-swap"><span class="tag-grey">FLIP FOR</span> <span class="tag-bold">STATS!</span></div>
+          <div class="tag-swap"><span class="tag-grey">WHERE THEY</span> <span class="tag-bold">YAT?</span></div>
+        </div>
+        <div class="crumbs hero-crumbs" id="heroCrumbs"></div>
+      </div>
       <div class="hero-right">  
         <button id="openSearch" class="hero-icon icon-btn" aria-label="Open search"><i class="ri-search-line"></i></button>  
         <button id="openFilters" class="hero-icon icon-btn" aria-label="Open filters"><i class="ri-filter-3-line"></i></button>  
@@ -464,14 +465,56 @@ const $ = s => document.querySelector(s);
 const $$ = s => Array.from(document.querySelectorAll(s));  
 const debounce = (fn, ms=300)=>{ let t; return (...a)=>{ clearTimeout(t); t=setTimeout(()=>fn(...a),ms); }; };  
   
-const levelOrder = {  
-  'MLB':13,'INTERNATIONAL':12,'TRIPLE-A':11,'AAA':11,'DOUBLE-A':10,'AA':10,  
-  'HIGH-A':9,'A+':9,'LOW-A':8,'A':8,'ROOKIE':7,'ROK':7,'INDY':6,  
-  'NCAA-D1':5,'NCAA-D2':4,'NCAA-D3':3,'NAIA':2,'JUCO':1  
-};  
-  
-/* DEFAULT STATUS FILTERS FOR INITIAL LOAD & RESET */  
-const DEFAULT_STATUSES = ['ACTIVE 2025', 'ACTIVE 2024', 'INJURED', 'FREE AGENT'];  
+const levelOrder = {
+  'MLB':13,'INTERNATIONAL':12,'TRIPLE-A':11,'AAA':11,'DOUBLE-A':10,'AA':10,
+  'HIGH-A':9,'A+':9,'LOW-A':8,'A':8,'ROOKIE':7,'ROK':7,'INDY':6,
+  'NCAA-D1':5,'NCAA-D2':4,'NCAA-D3':3,'NAIA':2,'JUCO':1
+};
+
+/* DEFAULT STATUS FILTERS FOR INITIAL LOAD & RESET */
+const DEFAULT_STATUSES = ['ACTIVE 2025', 'ACTIVE 2024', 'INJURED', 'FREE AGENT'];
+
+function getSchoolConfig(){
+  const fallback = {
+    hsid: '',
+    schoolName: '',
+    cityState: '',
+    tagline: 'ACTIVE BASEBALL ALUMNI',
+    crestSrc: 'assets/img/placeholder.png',
+    crestAlt: 'School Crest'
+  };
+
+  const cfg = window.schoolConfig || {};
+  const hsid = cfg.hsid ?? fallback.hsid;
+  const crestSrc = cfg.crestSrc || (hsid ? `assets/img/schools/${hsid}.png` : fallback.crestSrc);
+
+  return { ...fallback, ...cfg, hsid, crestSrc };
+}
+
+function applySchoolConfig(){
+  const cfg = getSchoolConfig();
+
+  const crestEls = [$('#schoolCrest'), $('#splashCrest')].filter(Boolean);
+  crestEls.forEach(img => {
+    if (!img) return;
+    if (cfg.crestSrc) img.src = cfg.crestSrc;
+    if (cfg.crestAlt) img.alt = cfg.crestAlt;
+    img.onerror = ()=>{ img.src = 'assets/img/placeholder.png'; };
+  });
+
+  if (cfg.cityState) $('#schoolCityState')?.textContent = cfg.cityState;
+  if (cfg.schoolName){
+    const nameUpper = cfg.schoolName.toUpperCase();
+    $('#schoolName')?.textContent = nameUpper;
+    $('#heroCrumbs')?.textContent = `${nameUpper} ▸ WHERE THEY YAT?`;
+  }
+  if (cfg.tagline) $('#schoolTagline')?.textContent = cfg.tagline;
+
+  const titlePieces = [cfg.schoolName, cfg.tagline].filter(Boolean).join(' ');
+  if (titlePieces){
+    document.title = `WHERE THEY YAT? – ${titlePieces}`;
+  }
+}
   
 function setDefaultStatusFilter() {  
   const container = $('#filterStatus');  
@@ -1117,10 +1160,11 @@ window.gemini = {
   }  
 };  
   
-/* Boot */  
-document.addEventListener('DOMContentLoaded', ()=>{  
-  const splash = $('#splashScreen');  
-  if (splash){  
+/* Boot */
+document.addEventListener('DOMContentLoaded', ()=>{
+  applySchoolConfig();
+  const splash = $('#splashScreen');
+  if (splash){
     const alreadyShown = sessionStorage.getItem('splashShown') === 'true';  
     if (alreadyShown){  
       splash.classList.add('is-hidden');  
