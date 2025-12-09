@@ -17,22 +17,22 @@ module.exports = async (req, res) => {
 
     // Base WHERE pieces
     const where = [];
-    const params = [];
+    const whereParams = [];
 
     if (q && q.trim() !== '') {
-      params.push(`%${q.trim().toLowerCase()}%`);
-      where.push(`LOWER(s.hsname) LIKE $${params.length}`);
+      whereParams.push(`%${q.trim().toLowerCase()}%`);
+      where.push(`LOWER(s.hsname) LIKE $${whereParams.length}`);
     }
 
     if (state && state !== 'all') {
       // state is encoded inside yatstats_state_rank like "1 (AZ)"
-      params.push(`%(${state})%`);
-      where.push(`stats.yatstats_state_rank LIKE $${params.length}`);
+      whereParams.push(`%(${state})%`);
+      where.push(`stats.yatstats_state_rank LIKE $${whereParams.length}`);
     }
 
     const whereSql = where.length ? `WHERE ${where.join(' AND ')}` : '';
 
-    // Count first
+    // 1) COUNT query (uses only whereParams)
     const countRows = await sql(
       `
       SELECT COUNT(*)::int AS count
@@ -41,18 +41,20 @@ module.exports = async (req, res) => {
         ON stats.hsid = s.hsid
       ${whereSql}
       `,
-      params
+      whereParams
     );
 
     const total = countRows[0]?.count || 0;
     const totalPages = total === 0 ? 1 : Math.ceil(total / perPage);
 
-    // Now fetch the page of results
-    params.push(perPage);
-    params.push(offset);
+    // 2) PAGE query: reuse whereParams, then append perPage + offset
+    const pageParams = [...whereParams, perPage, offset];
 
-    const limitIdx = params.length - 1;
-    const sizeIdx = params.length - 2;
+    // whereParams length = n
+    // perPage index = n + 1
+    // offset index = n + 2
+    const limitIdx = pageParams.length - 1;   // n + 1
+    const offsetIdx = pageParams.length;      // n + 2
 
     const rows = await sql(
       `
@@ -79,9 +81,9 @@ module.exports = async (req, res) => {
         (stats.yatstats_national_rank IS NULL) ASC,
         stats.yatstats_national_rank ASC NULLS LAST,
         s.hsname ASC
-      LIMIT $${sizeIdx} OFFSET $${limitIdx}
+      LIMIT $${limitIdx} OFFSET $${offsetIdx}
       `,
-      params
+      pageParams
     );
 
     res.status(200).json({
@@ -89,7 +91,7 @@ module.exports = async (req, res) => {
       pageSize: perPage,
       total,
       totalPages,
-      programs: rows.map(r => ({
+      programs: rows.map((r) => ({
         hsid: r.hsid,
         hsname: r.hsname,
         city: r.city,
@@ -102,14 +104,14 @@ module.exports = async (req, res) => {
         draftedHs: r.drafted_hs,
         draftedTotal: r.drafted_total,
         micrositeUrl: r.microsite_url,
-        stagingUrl: r.staging_url
-      }))
+        stagingUrl: r.staging_url,
+      })),
     });
   } catch (err) {
     console.error('Error in /api/hs-programs:', err);
     res.status(500).json({
       error: 'Server error while loading HS programs.',
-      message: err.message
+      message: err.message,
     });
   }
 };
