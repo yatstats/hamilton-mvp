@@ -712,16 +712,39 @@ function generateStatsGridHTML(player){
   grid += '</div>';  
   return grid;  
 }  
-  
+ function hydrateCardBackgrounds(){
+  document.querySelectorAll('.bg[data-bg]').forEach(el => {
+    const primary = el.dataset.bg;
+    const fallback = el.dataset.bgFallback;
+
+    const img = new Image();
+    img.onload = () => {
+      el.style.backgroundImage = `url('${primary}')`;
+    };
+    img.onerror = () => {
+      if (!fallback) return;
+      const img2 = new Image();
+      img2.onload = () => {
+        el.style.backgroundImage = `url('${fallback}')`;
+      };
+      img2.src = fallback;
+    };
+    img.src = primary;
+  });
+}
+ 
 /* Rendering */  
-function renderCards(list){  
-  const grid = $('#cardGrid'); if(!grid) return;  
-  if(!list.length){  
-    grid.innerHTML = `<p style="color:var(--muted);grid-column:1 / -1;">No players match the current filters.</p>`;  
-    return;  
-  }  
-  grid.innerHTML = list.map(cardHTML).join('');  
-}  
+function renderCards(list){
+  const grid = $('#cardGrid'); if(!grid) return;
+  if(!list.length){
+    grid.innerHTML = `<p style="color:var(--muted);grid-column:1 / -1;">No players match the current filters.</p>`;
+    return;
+  }
+
+  grid.innerHTML = list.map(cardHTML).join('');
+  hydrateCardBackgrounds(); // ← ADD THIS LINE
+}
+
   
 /* Sorting (unchanged) */  
 function defaultSort(a,b){  
