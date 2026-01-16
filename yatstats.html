@@ -13,7 +13,7 @@
       rel="stylesheet"
     />
 
-    <!-- Tailwind -->
+    <!-- Tailwind via CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
 
     <style>
@@ -21,24 +21,27 @@
         font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto,
           "Helvetica Neue", Arial, "Noto Sans", sans-serif;
       }
-
       .banner-small {
         letter-spacing: 0.18em;
         text-transform: uppercase;
         white-space: nowrap;
       }
-
       .banner-school {
-        font-family: "Bebas Neue", sans-serif;
+        font-family: "Bebas Neue", system-ui, sans-serif;
         letter-spacing: 0.16em;
         text-transform: uppercase;
         line-height: 1;
+      }
+      @media (min-width: 768px) {
+        .banner-school {
+          letter-spacing: 0.18em;
+        }
       }
     </style>
   </head>
 
   <body class="bg-black text-white">
-    <section class="py-14">
+    <section id="search-section" class="py-14">
       <div class="max-w-5xl mx-auto px-6 text-center">
         <h2 class="text-3xl md:text-4xl font-extrabold mb-3">
           SEARCH 17,000+<br />HS BASEBALL PROGRAMS
@@ -47,84 +50,389 @@
         <div class="max-w-3xl mx-auto grid sm:grid-cols-3 gap-3 mt-6">
           <input
             id="school-search-input"
-            class="bg-neutral-900 border border-neutral-700 rounded-md p-3"
+            class="w-full bg-neutral-900 border border-neutral-700 text-white placeholder-neutral-500 text-base md:text-lg rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-neutral-300"
             placeholder="E.g., HAMILTON"
+            autocomplete="off"
           />
           <select
             id="state-filter"
-            class="bg-neutral-900 border border-neutral-700 rounded-md p-3"
+            class="w-full bg-neutral-900 border border-neutral-700 text-white text-base md:text-lg rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-neutral-300"
           >
             <option value="">All States</option>
           </select>
           <button
             id="search-button"
-            class="bg-neutral-100 text-black font-semibold rounded-md"
+            class="bg-neutral-100 text-black font-semibold py-3 px-6 rounded-md text-base md:text-lg hover:bg-white transition"
           >
             Search
           </button>
         </div>
 
-        <div id="results-container" class="mt-10 hidden">
+        <div id="results-container" class="mt-8 max-w-5xl mx-auto text-left hidden">
+          <div id="loading" class="py-10 text-center hidden">
+            <div
+              class="animate-spin inline-block h-8 w-8 border-4 border-neutral-600 border-t-transparent rounded-full"
+            ></div>
+            <p class="text-gray-400 mt-4">Loading…</p>
+          </div>
+
           <div id="results-content"></div>
+
+          <div id="pagination" class="flex items-center justify-center gap-4 mt-8 text-sm"></div>
         </div>
+
+        <p id="feedback" class="text-gray-400 mt-6 hidden"></p>
       </div>
     </section>
 
     <script>
-      /*************************************************
-       * CONFIG — CHANGE THIS WHEN MOVING HOSTS
-       *************************************************/
+      /***********************
+       * CONFIG
+       ***********************/
+      // Logos
+      const LOGO_BASE = "https://yatstats.github.io/hamilton-mvp/assets/img/schools";
+      const LOGO_FALLBACK = LOGO_BASE + "/default.png";
 
-      // ✅ For Vercel / production:
-      // const API_ORIGIN = "";
+      // API:
+      // - If this HTML is served from *.yatstats.com, we can use a relative path (best).
+      // - If served elsewhere, we fall back to calling 5004.yatstats.com directly (requires CORS).
+      const API_PATH_REL = "/api/hs-programs";
+      const API_FALLBACK_ORIGIN = "https://5004.yatstats.com";
 
-      // ✅ For GitHub Pages testing:
-      const API_ORIGIN = "https://5004.yatstats.com";
+      function resolveApiBase() {
+        const h = (window.location.hostname || "").toLowerCase();
+        // Anything on yatstats.com (apex or subdomain) should use relative path
+        if (h === "yatstats.com" || h.endsWith(".yatstats.com")) return "";
+        // Otherwise, use fallback origin (requires CORS)
+        return API_FALLBACK_ORIGIN;
+      }
 
-      const API_PATH = API_ORIGIN + "/api/hs-programs";
+      const API_BASE = resolveApiBase();
+      const API_URL = API_BASE + API_PATH_REL;
 
-      const STATE_ABBR = {
-        AZ: "Arizona",
-        CA: "California",
-        TX: "Texas",
-        FL: "Florida",
+      // Full state list
+      const STATE_ABBR_TO_NAME = {
+        AL: "Alabama", AK: "Alaska", AZ: "Arizona", AR: "Arkansas",
+        CA: "California", CO: "Colorado", CT: "Connecticut", DE: "Delaware",
+        FL: "Florida", GA: "Georgia", HI: "Hawaii", ID: "Idaho",
+        IL: "Illinois", IN: "Indiana", IA: "Iowa", KS: "Kansas",
+        KY: "Kentucky", LA: "Louisiana", ME: "Maine", MD: "Maryland",
+        MA: "Massachusetts", MI: "Michigan", MN: "Minnesota", MS: "Mississippi",
+        MO: "Missouri", MT: "Montana", NE: "Nebraska", NV: "Nevada",
+        NH: "New Hampshire", NJ: "New Jersey", NM: "New Mexico", NY: "New York",
+        NC: "North Carolina", ND: "North Dakota", OH: "Ohio", OK: "Oklahoma",
+        OR: "Oregon", PA: "Pennsylvania", RI: "Rhode Island", SC: "South Carolina",
+        SD: "South Dakota", TN: "Tennessee", TX: "Texas", UT: "Utah",
+        VT: "Vermont", VA: "Virginia", WA: "Washington", WV: "West Virginia",
+        WI: "Wisconsin", WY: "Wyoming", DC: "District of Columbia",
       };
 
+      function fillStateDropdown() {
+        const stateEl = document.getElementById("state-filter");
+        const frag = document.createDocumentFragment();
+        Object.keys(STATE_ABBR_TO_NAME).sort().forEach((abbr) => {
+          const opt = document.createElement("option");
+          opt.value = abbr;
+          opt.textContent = STATE_ABBR_TO_NAME[abbr];
+          frag.appendChild(opt);
+        });
+        stateEl.appendChild(frag);
+      }
+
+      /***********************
+       * ELEMENTS
+       ***********************/
       const qInput = document.getElementById("school-search-input");
       const stateSel = document.getElementById("state-filter");
       const searchBtn = document.getElementById("search-button");
+
+      const loadingEl = document.getElementById("loading");
+      const feedbackEl = document.getElementById("feedback");
       const resultsWrap = document.getElementById("results-container");
       const resultsEl = document.getElementById("results-content");
+      const paginationEl = document.getElementById("pagination");
 
-      Object.entries(STATE_ABBR).forEach(([abbr, name]) => {
-        const opt = document.createElement("option");
-        opt.value = abbr;
-        opt.textContent = name;
-        stateSel.appendChild(opt);
-      });
+      /***********************
+       * STATE
+       ***********************/
+      let currentPage = 1;
+      let totalPages = 1;
+      let activeController = null;
 
-      async function runSearch() {
-        const params = new URLSearchParams();
-        if (qInput.value) params.set("q", qInput.value);
-        if (stateSel.value) params.set("state", stateSel.value);
-
-        const res = await fetch(`${API_PATH}?${params.toString()}`);
-        const data = await res.json();
-
-        resultsWrap.classList.remove("hidden");
-        resultsEl.innerHTML = "";
-
-        data.programs.forEach((p) => {
-          resultsEl.innerHTML += `
-            <div class="border border-neutral-800 p-6 rounded-xl mb-6">
-              <p class="banner-small text-neutral-400">${p.city}, ${p.state}</p>
-              <p class="banner-school text-2xl">${p.hsname}</p>
-            </div>
-          `;
-        });
+      function setLoading(isLoading) {
+        if (isLoading) {
+          loadingEl.classList.remove("hidden");
+          resultsWrap.classList.remove("hidden");
+          feedbackEl.classList.add("hidden");
+          feedbackEl.textContent = "";
+        } else {
+          loadingEl.classList.add("hidden");
+        }
       }
 
-      searchBtn.addEventListener("click", runSearch);
+      function showFeedback(msg) {
+        feedbackEl.textContent = msg;
+        feedbackEl.classList.remove("hidden");
+      }
+
+      function scrollToResultsTop() {
+        resultsWrap.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+
+      /***********************
+       * HELPERS (schema-flexible)
+       ***********************/
+      function pick(obj, keys, fallback) {
+        for (const k of keys) {
+          if (obj && obj[k] !== undefined && obj[k] !== null && obj[k] !== "") return obj[k];
+        }
+        return fallback;
+      }
+
+      function safeUpper(s) {
+        return (s ?? "").toString().trim().toUpperCase();
+      }
+
+      function normalizeUrl(u) {
+        if (!u) return "";
+        const s = u.toString().trim();
+        if (!s) return "";
+        if (s.startsWith("http://") || s.startsWith("https://")) return s;
+        return "https://" + s;
+      }
+
+      function getLogoPath(program) {
+        const id = pick(program, ["hsid", "logoHsid", "logo_hsid"], "");
+        return id ? `${LOGO_BASE}/${id}.png` : LOGO_FALLBACK;
+      }
+
+      function buildCta(program) {
+        // Prefer microsite_url (real url), then staging_url (numeric sandbox)
+        const raw = pick(program, ["microsite_url", "micrositeUrl", "staging_url", "stagingUrl", "url"], "");
+        const url = normalizeUrl(raw);
+
+        if (!url) {
+          return `
+            <button
+              class="w-full py-3 rounded-md font-semibold border border-neutral-700 bg-neutral-900 text-neutral-300 text-[0.75rem] sm:text-xs md:text-sm cursor-default"
+              disabled
+            >
+              MICROSITE COMING SOON – STATS PREVIEW ONLY
+            </button>
+          `;
+        }
+
+        return `
+          <a href="${url}" target="_blank" rel="noopener"
+            class="w-full py-3 rounded-md font-semibold border border-neutral-600 bg-neutral-100 text-black hover:bg-white block text-[0.75rem] sm:text-xs md:text-sm break-words text-center">
+            ENTER MICROSITE →
+          </a>
+        `;
+      }
+
+      /***********************
+       * RENDER
+       ***********************/
+      function renderResults(programs) {
+        resultsEl.innerHTML = "";
+
+        if (!Array.isArray(programs) || programs.length === 0) {
+          resultsEl.innerHTML = `<p class="text-gray-400 text-center py-8">No matches found.</p>`;
+          paginationEl.innerHTML = "";
+          return;
+        }
+
+        for (const program of programs) {
+          const hsname = safeUpper(pick(program, ["hsname", "hs_name", "high_school", "highSchool"], "UNKNOWN SCHOOL"));
+
+          // City/state fields vary by API shape
+          const city = pick(program, ["city", "cityname", "city_name"], "");
+          const state = safeUpper(pick(program, ["state", "regionid", "region_id", "st"], ""));
+          const cityLine = [city, state].filter(Boolean).join(", ").toUpperCase();
+
+          const active = Number(pick(program, ["current_aa", "currentActiveAlumni", "current_active_alumni"], 0));
+          const mlb = Number(pick(program, ["mlb", "mlbPlayersProduced", "mlb_players_produced"], 0));
+          const natRank = pick(program, ["yatstats_national_rank", "nationalRank", "national_rank"], "-");
+          const stateRank = pick(program, ["yatstats_state_rank", "stateRank", "state_rank"], "-");
+          const atnl = Number(pick(program, ["atnla", "allTimeNextLevelAlumni", "all_time_next_level_alumni"], 0));
+          const draftedHS = Number(pick(program, ["drafted_hs", "drafted_hsinteger", "draftedOutOfHighSchool"], 0));
+          const draftedTot = Number(pick(program, ["drafted", "draftedTotal", "drafted_total"], 0));
+
+          const logo = getLogoPath(program);
+          const cta = buildCta(program);
+
+          const cardHTML = `
+            <div class="mb-10 p-6 md:p-8 bg-[#050505] border border-neutral-800 rounded-xl shadow-lg">
+              <div class="flex items-center gap-4 mb-6">
+                <img src="${logo}"
+                    class="h-20 w-20 object-contain bg-neutral-900 rounded"
+                    loading="lazy"
+                    onerror="this.onerror=null;this.src='${LOGO_FALLBACK}';" />
+                <div class="h-20 flex flex-col justify-center gap-1">
+                  <p class="banner-small text-[0.6rem] md:text-xs text-neutral-400">${cityLine || "&nbsp;"}</p>
+                  <p class="banner-school text-2xl md:text-3xl">${hsname}</p>
+                  <p class="banner-small text-[0.6rem] md:text-xs text-neutral-300">ACTIVE ALUMNI</p>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-6">
+                <div class="bg-neutral-900 rounded p-4 text-center">
+                  <p class="text-2xl font-bold">${active}</p>
+                  <p class="text-xs text-neutral-400">Current Active Alumni</p>
+                </div>
+                <div class="bg-neutral-900 rounded p-4 text-center">
+                  <p class="text-2xl font-bold">${mlb}</p>
+                  <p class="text-xs text-neutral-400">MLB Players Produced</p>
+                </div>
+                <div class="bg-neutral-900 rounded p-4 text-center">
+                  <p class="text-2xl font-bold">${natRank}</p>
+                  <p class="text-xs text-neutral-400">National Rank</p>
+                </div>
+                <div class="bg-neutral-900 rounded p-4 text-center">
+                  <p class="text-2xl font-bold">${stateRank}</p>
+                  <p class="text-xs text-neutral-400">State Rank</p>
+                </div>
+                <div class="bg-neutral-900 rounded p-4 text-center">
+                  <p class="text-2xl font-bold">${atnl}</p>
+                  <p class="text-xs text-neutral-400">All-Time Next Level Alumni</p>
+                </div>
+                <div class="bg-neutral-900 rounded p-4 text-center">
+                  <p class="text-2xl font-bold">${draftedHS}/${draftedTot}</p>
+                  <p class="text-xs text-neutral-400">Drafted HS / Total</p>
+                </div>
+              </div>
+
+              <div class="mt-2">${cta}</div>
+            </div>
+          `;
+
+          resultsEl.insertAdjacentHTML("beforeend", cardHTML);
+        }
+      }
+
+      function renderPagination() {
+        paginationEl.innerHTML = "";
+        if (!totalPages || totalPages <= 1) return;
+
+        const info = document.createElement("span");
+        info.textContent = `Page ${currentPage} of ${totalPages}`;
+        info.className = "text-neutral-400";
+
+        const makeBtn = (label, onClick, disabled) => {
+          const base = "px-3 py-2 rounded border border-neutral-700";
+          const cls = disabled
+            ? `${base} text-neutral-500 cursor-not-allowed`
+            : `${base} bg-neutral-900 text-neutral-200 hover:bg-neutral-800`;
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.textContent = label;
+          btn.className = cls;
+          btn.disabled = !!disabled;
+          if (!disabled) btn.addEventListener("click", () => { onClick(); scrollToResultsTop(); });
+          return btn;
+        };
+
+        paginationEl.appendChild(makeBtn("Prev", () => runSearch(currentPage - 1), currentPage === 1));
+        paginationEl.appendChild(info);
+        paginationEl.appendChild(makeBtn("Next", () => runSearch(currentPage + 1), currentPage === totalPages));
+      }
+
+      /***********************
+       * FETCH / SEARCH
+       ***********************/
+      function parseApiResponse(data) {
+        const programs = data?.programs ?? data?.results ?? data?.rows ?? data?.data ?? [];
+        const page = Number(data?.page ?? data?.currentPage ?? data?.pagination?.page ?? 1) || 1;
+        const total = Number(data?.totalPages ?? data?.pages ?? data?.pagination?.totalPages ?? 1) || 1;
+        return { programs, page, totalPages: total };
+      }
+
+      function buildParams(page) {
+        const q = (qInput.value || "").trim();
+        const st = (stateSel.value || "").trim();
+        const params = new URLSearchParams();
+        if (q) params.set("q", q);
+        if (st) params.set("state", st);
+        params.set("page", String(page));
+        return params;
+      }
+
+      async function runSearch(page = 1) {
+        if (activeController) activeController.abort();
+        activeController = new AbortController();
+
+        setLoading(true);
+
+        try {
+          const params = buildParams(page);
+          const url = `${API_URL}?${params.toString()}`;
+
+          const res = await fetch(url, {
+            cache: "no-store",
+            signal: activeController.signal,
+            headers: { Accept: "application/json" },
+          });
+
+          if (!res.ok) {
+            let msg = `HTTP ${res.status}`;
+            try {
+              const maybe = await res.json();
+              if (maybe?.error) msg = maybe.error;
+              else if (maybe?.message) msg = maybe.message;
+            } catch (_) {}
+            throw new Error(msg);
+          }
+
+          const data = await res.json();
+          const parsed = parseApiResponse(data);
+
+          currentPage = parsed.page || 1;
+          totalPages = parsed.totalPages || 1;
+
+          resultsWrap.classList.remove("hidden");
+          renderResults(parsed.programs);
+          renderPagination();
+        } catch (err) {
+          if (err && err.name === "AbortError") return;
+
+          console.error(err);
+          resultsWrap.classList.remove("hidden");
+          resultsEl.innerHTML = "";
+          paginationEl.innerHTML = "";
+
+          const hostMsg = API_BASE
+            ? `This page is not on *.yatstats.com, so it is calling ${API_FALLBACK_ORIGIN}. If you see CORS errors in the console, the API must allow this site’s domain.`
+            : `API expected at ${API_PATH_REL} on the same host.`;
+
+          showFeedback(`Couldn’t load the HS directory. ${hostMsg}`);
+        } finally {
+          setLoading(false);
+        }
+      }
+
+      function debounce(fn, wait = 250) {
+        let t = null;
+        return (...args) => {
+          clearTimeout(t);
+          t = setTimeout(() => fn(...args), wait);
+        };
+      }
+
+      const debouncedSearch = debounce(() => runSearch(1), 300);
+
+      /***********************
+       * EVENTS
+       ***********************/
+      searchBtn.addEventListener("click", () => runSearch(1));
+      qInput.addEventListener("keydown", (e) => { if (e.key === "Enter") runSearch(1); });
+      qInput.addEventListener("input", () => debouncedSearch());
+      stateSel.addEventListener("change", () => runSearch(1));
+
+      /***********************
+       * INIT
+       ***********************/
+      fillStateDropdown();
+      runSearch(1);
     </script>
   </body>
 </html>
