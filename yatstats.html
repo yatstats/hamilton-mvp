@@ -13,7 +13,7 @@
       rel="stylesheet"
     />
 
-    <!-- Tailwind via CDN -->
+    <!-- Tailwind -->
     <script src="https://cdn.tailwindcss.com"></script>
 
     <style>
@@ -22,544 +22,109 @@
           "Helvetica Neue", Arial, "Noto Sans", sans-serif;
       }
 
-      /* small header lines (city/state + ACTIVE BASEBALL ALUMNI) */
       .banner-small {
-        font-family: Inter, system-ui, sans-serif;
         letter-spacing: 0.18em;
         text-transform: uppercase;
         white-space: nowrap;
       }
 
-      /* big school name */
       .banner-school {
-        font-family: "Bebas Neue", system-ui, sans-serif;
+        font-family: "Bebas Neue", sans-serif;
         letter-spacing: 0.16em;
         text-transform: uppercase;
         line-height: 1;
-      }
-
-      @media (min-width: 768px) {
-        .banner-school {
-          letter-spacing: 0.18em;
-        }
       }
     </style>
   </head>
 
   <body class="bg-black text-white">
-    <!-- Search Section -->
-    <section id="search-section" class="py-14">
+    <section class="py-14">
       <div class="max-w-5xl mx-auto px-6 text-center">
         <h2 class="text-3xl md:text-4xl font-extrabold mb-3">
           SEARCH 17,000+<br />HS BASEBALL PROGRAMS
         </h2>
 
-        <!-- Controls -->
         <div class="max-w-3xl mx-auto grid sm:grid-cols-3 gap-3 mt-6">
           <input
             id="school-search-input"
-            class="w-full bg-neutral-900 border border-neutral-700 text-white placeholder-neutral-500 text-base md:text-lg rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-neutral-300"
-            placeholder="E.g., YOUR LOCAL SCHOOL"
-            autocomplete="off"
+            class="bg-neutral-900 border border-neutral-700 rounded-md p-3"
+            placeholder="E.g., HAMILTON"
           />
           <select
             id="state-filter"
-            class="w-full bg-neutral-900 border border-neutral-700 text-white text-base md:text-lg rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-neutral-300"
+            class="bg-neutral-900 border border-neutral-700 rounded-md p-3"
           >
             <option value="">All States</option>
           </select>
           <button
             id="search-button"
-            class="bg-neutral-100 text-black font-semibold py-3 px-6 rounded-md text-base md:text-lg hover:bg-white transition"
+            class="bg-neutral-100 text-black font-semibold rounded-md"
           >
             Search
           </button>
         </div>
 
-        <!-- Results -->
-        <div
-          id="results-container"
-          class="mt-8 max-w-5xl mx-auto text-left hidden"
-        >
-          <div id="loading" class="py-10 text-center hidden">
-            <div
-              class="animate-spin inline-block h-8 w-8 border-4 border-neutral-600 border-t-transparent rounded-full"
-            ></div>
-            <p class="text-gray-400 mt-4">Loading…</p>
-          </div>
-
+        <div id="results-container" class="mt-10 hidden">
           <div id="results-content"></div>
-
-          <div
-            id="pagination"
-            class="flex items-center justify-center gap-4 mt-8 text-sm"
-          ></div>
         </div>
-
-        <p id="feedback" class="text-gray-400 mt-6 hidden"></p>
       </div>
     </section>
 
     <script>
-      /***********************
-       * CONFIG
-       ***********************/
-      // Where logos live
-      const LOGO_BASE =
-        "https://yatstats.github.io/hamilton-mvp/assets/img/schools";
-      const LOGO_FALLBACK = LOGO_BASE + "/default.png";
+      /*************************************************
+       * CONFIG — CHANGE THIS WHEN MOVING HOSTS
+       *************************************************/
 
-      // IMPORTANT: keep API relative so it works on root + subdomains
-      // (5004.yatstats.com -> /api/hs-programs still points to the same deployment)
-      const API_PATH = "/api/hs-programs";
+      // ✅ For Vercel / production:
+      // const API_ORIGIN = "";
 
-      // State list for dropdown
-      const STATE_ABBR_TO_NAME = {
-        AL: "Alabama",
-        AK: "Alaska",
+      // ✅ For GitHub Pages testing:
+      const API_ORIGIN = "https://5004.yatstats.com";
+
+      const API_PATH = API_ORIGIN + "/api/hs-programs";
+
+      const STATE_ABBR = {
         AZ: "Arizona",
-        AR: "Arkansas",
         CA: "California",
-        CO: "Colorado",
-        CT: "Connecticut",
-        DE: "Delaware",
-        FL: "Florida",
-        GA: "Georgia",
-        HI: "Hawaii",
-        ID: "Idaho",
-        IL: "Illinois",
-        IN: "Indiana",
-        IA: "Iowa",
-        KS: "Kansas",
-        KY: "Kentucky",
-        LA: "Louisiana",
-        ME: "Maine",
-        MD: "Maryland",
-        MA: "Massachusetts",
-        MI: "Michigan",
-        MN: "Minnesota",
-        MS: "Mississippi",
-        MO: "Missouri",
-        MT: "Montana",
-        NE: "Nebraska",
-        NV: "Nevada",
-        NH: "New Hampshire",
-        NJ: "New Jersey",
-        NM: "New Mexico",
-        NY: "New York",
-        NC: "North Carolina",
-        ND: "North Dakota",
-        OH: "Ohio",
-        OK: "Oklahoma",
-        OR: "Oregon",
-        PA: "Pennsylvania",
-        RI: "Rhode Island",
-        SC: "South Carolina",
-        SD: "South Dakota",
-        TN: "Tennessee",
         TX: "Texas",
-        UT: "Utah",
-        VT: "Vermont",
-        VA: "Virginia",
-        WA: "Washington",
-        WV: "West Virginia",
-        WI: "Wisconsin",
-        WY: "Wyoming",
-        DC: "District of Columbia",
+        FL: "Florida",
       };
 
-      function fillStateDropdown() {
-        const stateEl = document.getElementById("state-filter");
-        const frag = document.createDocumentFragment();
-        Object.keys(STATE_ABBR_TO_NAME)
-          .sort()
-          .forEach((abbr) => {
-            const opt = document.createElement("option");
-            opt.value = abbr; // send 2-letter code to API
-            opt.textContent = STATE_ABBR_TO_NAME[abbr];
-            frag.appendChild(opt);
-          });
-        stateEl.appendChild(frag);
-      }
-
-      /***********************
-       * ELEMENTS
-       ***********************/
       const qInput = document.getElementById("school-search-input");
       const stateSel = document.getElementById("state-filter");
       const searchBtn = document.getElementById("search-button");
-
-      const loadingEl = document.getElementById("loading");
-      const feedbackEl = document.getElementById("feedback");
       const resultsWrap = document.getElementById("results-container");
       const resultsEl = document.getElementById("results-content");
-      const paginationEl = document.getElementById("pagination");
 
-      /***********************
-       * GLOBAL STATE
-       ***********************/
-      let currentPage = 1;
-      let totalPages = 1;
+      Object.entries(STATE_ABBR).forEach(([abbr, name]) => {
+        const opt = document.createElement("option");
+        opt.value = abbr;
+        opt.textContent = name;
+        stateSel.appendChild(opt);
+      });
 
-      // used to cancel in-flight requests if user types fast
-      let activeController = null;
+      async function runSearch() {
+        const params = new URLSearchParams();
+        if (qInput.value) params.set("q", qInput.value);
+        if (stateSel.value) params.set("state", stateSel.value);
 
-      function scrollToResultsTop() {
-        resultsWrap.scrollIntoView({ behavior: "smooth", block: "start" });
-      }
+        const res = await fetch(`${API_PATH}?${params.toString()}`);
+        const data = await res.json();
 
-      function showFeedback(msg) {
-        feedbackEl.textContent = msg;
-        feedbackEl.classList.remove("hidden");
-      }
-
-      function clearFeedback() {
-        feedbackEl.classList.add("hidden");
-        feedbackEl.textContent = "";
-      }
-
-      function setLoading(isLoading) {
-        if (isLoading) {
-          loadingEl.classList.remove("hidden");
-          resultsWrap.classList.remove("hidden");
-          clearFeedback();
-        } else {
-          loadingEl.classList.add("hidden");
-        }
-      }
-
-      /***********************
-       * NORMALIZATION HELPERS
-       ***********************/
-      function safeUpper(s) {
-        return (s ?? "").toString().trim().toUpperCase();
-      }
-
-      function normalizeUrl(url) {
-        if (!url) return null;
-        const u = url.toString().trim();
-        if (!u) return null;
-        // if backend stores "5004.yatstats.com" without scheme
-        if (u.startsWith("http://") || u.startsWith("https://")) return u;
-        return "https://" + u;
-      }
-
-      function pick(obj, keys, fallback) {
-        for (const k of keys) {
-          if (obj && obj[k] !== undefined && obj[k] !== null) return obj[k];
-        }
-        return fallback;
-      }
-
-      /***********************
-       * RENDERING
-       ***********************/
-      function getLogoPath(program) {
-        const id = program.hsid || program.logoHsid || program.logo_hsid;
-        if (!id) return LOGO_FALLBACK;
-        return `${LOGO_BASE}/${id}.png`;
-      }
-
-      function buildCta(program) {
-        // accept multiple possible fields
-        const rawUrl = pick(program, ["micrositeUrl", "stagingUrl", "url"], null);
-        const url = normalizeUrl(rawUrl);
-
-        const ctaText = url
-          ? `CLICK TO ENTER THE YAT?STATS GLOBAL NETWORK THROUGH > ${url}`
-          : "MICROSITE COMING SOON – STATS PREVIEW ONLY";
-
-        if (url) {
-          return `
-            <a href="${url}" target="_blank" rel="noopener"
-              class="w-full py-3 rounded-md font-semibold border border-neutral-600 bg-neutral-100 text-black hover:bg-white block text-[0.7rem] sm:text-xs md:text-sm break-words text-center">
-              ${ctaText}
-            </a>
-          `;
-        }
-
-        return `
-          <button
-            class="w-full py-3 rounded-md font-semibold border border-neutral-600 bg-neutral-800 text-neutral-300 text-[0.7rem] sm:text-xs md:text-sm break-words cursor-default"
-            disabled>
-            ${ctaText}
-          </button>
-        `;
-      }
-
-      function renderResults(programs) {
+        resultsWrap.classList.remove("hidden");
         resultsEl.innerHTML = "";
 
-        if (!Array.isArray(programs) || programs.length === 0) {
-          resultsEl.innerHTML =
-            `<p class="text-gray-400 text-center py-8">No matches found.</p>`;
-          paginationEl.innerHTML = "";
-          return;
-        }
-
-        programs.forEach((program) => {
-          const logo = getLogoPath(program);
-
-          const city = (program.city || "").toString();
-          const state = safeUpper(program.state);
-          const cityLine = [city, state].filter(Boolean).join(", ").toUpperCase();
-
-          // ranks (support multiple shapes)
-          const natRank = pick(
-            program,
-            ["nationalRank", "yatstats_national_rank", "national_rank"],
-            "-"
-          );
-          const stateRank = pick(
-            program,
-            ["stateRank", "yatstats_state_rank", "state_rank"],
-            "-"
-          );
-
-          // stats (support multiple shapes)
-          const active = Number(
-            pick(program, ["currentActiveAlumni", "current_active_alumni"], 0)
-          );
-          const majors = Number(
-            pick(program, ["mlbPlayersProduced", "mlb_players_produced"], 0)
-          );
-          const alumni = Number(
-            pick(program, ["allTimeNextLevelAlumni", "all_time_next_level_alumni"], 0)
-          );
-          const draftedHS = Number(
-            pick(program, ["draftedOutOfHighSchool", "drafted_out_of_high_school"], 0)
-          );
-          const draftedTot = Number(
-            pick(program, ["draftedTotal", "drafted", "drafted_total"], 0)
-          );
-
-          const hsname = safeUpper(program.hsname);
-
-          const ctaHTML = buildCta(program);
-
-          const cardHTML = `
-            <div class="mb-10 p-6 md:p-8 bg-[#050505] border border-neutral-800 rounded-xl shadow-lg">
-              <div class="flex items-center gap-4 mb-6">
-                <img src="${logo}"
-                    class="h-20 w-20 object-contain bg-neutral-900 rounded"
-                    loading="lazy"
-                    onerror="this.onerror=null;this.src='${LOGO_FALLBACK}';">
-                <div class="h-20 flex flex-col justify-center gap-1">
-                  <p class="banner-small text-[0.6rem] md:text-xs text-neutral-400">
-                    ${cityLine}
-                  </p>
-                  <p class="banner-school text-2xl md:text-3xl">
-                    ${hsname}
-                  </p>
-                  <p class="banner-small text-[0.6rem] md:text-xs text-neutral-300">
-                    ACTIVE ALUMNI
-                  </p>
-                </div>
-              </div>
-
-              <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-6">
-                <div class="bg-neutral-900 rounded p-4 text-center">
-                  <p class="text-2xl font-bold">${active}</p>
-                  <p class="text-xs text-neutral-400">Current Active Alumni</p>
-                </div>
-                <div class="bg-neutral-900 rounded p-4 text-center">
-                  <p class="text-2xl font-bold">${majors}</p>
-                  <p class="text-xs text-neutral-400">MLB Players Produced</p>
-                </div>
-                <div class="bg-neutral-900 rounded p-4 text-center">
-                  <p class="text-2xl font-bold">${natRank}</p>
-                  <p class="text-xs text-neutral-400">National Rank</p>
-                </div>
-                <div class="bg-neutral-900 rounded p-4 text-center">
-                  <p class="text-2xl font-bold">${stateRank}</p>
-                  <p class="text-xs text-neutral-400">State Rank</p>
-                </div>
-                <div class="bg-neutral-900 rounded p-4 text-center">
-                  <p class="text-2xl font-bold">${alumni}</p>
-                  <p class="text-xs text-neutral-400">All-Time Next Level Alumni</p>
-                </div>
-                <div class="bg-neutral-900 rounded p-4 text-center">
-                  <p class="text-2xl font-bold">${draftedHS}/${draftedTot}</p>
-                  <p class="text-xs text-neutral-400">Drafted HS / Total</p>
-                </div>
-              </div>
-
-              <div class="mt-2">
-                ${ctaHTML}
-              </div>
+        data.programs.forEach((p) => {
+          resultsEl.innerHTML += `
+            <div class="border border-neutral-800 p-6 rounded-xl mb-6">
+              <p class="banner-small text-neutral-400">${p.city}, ${p.state}</p>
+              <p class="banner-school text-2xl">${p.hsname}</p>
             </div>
           `;
-
-          resultsEl.insertAdjacentHTML("beforeend", cardHTML);
         });
       }
 
-      function renderPagination() {
-        paginationEl.innerHTML = "";
-        if (!totalPages || totalPages <= 1) return;
-
-        const info = document.createElement("span");
-        info.textContent = `Page ${currentPage} of ${totalPages}`;
-        info.className = "text-neutral-400";
-
-        const makeBtn = (label, onClick, disabled) => {
-          const base = "px-3 py-2 rounded border border-neutral-700";
-          const cls = disabled
-            ? `${base} text-neutral-500 cursor-not-allowed`
-            : `${base} bg-neutral-900 text-neutral-200 hover:bg-neutral-800`;
-          const btn = document.createElement("button");
-          btn.type = "button";
-          btn.textContent = label;
-          btn.className = cls;
-          if (!disabled) {
-            btn.addEventListener("click", () => {
-              onClick();
-              scrollToResultsTop();
-            });
-          } else {
-            btn.disabled = true;
-          }
-          return btn;
-        };
-
-        const prevBtn = makeBtn("Prev", () => runSearch(currentPage - 1), currentPage === 1);
-        const nextBtn = makeBtn("Next", () => runSearch(currentPage + 1), currentPage === totalPages);
-
-        paginationEl.appendChild(prevBtn);
-        paginationEl.appendChild(info);
-        paginationEl.appendChild(nextBtn);
-      }
-
-      /***********************
-       * FETCH / SEARCH
-       ***********************/
-      function buildParams(page) {
-        const q = (qInput.value || "").trim();
-        const st = (stateSel.value || "").trim();
-
-        const params = new URLSearchParams();
-        if (q) params.set("q", q);
-        if (st) params.set("state", st);
-        params.set("page", String(page));
-        return params;
-      }
-
-      // Accept many API shapes so frontend doesn't break while backend evolves
-      function parseApiResponse(data) {
-        const programs =
-          data?.programs ??
-          data?.results ??
-          data?.rows ??
-          data?.data ??
-          [];
-
-        // pagination fields (flexible)
-        const page =
-          Number(data?.page) ||
-          Number(data?.currentPage) ||
-          Number(data?.pagination?.page) ||
-          1;
-
-        const total =
-          Number(data?.totalPages) ||
-          Number(data?.pages) ||
-          Number(data?.pagination?.totalPages) ||
-          1;
-
-        return { programs, page, totalPages: total };
-      }
-
-      async function runSearch(page = 1) {
-        // cancel previous request
-        if (activeController) activeController.abort();
-        activeController = new AbortController();
-
-        setLoading(true);
-
-        try {
-          const params = buildParams(page);
-          const url = `${API_PATH}?${params.toString()}`;
-
-          const res = await fetch(url, {
-            cache: "no-store",
-            signal: activeController.signal,
-            headers: {
-              Accept: "application/json",
-            },
-          });
-
-          if (!res.ok) {
-            // try to read json error message if backend returns it
-            let msg = `HTTP ${res.status}`;
-            try {
-              const maybe = await res.json();
-              if (maybe?.error) msg = maybe.error;
-              else if (maybe?.message) msg = maybe.message;
-            } catch (_) {}
-            throw new Error(msg);
-          }
-
-          const data = await res.json();
-          const parsed = parseApiResponse(data);
-
-          currentPage = parsed.page || 1;
-          totalPages = parsed.totalPages || 1;
-
-          resultsWrap.classList.remove("hidden");
-          renderResults(parsed.programs);
-          renderPagination();
-        } catch (err) {
-          if (err?.name === "AbortError") return;
-          console.error(err);
-
-          resultsWrap.classList.remove("hidden");
-          resultsEl.innerHTML = "";
-          paginationEl.innerHTML = "";
-
-          showFeedback(
-            "Couldn’t load the HS directory. Verify the API is reachable at /api/hs-programs and returns JSON."
-          );
-        } finally {
-          setLoading(false);
-        }
-      }
-
-      /***********************
-       * UX: debounce typing
-       ***********************/
-      function debounce(fn, wait = 250) {
-        let t = null;
-        return (...args) => {
-          clearTimeout(t);
-          t = setTimeout(() => fn(...args), wait);
-        };
-      }
-
-      const debouncedSearch = debounce(() => runSearch(1), 300);
-
-      /***********************
-       * EVENTS
-       ***********************/
-      searchBtn.addEventListener("click", () => runSearch(1));
-
-      qInput.addEventListener("keydown", (e) => {
-        if (e.key === "Enter") runSearch(1);
-      });
-
-      qInput.addEventListener("input", () => {
-        // auto-search as user types (debounced)
-        debouncedSearch();
-      });
-
-      stateSel.addEventListener("change", () => runSearch(1));
-
-      /***********************
-       * INIT
-       ***********************/
-      fillStateDropdown();
-
-      // Initial load: show first page of "everything"
-      runSearch(1);
+      searchBtn.addEventListener("click", runSearch);
     </script>
   </body>
 </html>
