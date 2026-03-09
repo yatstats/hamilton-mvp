@@ -143,20 +143,70 @@ body.light-theme .drawer-footer{background:rgba(255,255,255,.8)}
 .news-card{
   position:relative;background:var(--card-bg);border:1px solid var(--line);border-radius:12px;
   overflow:hidden;display:flex;gap:12px;align-items:flex-start;padding:10px;
+  cursor:pointer;
 }
+.news-card:focus-within{outline:2px solid var(--fg);outline-offset:2px}
 .news-thumb{
   display:block;flex-shrink:0;width:120px;aspect-ratio:5/7;background:#000 center/cover no-repeat;border-radius:8px
 }
 .news-body{flex:1;padding:0}
-.news-title{display:block;font:400 22px/1.05 "Bebas Neue",sans-serif;letter-spacing:.03em}
+.news-title{display:block;font:400 22px/1.1 "Bebas Neue",sans-serif;letter-spacing:.03em;cursor:pointer}
 .news-title:hover{text-decoration:underline}
-.news-meta{font:300 12px/1.2 Oswald;letter-spacing:.02em;color:var(--muted);margin-top:6px}
-.news-links{display:flex;gap:12px;margin-top:4px}
+.news-snippet{font:300 14px/1.55 Oswald;color:var(--muted);margin:6px 0 2px}
+.news-meta{font:300 14px/1.5 Oswald;letter-spacing:.02em;color:var(--muted);margin-top:8px}
+.news-links{display:flex;gap:12px;margin-top:8px}
 .news-readmore, .news-market{font:400 13px/1.1 "Bebas Neue",sans-serif;letter-spacing:.03em}
+.news-readmore{cursor:pointer}
 .news-readmore:hover, .news-market:hover{text-decoration:underline}
 .news-share{display:flex;gap:10px;justify-content:flex-end;margin-top:8px}
 .news-share .icon-btn{opacity:.85;font-size:18px}
 .news-share .icon-btn:hover{opacity:1}
+
+body.modal-open { overflow: hidden; }
+
+/* ──── Article detail modal ──── */
+.article-modal-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.78);z-index:90;
+  display:flex;align-items:center;justify-content:center;
+  padding:16px;overflow-y:auto;
+}
+.article-modal-overlay[hidden]{display:none}
+.article-modal{
+  background:var(--card-bg);border:1px solid var(--line);border-radius:16px;
+  width:100%;max-width:640px;overflow:hidden;position:relative;
+  display:flex;flex-direction:column;max-height:calc(100vh - 32px);
+}
+.article-modal-close{
+  position:absolute;top:10px;right:10px;z-index:2;
+  background:rgba(0,0,0,.6);border:none;border-radius:50%;
+  width:32px;height:32px;display:flex;align-items:center;justify-content:center;
+  cursor:pointer;color:#fff;
+}
+.article-modal-close:hover{background:rgba(0,0,0,.85)}
+.article-modal-img{
+  width:100%;aspect-ratio:16/9;background:#111 center/cover no-repeat;flex-shrink:0;
+}
+.article-modal-body{
+  padding:18px 20px 24px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;
+}
+.article-modal-title{font:400 28px/1.1 "Bebas Neue",sans-serif;letter-spacing:.03em}
+.article-modal-player{font:400 14px/1.4 Oswald;letter-spacing:.05em;color:var(--muted);text-transform:uppercase}
+.article-modal-meta{font:300 13px/1.5 Oswald;color:var(--muted);letter-spacing:.02em}
+.article-modal-snippet{
+  font:300 15px/1.65 Oswald;color:var(--ink);
+  border-left:2px solid var(--line);padding-left:12px;margin:4px 0;
+}
+.article-modal-actions{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:8px}
+.article-modal-readmore{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:10px 18px;background:var(--fg);color:var(--bg);
+  border-radius:10px;font:400 14px "Bebas Neue",sans-serif;letter-spacing:.06em;
+  transition:opacity .15s;
+}
+.article-modal-readmore:hover{opacity:.85}
+.article-modal-share{display:flex;gap:10px;align-items:center}
+.article-modal-share .icon-btn{opacity:.8;font-size:20px}
+.article-modal-share .icon-btn:hover{opacity:1}
 
 /* Overlay mode (used on certain BPs) */
 .overlay-mode .news-card{display:block;padding:0}
@@ -447,6 +497,29 @@ body.light-theme .drawer-footer{background:rgba(255,255,255,.8)}
   </a>
 </footer>
 
+<!-- ──────────────── ARTICLE DETAIL MODAL ──────────────── -->
+<div id="articleModal" class="article-modal-overlay" hidden role="dialog" aria-modal="true" aria-labelledby="articleModalTitle">
+  <div class="article-modal">
+    <button type="button" class="article-modal-close" id="articleModalClose" aria-label="Close article">
+      <i class="ri-close-line" style="font-size:18px"></i>
+    </button>
+    <div id="articleModalImg" class="article-modal-img" role="img" aria-label="Article image"></div>
+    <div class="article-modal-body">
+      <div id="articleModalTitle" class="article-modal-title"></div>
+      <div id="articleModalPlayer" class="article-modal-player" hidden></div>
+      <div id="articleModalMeta" class="article-modal-meta"></div>
+      <div id="articleModalSnippet" class="article-modal-snippet" hidden></div>
+      <div class="article-modal-actions">
+        <a id="articleModalReadMore" class="article-modal-readmore" href="#" target="_blank" rel="noopener">
+          <span id="articleModalReadMoreText">READ FULL ARTICLE</span>
+          <i class="ri-external-link-line"></i>
+        </a>
+        <div class="article-modal-share" id="articleModalShare" aria-label="Share article"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- ---------------- DEMO DATA FOR INVESTOR VIEW ---------------- -->
 <script type="application/json" id="news-json">
 {
@@ -708,6 +781,9 @@ function fallbackWeeks(){
 const PRO_LEVELS = new Set(['MLB','INTERNATIONAL','TRIPLE-A','AAA','DOUBLE-A','AA','HIGH-A','A+','LOW-A','A','ROOKIE','ROK','INDY']);
 const COLLEGE_LEVELS = new Set(['NCAA-D1','NCAA-D2','NCAA-D3','NAIA','JUCO']);
 let ALL_NEWS = [];
+/** Map of articleId → normalised article, populated as cards are rendered. */
+const ARTICLES_BY_ID = new Map();
+let _cardSeq = 0;
 function firstNameOf(full){ return String(full||'').trim().split(/\s+/)[0] || ''; }
 
 /**
@@ -759,7 +835,7 @@ function safeUrl(raw){
 
 /** Normalise a raw article row from either the DB API or the legacy demo JSON */
 function normaliseArticle(n){
-  return {
+  const article = {
     id:           n.id,
     hsid:         n.hsid,
     teamid:       n.teamid,
@@ -776,10 +852,83 @@ function normaliseArticle(n){
     snippet:      n.snippet || '',
     // DB uses category; legacy demo stored level in tags.level
     category:     n.category || n.tags?.level || '',
+    // TODO: grad_class and active_status require a player metadata join on playerid
+    grad_class:    n.grad_class    || null,
+    active_status: n.active_status || null,
   };
+  article.normalizedLevel = normalizeLevel(article.category);
+  article.confidence      = confidenceScore(article);
+  return article;
+}
+
+/**
+ * Minimum confidence score for an article to be rendered publicly.
+ * Articles scored below this threshold are suppressed as likely false-positive
+ * player matches (e.g. a different athlete sharing the same name).
+ */
+const MIN_CONFIDENCE = 40;
+
+/**
+ * Collapse category/level aliases to a canonical uppercase string.
+ * e.g. "Triple-A" → "AAA", "A+" → "HIGH-A".
+ */
+function normalizeLevel(cat){
+  const up = (cat || '').toUpperCase().trim();
+  if (up === 'TRIPLE-A')            return 'AAA';
+  if (up === 'DOUBLE-A')            return 'AA';
+  if (up === 'HIGH-A' || up === 'A+') return 'HIGH-A';
+  if (up === 'LOW-A'  || up === 'A')  return 'LOW-A';
+  return up;
+}
+
+/**
+ * Score how confidently an article is matched to the correct Hamilton alumnus.
+ * Returns a value in 0–100.
+ *
+ * Signals used (in priority order):
+ *  1. playerid present and > 0  → strong pipeline match (score 90)
+ *  2. player_name absent        → general school news, always show (score 100)
+ *  3. player's full name found in title/snippet → medium confidence (score 60–75)
+ *  4. player's last name found in title/snippet → weaker signal (+10/+5)
+ *  5. name-only tag, not in article text        → low confidence (score 30 → suppressed)
+ *
+ * TODO: incorporate player metadata (team, school, grad_class) once a player
+ *       join is available so context mismatches (e.g. wrong sport) are caught.
+ *       A future reviewed/curated publishable layer can override this score.
+ */
+function confidenceScore(n){
+  const playerName = (n.player_name || '').toLowerCase();
+
+  // No player match: general alumni-school news — always show
+  if (!playerName) return 100;
+
+  // Strong signal: data pipeline explicitly assigned a playerid
+  if (n.playerid != null && Number.isFinite(Number(n.playerid)) && Number(n.playerid) > 0) return 90;
+
+  // Name-only match: score by how prominently the player appears in the article
+  const title   = (n.title   || '').toLowerCase();
+  const snippet = (n.snippet || '').toLowerCase();
+
+  let score = 30; // base for any name-tagged article
+
+  if (title.includes(playerName))             score += 30; // full name in title
+  if (snippet && snippet.includes(playerName)) score += 15; // full name in snippet
+
+  // Partial last-name check as a weaker signal
+  const parts    = playerName.split(/\s+/);
+  const lastName = parts.length > 1 ? parts[parts.length - 1] : '';
+  if (lastName && title.includes(lastName))              score += 10;
+  if (lastName && snippet && snippet.includes(lastName)) score +=  5;
+
+  return Math.min(score, 85);
 }
 
 function newsCardHTML(n){
+  // Register article in the lookup map so the modal can retrieve it by ID
+  const articleId = (n.id != null) ? String(n.id) : `_c${++_cardSeq}`;
+  ARTICLES_BY_ID.set(articleId, n);
+  const safeId = escapeHTML(articleId);
+
   const articleUrl = safeUrl(n.url);
   // Use safeUrl for the thumbnail too: background-image:url() can execute
   // javascript: schemes in some browsers, so validate the scheme here.
@@ -792,33 +941,32 @@ function newsCardHTML(n){
   const first = firstNameOf(n.player_name || '');
   const shareText = encodeURIComponent(`We See Where YAT, ${first}! #YATABOY${first}`);
   const shareUrl = encodeURIComponent(articleUrl === '#' ? location.href : articleUrl);
-  const xHref = `https://twitter.com/intent/tweet?text=${shareText}&url=${shareUrl}`;
+  const xHref  = `https://twitter.com/intent/tweet?text=${shareText}&url=${shareUrl}`;
+  const fbHref = `https://www.facebook.com/sharer/sharer.php?u=${shareUrl}`;
   const schoolName = escapeHTML((window.SCHOOL_CONFIG?.name)||'School');
   const mailHref = `mailto:?subject=${encodeURIComponent(n.title||`${schoolName} Alumni News`)}&body=${shareText}%0A${shareUrl}`;
+  const copyUrl = escapeHTML(articleUrl === '#' ? '' : articleUrl);
   const snippetHTML = n.snippet
-    ? `<p class="news-snippet" style="font:300 12px/1.4 Oswald;color:var(--muted);margin:4px 0 0">${escapeHTML(n.snippet)}</p>`
+    ? `<p class="news-snippet">${escapeHTML(n.snippet)}</p>`
     : '';
   const playerMeta = pname ? `<span>${pname}</span> · ` : '';
   return `
-  <article class="news-card">
-    <a class="news-thumb" href="${articleUrl}" target="_blank" rel="noopener"
-       style="background-image:url('${img}')"
-       aria-label="Open story"></a>
+  <article class="news-card" data-open-article="${safeId}">
+    <a class="news-thumb" href="#" aria-label="View article details"
+       style="background-image:url('${img}')"></a>
     <div class="news-body">
-      <a class="news-title" href="${articleUrl}" target="_blank" rel="noopener">${title}</a>
+      <span class="news-title">${title}</span>
       ${snippetHTML}
       <div class="news-meta">${playerMeta}${src} · ${when}</div>
       <div class="news-links">
-        <a class="news-readmore" href="${articleUrl}" target="_blank" rel="noopener">READ MORE</a>
-        <!-- TEXT UPDATED TO MENTORSHIP MARKETPLACE -->
+        <span class="news-readmore">VIEW STORY</span>
         <a class="news-market" href="marketplace.html">MENTORSHIP MARKETPLACE</a>
       </div>
       <div class="news-share" aria-label="Share">
         <a class="icon-btn" href="${xHref}" target="_blank" rel="noopener" title="Share to X"><i class="ri-twitter-x-line"></i></a>
-        <a class="icon-btn" href="#" title="Instagram"><i class="ri-instagram-line"></i></a>
-        <a class="icon-btn" href="#" title="Facebook"><i class="ri-facebook-circle-line"></i></a>
-        <a class="icon-btn" href="#" title="TikTok"><i class="ri-tiktok-line"></i></a>
-        <a class="icon-btn" href="${mailHref}" title="Email"><i class="ri-mail-line"></i></a>
+        <a class="icon-btn" href="${fbHref}" target="_blank" rel="noopener" title="Share to Facebook"><i class="ri-facebook-circle-line"></i></a>
+        <a class="icon-btn" href="${mailHref}" title="Share via email"><i class="ri-mail-line"></i></a>
+        <button class="icon-btn copy-link-btn" data-copy-url="${copyUrl}" title="Copy link" aria-label="Copy link"><i class="ri-link"></i></button>
       </div>
     </div>
   </article>`;
@@ -826,20 +974,25 @@ function newsCardHTML(n){
 
 /** Rebuild dynamic filter options from the current article dataset */
 function populateFilterOptions(){
-  // Level options from category field
+  // Level options — populated from normalizedLevel so checkbox values are
+  // always uppercase and consistent with the comparison in renderNewsLists().
   const levelsBox = $('#filterLevels');
   if (levelsBox){
     const existing = new Set(
       Array.from(levelsBox.querySelectorAll('input[type="checkbox"]:not(.select-all)'))
         .map(i=>i.value)
     );
-    const seen = new Set(ALL_NEWS.map(n=>n.category).filter(Boolean));
-    seen.forEach(cat=>{
-      if (!existing.has(cat)){
+    const seen = new Set(
+      ALL_NEWS
+        .map(n => n.normalizedLevel || (n.category || '').toUpperCase())
+        .filter(Boolean)
+    );
+    seen.forEach(level=>{
+      if (!existing.has(level)){
         const lbl = document.createElement('label');
         const cb = document.createElement('input');
-        cb.type = 'checkbox'; cb.value = cat;
-        lbl.appendChild(cb); lbl.append(' ' + cat);
+        cb.type = 'checkbox'; cb.value = level; // already uppercase
+        lbl.appendChild(cb); lbl.append(' ' + level);
         levelsBox.appendChild(lbl);
       }
     });
@@ -912,28 +1065,33 @@ function renderNewsLists(){
   };
 
   const items = (ALL_NEWS || []).filter(n=>{
+    // Suppress low-confidence player matches (likely false positives)
+    if ((n.confidence ?? 100) < MIN_CONFIDENCE) return false;
+
     const title   = (n.title       || '').toLowerCase();
     const player  = (n.player_name || '').toLowerCase();
     const snippet = (n.snippet     || '').toLowerCase();
-    const category = (n.category || '').toUpperCase();
+    // Use normalizedLevel for filter comparison so checkbox values (uppercase)
+    // always match the article's level regardless of raw DB casing.
+    const normLevel = n.normalizedLevel || (n.category || '').toUpperCase();
     // TODO: n.status comes from player join — skip until playerid data is available
     const status  = '';
 
     if (nameQ    && !title.includes(nameQ)    && !player.includes(nameQ))  return false;
     if (keywordQ && !title.includes(keywordQ) && !snippet.includes(keywordQ)) return false;
     if (!inDate(n.published_at)) return false;
-    if (selLevels && !selLevels.has(category))          return false;
-    if (selStatus && status && !selStatus.has(status))  return false;
-    if (selSource && !selSource.has(n.source))          return false;
+    if (selLevels && !selLevels.has(normLevel))          return false;
+    if (selStatus && status && !selStatus.has(status))   return false;
+    if (selSource && !selSource.has(n.source))           return false;
 
     return true;
   }).sort((a,b)=> new Date(b.published_at||0) - new Date(a.published_at||0));
 
-  const pros    = items.filter(n=> PRO_LEVELS.has((n.category || '').toUpperCase()));
-  const college = items.filter(n=> COLLEGE_LEVELS.has((n.category || '').toUpperCase()));
+  const pros    = items.filter(n=> PRO_LEVELS.has(n.normalizedLevel || (n.category||'').toUpperCase()));
+  const college = items.filter(n=> COLLEGE_LEVELS.has(n.normalizedLevel || (n.category||'').toUpperCase()));
   const other   = items.filter(n=> {
-    const cat = (n.category || '').toUpperCase();
-    return !PRO_LEVELS.has(cat) && !COLLEGE_LEVELS.has(cat);
+    const lvl = n.normalizedLevel || (n.category || '').toUpperCase();
+    return !PRO_LEVELS.has(lvl) && !COLLEGE_LEVELS.has(lvl);
   });
 
   const empty = msg => `<p style="color:var(--muted)">${msg}</p>`;
@@ -949,6 +1107,95 @@ function renderNewsLists(){
       allSec.style.display = 'none';
     }
   }
+}
+
+/*** ----------------- ARTICLE MODAL ----------------- ***/
+
+/**
+ * Open the internal article detail modal for the given articleId.
+ * The modal shows headline, image, source, date, player, and snippet.
+ * The only outbound link is the secondary "Read full article" button.
+ */
+function openArticleModal(articleId){
+  const n = ARTICLES_BY_ID.get(articleId);
+  if (!n) return;
+  const modal = document.getElementById('articleModal');
+  if (!modal) return;
+
+  const articleUrl = safeUrl(n.url);
+  const rawImg = n.image_url || '';
+  const img = safeUrl(rawImg) !== '#' ? rawImg : 'assets/img/news/placeholder.jpg';
+  const when = n.published_at ? new Date(n.published_at).toLocaleString() : '';
+  const src  = n.source || '';
+  const first = firstNameOf(n.player_name || '');
+
+  // Thumbnail — img is already validated by safeUrl; use directly in CSS (no HTML encoding)
+  const imgEl = document.getElementById('articleModalImg');
+  if (imgEl) imgEl.style.backgroundImage = `url('${img.replace(/'/g, '%27')}')`;
+
+  // Title
+  const titleEl = document.getElementById('articleModalTitle');
+  if (titleEl) titleEl.textContent = n.title || '';
+
+  // Player name
+  const playerEl = document.getElementById('articleModalPlayer');
+  if (playerEl){
+    playerEl.textContent = n.player_name || '';
+    playerEl.hidden = !n.player_name;
+  }
+
+  // Source · date metadata
+  const metaEl = document.getElementById('articleModalMeta');
+  if (metaEl) metaEl.textContent = [src, when].filter(Boolean).join(' · ');
+
+  // Snippet
+  const snippetEl = document.getElementById('articleModalSnippet');
+  if (snippetEl){
+    snippetEl.textContent = n.snippet || '';
+    snippetEl.hidden = !n.snippet;
+  }
+
+  // "Read full article" outbound link
+  const readMoreEl = document.getElementById('articleModalReadMore');
+  if (readMoreEl){
+    if (articleUrl !== '#'){
+      readMoreEl.href = articleUrl;
+      readMoreEl.style.display = '';
+      const labelEl = document.getElementById('articleModalReadMoreText');
+      if (labelEl) labelEl.textContent = src ? `READ FULL ARTICLE AT ${src.toUpperCase()}` : 'READ FULL ARTICLE';
+    } else {
+      readMoreEl.style.display = 'none';
+    }
+  }
+
+  // Share buttons (built dynamically to keep modal HTML lean)
+  const shareText = encodeURIComponent(`We See Where YAT, ${first}! #YATABOY${first}`);
+  const shareUrl  = encodeURIComponent(articleUrl !== '#' ? articleUrl : location.href);
+  const xHref     = `https://twitter.com/intent/tweet?text=${shareText}&url=${shareUrl}`;
+  const fbHref    = `https://www.facebook.com/sharer/sharer.php?u=${shareUrl}`;
+  const schoolName = (window.SCHOOL_CONFIG?.name) || 'School';
+  const mailHref  = `mailto:?subject=${encodeURIComponent(n.title || `${schoolName} Alumni News`)}&body=${shareText}%0A${shareUrl}`;
+  const copyUrl   = escapeHTML(articleUrl !== '#' ? articleUrl : location.href);
+
+  const shareEl = document.getElementById('articleModalShare');
+  if (shareEl){
+    shareEl.innerHTML = `
+      <a class="icon-btn" href="${xHref}" target="_blank" rel="noopener" title="Share to X"><i class="ri-twitter-x-line"></i></a>
+      <a class="icon-btn" href="${fbHref}" target="_blank" rel="noopener" title="Share to Facebook"><i class="ri-facebook-circle-line"></i></a>
+      <a class="icon-btn" href="${mailHref}" title="Share via email"><i class="ri-mail-line"></i></a>
+      <button class="icon-btn copy-link-btn" data-copy-url="${copyUrl}" title="Copy link" aria-label="Copy link"><i class="ri-link"></i></button>
+    `;
+  }
+
+  modal.hidden = false;
+  document.body.classList.add('modal-open');
+  document.getElementById('articleModalClose')?.focus();
+}
+
+function closeArticleModal(){
+  const modal = document.getElementById('articleModal');
+  if (modal) modal.hidden = true;
+  document.body.classList.remove('modal-open');
 }
 
 /*** ----------------- BOOT ----------------- ***/
@@ -985,6 +1232,61 @@ document.addEventListener('DOMContentLoaded', async ()=>{
 
   $('#filtersReset')?.addEventListener('click',  e=>{ e.preventDefault(); resetFilters(); applyNewsFilters(); });
   $('#filtersReset2')?.addEventListener('click', e=>{ e.preventDefault(); resetFilters(); applyNewsFilters(); });
+
+  // ── Article modal ─────────────────────────────────────────────────────────
+  document.getElementById('articleModalClose')?.addEventListener('click', closeArticleModal);
+
+  // Click outside the modal card to close
+  document.getElementById('articleModal')?.addEventListener('click', e=>{
+    if (e.target === document.getElementById('articleModal')) closeArticleModal();
+  });
+
+  // ESC key closes modal
+  document.addEventListener('keydown', e=>{
+    if (e.key === 'Escape') closeArticleModal();
+  });
+
+  // Delegated click handler:
+  //   • copy-link buttons (on cards and inside modal) — copy URL to clipboard
+  //   • card body click → open article modal (excludes share area and marketplace link)
+  document.addEventListener('click', e=>{
+    // Copy-link button — handle first so it doesn't also trigger modal open
+    const copyBtn = e.target.closest('.copy-link-btn');
+    if (copyBtn){
+      e.preventDefault();
+      e.stopPropagation();
+      const url = copyBtn.dataset.copyUrl || location.href;
+      const flashCheck = ()=>{
+        const orig = copyBtn.innerHTML;
+        copyBtn.innerHTML = '<i class="ri-check-line"></i>';
+        setTimeout(()=>{ copyBtn.innerHTML = orig; }, 1500);
+      };
+      navigator.clipboard?.writeText(url).then(flashCheck).catch(()=>{
+        // Fallback for browsers that restrict clipboard API
+        try {
+          const ta = document.createElement('textarea');
+          ta.value = url;
+          ta.style.cssText = 'position:fixed;opacity:0;top:0;left:0';
+          document.body.appendChild(ta);
+          ta.focus(); ta.select();
+          document.execCommand('copy');
+          document.body.removeChild(ta);
+          flashCheck();
+        } catch {}
+      });
+      return;
+    }
+
+    // Share area and marketplace links remain outbound — don't open modal
+    if (e.target.closest('.news-share') || e.target.closest('.news-market')) return;
+
+    // Card click → open modal
+    const card = e.target.closest('[data-open-article]');
+    if (card){
+      e.preventDefault();
+      openArticleModal(card.dataset.openArticle);
+    }
+  });
 
   // ── News loading ──────────────────────────────────────────────────────────
   // HSID is resolved from window.SCHOOL_CONFIG which is populated by
