@@ -433,38 +433,6 @@ body.light-theme .card-block{box-shadow:0 8px 18px rgba(0,0,0,.12);}
 .game-log-team{font:700 14px "Bebas Neue",sans-serif;letter-spacing:.04em;opacity:.9}
 .game-schedule-msg{font-size:14px;opacity:.8;text-align:center;padding:18px 0}
 
-/* CAREER PATH */
-.career-path-section{
-  background:var(--card-bg);
-  border-radius:16px;
-  padding:14px;
-  margin-top:12px;
-  box-shadow:0 8px 18px rgba(0,0,0,.35);
-}
-body.light-theme .career-path-section{box-shadow:0 8px 18px rgba(0,0,0,.12);}
-.career-path-title{
-  font:400 11px "Bebas Neue",sans-serif;
-  letter-spacing:.1em;
-  text-transform:uppercase;
-  color:var(--muted);
-  margin-bottom:6px;
-}
-.career-path-divider{border:none;border-top:1px solid var(--line);margin:0 0 12px}
-.career-path-stops{display:flex;flex-wrap:wrap;gap:18px;padding:4px 0}
-.career-stop{display:flex;flex-direction:column;align-items:center;gap:6px;min-width:60px}
-.career-stop-dot{
-  width:14px;height:14px;border-radius:50%;
-  border:2px solid var(--muted);background:transparent;flex-shrink:0;
-}
-.career-stop-name{
-  font:700 9px "Bebas Neue",sans-serif;
-  letter-spacing:.08em;
-  text-transform:uppercase;
-  text-align:center;
-  max-width:72px;
-  word-break:break-word;
-}
-
 /* FOOTER sponsor */
 .site-footer{
   position:fixed;
@@ -1026,37 +994,6 @@ function renderGameLogTab(player){
     scheduleHTML = `<p class="game-schedule-msg">Schedule not yet available for ${teamDisplay}.</p>`;
   }
 
-  // Career path: build from colleges and org, filtering out UNKNOWN/blank values
-  const isUnknown = v => {
-    if (v == null || typeof v !== 'string') return true;
-    const u = v.trim().toUpperCase();
-    return u === '' || u === 'UNKNOWN' || u === '--' || u === 'N/A';
-  };
-
-  const collegeStops = (player.colleges || '')
-    .split(/[,;]/)
-    .map(c => c.trim())
-    .filter(c => !isUnknown(c));
-
-  const orgStop = (player.org || '').trim();
-  const orgValid = !isUnknown(orgStop) ? orgStop : '';
-
-  const careerStops = [...collegeStops];
-  if (orgValid && !careerStops.some(s => s.toUpperCase() === orgValid.toUpperCase())) careerStops.push(orgValid);
-
-  const careerPathHTML = careerStops.length > 0 ? `
-    <div class="career-path-section">
-      <div class="career-path-title">CAREER PATH</div>
-      <hr class="career-path-divider">
-      <div class="career-path-stops">
-        ${careerStops.map(stop => `
-          <div class="career-stop">
-            <div class="career-stop-dot"></div>
-            <div class="career-stop-name">${escHTML(stop)}</div>
-          </div>`).join('')}
-      </div>
-    </div>` : '';
-
   panel.innerHTML = `
     <div class="card-block">
       <div class="game-log-header">
@@ -1064,8 +1001,7 @@ function renderGameLogTab(player){
         <div class="game-log-team">${teamDisplay}</div>
       </div>
       ${scheduleHTML}
-    </div>
-    ${careerPathHTML}`;
+    </div>`;
 }
 
 function renderNewsTab(player){
