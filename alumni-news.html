@@ -234,10 +234,29 @@ body.light-theme .drawer-footer{background:rgba(255,255,255,.8)}
 
 /* Focus */
 .icon-btn:focus,button:focus,input:focus{outline:2px solid var(--fg);outline-offset:2px}
+
+/* Demo-data warning banner */
+#demoBanner{
+  display:none;
+  background:#7c3a00;
+  color:#fff;
+  font:400 12px/1.4 Oswald;
+  letter-spacing:.06em;
+  text-align:center;
+  padding:6px 16px;
+  text-transform:uppercase;
+  z-index:49;
+}
+#demoBanner strong{font-weight:700}
 </style>
 
 </head>
 <body data-tokenize>
+<!-- DEMO DATA WARNING — shown when the API is unavailable and the page is
+     using the embedded sample articles instead of live database content -->
+<div id="demoBanner" role="alert" aria-live="polite">
+  <strong>⚠ Demo data</strong> — Live articles could not be loaded. This content is sample data only and does not reflect actual alumni news.
+</div>
 <!-- HEADER -->
 <header class="header">
   <div class="container topbar">
@@ -326,16 +345,18 @@ body.light-theme .drawer-footer{background:rgba(255,255,255,.8)}
       </div>
     </details>
 
-    <details class="filter-group">
-      <summary class="filter-title">By Status</summary>
+    <!-- Status filter is disabled until player metadata is joined via playerid.
+         Checking these boxes currently has no effect on results. -->
+    <details class="filter-group" aria-disabled="true" style="opacity:.45;pointer-events:none">
+      <summary class="filter-title">By Status <span style="font:300 10px Oswald;letter-spacing:.02em;color:var(--muted);margin-left:6px">(requires player data)</span></summary>
       <div class="filter-options" id="filterStatus">
-        <label class="select-all-label"><input type="checkbox" class="select-all"> Select All</label>
-        <label><input type="checkbox" value="ACTIVE 2025"> ACTIVE 2025</label>
-        <label><input type="checkbox" value="ACTIVE 2024"> ACTIVE 2024</label>
-        <label><input type="checkbox" value="FREE AGENT"> FREE AGENT</label>
-        <label><input type="checkbox" value="INJURED"> INJURED</label>
-        <label><input type="checkbox" value="RETIRED"> RETIRED</label>
-        <label><input type="checkbox" value="SPONSOR"> SPONSOR</label>
+        <label class="select-all-label"><input type="checkbox" class="select-all" disabled> Select All</label>
+        <label><input type="checkbox" value="ACTIVE 2025" disabled> ACTIVE 2025</label>
+        <label><input type="checkbox" value="ACTIVE 2024" disabled> ACTIVE 2024</label>
+        <label><input type="checkbox" value="FREE AGENT" disabled> FREE AGENT</label>
+        <label><input type="checkbox" value="INJURED" disabled> INJURED</label>
+        <label><input type="checkbox" value="RETIRED" disabled> RETIRED</label>
+        <label><input type="checkbox" value="SPONSOR" disabled> SPONSOR</label>
       </div>
     </details>
 
@@ -405,10 +426,10 @@ body.light-theme .drawer-footer{background:rgba(255,255,255,.8)}
     </aside>
   </div>
 
-  <!-- All Headlines — items whose category isn't recognised as pro or college -->
+  <!-- Other Headlines — items whose category isn't recognised as pro or college -->
   <!-- TODO: improve classification once category values are standardised in the pipeline -->
   <section id="col-all" class="news-col news-root overlay-mode" style="margin-top:16px;display:none">
-    <h3>ALL HEADLINES</h3>
+    <h3>OTHER HEADLINES</h3>
     <div id="allFeed" class="news-feed"></div>
   </section>
 
@@ -689,6 +710,53 @@ const COLLEGE_LEVELS = new Set(['NCAA-D1','NCAA-D2','NCAA-D3','NAIA','JUCO']);
 let ALL_NEWS = [];
 function firstNameOf(full){ return String(full||'').trim().split(/\s+/)[0] || ''; }
 
+/**
+ * Escape a string for safe insertion into HTML text content or attribute values.
+ *
+ * Security contract:
+ *   escapeHTML('<script>') === '&lt;script&gt;'
+ *   escapeHTML('"x"')      === '&quot;x&quot;'
+ *   escapeHTML("'x'")      === '&#x27;x&#x27;'
+ *   escapeHTML('a & b')    === 'a &amp; b'
+ *   escapeHTML(null)        === ''
+ *   escapeHTML(undefined)   === ''
+ *   escapeHTML('')          === ''
+ *
+ * TODO: when a test runner is added to this project, cover these cases
+ * plus double-escaping (already-escaped input must NOT be double-escaped).
+ */
+function escapeHTML(str){
+  return String(str||'')
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;')
+    .replace(/'/g,'&#x27;');
+}
+
+/**
+ * Return the URL only when it uses http or https.
+ * Falls back to '#' for any other scheme (e.g. javascript:, data:, file:) to
+ * prevent script injection via href attributes or CSS background-image: url().
+ *
+ * Security contract:
+ *   safeUrl('https://example.com')    → 'https://example.com'
+ *   safeUrl('http://example.com')     → 'http://example.com'
+ *   safeUrl('javascript:alert(1)')    → '#'
+ *   safeUrl('data:text/html,<script>') → '#'
+ *   safeUrl('file:///etc/passwd')     → '#'
+ *   safeUrl('not-a-url')              → '#'  (relative w/ bad scheme becomes absolute, still validated)
+ *   safeUrl(null)                     → '#'
+ *
+ * TODO: when a test runner is added to this project, cover these cases.
+ */
+function safeUrl(raw){
+  try {
+    const u = new URL(String(raw||''), location.href);
+    return (u.protocol === 'http:' || u.protocol === 'https:') ? u.href : '#';
+  } catch { return '#'; }
+}
+
 /** Normalise a raw article row from either the DB API or the legacy demo JSON */
 function normaliseArticle(n){
   return {
@@ -712,29 +780,36 @@ function normaliseArticle(n){
 }
 
 function newsCardHTML(n){
-  const img = n.image_url || 'assets/img/news/placeholder.jpg';
+  const articleUrl = safeUrl(n.url);
+  // Use safeUrl for the thumbnail too: background-image:url() can execute
+  // javascript: schemes in some browsers, so validate the scheme here.
+  const rawImg = n.image_url || 'assets/img/news/placeholder.jpg';
+  const img = safeUrl(rawImg) !== '#' ? escapeHTML(rawImg) : escapeHTML('assets/img/news/placeholder.jpg');
   const when = n.published_at ? new Date(n.published_at).toLocaleString() : '';
-  const src = n.source || 'News';
-  const pname = n.player_name || '';
-  const first = firstNameOf(pname);
+  const src = escapeHTML(n.source || 'News');
+  const pname = escapeHTML(n.player_name || '');
+  const title = escapeHTML(n.title || 'Read more');
+  const first = firstNameOf(n.player_name || '');
   const shareText = encodeURIComponent(`We See Where YAT, ${first}! #YATABOY${first}`);
-  const shareUrl = encodeURIComponent(n.url || location.href);
+  const shareUrl = encodeURIComponent(articleUrl === '#' ? location.href : articleUrl);
   const xHref = `https://twitter.com/intent/tweet?text=${shareText}&url=${shareUrl}`;
-  const schoolName = (window.SCHOOL_CONFIG?.name)||'School';
+  const schoolName = escapeHTML((window.SCHOOL_CONFIG?.name)||'School');
   const mailHref = `mailto:?subject=${encodeURIComponent(n.title||`${schoolName} Alumni News`)}&body=${shareText}%0A${shareUrl}`;
-  const snippetHTML = n.snippet ? `<p class="news-snippet" style="font:300 12px/1.4 Oswald;color:var(--muted);margin:4px 0 0">${n.snippet}</p>` : '';
+  const snippetHTML = n.snippet
+    ? `<p class="news-snippet" style="font:300 12px/1.4 Oswald;color:var(--muted);margin:4px 0 0">${escapeHTML(n.snippet)}</p>`
+    : '';
   const playerMeta = pname ? `<span>${pname}</span> · ` : '';
   return `
   <article class="news-card">
-    <a class="news-thumb" href="${n.url||'#'}" target="_blank" rel="noopener"
+    <a class="news-thumb" href="${articleUrl}" target="_blank" rel="noopener"
        style="background-image:url('${img}')"
        aria-label="Open story"></a>
     <div class="news-body">
-      <a class="news-title" href="${n.url||'#'}" target="_blank" rel="noopener">${n.title||'Read more'}</a>
+      <a class="news-title" href="${articleUrl}" target="_blank" rel="noopener">${title}</a>
       ${snippetHTML}
       <div class="news-meta">${playerMeta}${src} · ${when}</div>
       <div class="news-links">
-        <a class="news-readmore" href="${n.url||'#'}" target="_blank" rel="noopener">READ MORE</a>
+        <a class="news-readmore" href="${articleUrl}" target="_blank" rel="noopener">READ MORE</a>
         <!-- TEXT UPDATED TO MENTORSHIP MARKETPLACE -->
         <a class="news-market" href="marketplace.html">MENTORSHIP MARKETPLACE</a>
       </div>
@@ -969,6 +1044,18 @@ document.addEventListener('DOMContentLoaded', async ()=>{
 
   /** Load articles from the embedded demo JSON (fallback / development) */
   function loadFromEmbedded(){
+    // ── Demo-data safety indicators ──────────────────────────────────────────
+    // Show a visible on-page banner so fallback content is never mistaken for
+    // live data, and emit a loud console warning for developers.
+    const banner = document.getElementById('demoBanner');
+    if (banner) banner.style.display = '';
+    console.warn(
+      '%c[YAT?STATS] DEMO DATA MODE',
+      'background:#7c3a00;color:#fff;font-weight:bold;padding:2px 6px',
+      '— The /api/news-articles endpoint could not be reached. ' +
+      'The page is displaying embedded sample articles, NOT live database content. ' +
+      'Ensure NEON_DATABASE_URL is set and the Vercel function is deployed.'
+    );
     try{
       const raw  = $('#news-json')?.textContent || '{}';
       const data = JSON.parse(raw);
