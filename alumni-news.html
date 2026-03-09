@@ -234,10 +234,29 @@ body.light-theme .drawer-footer{background:rgba(255,255,255,.8)}
 
 /* Focus */
 .icon-btn:focus,button:focus,input:focus{outline:2px solid var(--fg);outline-offset:2px}
+
+/* Demo-data warning banner */
+#demoBanner{
+  display:none;
+  background:#7c3a00;
+  color:#fff;
+  font:400 12px/1.4 Oswald;
+  letter-spacing:.06em;
+  text-align:center;
+  padding:6px 16px;
+  text-transform:uppercase;
+  z-index:49;
+}
+#demoBanner strong{font-weight:700}
 </style>
 
 </head>
 <body data-tokenize>
+<!-- DEMO DATA WARNING — shown when the API is unavailable and the page is
+     using the embedded sample articles instead of live database content -->
+<div id="demoBanner" role="alert" aria-live="polite">
+  <strong>⚠ Demo data</strong> — Live articles could not be loaded. This content is sample data only and does not reflect actual alumni news.
+</div>
 <!-- HEADER -->
 <header class="header">
   <div class="container topbar">
@@ -326,16 +345,18 @@ body.light-theme .drawer-footer{background:rgba(255,255,255,.8)}
       </div>
     </details>
 
-    <details class="filter-group">
-      <summary class="filter-title">By Status</summary>
+    <!-- Status filter is disabled until player metadata is joined via playerid.
+         Checking these boxes currently has no effect on results. -->
+    <details class="filter-group" aria-disabled="true" style="opacity:.45;pointer-events:none">
+      <summary class="filter-title">By Status <span style="font:300 10px Oswald;letter-spacing:.02em;color:var(--muted);margin-left:6px">(requires player data)</span></summary>
       <div class="filter-options" id="filterStatus">
-        <label class="select-all-label"><input type="checkbox" class="select-all"> Select All</label>
-        <label><input type="checkbox" value="ACTIVE 2025"> ACTIVE 2025</label>
-        <label><input type="checkbox" value="ACTIVE 2024"> ACTIVE 2024</label>
-        <label><input type="checkbox" value="FREE AGENT"> FREE AGENT</label>
-        <label><input type="checkbox" value="INJURED"> INJURED</label>
-        <label><input type="checkbox" value="RETIRED"> RETIRED</label>
-        <label><input type="checkbox" value="SPONSOR"> SPONSOR</label>
+        <label class="select-all-label"><input type="checkbox" class="select-all" disabled> Select All</label>
+        <label><input type="checkbox" value="ACTIVE 2025" disabled> ACTIVE 2025</label>
+        <label><input type="checkbox" value="ACTIVE 2024" disabled> ACTIVE 2024</label>
+        <label><input type="checkbox" value="FREE AGENT" disabled> FREE AGENT</label>
+        <label><input type="checkbox" value="INJURED" disabled> INJURED</label>
+        <label><input type="checkbox" value="RETIRED" disabled> RETIRED</label>
+        <label><input type="checkbox" value="SPONSOR" disabled> SPONSOR</label>
       </div>
     </details>
 
@@ -353,7 +374,22 @@ body.light-theme .drawer-footer{background:rgba(255,255,255,.8)}
 
     <details class="filter-group">
       <summary class="filter-title">By Roster Year</summary>
+      <!-- TODO: roster year requires player metadata join on playerid -->
       <div class="filter-options" id="filterRosterYear"></div>
+    </details>
+
+    <details class="filter-group">
+      <summary class="filter-title">By Source</summary>
+      <div class="filter-options" id="filterSource">
+        <label class="select-all-label"><input type="checkbox" class="select-all"> Select All</label>
+      </div>
+    </details>
+
+    <details class="filter-group" open>
+      <summary class="filter-title">Keyword Search</summary>
+      <div class="filter-options">
+        <input id="filterKeyword" placeholder="Search headlines & snippets…" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--ink)"/>
+      </div>
     </details>
   </div>
 
@@ -373,11 +409,11 @@ body.light-theme .drawer-footer{background:rgba(255,255,255,.8)}
     <div class="news-wrap">
       <section id="col-pro" class="news-col news-root overlay-mode">
         <h3>ALUMNI HEADLINES (Pros)</h3>
-        <div id="proFeed" class="news-feed"><p style="color:var(--muted)">Loading…</p></div>
+        <div id="proFeed" class="news-feed"><p style="color:var(--muted)">Loading Alumni News…</p></div>
       </section>
       <section id="col-college" class="news-col news-root overlay-mode">
         <h3>ALUMNI HEADLINES (College)</h3>
-        <div id="collegeFeed" class="news-feed"><p style="color:var(--muted)">Loading…</p></div>
+        <div id="collegeFeed" class="news-feed"><p style="color:var(--muted)">Loading Alumni News…</p></div>
       </section>
     </div>
 
@@ -388,6 +424,20 @@ body.light-theme .drawer-footer{background:rgba(255,255,255,.8)}
         <p style="color:var(--muted)">Loading linescores…</p>
       </div>
     </aside>
+  </div>
+
+  <!-- Other Headlines — items whose category isn't recognised as pro or college -->
+  <!-- TODO: improve classification once category values are standardised in the pipeline -->
+  <section id="col-all" class="news-col news-root overlay-mode" style="margin-top:16px;display:none">
+    <h3>OTHER HEADLINES</h3>
+    <div id="allFeed" class="news-feed"></div>
+  </section>
+
+  <!-- Load More -->
+  <div style="text-align:center;margin:16px 0 8px">
+    <button id="loadMoreBtn" style="display:none;padding:12px 28px;border:1px solid var(--line);border-radius:12px;background:none;color:var(--fg);font:400 15px 'Bebas Neue',sans-serif;letter-spacing:.06em;cursor:pointer">
+      LOAD MORE
+    </button>
   </div>
 </main>
 
@@ -504,6 +554,7 @@ function resetFilters(){
     if (i.type==='checkbox') i.checked=false;
     if (i.type==='text' || i.type==='date') i.value='';
   });
+  if ($('#filterKeyword')) $('#filterKeyword').value='';
   // optional: default some statuses on
   $$('#filterStatus input[value^="ACTIVE"]').forEach(i=>i.checked=true);
 }
@@ -658,25 +709,107 @@ const PRO_LEVELS = new Set(['MLB','INTERNATIONAL','TRIPLE-A','AAA','DOUBLE-A','A
 const COLLEGE_LEVELS = new Set(['NCAA-D1','NCAA-D2','NCAA-D3','NAIA','JUCO']);
 let ALL_NEWS = [];
 function firstNameOf(full){ return String(full||'').trim().split(/\s+/)[0] || ''; }
+
+/**
+ * Escape a string for safe insertion into HTML text content or attribute values.
+ *
+ * Security contract:
+ *   escapeHTML('<script>') === '&lt;script&gt;'
+ *   escapeHTML('"x"')      === '&quot;x&quot;'
+ *   escapeHTML("'x'")      === '&#x27;x&#x27;'
+ *   escapeHTML('a & b')    === 'a &amp; b'
+ *   escapeHTML(null)        === ''
+ *   escapeHTML(undefined)   === ''
+ *   escapeHTML('')          === ''
+ *
+ * TODO: when a test runner is added to this project, cover these cases
+ * plus double-escaping (already-escaped input must NOT be double-escaped).
+ */
+function escapeHTML(str){
+  return String(str||'')
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;')
+    .replace(/'/g,'&#x27;');
+}
+
+/**
+ * Return the URL only when it uses http or https.
+ * Falls back to '#' for any other scheme (e.g. javascript:, data:, file:) to
+ * prevent script injection via href attributes or CSS background-image: url().
+ *
+ * Security contract:
+ *   safeUrl('https://example.com')    → 'https://example.com'
+ *   safeUrl('http://example.com')     → 'http://example.com'
+ *   safeUrl('javascript:alert(1)')    → '#'
+ *   safeUrl('data:text/html,<script>') → '#'
+ *   safeUrl('file:///etc/passwd')     → '#'
+ *   safeUrl('not-a-url')              → '#'  (relative w/ bad scheme becomes absolute, still validated)
+ *   safeUrl(null)                     → '#'
+ *
+ * TODO: when a test runner is added to this project, cover these cases.
+ */
+function safeUrl(raw){
+  try {
+    const u = new URL(String(raw||''), location.href);
+    return (u.protocol === 'http:' || u.protocol === 'https:') ? u.href : '#';
+  } catch { return '#'; }
+}
+
+/** Normalise a raw article row from either the DB API or the legacy demo JSON */
+function normaliseArticle(n){
+  return {
+    id:           n.id,
+    hsid:         n.hsid,
+    teamid:       n.teamid,
+    playerid:     n.playerid,
+    // DB uses player_name; legacy demo used player_display_name
+    player_name:  n.player_name || n.player_display_name || n.player || '',
+    title:        n.title || '',
+    source:       n.source || '',
+    // DB uses published_at; legacy demo used publishedAt
+    published_at: n.published_at || n.publishedAt || null,
+    url:          n.url || '',
+    // DB uses image_url; legacy demo used image
+    image_url:    n.image_url || n.image || '',
+    snippet:      n.snippet || '',
+    // DB uses category; legacy demo stored level in tags.level
+    category:     n.category || n.tags?.level || '',
+  };
+}
+
 function newsCardHTML(n){
-  const img = n.image || 'assets/img/news/placeholder.jpg';
-  const when = n.publishedAt ? new Date(n.publishedAt).toLocaleString() : '';
-  const src = n.source || 'News';
-  const pname = n.player_display_name || '';
-  const first = firstNameOf(pname);
+  const articleUrl = safeUrl(n.url);
+  // Use safeUrl for the thumbnail too: background-image:url() can execute
+  // javascript: schemes in some browsers, so validate the scheme here.
+  const rawImg = n.image_url || 'assets/img/news/placeholder.jpg';
+  const img = safeUrl(rawImg) !== '#' ? escapeHTML(rawImg) : escapeHTML('assets/img/news/placeholder.jpg');
+  const when = n.published_at ? new Date(n.published_at).toLocaleString() : '';
+  const src = escapeHTML(n.source || 'News');
+  const pname = escapeHTML(n.player_name || '');
+  const title = escapeHTML(n.title || 'Read more');
+  const first = firstNameOf(n.player_name || '');
   const shareText = encodeURIComponent(`We See Where YAT, ${first}! #YATABOY${first}`);
-  const shareUrl = encodeURIComponent(n.url || location.href);
+  const shareUrl = encodeURIComponent(articleUrl === '#' ? location.href : articleUrl);
   const xHref = `https://twitter.com/intent/tweet?text=${shareText}&url=${shareUrl}`;
-  const schoolName = (window.SCHOOL_CONFIG?.name)||'School';
+  const schoolName = escapeHTML((window.SCHOOL_CONFIG?.name)||'School');
   const mailHref = `mailto:?subject=${encodeURIComponent(n.title||`${schoolName} Alumni News`)}&body=${shareText}%0A${shareUrl}`;
+  const snippetHTML = n.snippet
+    ? `<p class="news-snippet" style="font:300 12px/1.4 Oswald;color:var(--muted);margin:4px 0 0">${escapeHTML(n.snippet)}</p>`
+    : '';
+  const playerMeta = pname ? `<span>${pname}</span> · ` : '';
   return `
   <article class="news-card">
-    <a class="news-thumb" href="${n.url||'#'}" target="_blank" rel="noopener" style="background-image:url('${img}')" aria-label="Open story"></a>
+    <a class="news-thumb" href="${articleUrl}" target="_blank" rel="noopener"
+       style="background-image:url('${img}')"
+       aria-label="Open story"></a>
     <div class="news-body">
-      <a class="news-title" href="${n.url||'#'}" target="_blank" rel="noopener">${n.title||'Read more'}</a>
-      <div class="news-meta">${src} • ${when}</div>
+      <a class="news-title" href="${articleUrl}" target="_blank" rel="noopener">${title}</a>
+      ${snippetHTML}
+      <div class="news-meta">${playerMeta}${src} · ${when}</div>
       <div class="news-links">
-        <a class="news-readmore" href="${n.url||'#'}" target="_blank" rel="noopener">READ MORE</a>
+        <a class="news-readmore" href="${articleUrl}" target="_blank" rel="noopener">READ MORE</a>
         <!-- TEXT UPDATED TO MENTORSHIP MARKETPLACE -->
         <a class="news-market" href="marketplace.html">MENTORSHIP MARKETPLACE</a>
       </div>
@@ -690,58 +823,132 @@ function newsCardHTML(n){
     </div>
   </article>`;
 }
+
+/** Rebuild dynamic filter options from the current article dataset */
+function populateFilterOptions(){
+  // Level options from category field
+  const levelsBox = $('#filterLevels');
+  if (levelsBox){
+    const existing = new Set(
+      Array.from(levelsBox.querySelectorAll('input[type="checkbox"]:not(.select-all)'))
+        .map(i=>i.value)
+    );
+    const seen = new Set(ALL_NEWS.map(n=>n.category).filter(Boolean));
+    seen.forEach(cat=>{
+      if (!existing.has(cat)){
+        const lbl = document.createElement('label');
+        const cb = document.createElement('input');
+        cb.type = 'checkbox'; cb.value = cat;
+        lbl.appendChild(cb); lbl.append(' ' + cat);
+        levelsBox.appendChild(lbl);
+      }
+    });
+  }
+
+  // Source options
+  const srcBox = $('#filterSource');
+  if (srcBox){
+    const existing = new Set(
+      Array.from(srcBox.querySelectorAll('input[type="checkbox"]:not(.select-all)'))
+        .map(i=>i.value)
+    );
+    const seen = new Set(ALL_NEWS.map(n=>n.source).filter(Boolean));
+    seen.forEach(src=>{
+      if (!existing.has(src)){
+        const lbl = document.createElement('label');
+        const cb = document.createElement('input');
+        cb.type = 'checkbox'; cb.value = src;
+        lbl.appendChild(cb); lbl.append(' ' + src);
+        srcBox.appendChild(lbl);
+      }
+    });
+  }
+
+  // TODO: grad class and roster year require joining player data via playerid
+  // Placeholder to prevent empty section confusion
+  const gradBox = $('#filterGradClass');
+  if (gradBox && !gradBox.querySelector('p')){
+    const p = document.createElement('p');
+    p.style.cssText = 'font:300 11px Oswald;color:var(--muted);margin:4px 0';
+    p.textContent = 'Available after player data is linked.';
+    gradBox.appendChild(p);
+  }
+  const rosterBox = $('#filterRosterYear');
+  if (rosterBox && !rosterBox.querySelector('p')){
+    const p = document.createElement('p');
+    p.style.cssText = 'font:300 11px Oswald;color:var(--muted);margin:4px 0';
+    p.textContent = 'Available after player data is linked.';
+    rosterBox.appendChild(p);
+  }
+}
+
 function renderNewsLists(){
-  // current selections
-  const nameQ = ($('#filterName')?.value || '').trim().toLowerCase();
+  // current filter selections
+  const nameQ    = ($('#filterName')?.value    || '').trim().toLowerCase();
+  const keywordQ = ($('#filterKeyword')?.value || '').trim().toLowerCase();
 
   // date range (headlines only)
   const from = $('#dateFrom')?.value ? new Date($('#dateFrom').value) : null;
-  const to   = $('#dateTo')?.value ? new Date($('#dateTo').value + 'T23:59:59') : null;
+  const to   = $('#dateTo')?.value   ? new Date($('#dateTo').value + 'T23:59:59') : null;
 
-  // gather checkbox selections if those groups exist
   const selected = ids => {
     const box = $(ids);
-    if (!box) return null; // group not present -> ignore
+    if (!box) return null;
     const picks = Array.from(box.querySelectorAll('input[type="checkbox"]:not(.select-all):checked'))
       .map(i=>i.value);
-    return picks.length ? new Set(picks) : null; // empty => no filter
+    return picks.length ? new Set(picks) : null;
   };
+  // TODO: status/grad/roster filters require player metadata – wired as stubs
   const selStatus = selected('#filterStatus');
   const selLevels = selected('#filterLevels');
-  const selGrad   = selected('#filterGradClass');
-  const selRoster = selected('#filterRosterYear');
+  const selSource = selected('#filterSource');
 
   const inDate = d => {
     if (!from && !to) return true;
     const t = new Date(d || 0);
     if (from && t < from) return false;
-    if (to && t > to) return false;
+    if (to   && t > to)   return false;
     return true;
   };
 
   const items = (ALL_NEWS || []).filter(n=>{
-    const title = (n.title||'').toLowerCase();
-    const player = (n.player_display_name||'').toLowerCase();
-    const level = String(n.tags?.level||'').toUpperCase();
-    const status = String(n.tags?.status||'').toUpperCase();
-    const grad = String(n.tags?.grad_class||'');
-    const roster = String(n.tags?.roster_year||'');
+    const title   = (n.title       || '').toLowerCase();
+    const player  = (n.player_name || '').toLowerCase();
+    const snippet = (n.snippet     || '').toLowerCase();
+    const category = (n.category || '').toUpperCase();
+    // TODO: n.status comes from player join — skip until playerid data is available
+    const status  = '';
 
-    if (nameQ && !title.includes(nameQ) && !player.includes(nameQ)) return false;
-    if (!inDate(n.publishedAt)) return false;
-    if (selLevels && !selLevels.has(level)) return false;
-    if (selStatus && !selStatus.has(status)) return false;
-    if (selGrad && !selGrad.has(grad)) return false;
-    if (selRoster && !selRoster.has(roster)) return false;
+    if (nameQ    && !title.includes(nameQ)    && !player.includes(nameQ))  return false;
+    if (keywordQ && !title.includes(keywordQ) && !snippet.includes(keywordQ)) return false;
+    if (!inDate(n.published_at)) return false;
+    if (selLevels && !selLevels.has(category))          return false;
+    if (selStatus && status && !selStatus.has(status))  return false;
+    if (selSource && !selSource.has(n.source))          return false;
 
     return true;
-  }).sort((a,b)=> new Date(b.publishedAt||0)-new Date(a.publishedAt||0));
+  }).sort((a,b)=> new Date(b.published_at||0) - new Date(a.published_at||0));
 
-  const pros = items.filter(n=> PRO_LEVELS.has(String(n.tags?.level||'').toUpperCase()) );
-  const college = items.filter(n=> COLLEGE_LEVELS.has(String(n.tags?.level||'').toUpperCase()) );
+  const pros    = items.filter(n=> PRO_LEVELS.has((n.category || '').toUpperCase()));
+  const college = items.filter(n=> COLLEGE_LEVELS.has((n.category || '').toUpperCase()));
+  const other   = items.filter(n=> {
+    const cat = (n.category || '').toUpperCase();
+    return !PRO_LEVELS.has(cat) && !COLLEGE_LEVELS.has(cat);
+  });
 
-  $('#proFeed').innerHTML = pros.length ? pros.map(newsCardHTML).join('') : `<p style="color:var(--muted)">No pro headlines in range.</p>`;
-  $('#collegeFeed').innerHTML = college.length ? college.map(newsCardHTML).join('') : `<p style="color:var(--muted)">No college headlines in range.</p>`;
+  const empty = msg => `<p style="color:var(--muted)">${msg}</p>`;
+  $('#proFeed').innerHTML     = pros.length    ? pros.map(newsCardHTML).join('')    : empty('No pro headlines in range.');
+  $('#collegeFeed').innerHTML = college.length ? college.map(newsCardHTML).join('') : empty('No college headlines in range.');
+
+  const allSec = $('#col-all');
+  if (allSec){
+    if (other.length){
+      $('#allFeed').innerHTML = other.map(newsCardHTML).join('');
+      allSec.style.display = '';
+    } else {
+      allSec.style.display = 'none';
+    }
+  }
 }
 
 /*** ----------------- BOOT ----------------- ***/
@@ -757,16 +964,15 @@ document.addEventListener('DOMContentLoaded', async ()=>{
   $('#clearDates')?.addEventListener('click', e=>{
     e.preventDefault();
     if ($('#dateFrom')) $('#dateFrom').value = '';
-    if ($('#dateTo')) $('#dateTo').value = '';
+    if ($('#dateTo'))   $('#dateTo').value   = '';
     applyNewsFilters();
   });
 
-  // Name filter
-  $('#filterName')?.addEventListener('input', ()=>{
-    applyNewsFilters();
-  });
+  // Name / keyword filter inputs
+  $('#filterName')?.addEventListener('input', ()=>{ applyNewsFilters(); });
+  $('#filterKeyword')?.addEventListener('input', ()=>{ applyNewsFilters(); });
 
-  // Status / level / class / roster changes
+  // Checkbox filter changes (status, level, source)
   $('#filters')?.addEventListener('change', e=>{
     if (e.target.classList.contains('select-all')){
       const on = e.target.checked;
@@ -777,16 +983,97 @@ document.addEventListener('DOMContentLoaded', async ()=>{
     applyNewsFilters();
   });
 
-  $('#filtersReset')?.addEventListener('click', e=>{ e.preventDefault(); resetFilters(); applyNewsFilters(); });
+  $('#filtersReset')?.addEventListener('click',  e=>{ e.preventDefault(); resetFilters(); applyNewsFilters(); });
   $('#filtersReset2')?.addEventListener('click', e=>{ e.preventDefault(); resetFilters(); applyNewsFilters(); });
 
-  // Load headlines (demo JSON inline)
-  try{
-    const raw = $('#news-json')?.textContent || '{}';
-    const data = JSON.parse(raw);
-    ALL_NEWS = Array.isArray(data.items) ? data.items : [];
-  }catch{ ALL_NEWS = []; }
-  renderNewsLists();
+  // ── News loading ──────────────────────────────────────────────────────────
+  // HSID is resolved from window.SCHOOL_CONFIG which is populated by
+  // school-config.js.  school-config.js reads CURRENT_HSID which is set
+  // per-microsite (subdomain → HSID mapping is a TODO in school-config.js).
+  const hsid = window.SCHOOL_CONFIG?.hsid;
+  let currentPage = 1;
+  const PER_PAGE  = 30;
+  let newsHasMore = false;
+
+  /**
+   * Fetch a page of articles from /api/news-articles.
+   * On the first page this replaces ALL_NEWS; subsequent pages append.
+   * Falls back to the embedded demo data when the API is unavailable.
+   */
+  async function loadNewsPage(pageNum){
+    // Guard: if we somehow have no HSID, fall back immediately
+    if (!hsid){
+      console.warn('[news] No HSID – using embedded demo data.');
+      loadFromEmbedded();
+      return;
+    }
+
+    try {
+      const url = `/api/news-articles?hsid=${encodeURIComponent(hsid)}&page=${pageNum}&pageSize=${PER_PAGE}`;
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+
+      const articles = Array.isArray(data.articles) ? data.articles.map(normaliseArticle) : [];
+
+      if (pageNum === 1){
+        ALL_NEWS = articles;
+      } else {
+        ALL_NEWS = ALL_NEWS.concat(articles);
+      }
+
+      newsHasMore   = data.hasMore || false;
+      currentPage   = pageNum;
+
+      const btn = $('#loadMoreBtn');
+      if (btn) btn.style.display = newsHasMore ? '' : 'none';
+
+      populateFilterOptions();
+      renderNewsLists();
+    } catch(err){
+      console.error('[news] API fetch failed:', err);
+      if (pageNum === 1){
+        // ── Loading bug fix: always clear loading state even on error ──
+        loadFromEmbedded();
+      }
+      // On pagination errors simply hide the Load More button
+      const btn = $('#loadMoreBtn');
+      if (btn) btn.style.display = 'none';
+    }
+  }
+
+  /** Load articles from the embedded demo JSON (fallback / development) */
+  function loadFromEmbedded(){
+    // ── Demo-data safety indicators ──────────────────────────────────────────
+    // Show a visible on-page banner so fallback content is never mistaken for
+    // live data, and emit a loud console warning for developers.
+    const banner = document.getElementById('demoBanner');
+    if (banner) banner.style.display = '';
+    console.warn(
+      '%c[YAT?STATS] DEMO DATA MODE',
+      'background:#7c3a00;color:#fff;font-weight:bold;padding:2px 6px',
+      '— The /api/news-articles endpoint could not be reached. ' +
+      'The page is displaying embedded sample articles, NOT live database content. ' +
+      'Ensure NEON_DATABASE_URL is set and the Vercel function is deployed.'
+    );
+    try{
+      const raw  = $('#news-json')?.textContent || '{}';
+      const data = JSON.parse(raw);
+      ALL_NEWS   = Array.isArray(data.items) ? data.items.map(normaliseArticle) : [];
+    }catch{
+      ALL_NEWS = [];
+    }
+    populateFilterOptions();
+    renderNewsLists();
+  }
+
+  // Load More button
+  $('#loadMoreBtn')?.addEventListener('click', async ()=>{
+    if (newsHasMore) await loadNewsPage(currentPage + 1);
+  });
+
+  // Initial load
+  loadNewsPage(1).catch(err => console.error('[news] Initial load failed:', err));
 
   // Load linescores from CSV or fallback
   const mount = document.getElementById('scoresMount');
