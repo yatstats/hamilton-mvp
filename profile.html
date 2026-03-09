@@ -427,6 +427,44 @@ body.light-theme .card-block{box-shadow:0 8px 18px rgba(0,0,0,.12);}
 /* gallery placeholder */
 .gallery-note{font-size:14px;line-height:1.5;margin-top:6px}
 
+/* GAME LOG */
+.game-log-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}
+.game-log-header .card-title{margin-bottom:0}
+.game-log-team{font:700 14px "Bebas Neue",sans-serif;letter-spacing:.04em;opacity:.9}
+.game-schedule-msg{font-size:14px;opacity:.8;text-align:center;padding:18px 0}
+
+/* CAREER PATH */
+.career-path-section{
+  background:var(--card-bg);
+  border-radius:16px;
+  padding:14px;
+  margin-top:12px;
+  box-shadow:0 8px 18px rgba(0,0,0,.35);
+}
+body.light-theme .career-path-section{box-shadow:0 8px 18px rgba(0,0,0,.12);}
+.career-path-title{
+  font:400 11px "Bebas Neue",sans-serif;
+  letter-spacing:.1em;
+  text-transform:uppercase;
+  color:var(--muted);
+  margin-bottom:6px;
+}
+.career-path-divider{border:none;border-top:1px solid var(--line);margin:0 0 12px}
+.career-path-stops{display:flex;flex-wrap:wrap;gap:18px;padding:4px 0}
+.career-stop{display:flex;flex-direction:column;align-items:center;gap:6px;min-width:60px}
+.career-stop-dot{
+  width:14px;height:14px;border-radius:50%;
+  border:2px solid var(--muted);background:transparent;flex-shrink:0;
+}
+.career-stop-name{
+  font:700 9px "Bebas Neue",sans-serif;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  text-align:center;
+  max-width:72px;
+  word-break:break-word;
+}
+
 /* FOOTER sponsor */
 .site-footer{
   position:fixed;
@@ -595,6 +633,10 @@ const $$ = s => Array.from(document.querySelectorAll(s));
 
 const FAVORITES_KEY = 'YAT_FAN_FAVORITES_V1';
 const SUPERFAN_KEY  = 'YAT_SUPERFAN_DASHBOARD_V1';
+
+function escHTML(str){
+  return String(str ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
 
 async function loadCSV(url){
   const res = await fetch(url);
@@ -910,7 +952,8 @@ function populateTabs(player){
 
     <div class="tabs-wrapper">
       <nav class="back-nav">
-        <button class="back-nav-link active" data-tab="stats">SEASON & CAREER STATS</button>
+        <button class="back-nav-link active" data-tab="gamelog">GAME LOG</button>
+        <button class="back-nav-link" data-tab="stats">STATS</button>
         <button class="back-nav-link" data-tab="news">NEWS & VIDEOS</button>
         <button class="back-nav-link" data-tab="social">SOCIAL MEDIA</button>
         <button class="back-nav-link" data-tab="mentor">MENTORSHIP MARKETPLACE</button>
@@ -919,7 +962,8 @@ function populateTabs(player){
     </div>
 
     <section class="profile-panels">
-      <div class="tab-panel active" data-tab="stats" id="tabStats">
+      <div class="tab-panel active" data-tab="gamelog" id="tabGameLog"></div>
+      <div class="tab-panel" data-tab="stats" id="tabStats">
         ${generateStatsGridHTML(player)}
       </div>
       <div class="tab-panel" data-tab="news" id="tabNews"></div>
@@ -939,7 +983,9 @@ function populateTabs(player){
   function showTab(id){
     links.forEach(l=>l.classList.toggle('active', l.dataset.tab===id));
     panels.forEach(p=>p.classList.toggle('active', p.dataset.tab===id));
-    if (id === 'stats'){
+    if (id === 'gamelog'){
+      renderGameLogTab(player);
+    } else if (id === 'stats'){
       $('#tabStats').innerHTML = generateStatsGridHTML(player);
     } else if (id === 'news'){
       renderNewsTab(player);
@@ -955,6 +1001,71 @@ function populateTabs(player){
   links.forEach(link=>{
     link.addEventListener('click', ()=>showTab(link.dataset.tab));
   });
+  // render default tab
+  renderGameLogTab(player);
+}
+
+function renderGameLogTab(player){
+  const panel = $('#tabGameLog');
+  if (!panel) return;
+
+  const team = player.team || '';
+  const teamDisplay = escHTML(team || 'this team');
+
+  // Game schedule section
+  let scheduleHTML;
+  if (player.next_game_date || player.next_game_opponent){
+    const date = escHTML(player.next_game_date || '');
+    const time = escHTML(player.next_game_time || '');
+    const opp  = escHTML(player.next_game_opponent || '');
+    scheduleHTML = `<div style="font-size:13px;padding:8px 0;">
+      <strong>NEXT GAME</strong><br>
+      ${date}${time ? ' • ' + time : ''}${opp ? '<br>' + opp : ''}
+    </div>`;
+  } else {
+    scheduleHTML = `<p class="game-schedule-msg">Schedule not yet available for ${teamDisplay}.</p>`;
+  }
+
+  // Career path: build from colleges and org, filtering out UNKNOWN/blank values
+  const isUnknown = v => {
+    if (v == null || typeof v !== 'string') return true;
+    const u = v.trim().toUpperCase();
+    return u === '' || u === 'UNKNOWN' || u === '--' || u === 'N/A';
+  };
+
+  const collegeStops = (player.colleges || '')
+    .split(/[,;]/)
+    .map(c => c.trim())
+    .filter(c => !isUnknown(c));
+
+  const orgStop = (player.org || '').trim();
+  const orgValid = !isUnknown(orgStop) ? orgStop : '';
+
+  const careerStops = [...collegeStops];
+  if (orgValid && !careerStops.some(s => s.toUpperCase() === orgValid.toUpperCase())) careerStops.push(orgValid);
+
+  const careerPathHTML = careerStops.length > 0 ? `
+    <div class="career-path-section">
+      <div class="career-path-title">CAREER PATH</div>
+      <hr class="career-path-divider">
+      <div class="career-path-stops">
+        ${careerStops.map(stop => `
+          <div class="career-stop">
+            <div class="career-stop-dot"></div>
+            <div class="career-stop-name">${escHTML(stop)}</div>
+          </div>`).join('')}
+      </div>
+    </div>` : '';
+
+  panel.innerHTML = `
+    <div class="card-block">
+      <div class="game-log-header">
+        <div class="card-title"><i class="ri-calendar-line"></i> GAME LOG</div>
+        <div class="game-log-team">${teamDisplay}</div>
+      </div>
+      ${scheduleHTML}
+    </div>
+    ${careerPathHTML}`;
 }
 
 function renderNewsTab(player){
