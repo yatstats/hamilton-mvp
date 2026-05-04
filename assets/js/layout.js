@@ -11,6 +11,9 @@ const NAV_ITEMS = [
   { href: 'faq.html', thin: '', bold: 'FAQ’S' },
 ];
 
+let galleryFlipAllActive = false;
+let galleryFlipAllObserver = null;
+
 function tokenReplace(str, config){
   return str
     .replace(/\{\{SCHOOL_NAME\}\}/gi, config.name || '')
@@ -62,6 +65,56 @@ function applySchoolBranding(root = document) {
     .replace(/5004/gi, config.hsid || '');
 }
 
+function setGalleryCardsFlipped(shouldFlip) {
+  document.querySelectorAll('#cardGrid .card').forEach((card) => {
+    card.classList.toggle('is-flipped', shouldFlip);
+  });
+}
+
+function syncGalleryFlipAllButton() {
+  const btn = document.querySelector('#flipAllCards');
+  if (!btn) return;
+
+  btn.setAttribute('aria-pressed', String(galleryFlipAllActive));
+  btn.setAttribute(
+    'aria-label',
+    galleryFlipAllActive ? 'Flip all cards to front' : 'Flip all cards to back'
+  );
+  btn.title = galleryFlipAllActive ? 'Flip all to front' : 'Flip all to back';
+
+  const icon = btn.querySelector('i');
+  if (icon) {
+    icon.className = galleryFlipAllActive ? 'ri-arrow-go-back-line' : 'ri-flip-horizontal-line';
+  }
+}
+
+function setupGalleryFlipAll() {
+  const grid = document.querySelector('#cardGrid');
+  const heroActions = document.querySelector('.hero-right');
+  if (!grid || !heroActions || document.querySelector('#flipAllCards')) return;
+
+  const btn = document.createElement('button');
+  btn.id = 'flipAllCards';
+  btn.type = 'button';
+  btn.className = 'hero-icon icon-btn';
+  btn.innerHTML = '<i class="ri-flip-horizontal-line"></i>';
+
+  heroActions.prepend(btn);
+  syncGalleryFlipAllButton();
+
+  btn.addEventListener('click', () => {
+    galleryFlipAllActive = !galleryFlipAllActive;
+    setGalleryCardsFlipped(galleryFlipAllActive);
+    syncGalleryFlipAllButton();
+  });
+
+  if (galleryFlipAllObserver) galleryFlipAllObserver.disconnect();
+  galleryFlipAllObserver = new MutationObserver(() => {
+    if (galleryFlipAllActive) setGalleryCardsFlipped(true);
+  });
+  galleryFlipAllObserver.observe(grid, { childList: true });
+}
+
 function wireLayoutToggles() {
   const drawerMask = document.querySelector('.drawer-mask');
   drawerMask?.addEventListener('click', () => {
@@ -101,4 +154,5 @@ document.addEventListener('DOMContentLoaded', () => {
   hydrateNav();
   applySchoolBranding();
   wireLayoutToggles();
+  setupGalleryFlipAll();
 });
